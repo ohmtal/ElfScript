@@ -1282,6 +1282,7 @@ public:
       }
       else
       {
+            //XXTH FIXME
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, false, &cb);
 //          evt->populateArgs(mArgv);
@@ -1295,7 +1296,19 @@ public:
    }   
 };
 
+
+//------------------------------------------------------------------------------
+// XXTH TGE Compat! but better
+// NOTE: better use: DefineEngineMethod
+#define ConsoleMethod(className, name, returnType, minArgs, maxArgs, usage) \
+      ConsoleMethod(className, name, returnType, minArgs, maxArgs, usage)
+
+// NOTE: better use: DefineEngineFunction
+#define ConsoleFunction(name,returnType,minArgs,maxArgs,usage) \
+       DefineEngineStringlyVariadicFunction(name,returnType,minArgs,maxArgs,usage)
+
+//------------------------------------------------------------------------------
+
 // Re-enable some VC warnings we disabled for this file.
 #pragma warning( pop ) // 4510 and 4610
-
 #endif // !_ENGINEAPI_H_

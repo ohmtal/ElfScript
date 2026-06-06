@@ -116,6 +116,29 @@ void init()
 
     // Hook in for UDP notification
     // Net::getPacketReceiveEvent().notify(GNet, &NetInterface::processPacketReceiveEvent);
+
+
+     Sim::init();
+}
+
+void shutDown() {
+    Platform::shutdown();
+    NetStringTable::destroy();
+    Con::shutdown();
+
+    _StringTable::destroy();
+    FrameAllocator::destroy();
+//     Net::shutdown();
+//     Sampler::destroy();
+//
+//     ManagedSingleton< ThreadManager >::deleteSingleton();
+
+    // asserts should be destroyed LAST
+    PlatformAssert::destroy();
+
+    Sim::shutdown();
+
+    engineAPI::gIsInitialized = false;
 }
 
 DefineEngineFunction(helloWorld, void, (String name), , "hello world")
@@ -133,11 +156,19 @@ int main() {
         error("This is NOT a error!");
         warn("This is NOT a warning!");
         echo( 5 + 5 );
+
+        function FOO::bar(%this) {
+            %this.dump();
+        }
+        $foo = new ScriptObject() { class = "FOO"; };
+        $foo.userValue = 4711;
+        $foo.bar();
+        echo(mSin(3.14));
     )";
     Con::evaluatef(code.c_str());
+
+    // ------ output log entries:
     ConsoleLogEntry *log;
-
-
     U32 size;
 
     Con::getLockLog(log, size);
@@ -146,6 +177,8 @@ int main() {
         ConsoleLogEntry &entry = log[i];
         printf("%d:[%d]:[%d] %s\n", i,entry.mLevel, entry.mType, entry.mString);
     }
+    // -------- finallize
+    shutDown();
 
     return 0;
 }
