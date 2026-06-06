@@ -125,7 +125,7 @@ DefineEngineFunction(helloWorld, void, (String name), , "hello world")
 
 
 int main() {
-    printf("Hello World\n");
+    printf("Startup ....\n");
     init();
     // filesystem not implemented   Con::setLogMode(0);
     std::string code= R"(
