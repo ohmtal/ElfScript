@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #include "core/strings/stringFunctions.h"
-#include "platform/platform.h"
+// XXTH not required here ?  #include "platform/platform.h"
 
 
 #if defined(TORQUE_OS_WIN)

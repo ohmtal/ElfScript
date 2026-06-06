@@ -177,6 +177,8 @@ int main() {
         ConsoleLogEntry &entry = log[i];
         printf("%d:[%d]:[%d] %s\n", i,entry.mLevel, entry.mType, entry.mString);
     }
+
+    Con::unlockLog();
     // -------- finallize
     shutDown();
 

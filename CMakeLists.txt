@@ -206,10 +206,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE "./" )
 #     core/strings/stringFunctions.h
 #     core/strings/stringUnit.cpp
 #     core/strings/stringUnit.h
-#     core/strings/unicode.cpp
-#     core/strings/unicode.h
 #
 #     core/util/tVector.cpp
+#     platform/XXTHMemory.cpp
+#     core/util/str.cpp
 # )
 #
 #
