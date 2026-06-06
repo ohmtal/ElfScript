@@ -209,4 +209,3 @@ add_executable(HelloConsole main.cpp
 
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "./" )
-target_include_directories(${PROJECT_NAME} PRIVATE "./lib/tinyxml2" )

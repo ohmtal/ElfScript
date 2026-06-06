@@ -51,9 +51,7 @@
 #ifndef _SIMOBJECTREF_H_
    #include "console/simObjectRef.h"
 #endif
-#ifndef TINYXML_INCLUDED
-   #include "tinyxml2.h"
-#endif
+
 
 #ifndef _CONSOLFUNCTIONS_H_
 #include "console/consoleFunctions.h"

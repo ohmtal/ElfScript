@@ -38,52 +38,9 @@
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
-//FIXME ? #include "gui/editor/guiInspector.h"
 #include "console/script.h"
 
 #include "sim/netObject.h"
-
-// ImplementBitfieldType(GameTypeMasksType,
-//    "The type of animation effect to apply to this material.\n"
-//    "@ingroup GFX\n\n")
-// { SceneObjectTypes::StaticObjectType, "$TypeMasks::StaticObjectType", "Static Objects.\n" },
-// { SceneObjectTypes::EnvironmentObjectType, "$TypeMasks::EnvironmentObjectType" , "Objects considered part of the background or environment of a level.\n" },
-// { SceneObjectTypes::TerrainObjectType, "$TypeMasks::TerrainObjectType" , "Terrain Objects.\n" },
-// { SceneObjectTypes::WaterObjectType, "$TypeMasks::WaterObjectType", "Water Objects.\n" },
-// { SceneObjectTypes::TriggerObjectType, "$TypeMasks::TriggerObjectType", "Interactive Trigger Objects.\n" },
-// { SceneObjectTypes::MarkerObjectType, "$TypeMasks::MarkerObjectType", "Marker Objects, utilized primarily for tooling.\n" },
-// { SceneObjectTypes::LightObjectType, "$TypeMasks::LightObjectType", "Lights.\n" },
-// { SceneObjectTypes::ZoneObjectType, "$TypeMasks::ZoneObjectType", "zones.\n" },
-// { SceneObjectTypes::StaticShapeObjectType, "$TypeMasks::StaticShapeObjectType", "Static Shape Objects. Distinct from StaticObjectType in that Static Shapes have additional functionality and behaviors.\n" },
-// { SceneObjectTypes::DynamicShapeObjectType, "$TypeMasks::DynamicShapeObjectType", "Any sort of Dynamic Object.\n" },
-// { SceneObjectTypes::GameBaseObjectType, "$TypeMasks::GameBaseObjectType", "Any Gamebase-based Objects. Objects generally associated to gameplay functionality.\n" },
-// { SceneObjectTypes::GameBaseHiFiObjectType, "$TypeMasks::GameBaseHiFiObjectType", "Specialised Gamebase-based Objects. currently narrowly used. if at all.\n" },
-// { SceneObjectTypes::ShapeBaseObjectType, "$TypeMasks::ShapeBaseObjectType", "Any Gamebase-based Objects. Objects generally associated to gameplay functionality.\n" },
-// { SceneObjectTypes::CameraObjectType, "$TypeMasks::CameraObjectType", "Camera Objects.\n" },
-// { SceneObjectTypes::PlayerObjectType, "$TypeMasks::PlayerObjectType", "Player Objects.\n" },
-// { SceneObjectTypes::ItemObjectType, "$TypeMasks::ItemObjectType", "Item Objects.\n" },
-// { SceneObjectTypes::VehicleObjectType, "$TypeMasks::VehicleObjectType", "Any sort of Vehicle Object.\n" },
-// { SceneObjectTypes::VehicleBlockerObjectType, "$TypeMasks::VehicleBlockerObjectType", "\n" },
-// { SceneObjectTypes::ProjectileObjectType, "$TypeMasks::ProjectileObjectType", "Projectiles.\n" },
-// { SceneObjectTypes::ExplosionObjectType, "$TypeMasks::ExplosionObjectType", "Explosion and Effects.\n" },
-// { SceneObjectTypes::CorpseObjectType, "$TypeMasks::CorpseObjectType", "Corpses of controlled objects.\n" },
-// { SceneObjectTypes::DebrisObjectType, "$TypeMasks::DebrisObjectType", "Debris or debris-like things such as shell casings.\n" },
-// { SceneObjectTypes::PhysicalZoneObjectType, "$TypeMasks::PhysicalZoneObjectType", "Physical Zones. Distinct from triggers in that they have physics forces applications.\n" },
-// { SceneObjectTypes::EntityObjectType, "$TypeMasks::EntityObjectType", "A generic entity.\n" },
-// { SceneObjectTypes::InteriorLikeObjectType, "$TypeMasks::InteriorLikeObjectType", "InteriorLikeObjectType (deprecated).\n" },
-// { SceneObjectTypes::TerrainLikeObjectType, "$TypeMasks::TerrainLikeObjectType", "Pseudo-terrains, like groundplanes, or meshroads.\n" },
-// #if defined(AFX_CAP_AFXMODEL_TYPE)
-// { SceneObjectTypes::afxModelObjectType, "afxModelObjectType", "afx-specific model typemask.\n" },
-// #else
-// { SceneObjectTypes::N_A_27, "$TypeMasks::N_A_27", "unused 27th bit.\n" },
-// #endif
-// { SceneObjectTypes::N_A_28, "$TypeMasks::N_A_28", "unused 28th bit.\n" },
-// { SceneObjectTypes::PathShapeObjectType, "$TypeMasks::PathShapeObjectType", "Path-following Objects.\n" },
-// { SceneObjectTypes::TurretObjectType, "$TypeMasks::TurretObjectType", "Turret Objects.\n" },
-// { SceneObjectTypes::N_A_31, "$TypeMasks::N_A_31", "unused 31st bit.\n" },
-// { SceneObjectTypes::AIObjectType, "$TypeMasks::AIObjectType", "AIObjectType.\n" },
-//
-// EndImplementBitfieldType;
 
 IMPLEMENT_CONOBJECT( SimObject );
 
