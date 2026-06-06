@@ -37,15 +37,15 @@
    #include "core/bitSet.h"
 #endif
 
-// WTF ?
+
 // #ifndef _TAML_CALLBACKS_H_
 // #include "persistence/taml/tamlCallbacks.h"
 // #endif
 
 //FIXME ?
-#ifndef _OBJECTTYPES_H_
-#include "T3D/objectTypes.h"
-#endif
+// #ifndef _OBJECTTYPES_H_
+// #include "T3D/objectTypes.h"
+// #endif
 
 class Stream;
 class LightManager;
@@ -1013,8 +1013,8 @@ public:
    virtual void reloadReset() { }
 };
 
-typedef SceneObjectTypes GameTypeMasksType;
-DefineBitfieldType(GameTypeMasksType);
+// typedef SceneObjectTypes GameTypeMasksType;
+// DefineBitfieldType(GameTypeMasksType);
 
 /// Smart SimObject pointer.
 ///
