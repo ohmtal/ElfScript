@@ -179,6 +179,10 @@ set(CORE_SRC
     sim/netStringTable.cpp
     # util
     util/messaging/message.cpp
+    # math
+    # math/mConsoleFunctions.cpp
+    # math/mRandom.cpp
+    # # math/
 )
 # torqueAddSourceDirectories("math" "math/util" "math/public" "math/impl")
 file(GLOB MATH_SRC "math/*.cpp")
