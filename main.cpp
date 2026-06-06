@@ -163,7 +163,7 @@ int main() {
         $foo = new ScriptObject() { class = "FOO"; };
         $foo.userValue = 4711;
         $foo.bar();
-        echo(mSin(3.14));
+        echo(mSin(3.14)); //math not impemented so far
     )";
     Con::evaluatef(code.c_str());
 

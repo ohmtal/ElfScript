@@ -121,12 +121,6 @@ set(CONSOLE_SRC
     console/torquescript/parser.h
     console/torquescript/runtime.cpp
     console/torquescript/runtime.h
-
-
-    # sim
-    sim/netStringTable.cpp
-    # util
-    util/messaging/message.cpp
 )
 
 set(CORE_SRC
@@ -180,6 +174,11 @@ set(CORE_SRC
     platform/platformAssert.cpp
     platform/XXTHMemory.cpp
     platform/XXTHPlatformProcess.cpp
+
+    # sim
+    sim/netStringTable.cpp
+    # util
+    util/messaging/message.cpp
 )
 # torqueAddSourceDirectories("math" "math/util" "math/public" "math/impl")
 file(GLOB MATH_SRC "math/*.cpp")
@@ -190,13 +189,31 @@ file(GLOB MATH_PUPLIC_SRC "math/impl/*.cpp")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
 
-add_executable(HelloConsole main.cpp
+add_executable(${PROJECT_NAME} main.cpp
     ${CONSOLE_SRC}
     ${CORE_SRC}
     # ${MATH_PUPLIC_SRC}
     # ${MATH_SRC}
     # ${SRC_THREAD}
-
-
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "./" )
+
+# --------------- string only test ----------------
+# set(STR_SRC
+#     core/strings/findMatch.cpp
+#     core/strings/findMatch.h
+#     core/strings/stringFunctions.cpp
+#     core/strings/stringFunctions.h
+#     core/strings/stringUnit.cpp
+#     core/strings/stringUnit.h
+#     core/strings/unicode.cpp
+#     core/strings/unicode.h
+#
+#     core/util/tVector.cpp
+# )
+#
+#
+# add_executable(StrTest strTest.cpp
+#     ${STR_SRC}
+# )
+# target_include_directories(StrTest PRIVATE "./" )
