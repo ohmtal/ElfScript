@@ -41,7 +41,7 @@
 #define TORQUE_APP_VERSION         1000
 
 /// Human readable application version string.
-#define TORQUE_APP_VERSION_STRING  "1.0.0.0"
+#define TORQUE_APP_VERSION_STRING  "26.06.06.0"
 
 /// Define me if you want to enable Arcane FX support.
 // #define TORQUE_AFX_ENABLED

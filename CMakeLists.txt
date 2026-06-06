@@ -30,8 +30,6 @@ set(CONSOLE_SRC
     console/consoleTypes.cpp
     console/consoleTypes.h
     console/consoleValueStack.h
-    # console/consoleXMLExport.cpp
-    # console/consoleXMLExport.h
     console/debugOutputConsumer.cpp
     console/debugOutputConsumer.h
     console/dynamicTypes.cpp
@@ -52,15 +50,12 @@ set(CONSOLE_SRC
     console/engineTypeInfo.h
     console/engineTypes.cpp
     console/engineTypes.h
-    # console/engineXMLExport.cpp
     console/fieldBrushObject.cpp
     console/fieldBrushObject.h
     console/fileSystemFunctions.cpp
     console/fixedTuple.h
     console/ICallMethod.h
     console/module.h
-    # console/persistenceManager.cpp
-    # console/persistenceManager.h
     console/propertyParsing.cpp
     console/propertyParsing.h
     console/returnBuffer.cpp
@@ -89,8 +84,6 @@ set(CONSOLE_SRC
     console/simObject.h
     console/simObjectList.cpp
     console/simObjectList.h
-    # console/simObjectMemento.cpp
-    # console/simObjectMemento.h
     console/simObjectRef.h
     console/simPersistID.cpp
     console/simPersistID.h
@@ -99,8 +92,6 @@ set(CONSOLE_SRC
     console/simSerialize.cpp
     console/simSet.cpp
     console/simSet.h
-    # console/SimXMLDocument.cpp
-    # console/SimXMLDocument.h
     console/stringStack.cpp
     console/stringStack.h
     # console/telnetConsole.cpp
