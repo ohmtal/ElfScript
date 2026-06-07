@@ -32,6 +32,7 @@ if (BUILD_ELFSCRIPT)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
     add_executable(${TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demoMain.cpp
         ${ELFSCRIPT_SRC}
+        ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
     target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" )
 endif()
