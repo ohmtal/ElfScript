@@ -37,7 +37,7 @@ MODULE_BEGIN( TelnetConsole )
    {
       TelnetConsole::create();
    }
-   
+
    MODULE_SHUTDOWN
    {
       TelnetConsole::destroy();

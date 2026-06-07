@@ -11,8 +11,8 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/console.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleInternal.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleInternal.h
-    ${CMAKE_CURRENT_LIST_DIR}/console/consoleLogger.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/consoleLogger.h
+    # ${CMAKE_CURRENT_LIST_DIR}/console/consoleLogger.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/consoleLogger.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleObject.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleParser.cpp
@@ -20,8 +20,8 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleTypes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleTypes.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleValueStack.h
-    ${CMAKE_CURRENT_LIST_DIR}/console/debugOutputConsumer.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/debugOutputConsumer.h
+    # ${CMAKE_CURRENT_LIST_DIR}/console/debugOutputConsumer.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/debugOutputConsumer.h
     ${CMAKE_CURRENT_LIST_DIR}/console/dynamicTypes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/dynamicTypes.h
     ${CMAKE_CURRENT_LIST_DIR}/console/engineAPI.h
@@ -40,8 +40,8 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypeInfo.h
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.h
-    ${CMAKE_CURRENT_LIST_DIR}/console/fieldBrushObject.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/fieldBrushObject.h
+    # ${CMAKE_CURRENT_LIST_DIR}/console/fieldBrushObject.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/fieldBrushObject.h
     ${CMAKE_CURRENT_LIST_DIR}/console/fileSystemFunctions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/fixedTuple.h
     ${CMAKE_CURRENT_LIST_DIR}/console/ICallMethod.h
