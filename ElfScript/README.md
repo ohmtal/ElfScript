@@ -10,20 +10,21 @@ Commands like exec (file) or mSin (math) should be optional and added as
 
 ## Step by Step
 
-1.) Platform
+1.) Platform **DONE** 
 
     platform/types.h 
     platfrom/platformMemory.h /cpp
     plattform/platform.h and stub
     platform/platformAssert.h stub
 
-2.) Core start
+2.) Core start **DONE**
 
     frameAllocator
     datachunker
     
-3.) String, StringFunctions and StringTable
+3.) String, StringFunctions and StringTable  **DONE**
 
     stringtable
     stringfunctions
 
+4.) ... will see whats next ;) ...

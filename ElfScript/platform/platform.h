@@ -119,11 +119,7 @@
 #ifndef String
 #pragma message("FIXME FAKE String class")
       using  String =  std::string;
-      class StringTableClass {
-      public:
-            StringTableEntry insert(const char* ) { return ""; }
-      };
-      static StringTableClass* StringTable = new StringTableClass();
+
 #endif
 #ifndef Vector
 #pragma message("FIXME FAKE Vector class")

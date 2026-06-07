@@ -1,5 +1,6 @@
 #include "platform/types.h"
 #include "platform/platformAssert.h"
+#include "core/stringTable.h"
 
 // ---- FIXME fake stub stuff -------------
 #include <cstdio>

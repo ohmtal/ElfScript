@@ -1,11 +1,14 @@
 #include <cstdio>
 #include "platform/platform.h"
+#include "core/frameAllocator.h"
+#include "core/strings/stringFunctions.h"
+#include "core/stringTable.h"
 
 int main() {
 
     printf("Startup ....\n");
 
-    printf("1. Platform -----------------------------------------\n");
+    printf("\n1. Platform -----------------------------------------\n");
     // types loaded ?
     S32 myInt = -66; U32 myUInt = 66; F32 myFloat = 66.66f;
     char myChar[66];
@@ -20,7 +23,19 @@ int main() {
     printf(" * Platform Stub test:"); Platform::postQuitMessage(0);
 
 
+    printf("\n2. Basic Core -----------------------------------------\n");
+    AlignedBufferAllocator<U32> alloc32;
+    alloc32.initWithElements(new U32[10], 10);
+    void* ptr = alloc32.allocBytes(2);
+    // Reset back to start
+    alloc32.setPosition(0);
+    printf(" * frameAllocator test: size=%d (10) pointer:%p\n"
+        , alloc32.getSize(), (void*) ptr);
 
-    // Bye Bye
+    printf("\n3. StringTable && stringFunctions ------------------------\n");
+    printf(" * Test stringFunctions: %d %f\n", dAtoi("66"), dAtof("66.66"));
+    printf(" * Test stringTable: %s\n", StringTable->insert("Hello World - ElfScript"));
+
+    printf("\n:: Bye Bye - reached the end. good sign -----------------\n");
     return 0;
 }
