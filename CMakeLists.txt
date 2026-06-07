@@ -17,6 +17,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
 add_executable(${PROJECT_NAME} main.cpp
     ${TORQUESCRIPT_SRC}
+    ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHPlatformProcess.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE "./" )
 

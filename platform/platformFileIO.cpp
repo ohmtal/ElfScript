@@ -551,6 +551,7 @@ StringTableEntry Platform::makeRelativePathName(const char *path, const char *to
 
 static StringTableEntry tryStripBasePath(const char *path, const char *base)
 {
+   if (!path || !base) return NULL; //XXTH
    U32 len = dStrlen(base);
    if(dStrnicmp(path, base, len) == 0)
    {

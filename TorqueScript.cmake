@@ -163,7 +163,7 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/platform/platformFileIO.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/platformAssert.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHMemory.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHPlatformProcess.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHPlatformProcess.cpp
 
     # sim
     ${CMAKE_CURRENT_LIST_DIR}/sim/netStringTable.cpp

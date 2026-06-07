@@ -55,7 +55,7 @@ namespace Platform
 
    // StringTableEntry getMainDotCsDir() {
    //    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-   //    return nullptr;
+   //    return StringTable->insert("");
    // }
 
    // /// Set main.tscript directory. Used in runEntryScript()
@@ -251,13 +251,13 @@ bool setCurrentDirectory(StringTableEntry newDir)
 StringTableEntry getExecutableName()
 {
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-   return nullptr;
+    return StringTable->insert("");
 }
 
 StringTableEntry getExecutablePath()
 {
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-   return nullptr;
+    return StringTable->insert("");
 }
 
 bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth )
