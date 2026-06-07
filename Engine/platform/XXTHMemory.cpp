@@ -84,7 +84,6 @@ void* dRealloc_r(void* in_pResize, dsize_t in_size, const char* fileName, const 
 }
 
 // -------------------------------------------------------------------------------------------
-// FIXME X86 only !!!
 void *dMalloc_aligned(dsize_t in_size, int alignment)
 {
 #if defined(_MSC_VER)
@@ -111,12 +110,3 @@ void dFree_aligned(void* p)
 #endif
 }
 
-// void *dMalloc_aligned(dsize_t in_size, int alignment)
-// {
-//    return _mm_malloc(in_size, alignment);
-// }
-//
-// void dFree_aligned(void* p)
-// {
-//    return _mm_free(p);
-// }
