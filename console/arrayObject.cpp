@@ -24,7 +24,7 @@
 #include "console/arrayObject.h"
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
-#include "math/mMathFn.h"
+// #include "math/mMathFn.h"
 
 
 IMPLEMENT_CONOBJECT(ArrayObject);
@@ -156,7 +156,7 @@ bool ArrayObject::_addKeyFromField( void *object, const char *index, const char 
 
 S32 ArrayObject::getIndexFromValue( const String &value ) const
 {
-   S32 currentIndex = mMax(mCurrentIndex, 0);
+   S32 currentIndex = std::max(mCurrentIndex, 0);
    S32 foundIndex = -1;
    for ( S32 i = currentIndex; i < mArray.size(); i++ )
    {
@@ -186,7 +186,7 @@ S32 ArrayObject::getIndexFromValue( const String &value ) const
 
 S32 ArrayObject::getIndexFromKey( const String &key ) const
 {
-   S32 currentIndex = mMax(mCurrentIndex, 0);
+   S32 currentIndex = std::max(mCurrentIndex, 0);
    S32 foundIndex = -1;
    for ( S32 i = currentIndex; i < mArray.size(); i++ )
    {
@@ -216,7 +216,7 @@ S32 ArrayObject::getIndexFromKey( const String &key ) const
 
 S32 ArrayObject::getIndexFromKeyValue( const String &key, const String &value ) const
 {
-   S32 currentIndex = mMax(mCurrentIndex, 0);
+   S32 currentIndex = std::max(mCurrentIndex, 0);
    S32 foundIndex = -1;
    for ( S32 i = currentIndex; i < mArray.size(); i++ )
    {
@@ -308,7 +308,7 @@ void ArrayObject::push_front( const String &key, const String &value )
 
 void ArrayObject::insert( const String &key, const String &value, S32 index )
 {
-   index = mClamp( index, 0, mArray.size() );
+   index = std::clamp( index, 0, mArray.size() );
    mArray.insert( index, Element( key, value ) );
 }
 

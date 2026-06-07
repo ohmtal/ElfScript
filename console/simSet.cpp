@@ -34,7 +34,8 @@
 //FIXME #include "platform/profiler.h"
 #include "console/typeValidators.h"
 #include "core/frameAllocator.h"
-#include "math/mMathFn.h"
+// #include "math/mMathFn.h"
+#include "core/XXTHMath.h"
 
 
 IMPLEMENT_CONOBJECT_CHILDREN( SimSet );

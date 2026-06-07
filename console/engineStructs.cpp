@@ -24,28 +24,28 @@
 #include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "core/util/uuid.h"
-#include "core/color.h"
-#include "math/mPolyhedron.h"
+// #include "core/color.h"
+// #include "math/mPolyhedron.h"
 
-IMPLEMENT_STRUCT(PlaneF,
-   PlaneF, ,
-   "")
-
-   FIELD(x, x, 1, "")
-   FIELD(y, y, 1, "")
-   FIELD(z, z, 1, "")
-   FIELD(d, d, 1, "")
-
-END_IMPLEMENT_STRUCT;
-
-IMPLEMENT_STRUCT( PolyhedronData::Edge,
-   Edge,,
-   "" )
-
-   FIELD_AS(U32, face, face, 2, "")
-   FIELD_AS(U32, vertex, vertex, 2, "")
-
-END_IMPLEMENT_STRUCT;
+// IMPLEMENT_STRUCT(PlaneF,
+//    PlaneF, ,
+//    "")
+//
+//    FIELD(x, x, 1, "")
+//    FIELD(y, y, 1, "")
+//    FIELD(z, z, 1, "")
+//    FIELD(d, d, 1, "")
+//
+// END_IMPLEMENT_STRUCT;
+//
+// IMPLEMENT_STRUCT( PolyhedronData::Edge,
+//    Edge,,
+//    "" )
+//
+//    FIELD_AS(U32, face, face, 2, "")
+//    FIELD_AS(U32, vertex, vertex, 2, "")
+//
+// END_IMPLEMENT_STRUCT;
 
 
 IMPLEMENT_STRUCT(Torque::UUID,
@@ -61,28 +61,28 @@ IMPLEMENT_STRUCT(Torque::UUID,
 
 END_IMPLEMENT_STRUCT;
 
-IMPLEMENT_STRUCT( ColorI,
-   ColorI,,
-   "RGBA color quadruple in 8bit integer precision per channel." )
-   
-   FIELD( red, red, 1, "Red channel value." )
-   FIELD( green, green, 1, "Green channel value." )
-   FIELD( blue, blue, 1, "Blue channel value." )
-   FIELD( alpha, alpha, 1, "Alpha channel value." )
-   
-END_IMPLEMENT_STRUCT;
+// IMPLEMENT_STRUCT( ColorI,
+//    ColorI,,
+//    "RGBA color quadruple in 8bit integer precision per channel." )
+//
+//    FIELD( red, red, 1, "Red channel value." )
+//    FIELD( green, green, 1, "Green channel value." )
+//    FIELD( blue, blue, 1, "Blue channel value." )
+//    FIELD( alpha, alpha, 1, "Alpha channel value." )
+//
+// END_IMPLEMENT_STRUCT;
 
 
-IMPLEMENT_STRUCT( LinearColorF,
-   LinearColorF,,
-   "RGBA color quadruple in 32bit floating-point precision per channel." )
-
-   FIELD( red, red, 1, "Red channel value." )
-   FIELD( green, green, 1, "Green channel value." )
-   FIELD( blue, blue, 1, "Blue channel value." )
-   FIELD( alpha, alpha, 1, "Alpha channel value." )
-
-END_IMPLEMENT_STRUCT;
+// IMPLEMENT_STRUCT( LinearColorF,
+//    LinearColorF,,
+//    "RGBA color quadruple in 32bit floating-point precision per channel." )
+//
+//    FIELD( red, red, 1, "Red channel value." )
+//    FIELD( green, green, 1, "Green channel value." )
+//    FIELD( blue, blue, 1, "Blue channel value." )
+//    FIELD( alpha, alpha, 1, "Alpha channel value." )
+//
+// END_IMPLEMENT_STRUCT;
 
 // Vectors
 IMPLEMENT_STRUCT( Vector< bool >,
@@ -115,35 +115,35 @@ IMPLEMENT_STRUCT( Vector< F32 >,
 
 END_IMPLEMENT_STRUCT;
 
-IMPLEMENT_STRUCT( Vector< Point3F >,
-   Point3FVector,,
-   "" )
-
-   VectorFieldEngineExport::getElementCountField< Point3F >(),
-   VectorFieldEngineExport::getArraySizeField< Point3F >(),
-   VectorFieldEngineExport::getArrayField< Point3F >(),
-
-END_IMPLEMENT_STRUCT;
-
-IMPLEMENT_STRUCT(Vector< PlaneF >,
-   PlaneFVector, ,
-   "")
-
-   VectorFieldEngineExport::getElementCountField< PlaneF >(),
-   VectorFieldEngineExport::getArraySizeField< PlaneF >(),
-   VectorFieldEngineExport::getArrayField< PlaneF >(),
-
-END_IMPLEMENT_STRUCT;
-
-IMPLEMENT_STRUCT(Vector< PolyhedronData::Edge >,
-   EdgeVector, ,
-   "")
-
-   VectorFieldEngineExport::getElementCountField< PolyhedronData::Edge >(),
-   VectorFieldEngineExport::getArraySizeField< PolyhedronData::Edge >(),
-   VectorFieldEngineExport::getArrayField< PolyhedronData::Edge >(),
-
-END_IMPLEMENT_STRUCT;
+// IMPLEMENT_STRUCT( Vector< Point3F >,
+//    Point3FVector,,
+//    "" )
+//
+//    VectorFieldEngineExport::getElementCountField< Point3F >(),
+//    VectorFieldEngineExport::getArraySizeField< Point3F >(),
+//    VectorFieldEngineExport::getArrayField< Point3F >(),
+//
+// END_IMPLEMENT_STRUCT;
+//
+// IMPLEMENT_STRUCT(Vector< PlaneF >,
+//    PlaneFVector, ,
+//    "")
+//
+//    VectorFieldEngineExport::getElementCountField< PlaneF >(),
+//    VectorFieldEngineExport::getArraySizeField< PlaneF >(),
+//    VectorFieldEngineExport::getArrayField< PlaneF >(),
+//
+// END_IMPLEMENT_STRUCT;
+//
+// IMPLEMENT_STRUCT(Vector< PolyhedronData::Edge >,
+//    EdgeVector, ,
+//    "")
+//
+//    VectorFieldEngineExport::getElementCountField< PolyhedronData::Edge >(),
+//    VectorFieldEngineExport::getArraySizeField< PolyhedronData::Edge >(),
+//    VectorFieldEngineExport::getArrayField< PolyhedronData::Edge >(),
+//
+// END_IMPLEMENT_STRUCT;
 
 IMPLEMENT_STRUCT(Vector< const char* >,
    StringVector, ,

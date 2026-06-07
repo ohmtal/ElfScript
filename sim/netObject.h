@@ -31,9 +31,9 @@
 #ifndef _SIMBASE_H_
 #include "console/simBase.h"
 #endif
-#ifndef _MMATH_H_
-#include "math/mMath.h"
-#endif
+// #ifndef _MMATH_H_
+// #include "math/mMath.h"
+// #endif
 
 
 //-----------------------------------------------------------------------------
@@ -42,16 +42,16 @@ class NetObject;
 
 //-----------------------------------------------------------------------------
 
-struct CameraScopeQuery
-{
-   NetObject *camera;       ///< Pointer to the viewing object.
-   Point3F pos;             ///< Position in world space
-   Point3F orientation;     ///< Viewing vector in world space
-   F32 fov;                 ///< Viewing angle/2
-   F32 sinFov;              ///< sin(fov/2);
-   F32 cosFov;              ///< cos(fov/2);
-   F32 visibleDistance;     ///< Visible distance.
-};
+// struct CameraScopeQuery
+// {
+//    NetObject *camera;       ///< Pointer to the viewing object.
+//    Point3F pos;             ///< Position in world space
+//    Point3F orientation;     ///< Viewing vector in world space
+//    F32 fov;                 ///< Viewing angle/2
+//    F32 sinFov;              ///< sin(fov/2);
+//    F32 cosFov;              ///< cos(fov/2);
+//    F32 visibleDistance;     ///< Visible distance.
+// };
 
 struct GhostInfo;
 
@@ -335,7 +335,7 @@ public:
    /// @param  updateMask     Current update mask.
    /// @param  updateSkips    Number of ticks we haven't been updated for.
    /// @returns A floating point value indicating priority. These are typically < 5.0.
-   virtual F32 getUpdatePriority(CameraScopeQuery *focusObject, U32 updateMask, S32 updateSkips);
+   // virtual F32 getUpdatePriority(CameraScopeQuery *focusObject, U32 updateMask, S32 updateSkips);
 
    /// Instructs this object to pack its state for transfer over the network.
    ///
@@ -365,7 +365,7 @@ public:
    ///
    /// @param   cr         Net connection requesting scope information.
    /// @param   camInfo    Information about what this object can see.
-   virtual void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
+   // virtual void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
 
    /// Get the ghost index of this object.
    U32 getNetIndex() { return mNetIndex; }

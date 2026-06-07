@@ -38,9 +38,9 @@
 #include "core/util/journal/journal.h"
 // #include "gfx/gfxEnums.h"
 #include "core/util/uuid.h"
-#include "core/color.h"
-#include "math/mPoint3.h"
-#include "math/mathTypes.h"
+// #include "core/color.h"
+// #include "math/mPoint3.h"
+// #include "math/mathTypes.h"
 #include "torquescript/runtime.h"
 
 // This is a temporary hack to get tools using the library to

@@ -27,9 +27,9 @@
 #include "console/dynamicTypes.h"
 #endif
 
-#ifndef _MATHTYPES_H_
-#include "math/mathTypes.h"
-#endif
+// #ifndef _MATHTYPES_H_
+// #include "math/mathTypes.h"
+// #endif
 
 #ifndef _ENGINEPRIMITIVES_H_
 #include "console/enginePrimitives.h"
@@ -82,7 +82,7 @@ DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, const char*)
 
-DefineConsoleType(TypeRotationF, RotationF)
+// DefineConsoleType(TypeRotationF, RotationF)
 
 /// A universally unique identifier.
 DefineConsoleType( TypeUUID, Torque::UUID )

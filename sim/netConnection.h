@@ -28,9 +28,9 @@
 #ifndef _NETCONNECTION_H_
 #define _NETCONNECTION_H_
 
-#ifndef _MPOINT3_H_
-#include "math/mPoint3.h"
-#endif
+// #ifndef _MPOINT3_H_
+// #include "math/mPoint3.h"
+// #endif
 #ifndef _NETOBJECT_H_
 #include "sim/netObject.h"
 #endif

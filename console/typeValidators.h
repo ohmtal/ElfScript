@@ -23,9 +23,9 @@
 #ifndef _TYPEVALIDATORS_H_
 #define _TYPEVALIDATORS_H_
 
-#ifndef _MMATHFN_H_
-#include "math/mMathFn.h"
-#endif
+// #ifndef _MMATHFN_H_
+// #include "math/mMathFn.h"
+// #endif
 
 class TypeValidator
 {
@@ -53,8 +53,8 @@ class FRangeValidator : public TypeValidator
 public:
    FRangeValidator(F32 minValue, F32 maxValue, F32 fidelity = 0.0f)
    {
-      minV = mFabs(minValue) > F32_MIN ? minValue : 0.0f;
-      maxV = mFabs(maxValue) > F32_MIN ? maxValue : 0.0f;
+      minV = std::abs(minValue) > F32_MIN ? minValue : 0.0f;
+      maxV = std::abs(maxValue) > F32_MIN ? maxValue : 0.0f;
       mFidelity = fidelity;
    }
    void validateType(SimObject *object, StringTableEntry varname, void *typePtr) override;

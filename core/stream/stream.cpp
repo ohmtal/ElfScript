@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/color.h"
+
 #include "core/util/rawData.h"
 #include "core/frameAllocator.h"
 #include "platform/platformNet.h"
@@ -261,40 +261,40 @@ void Stream::_read(String * str)
 }
 
 
-bool Stream::write(const ColorI& rColor)
-{
-   bool success = write(rColor.red);
-   success     |= write(rColor.green);
-   success     |= write(rColor.blue);
-   success     |= write(rColor.alpha);
+// bool Stream::write(const ColorI& rColor)
+// {
+//    bool success = write(rColor.red);
+//    success     |= write(rColor.green);
+//    success     |= write(rColor.blue);
+//    success     |= write(rColor.alpha);
+//
+//    return success;
+// }
+//
+// bool Stream::write(const LinearColorF& rColor)
+// {
+//    ColorI temp = LinearColorF(rColor).toColorI();
+//    return write(temp);
+// }
 
-   return success;
-}
-
-bool Stream::write(const LinearColorF& rColor)
-{
-   ColorI temp = LinearColorF(rColor).toColorI();
-   return write(temp);
-}
-
-bool Stream::read(ColorI* pColor)
-{
-   bool success = read(&pColor->red);
-   success     |= read(&pColor->green);
-   success     |= read(&pColor->blue);
-   success     |= read(&pColor->alpha);
-
-   return success;
-}
-
-bool Stream::read(LinearColorF* pColor)
-{
-   ColorI temp;
-   bool success = read(&temp);
-
-   *pColor = temp;
-   return success;
-}
+// bool Stream::read(ColorI* pColor)
+// {
+//    bool success = read(&pColor->red);
+//    success     |= read(&pColor->green);
+//    success     |= read(&pColor->blue);
+//    success     |= read(&pColor->alpha);
+//
+//    return success;
+// }
+//
+// bool Stream::read(LinearColorF* pColor)
+// {
+//    ColorI temp;
+//    bool success = read(&temp);
+//
+//    *pColor = temp;
+//    return success;
+// }
 
 bool Stream::write(const NetAddress &na)
 {

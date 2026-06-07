@@ -31,13 +31,13 @@
 #ifndef _STREAM_H_
 #include "core/stream/stream.h"
 #endif
-#ifndef _MPOINT3_H_
-#include "math/mPoint3.h"
-#endif
+// #ifndef _MPOINT3_H_
+// #include "math/mPoint3.h"
+// #endif
 #ifndef _CRC_H_
 #include "core/crc.h"
 #endif
-
+#include <cmath>
 //-------------------------------------- Some caveats when using this class:
 //                                        - Get/setPosition semantics are changed
 //                                         to indicate bit position rather than
@@ -65,7 +65,7 @@ protected:
    S32  maxReadBitNum;
    S32  maxWriteBitNum;
    char *stringBuffer;
-   Point3F mCompressPoint;
+   // Point3F mCompressPoint;
 
    friend class HuffmanProcessor;
 public:
@@ -371,7 +371,7 @@ inline U32 BitStream::readRangedU32(U32 rangeStart, U32 rangeEnd)
 
 inline void BitStream::writeRangedS32( S32 value, S32 min, S32 max )
 {
-   value = mClamp( value, min, max );
+   value = std::clamp( value, min, max );
    writeRangedU32( ( value - min ), 0, ( max - min ) );
 }
 
@@ -382,8 +382,8 @@ inline S32 BitStream::readRangedS32( S32 min, S32 max )
 
 inline void BitStream::writeRangedF32( F32 value, F32 min, F32 max, U32 numBits )
 {
-   value = ( mClampF( value, min, max ) - min ) / ( max - min );
-   writeInt( (S32)mFloor(value * F32( (1 << numBits) - 1 )), numBits );
+   value = ( std::clamp( value, min, max ) - min ) / ( max - min );
+   writeInt( (S32)std::floor(value * F32( (1 << numBits) - 1 )), numBits );
 }
 
 inline F32 BitStream::readRangedF32( F32 min, F32 max, U32 numBits )

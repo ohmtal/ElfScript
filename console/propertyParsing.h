@@ -23,6 +23,8 @@
 #ifndef _PROPERTYPARSING_H_
 #define _PROPERTYPARSING_H_
 
+#include <cmath>
+
 class ColorI;
 class LinearColorF;
 class Point2I;
@@ -208,7 +210,7 @@ namespace PropertyInfo
       {
          if constexpr (std::is_same_v<T, int> || std::is_same_v<T, S32>)
          {
-            out[index++] = mRound(dAtof(tok));
+            out[index++] = std::round(dAtof(tok));
          }
          else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, F32>)
          {

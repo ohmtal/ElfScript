@@ -12,19 +12,6 @@
 // #include <platform/platformProcess.h>
 
 
-S32 mRandI(S32 i1, S32 i2){
-    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-    return i1;
-}
-F32 mRandF(F32 f1, F32 f2){
-    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-    return f1;
-
-}
-F32 mRandF() {
-    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-    return 0.123;
-}
 
 StringTableEntry osGetTemporaryDirectory(){
     Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);

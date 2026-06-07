@@ -44,7 +44,7 @@ namespace KeyCmp
 #include "console/console.h"
 #include "console/engineAPI.h"
 
-#include "math/mMathFn.h"
+// #include "math/mMathFn.h"
 
 #include "platform/platform.h"
 // #include "platform/profiler.h"

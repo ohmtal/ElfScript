@@ -35,7 +35,7 @@
 #include "core/util/safeDelete.h"
 //FIXME  #include "platform/platformIntrinsics.h"
 //FIXME #include "platform/profiler.h"
-#include "math/mMathFn.h"
+// #include "math/mMathFn.h"
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -460,7 +460,7 @@ String getUniqueName( const char *inName )
 
    S32 suffixNumb = -1;
    String nameStr( String::GetTrailingNumber( outName, suffixNumb ) );
-   suffixNumb = mAbs( suffixNumb ) + 1;
+   suffixNumb = std::abs( suffixNumb ) + 1;
 
    #define MAX_TRIES 100
 

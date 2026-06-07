@@ -27,8 +27,8 @@
    #include "console/engineTypes.h"
 #endif
 
-#include "math/mPlane.h"
-#include "math/mPolyhedron.h"
+// #include "math/mPlane.h"
+// #include "math/mPolyhedron.h"
 
 /// @file
 /// Definitions for the core primitive types used in the
@@ -54,9 +54,9 @@ DECLARE_PRIMITIVE_R(U8*);
 DECLARE_PRIMITIVE_R(S32*);
 DECLARE_PRIMITIVE_R(U32*);
 DECLARE_PRIMITIVE_R(F32*);
-DECLARE_PRIMITIVE_R(Point3F*);
-DECLARE_PRIMITIVE_R(PlaneF*);
-DECLARE_PRIMITIVE_R(PolyhedronData::Edge*);
+// DECLARE_PRIMITIVE_R(Point3F*);
+// DECLARE_PRIMITIVE_R(PlaneF*);
+// DECLARE_PRIMITIVE_R(PolyhedronData::Edge*);
 DECLARE_PRIMITIVE_R(const char**);
 
 //FIXME: this allows String to be used as a struct field type
