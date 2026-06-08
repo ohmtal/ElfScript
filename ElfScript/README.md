@@ -1,5 +1,7 @@
 # ElfScript
 
+![ElfScript Logo](./res/logo256.png)
+
 Cutdown TorqueScript to minimum attempt.
 
 **Current Goals**: Get StringTable and StringFunction working 
