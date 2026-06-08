@@ -52,25 +52,20 @@ Finally:
    
 5.) core/string part II
 
-**FAILED* 
     core/util/hashFunction.*
     core/string/findMatch.*
     core/strings/stringUnit.*
     core/strings/unicode.h.*
    
 6.) str.h /  core/util/tDictionary.*
+
     core/elfWrapper ***** replace engineAPI inlude in str.cpp *******
     core/util/autoPtr.h
     core/util/tDictionary.*
-    core/util/str.*
+    core/util/str.* **** renamed to core/strings/String.* ******
+    core/stringTable => core/strings/stringTable.h
    
-
     
-
-# core/util/str missing includes
-    #include "console/console.h"
-    #include "console/engineAPI.h"
-    #include "platform/platformIntrinsics.h" << seams to be deprecated atomic swap! 
 
     
 ## console/torquescript missing includes:
@@ -84,32 +79,22 @@ astNodes.cpp:#include "console/console.h"
 astNodes.cpp:#include "console/simBase.h"
 
 cmdgram.cpp:#include "console/console.h"
-cmdgram.cpp:#include "console/torquescript/compiler.h"
 cmdgram.cpp:#include "console/consoleInternal.h"
 
 CMDgram.y:#include "console/console.h"
-CMDgram.y:#include "console/torquescript/compiler.h"
 CMDgram.y:#include "console/consoleInternal.h"
-CMDgram.y:#include "core/strings/stringFunctions.h"
 
 CMDscan.cpp:#include "console/console.h"
-CMDscan.cpp:#include "console/torquescript/compiler.h"
 CMDscan.cpp:#include "console/dynamicTypes.h"
-CMDscan.cpp:#include "console/torquescript/CMDgram.h"
 
 CMDscan.l:#include "console/console.h"
-CMDscan.l:#include "console/torquescript/compiler.h"
 CMDscan.l:#include "console/dynamicTypes.h"
-CMDscan.l:#include "console/torquescript/CMDgram.h"
 
 codeBlock.cpp:#include "console/console.h"
-codeBlock.cpp:#include "core/strings/unicode.h"
-codeBlock.cpp:#include "core/stringTable.h"
 codeBlock.cpp:#include "core/stream/fileStream.h"
 
 codeBlock.h:#include "console/runtime.h"
 
-compiledEval.cpp:#include "core/strings/stringUnit.h"
 compiledEval.cpp:#include "console/consoleInternal.h"
 compiledEval.cpp:#include "console/simBase.h"
 compiledEval.cpp:#include "console/stringStack.h"
