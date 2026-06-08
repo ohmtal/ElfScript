@@ -85,10 +85,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-// #include "console/console.h"
-#include "core/strings/stringTable.h"
+#include "console/console.h"
 #include "console/torquescript/compiler.h"
-// #include "console/consoleInternal.h"
+#include "console/consoleInternal.h"
 #include "core/strings/stringFunctions.h"
 
 #ifndef YYDEBUG

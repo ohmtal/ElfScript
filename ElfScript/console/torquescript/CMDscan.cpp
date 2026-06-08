@@ -899,8 +899,8 @@ char *yytext;
 
 #include <stdio.h>
 #include "platform/platform.h"
-#include "core/strings/stringTable.h"
-// #include "console/console.h"
+#include "core/stringTable.h"
+#include "console/console.h"
 #include "console/torquescript/compiler.h"
 #include "console/dynamicTypes.h"
 #include "core/strings/stringFunctions.h"

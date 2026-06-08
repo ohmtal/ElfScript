@@ -69,17 +69,32 @@ Finally:
    
 7.) insert torqueScript and see what happen ...
     
-    Very tricky ... 
+    Now it's getting tricky ... 
     
-   consoleInternal.h:
-    - SimObject ConsoleValue execute(S32 argc, ConsoleValue* argv, SimObject* thisObj);
+    I guess i have to put in the complete console folder and
+    then start removing instead of tring to insert only things 
+    i verified. 
+    
+    console/consoleInternal.h
+        - Dictionary
+        - ConsoleValueFrame
+        - ConsoleValue
+        - Namespace
+        - ConsoleValueFrame* currentRegisterArray;
+          
+    console/module.h:
+        - Con::Module
+        
+    console/runtime.h
+        - Con::EvalResult
+        
+    consoleInternal.h uses SimObject:
+        - SimObject ConsoleValue execute(S32 argc, ConsoleValue* argv, SimObject* thisObj);
+
+---
 
     
 ## console/torquescript missing includes:
-
-Confirmed:
-
-    -  #include "console/consoleInternal.h"
 
 
 ```

@@ -1,11 +1,6 @@
-//-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
-// Copyright (c) 2026 Thomas Hühn (XXTH)
-// SPDX-License-Identifier: MIT
-//-----------------------------------------------------------------------------
 #ifndef _EVALSTATE_H
 #define _EVALSTATE_H
-// #include "console/consoleInternal.h"
+#include "console/consoleInternal.h"
 
 class ExprEvalState
 {

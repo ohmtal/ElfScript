@@ -50,6 +50,13 @@ set(elf_core
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/String.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/String.h
 
+    # ---------------------------------------------------
+    # for console:
+    ${CMAKE_CURRENT_LIST_DIR}/core/bitSet.h
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/refBase.h
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/refBase.cpp
+
+
 )
 
 set(elf_torquescript

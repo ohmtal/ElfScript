@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
-// Copyright (c) 2026 Thomas Hühn (XXTH)
-// SPDX-License-Identifier: MIT
-//-----------------------------------------------------------------------------
+﻿
 #include "evalState.h"
 
 void ExprEvalState::pushFrame(StringTableEntry frameName, Namespace *ns, S32 registerCount)

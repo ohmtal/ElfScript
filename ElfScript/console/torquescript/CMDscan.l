@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include "platform/platform.h"
 #include "core/stringTable.h"
-// #include "console/console.h"
+#include "console/console.h"
 #include "console/torquescript/compiler.h"
-// #include "console/dynamicTypes.h"
+#include "console/dynamicTypes.h"
 #include "core/strings/stringFunctions.h"
 
 template< typename T >
