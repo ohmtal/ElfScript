@@ -35,7 +35,7 @@
 
 class CodeStream;
 struct StmtNode;
-class Stream;
+// class Stream;
 class DataChunker;
 
 #include "platform/platform.h"

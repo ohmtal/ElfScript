@@ -31,14 +31,12 @@
 #include "console/consoleInternal.h"
 
 #include "console/simBase.h"
-// #include "sim/netStringTable.h"
 #include "console/stringStack.h"
 #include "util/messaging/message.h"
 #include "core/frameAllocator.h"
 
 #include "console/returnBuffer.h"
 #include "console/consoleValueStack.h"
-// #include "console/telnetDebugger.h"
 
 
 using namespace Compiler;
@@ -428,7 +426,7 @@ TORQUE_NOINLINE void doSlowMathOp()
 }
 
 template<FloatOperation Op>
-TORQUE_FORCEINLINE void doFloatMathOperation()
+/*XXTH TORQUE_FORCEINLINE*/ inline void doFloatMathOperation()
 {
    ConsoleValue& a = stack[_STK];
    ConsoleValue& b = stack[_STK - 1];
@@ -510,7 +508,7 @@ TORQUE_NOINLINE void doSlowIntegerOp()
 }
 
 template<IntegerOperation Op>
-TORQUE_FORCEINLINE void doIntOperation()
+/*XXTH TORQUE_FORCEINLINE*/ inline void doIntOperation()
 {
    ConsoleValue& a = stack[_STK];
    ConsoleValue& b = stack[_STK - 1];
@@ -1843,12 +1841,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_TAG_TO_STR:
          code[ip - 1] = OP_LOADIMMED_STR;
          // it's possible the string has already been converted
-         if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
-         {
-            U32 id = GameAddTaggedString(curStringTable + code[ip]);
-            dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
-            *(curStringTable + code[ip]) = StringTagPrefixByte;
-         }
+         Con::warnf(" %s OP_TAG_TO_STR not implemented (%s:%d)", __func__, __FILE__, __LINE__);
+
+         // if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
+         // {
+         //    U32 id = GameAddTaggedString(curStringTable + code[ip]);
+         //    dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
+         //    *(curStringTable + code[ip]) = StringTagPrefixByte;
+         // }
          TORQUE_CASE_FALLTHROUGH;
 
       case OP_LOADIMMED_STR:

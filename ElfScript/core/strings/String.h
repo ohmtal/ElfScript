@@ -12,9 +12,9 @@
 #include "platform/types.h"
 #endif
 
-// #ifndef _STRINGFUNCTIONS_H_
-// #include "core/strings/stringFunctions.h"
-// #endif
+#ifndef _STRINGFUNCTIONS_H_
+#include "core/strings/stringFunctions.h"
+#endif
 #include <string.h> // FIXME recursice include with stringFunctions?
 
 template< class T > class Vector;

@@ -37,7 +37,10 @@
 #include "core/strings/String.h"
 #include "core/util/journal/journaledSignal.h"
 #include "core/strings/stringTable.h"
+#include "core/strings/stringFunctions.h"
 #include <iostream>
+#include "core/util/rawData.h"
+#include "core/util/delegate.h"
 
 class SimObject;
 class Namespace;
@@ -684,11 +687,11 @@ namespace Con
    void addConsumer(ConsumerCallback cb);
    void removeConsumer(ConsumerCallback cb);
 
-   typedef JournaledSignal<void(RawData)> ConsoleInputEvent;
+   // FIXME typedef JournaledSignal<void(RawData)> ConsoleInputEvent;
 
    /// Called from the native consoles to provide lines of console input
    /// to process. This will schedule it for execution ASAP.
-   extern ConsoleInputEvent smConsoleInput;
+    // FIXME extern ConsoleInputEvent smConsoleInput;
 
    /// @}
 

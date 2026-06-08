@@ -11,7 +11,7 @@ endif()
 # -----------------------------------------------------------------------------
 # ----------  options ----------
 option(BUILD_TORQUESCRIPT "Build the Torque Script" ON)
-option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
+option(BUILD_ELFSCRIPT "Build the ElfScript" OFF)
 # -----------------------------------------------------------------------------
 if (BUILD_TORQUESCRIPT)
     #  defines TORQUESCRIPT_SRC

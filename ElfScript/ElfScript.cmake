@@ -55,6 +55,96 @@ set(elf_core
     ${CMAKE_CURRENT_LIST_DIR}/core/bitSet.h
     ${CMAKE_CURRENT_LIST_DIR}/core/util/refBase.h
     ${CMAKE_CURRENT_LIST_DIR}/core/util/refBase.cpp
+    # like functional
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/tSignal.cpp
+    # for new id ?!
+    ${CMAKE_CURRENT_LIST_DIR}/util/messaging/message.cpp
+
+     ${CMAKE_CURRENT_LIST_DIR}/core/crc.cpp
+)
+
+set(elf_console
+ ${CMAKE_CURRENT_LIST_DIR}/console/console.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleDoc.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleDoc.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleFunctions.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleFunctions.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/console.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleInternal.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleInternal.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleObject.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleObject.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleParser.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleParser.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleTypes.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleTypes.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/consoleValueStack.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/dynamicTypes.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/dynamicTypes.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineAPI.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineDoc.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineExports.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineExports.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineFunctions.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineFunctions.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineObject.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineObject.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/enginePrimitives.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/enginePrimitives.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineStructs.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineStructs.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineTypeInfo.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineTypeInfo.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/fileSystemFunctions.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/fixedTuple.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/ICallMethod.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/module.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/propertyParsing.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/propertyParsing.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/returnBuffer.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/returnBuffer.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/runtimeClassRep.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/runtimeClassRep.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/runtime.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/scriptFilename.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/scriptFilename.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/script.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/scriptObjects.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/scriptObjects.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simBase.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/sim.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simDatablock.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simDatablock.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simDictionary.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simDictionary.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simEvents.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simEvents.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simFieldDictionary.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simFieldDictionary.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/sim.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simManager.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simObject.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simObject.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simObjectList.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simObjectList.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simObjectRef.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simPersistID.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simPersistID.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simPersistSet.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simPersistSet.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/simSerialize.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simSet.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/simSet.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/stringStack.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/stringStack.h
+ # ${CMAKE_CURRENT_LIST_DIR}/console/telnetConsole.cpp
+ # ${CMAKE_CURRENT_LIST_DIR}/console/telnetConsole.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/telnetDebugger.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/telnetDebugger.h
+ ${CMAKE_CURRENT_LIST_DIR}/console/typeValidators.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/console/typeValidators.h
 
 
 )
@@ -86,5 +176,6 @@ set(elf_torquescript
 set(ELFSCRIPT_SRC
     ${elf_platform}
     ${elf_core}
-    # ${elf_torquescript}
+    ${elf_torquescript}
+    ${elf_console}
 )
