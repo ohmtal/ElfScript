@@ -52,9 +52,32 @@ set(elf_core
 
 )
 
+set(elf_torquescript
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/astAlloc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/ast.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/astNodes.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/cmdgram.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDscan.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiler.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiler.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/evalState.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/evalState.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/optimizer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/parser.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/parser.h
+
+    # FIXME
+    # ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/runtime.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/runtime.h
+)
 
 
 set(ELFSCRIPT_SRC
     ${elf_platform}
     ${elf_core}
+    # ${elf_torquescript}
 )

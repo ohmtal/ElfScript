@@ -62,8 +62,6 @@ int main() {
         dPrintf (" * String compare failed !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
-
-
     printf("\n:: Bye Bye - reached the end. good sign -----------------\n");
     return 0;
 }

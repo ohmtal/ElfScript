@@ -67,10 +67,20 @@ Finally:
     core/util/str.* **** renamed to core/strings/String.* ******
     core/stringTable => core/strings/stringTable.h
    
+7.) insert torqueScript and see what happen ...
     
+    Very tricky ... 
+    
+   consoleInternal.h:
+    - SimObject ConsoleValue execute(S32 argc, ConsoleValue* argv, SimObject* thisObj);
 
     
 ## console/torquescript missing includes:
+
+Confirmed:
+
+    -  #include "console/consoleInternal.h"
+
 
 ```
 astAlloc.cpp:#include "console/console.h"
