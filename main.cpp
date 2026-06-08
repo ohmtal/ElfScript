@@ -3,6 +3,7 @@
 #include "console/script.h"
 #include "sim/netStringTable.h"
 #include "console/engineAPI.h"
+#include <platform/platformVolume.h>
 
 namespace engineAPI
 {
@@ -44,14 +45,14 @@ void init()
 
 
     // init Filesystem first, so we can actually log errors for all components that follow
-    // // Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
-    // // Platform::FS::MountDefaults();
-    // //
-    // // // Set our working directory.
-    // // Torque::FS::SetCwd( "game:/" );
-    //
-    // // Set our working directory.
-    // Platform::setCurrentDirectory( Platform::getMainDotCsDir() );
+    Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
+    Platform::FS::MountDefaults();
+
+    // Set our working directory.
+    Torque::FS::SetCwd( "assets:/" );
+
+    // Set our working directory.
+    Platform::setCurrentDirectory( Platform::getMainDotCsDir() );
 
     // Processor::init();
     // Math::init();

@@ -114,12 +114,14 @@ set(CONSOLE_SRC
 )
 
 set(CORE_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/core/crc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/bitVector.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/iTickable.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/virtualMountSystem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/util/str.h
     ${CMAKE_CURRENT_LIST_DIR}/core/util/str.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/util/byteBuffer.cpp
+
 
     ${CMAKE_CURRENT_LIST_DIR}/core/util/hashFunction.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/util/tVector.cpp
@@ -157,24 +159,53 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/unicode.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/unicode.h
 
+
     # ------ FIXME other group:
-
-
-    ${CMAKE_CURRENT_LIST_DIR}/platform/platformFileIO.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/platform/platformAssert.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHMemory.cpp
-    # ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHPlatformProcess.cpp
-
     # sim
     ${CMAKE_CURRENT_LIST_DIR}/sim/netStringTable.cpp
     # util
     ${CMAKE_CURRENT_LIST_DIR}/util/messaging/message.cpp
+)
+
+set(ZIP_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/centralDir.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/compressor.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/extraField.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/fileHeader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipArchive.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipCryptStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipSubStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipTempStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipVolume.cpp
 
 )
 
+set(PLATFORM_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/platform/platformFileIO.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/platform/platformAssert.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/platform/platformMemory.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/platform/platformVolume.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/platform/XXTHPlatformProcess.cpp
+
+)
+
+set(POSIX_SRC
+   ${CMAKE_CURRENT_LIST_DIR}/platform/posix/posixVolume.cpp
+)
+set(WIN_SRC
+   ${CMAKE_CURRENT_LIST_DIR}/platform/win/winVolume.cpp
+)
+
+if(WIN32)
+    list(APPEND PLATFORM_SRC ${WIN_SRC})
+elseif(UNIX)
+    list(APPEND PLATFORM_SRC ${POSIX_SRC})
+endif()
 
 set(TORQUESCRIPT_SRC
     ${CONSOLE_SRC}
     ${CORE_SRC}
+    ${PLATFORM_SRC}
 )
 

@@ -43,7 +43,7 @@
 
 #include "core/util/safeDelete.h"
 
-#include "app/version.h"
+// #include "app/version.h"
 
 namespace Zip
 {
@@ -346,7 +346,7 @@ void ZipArchive::updateFile(ZipTempStream *stream)
    cd->mInternalFlags &= ~CDFileOpen;
 
    // Upper byte should be zero, lower is version as major * 10 + minor
-   cd->mVersionMadeBy = (getVersionNumber() / 100) & 0xff;
+   cd->mVersionMadeBy = /*XXTH(getVersionNumber() / 100)*/ 10 & 0xff;
    cd->mExtractVer = 20;
 
    U32 dosTime = currentTimeToDOSTime();
