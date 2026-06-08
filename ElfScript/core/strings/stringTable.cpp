@@ -23,7 +23,7 @@
 //XXTH 2026-06-07 replaced String::compare with dStrcmp
 
 #include "core/strings/stringFunctions.h"
-#include "core/stringTable.h"
+#include "core/strings/stringTable.h"
 // XXTH #include "platform/profiler.h"
 
 _StringTable *_gStringTable = NULL;

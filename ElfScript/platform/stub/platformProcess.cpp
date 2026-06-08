@@ -1,28 +1,8 @@
 #include "platform/types.h"
 #include "platform/platformAssert.h"
-#include "core/stringTable.h"
+#include "core/strings/stringTable.h"
+#include "core/util/tVector.h"
 
-// ---- FIXME fake stub stuff -------------
-#include <cstdio>
-#include <stdarg.h>
-namespace Con{
-#ifndef warnf
-
-    void warnf(const char* fmt,...)
-    {
-        va_list argptr;
-        va_start(argptr, fmt);
-        vprintf(fmt, argptr);
-        printf("\n");
-        va_end(argptr);
-    }
-
-
-#endif
-} //namespace Con
-
-
-// FIXME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 StringTableEntry osGetTemporaryDirectory(){
     Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);

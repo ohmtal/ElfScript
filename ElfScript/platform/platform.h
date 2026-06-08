@@ -35,9 +35,9 @@
 #include "platform/platformAssert.h"
 #endif
 
-// #ifndef _TORQUE_STRING_H_
-// #include "core/util/str.h"
-// #endif
+#ifndef _TORQUE_STRING_H_
+#include "core/strings/String.h"
+#endif
 // #ifndef _TORQUE_SAFEDELETE_H_
 // #include "core/util/safeDelete.h"
 // #endif
@@ -113,19 +113,29 @@
 // struct InputEventInfo;
 
 // FIXME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//FIXME temp forward!
-#include <string>
-#include <vector>
-#ifndef String
-#pragma message("FIXME FAKE String class")
-      using  String =  std::string;
 
-#endif
-#ifndef Vector
-#pragma message("FIXME FAKE Vector class")
-      template <typename T>
-      using Vector = std::vector<T>;
-#endif
+
+// ---- FIXME fake stub stuff -------------
+#include <cstdio>
+#include <stdarg.h>
+namespace Con{
+      #ifndef warnf
+
+      inline void warnf(const char* fmt,...)
+      {
+            va_list argptr;
+            va_start(argptr, fmt);
+            vprintf(fmt, argptr);
+            printf("\n");
+            va_end(argptr);
+      }
+
+
+      #endif
+} //namespace Con
+
+
+
 class InputEventInfo;
 // FIXME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

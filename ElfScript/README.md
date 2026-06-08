@@ -8,6 +8,22 @@ Cutdown TorqueScript to minimum attempt.
 Commands like exec (file) or mSin (math) should be optional and added as 
 "plugin".
 
+## NOTE: this are the new includes for copy/paste
+
+str.h becomes:
+
+    #include "core/strings/String.h"
+    #include "core/strings/stringTable.h"
+
+## NOTE: some fake/stub/wrapper definitions in platfrom/platform.h!
+
+Finally:
+
+    - [ ] types.[COMPILER].h really needed ? 
+    - [ ] Add the NameSpace **elf** when running. 
+    - [ ] think about the directories core/string (stringtable/str) core/util ..
+    - [ ] update MIT Headers with SPX version 
+
 ## Step by Step
 
 1.) Platform **DONE** 
@@ -27,12 +43,36 @@ Commands like exec (file) or mSin (math) should be optional and added as
     stringtable
     stringfunctions
 
-4.) String
+4.) Vector **DONE** 
 
+    core/util
+    tVector.cpp
+    tVector.h
+    tVectorSpecializations.h 
+   
+5.) core/string part II
 
-5.) Vector
+**FAILED* 
+    core/util/hashFunction.*
+    core/string/findMatch.*
+    core/strings/stringUnit.*
+    core/strings/unicode.h.*
+   
+6.) str.h /  core/util/tDictionary.*
+    core/elfWrapper ***** replace engineAPI inlude in str.cpp *******
+    core/util/autoPtr.h
+    core/util/tDictionary.*
+    core/util/str.*
+   
 
+    
 
+# core/util/str missing includes
+    #include "console/console.h"
+    #include "console/engineAPI.h"
+    #include "platform/platformIntrinsics.h" << seams to be deprecated atomic swap! 
+
+    
 ## console/torquescript missing includes:
 
 ```
@@ -79,7 +119,6 @@ compiledEval.cpp:#include "console/consoleValueStack.h"
 
 compiler.cpp:#include "console/console.h"
 compiler.cpp:#include "console/simBase.h"
-compiler.h:#include "core/util/tVector.h"
 evalState.h:#include "console/consoleInternal.h"
 
 runtime.cpp:#include "console/script.h"
