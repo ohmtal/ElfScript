@@ -954,7 +954,11 @@ DefineEngineMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects
 {
    object->deleteAllObjects();
 }
-
+//XXTH Compat
+DefineEngineMethod( SimSet, deleteObjects, void, (), , "() Delete all objects in the set." )
+{
+      object->deleteAllObjects();
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SimSet, getRandom, SimObject*, (),,
