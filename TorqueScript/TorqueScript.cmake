@@ -165,7 +165,15 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/sim/netStringTable.cpp
     # util
     ${CMAKE_CURRENT_LIST_DIR}/util/messaging/message.cpp
+
+
+    # basic math
+    ${CMAKE_CURRENT_LIST_DIR}/math/mMathFn.h
+    ${CMAKE_CURRENT_LIST_DIR}/math/mConsoleFunctions.cpp
+
 )
+
+
 
 set(ZIP_SRC
     ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/centralDir.cpp
@@ -180,6 +188,8 @@ set(ZIP_SRC
     ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipVolume.cpp
 
 )
+
+
 
 set(PLATFORM_SRC
     ${CMAKE_CURRENT_LIST_DIR}/platform/platformFileIO.cpp
@@ -196,6 +206,8 @@ set(POSIX_SRC
 set(WIN_SRC
    ${CMAKE_CURRENT_LIST_DIR}/platform/win/winVolume.cpp
 )
+
+
 
 if(WIN32)
     list(APPEND PLATFORM_SRC ${WIN_SRC})
