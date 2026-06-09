@@ -1195,7 +1195,8 @@ public:
       }
       else
       {
-            Con::errorf("Threads not supported!");
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+            return R();
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc + sizeof...(ArgTs), NULL, false, &cb);
 //          evt->populateArgs(mArgv);
@@ -1241,6 +1242,8 @@ public:
       }
       else
       {
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+             return R();
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, true, &cb);
 //          evt->populateArgs(mArgv);
@@ -1282,6 +1285,8 @@ public:
       }
       else
       {
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+            return R();
             //XXTH FIXME
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, false, &cb);

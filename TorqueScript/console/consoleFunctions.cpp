@@ -2088,7 +2088,6 @@ DefineEngineFunction( setLogMode, void, ( S32 mode ),,
 // MARK: ---- Misc ----
 
 //-----------------------------------------------------------------------------
-
 DefineEngineFunction( quit, void, ( ),,
    "Shut down the engine and exit its process.\n"
    "This function cleanly uninitializes the engine and then exits back to the system with a process "

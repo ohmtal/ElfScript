@@ -24,6 +24,10 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+//
+// XXTH: 2026-06-09 moved script onAdd onRemove from ScriptObject to SimObject !!!!
+//
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
 #include "platform/platform.h"
 #include "platform/platformMemory.h"
@@ -59,6 +63,17 @@ bool SimObject::preventNameChanging = false;
 IMPLEMENT_CALLBACK(SimObject, onInspectPostApply, void, (SimObject* obj), (obj), "Generic callback for when an object is edited");
 IMPLEMENT_CALLBACK(SimObject, onSelected, void, (SimObject* obj), (obj), "Generic callback for when an object is selected");
 IMPLEMENT_CALLBACK(SimObject, onUnselected, void, (SimObject* obj), (obj), "Generic callback for when an object is un-selected");
+
+
+IMPLEMENT_CALLBACK( SimObject, onAdd, void, ( SimObjectId ID ), ( ID ),
+   "Called when this SimObject is added to the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
+);
+
+IMPLEMENT_CALLBACK( SimObject, onRemove, void, ( SimObjectId ID ), ( ID ),
+   "Called when this SimObject is removed from the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
+);
 
 namespace Sim
 {
@@ -1557,6 +1572,9 @@ bool SimObject::onAdd()
 
    linkNamespaces();
 
+   // Call onAdd in script!
+   onAdd_callback(getId());
+
    return true;
 }
 
@@ -1564,9 +1582,13 @@ bool SimObject::onAdd()
 
 void SimObject::onRemove()
 {
+  // Call onRemove in script!
+  onRemove_callback(getId());
+
    mFlags.clear(Added);
 
    unlinkNamespaces();
+
 }
 
 //-----------------------------------------------------------------------------
