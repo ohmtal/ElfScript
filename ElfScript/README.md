@@ -1,4 +1,10 @@
-# ElfScript
+# ElfScript - DEAD
+
+## CANCLED - i concentrate on torqueScript folder - i started modifing it 
+##  and dont want to sync this.
+##  Another reason is it seams that i don't get it as small as i hoped ;)
+
+---
 
 ![ElfScript Logo](./res/logo256.png)
 
