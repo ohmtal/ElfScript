@@ -167,10 +167,6 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/util/messaging/message.cpp
 
 
-    # basic math
-    ${CMAKE_CURRENT_LIST_DIR}/math/mMathFn.h
-    ${CMAKE_CURRENT_LIST_DIR}/math/mConsoleFunctions.cpp
-
 )
 
 
