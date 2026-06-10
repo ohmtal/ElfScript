@@ -550,32 +550,33 @@ void init()
    initEventQueue();
    initRoot();
 
-   InstantiateNamedSet(ActiveActionMapSet);
-   InstantiateNamedSet(GhostAlwaysSet);
-   InstantiateNamedSet(WayPointSet);
-   InstantiateNamedSet(fxReplicatorSet);
-   InstantiateNamedSet(fxFoliageSet);
-   InstantiateNamedSet(MaterialSet);
-   InstantiateNamedSet(SFXSourceSet);
-   InstantiateNamedSet(SFXDescriptionSet);
-   InstantiateNamedSet(SFXTrackSet);
-   InstantiateNamedSet(SFXEnvironmentSet);
-   InstantiateNamedSet(SFXStateSet);
-   InstantiateNamedSet(SFXAmbienceSet);
-   InstantiateNamedSet(TerrainMaterialSet);
+   // XXTH
+   // InstantiateNamedSet(ActiveActionMapSet);
+   // InstantiateNamedSet(GhostAlwaysSet);
+   // InstantiateNamedSet(WayPointSet);
+   // InstantiateNamedSet(fxReplicatorSet);
+   // InstantiateNamedSet(fxFoliageSet);
+   // InstantiateNamedSet(MaterialSet);
+   // InstantiateNamedSet(SFXSourceSet);
+   // InstantiateNamedSet(SFXDescriptionSet);
+   // InstantiateNamedSet(SFXTrackSet);
+   // InstantiateNamedSet(SFXEnvironmentSet);
+   // InstantiateNamedSet(SFXStateSet);
+   // InstantiateNamedSet(SFXAmbienceSet);
+   // InstantiateNamedSet(TerrainMaterialSet);
    InstantiateNamedSet(DataBlockSet);
-   InstantiateNamedSet(ForestBrushSet); 
-   InstantiateNamedSet(ForestItemDataSet);
-   InstantiateNamedGroup(ActionMapGroup);
-   InstantiateNamedGroup(ClientGroup);
-   InstantiateNamedGroup(GuiGroup);
-   InstantiateNamedGroup(GuiDataGroup);
-   InstantiateNamedGroup(TCPGroup);
-   InstantiateNamedGroup(ClientConnectionGroup);
-   InstantiateNamedGroup(SFXParameterGroup);
-   InstantiateNamedSet(BehaviorSet);
-   InstantiateNamedSet(sgMissionLightingFilterSet);
-
+   // InstantiateNamedSet(ForestBrushSet);
+   // InstantiateNamedSet(ForestItemDataSet);
+   // InstantiateNamedGroup(ActionMapGroup);
+   // InstantiateNamedGroup(ClientGroup);
+   // InstantiateNamedGroup(GuiGroup);
+   // InstantiateNamedGroup(GuiDataGroup);
+   // InstantiateNamedGroup(TCPGroup);
+   // InstantiateNamedGroup(ClientConnectionGroup);
+   // InstantiateNamedGroup(SFXParameterGroup);
+   // InstantiateNamedSet(BehaviorSet);
+   // InstantiateNamedSet(sgMissionLightingFilterSet);
+   //
    gDataBlockGroup = new SimDataBlockGroup();
    gDataBlockGroup->registerObject("DataBlockGroup");
    gRootGroup->addObject(gDataBlockGroup);

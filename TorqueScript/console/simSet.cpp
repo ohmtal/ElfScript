@@ -754,7 +754,7 @@ void SimGroup::clear()
    {
       SimObject* object = mObjectList.last();
       object->onGroupRemove();
-      
+
 	  mObjectList.pop_back();
       mNameDictionary.remove( object );
       object->mGroup = 0;
@@ -766,7 +766,7 @@ void SimGroup::clear()
       if( engineAPI::gUseConsoleInterop )
          object->deleteObject();
       else
-         object->decRefCount();      
+         object->decRefCount();
    }
    unlock();
 

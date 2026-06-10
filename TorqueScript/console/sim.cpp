@@ -53,33 +53,33 @@
 namespace Sim
 {
    // Don't forget to InstantiateNamed* in simManager.cc - DMM
-   ImplementNamedSet(ActiveActionMapSet)
-   ImplementNamedSet(GhostAlwaysSet)
-   ImplementNamedSet(WayPointSet)
-   ImplementNamedSet(fxReplicatorSet)
-   ImplementNamedSet(fxFoliageSet)
-   ImplementNamedSet(BehaviorSet)
-   ImplementNamedSet(MaterialSet)
-   ImplementNamedSet(SFXSourceSet)
-   ImplementNamedSet(SFXDescriptionSet)
-   ImplementNamedSet(SFXTrackSet)
-   ImplementNamedSet(SFXEnvironmentSet)
-   ImplementNamedSet(SFXStateSet)
-   ImplementNamedSet(SFXAmbienceSet)
-   ImplementNamedSet(TerrainMaterialSet)
+   // ImplementNamedSet(ActiveActionMapSet)
+   // ImplementNamedSet(GhostAlwaysSet)
+   // ImplementNamedSet(WayPointSet)
+   // ImplementNamedSet(fxReplicatorSet)
+   // ImplementNamedSet(fxFoliageSet)
+   // ImplementNamedSet(BehaviorSet)
+   // ImplementNamedSet(MaterialSet)
+   // ImplementNamedSet(SFXSourceSet)
+   // ImplementNamedSet(SFXDescriptionSet)
+   // ImplementNamedSet(SFXTrackSet)
+   // ImplementNamedSet(SFXEnvironmentSet)
+   // ImplementNamedSet(SFXStateSet)
+   // ImplementNamedSet(SFXAmbienceSet)
+   // ImplementNamedSet(TerrainMaterialSet)
    ImplementNamedSet(DataBlockSet);
-   ImplementNamedSet(ForestBrushSet);
-   ImplementNamedSet(ForestItemDataSet);
-   ImplementNamedGroup(ActionMapGroup)
-   ImplementNamedGroup(ClientGroup)
-   ImplementNamedGroup(GuiGroup)
-   ImplementNamedGroup(GuiDataGroup)
-   ImplementNamedGroup(TCPGroup)
-   ImplementNamedGroup(SFXParameterGroup);
-
-   //groups created on the client
-   ImplementNamedGroup(ClientConnectionGroup)
-   ImplementNamedSet(sgMissionLightingFilterSet)
+   // ImplementNamedSet(ForestBrushSet);
+   // ImplementNamedSet(ForestItemDataSet);
+   // ImplementNamedGroup(ActionMapGroup)
+   // ImplementNamedGroup(ClientGroup)
+   // ImplementNamedGroup(GuiGroup)
+   // ImplementNamedGroup(GuiDataGroup)
+   // ImplementNamedGroup(TCPGroup)
+   // ImplementNamedGroup(SFXParameterGroup);
+   //
+   // //groups created on the client
+   // ImplementNamedGroup(ClientConnectionGroup)
+   // ImplementNamedSet(sgMissionLightingFilterSet)
 }
 
 //-----------------------------------------------------------------------------

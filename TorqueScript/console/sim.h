@@ -92,32 +92,32 @@ enum SimObjectsConstants : U32
 
 namespace Sim
 {
-   DeclareNamedSet(ActiveActionMapSet)
-   DeclareNamedSet(GhostAlwaysSet)
-   DeclareNamedSet(WayPointSet)
-   DeclareNamedSet(fxReplicatorSet)
-   DeclareNamedSet(fxFoliageSet)
-   DeclareNamedSet(BehaviorSet)
-   DeclareNamedSet(MaterialSet)
-   DeclareNamedSet(SFXSourceSet);
-   DeclareNamedSet(SFXDescriptionSet);
-   DeclareNamedSet(SFXTrackSet);
-   DeclareNamedSet(SFXEnvironmentSet);
-   DeclareNamedSet(SFXStateSet);
-   DeclareNamedSet(SFXAmbienceSet);
-   DeclareNamedSet(TerrainMaterialSet);
+   // DeclareNamedSet(ActiveActionMapSet)
+   // DeclareNamedSet(GhostAlwaysSet)
+   // DeclareNamedSet(WayPointSet)
+   // DeclareNamedSet(fxReplicatorSet)
+   // DeclareNamedSet(fxFoliageSet)
+   // DeclareNamedSet(BehaviorSet)
+   // DeclareNamedSet(MaterialSet)
+   // DeclareNamedSet(SFXSourceSet);
+   // DeclareNamedSet(SFXDescriptionSet);
+   // DeclareNamedSet(SFXTrackSet);
+   // DeclareNamedSet(SFXEnvironmentSet);
+   // DeclareNamedSet(SFXStateSet);
+   // DeclareNamedSet(SFXAmbienceSet);
+   // DeclareNamedSet(TerrainMaterialSet);
    DeclareNamedSet(DataBlockSet);
-   DeclareNamedSet(ForestBrushSet);
-   DeclareNamedSet(ForestItemDataSet);
-   DeclareNamedGroup(ActionMapGroup)
-   DeclareNamedGroup(ClientGroup)
-   DeclareNamedGroup(GuiGroup)
-   DeclareNamedGroup(GuiDataGroup)
-   DeclareNamedGroup(TCPGroup)
-   DeclareNamedGroup(ClientConnectionGroup)
-   DeclareNamedGroup(SFXParameterGroup);
-
-   DeclareNamedSet(sgMissionLightingFilterSet);
+   // DeclareNamedSet(ForestBrushSet);
+   // DeclareNamedSet(ForestItemDataSet);
+   // DeclareNamedGroup(ActionMapGroup)
+   // DeclareNamedGroup(ClientGroup)
+   // DeclareNamedGroup(GuiGroup)
+   // DeclareNamedGroup(GuiDataGroup)
+   // DeclareNamedGroup(TCPGroup)
+   // DeclareNamedGroup(ClientConnectionGroup)
+   // DeclareNamedGroup(SFXParameterGroup);
+   //
+   // DeclareNamedSet(sgMissionLightingFilterSet);
    
    void init();
    void shutdown();

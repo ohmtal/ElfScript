@@ -1230,6 +1230,7 @@ ConsoleValue execute(S32 argc, const char *argv[])
 // Internal execute for object method which does not save the stack
 static ConsoleValue _internalExecute(SimObject *object, S32 argc, ConsoleValue argv[], bool thisCallOnly)
 {
+
    if (object == NULL)
       return (ConsoleValue());
 

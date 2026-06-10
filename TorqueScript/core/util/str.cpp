@@ -316,8 +316,12 @@ class String::StringData : protected StringDataImpl
          if( mRefCount != U32_MAX )
          {
             -- mRefCount;
+            // if( !mRefCount )
+            //    delete this;
+            //XXTH aSAN:
             if( !mRefCount )
-               delete this;
+                dFree(this);
+
          }
       }
 

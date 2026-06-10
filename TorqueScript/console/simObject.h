@@ -762,7 +762,7 @@ class SimObject: public ConsoleObject
       void unregisterObject();
 
       /// Unregister, mark as deleted, and free the object.
-      void deleteObject();
+      virtual void deleteObject();
 
       /// Performs a safe delayed delete of the object using a sim event.
       void safeDeleteObject();
