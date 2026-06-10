@@ -581,17 +581,39 @@ void init()
    gDataBlockGroup->registerObject("DataBlockGroup");
    gRootGroup->addObject(gDataBlockGroup);
    
+   InstantiateNamedSet(GarbageCollectionSet); //XXTH
+
    SimPersistID::init();
 }
 
 void shutdown()
 {
    sgIsShuttingDown = true;
-   
+
+   //XXTH auto GarbageCollection
+   if (Sim::getGarbageCollectionSet())
+   {
+// #ifdef TORQUE_DEBUG
+         // dPrintf(" * lauchning GarbageCollection on %d object(s).\n", Sim::getGarbageCollectionSet()->size());
+// #endif
+         while (Sim::getGarbageCollectionSet()->size() > 0)
+         {
+               SimObject* obj = Sim::getGarbageCollectionSet()->at(0);
+               Sim::getGarbageCollectionSet()->removeObject(obj);
+               obj->deleteObject();
+         }
+   }
+
+
+
    shutdownRoot();
    shutdownEventQueue();
    
    SimPersistID::shutdown();
+
+
+
+
 }
 
 bool isShuttingDown()

@@ -80,6 +80,9 @@ namespace Sim
    // //groups created on the client
    // ImplementNamedGroup(ClientConnectionGroup)
    // ImplementNamedSet(sgMissionLightingFilterSet)
+
+   //XXTH auto garbageCollection
+   ImplementNamedSet(GarbageCollectionSet); //XXTH
 }
 
 //-----------------------------------------------------------------------------

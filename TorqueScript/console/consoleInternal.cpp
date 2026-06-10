@@ -720,6 +720,16 @@ Namespace::~Namespace()
       mUsage = NULL;
       mCleanUpUsage = false;
    }
+
+   //XXTH TEST: ASan:
+   Entry *walk = mEntryList;
+   while(walk)
+   {
+         Entry *next = walk->mNext;
+         // SAFE_DELETE(walk);
+         destructInPlace(walk);
+         walk = next;
+   }
 }
 
 void Namespace::clearEntries()

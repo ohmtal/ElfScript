@@ -616,7 +616,7 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    gIsEvalCompile = fileName == NULL || setFrame == 0;
    gFuncVars = gIsEvalCompile ? &gEvalFuncVars : &gGlobalScopeFuncVars;
 
-   // Set up the parser.
+   // Set up the parser. XXTH memleak!
    smCurrentParser = new TorqueScriptParser();
    AssertISV(smCurrentParser, avar("CodeBlock::compile - no parser available for '%s'!", fileName));
 
@@ -629,6 +629,12 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    {
       smCurrentLineText = "\0";
       delete this;
+
+      //XXTH memleak:
+      SAFE_DELETE(smCurrentParser);
+      smCurrentParser = nullptr;
+      //<<<<<
+
       return Con::EvalResult(Con::getVariable("$ScriptError"));
    }
 
@@ -676,6 +682,12 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    Con::EvalResult execResult = (exec(0, fileName, NULL, localRegisterCount, 0, noCalls, NULL, setFrame));
 
    smCurrentLineText = "\0";
+
+   //XXTH memleak:
+   SAFE_DELETE(smCurrentParser);
+   smCurrentParser = nullptr;
+   //<<<<<
+
    return execResult;
 }
 

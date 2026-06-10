@@ -118,6 +118,8 @@ namespace Sim
    // DeclareNamedGroup(SFXParameterGroup);
    //
    // DeclareNamedSet(sgMissionLightingFilterSet);
+
+   DeclareNamedSet(GarbageCollectionSet); //XXTH
    
    void init();
    void shutdown();

@@ -1575,6 +1575,9 @@ bool SimObject::onAdd()
    // Call onAdd in script!
    onAdd_callback(getId());
 
+   //XXTH i added it on SimObject so far maybe move to EngineObject
+   if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
+
    return true;
 }
 
