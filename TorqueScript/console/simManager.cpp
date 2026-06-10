@@ -593,9 +593,9 @@ void shutdown()
    //XXTH auto GarbageCollection
    if (Sim::getGarbageCollectionSet())
    {
-// #ifdef TORQUE_DEBUG
-         // dPrintf(" * lauchning GarbageCollection on %d object(s).\n", Sim::getGarbageCollectionSet()->size());
-// #endif
+#ifdef TORQUE_DEBUG
+         dPrintf(" * lauchning GarbageCollection on %d object(s).\n", Sim::getGarbageCollectionSet()->size());
+#endif
          while (Sim::getGarbageCollectionSet()->size() > 0)
          {
                SimObject* obj = Sim::getGarbageCollectionSet()->at(0);
