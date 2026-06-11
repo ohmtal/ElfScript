@@ -272,7 +272,7 @@ static DataChunker consoleLogChunker;
 static Vector<ConsoleLogEntry> consoleLog(__FILE__, __LINE__);
 static bool consoleLogLocked;
 bool scriptWarningsAsAsserts = true;
-static bool logBufferEnabled=true;
+static bool logBufferEnabled=false; //XXTH default to false! use consumer
 static S32 printLevel = 10;
 static FileStream consoleLogFile;
 static const char *defLogFileName = "console.log";

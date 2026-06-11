@@ -658,7 +658,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                      NULL,       // thisNamespace
                      0,          // argc
                      NULL,       // argv  ← signals non-function (codelet) call
-                     false,    // noCalls NOTE: XXTH reactivated!!!! and deactivated again
+                     noCalls,    // noCalls NOTE: XXTH reactivated!!!! and deactivated again
                      NULL,       // packageName
                      -2          // setFrame
                   );
@@ -807,8 +807,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       {
          //NOTE XXTH we have noCalls but we want to load the functions!
             // NOTE rolled back cause memory leak!!
-         //orig:
-         if (!noCalls)
+         //orig: if (!noCalls)
          {
             fnName = CodeToSTE(code, ip);
             fnNamespace = CodeToSTE(code, ip + 2);
