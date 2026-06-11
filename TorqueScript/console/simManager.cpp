@@ -594,7 +594,7 @@ void shutdown()
    if (Sim::getGarbageCollectionSet())
    {
 #ifdef TORQUE_DEBUG
-         dPrintf(" * lauchning GarbageCollection on %d object(s).\n", Sim::getGarbageCollectionSet()->size());
+         dPrintf(" * Shutdown Script GarbageCollection on %d Object(s).\n", Sim::getGarbageCollectionSet()->size());
 #endif
          while (Sim::getGarbageCollectionSet()->size() > 0)
          {

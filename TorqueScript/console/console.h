@@ -199,8 +199,16 @@ public:
 
    ConsoleValue& operator=(const ConsoleValue& other)
    {
+      //XXTH memleak
       if (this != &other)
-         copyFrom(other);
+      {
+            cleanupData(); // clean old data!
+            copyFrom(other);
+      }
+
+      // orig:
+      // if (this != &other)
+      //    copyFrom(other);
       return *this;
    }
 

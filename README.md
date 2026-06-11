@@ -5,11 +5,19 @@
 Based on the current (2026-05-xx) Torque3D source code this is my first working version of TorqueScript without Torque3D. 
 It need to be more stripped down because there are much more files than needed and on the other hand i maybe removed to much (threads/mutex).
 
-# ElfScript (WiP)
+## Notable changes:
+    - Fixed some memory leaks :)
+    - Every created Object based on SimObject is added to a GarbageCollections which is clean on shutdown.
+    
+---
+
+# ElfScript (canceled)
 
 ![ElfScript Logo](./ElfScript/res/logo256.png)
 
-The stripdown to minimum of Torque3D's TorqueScript :) 
+~~The stripdown to minimum of Torque3D's TorqueScript :)~~
+I canceled it and work on the TorqueScript folder, because i had to add
+so many source that the difference is not so big.
 
 - [ElfScript](./ElfScript/)
 

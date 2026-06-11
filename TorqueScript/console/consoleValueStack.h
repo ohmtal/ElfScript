@@ -67,10 +67,27 @@ public:
       sp = 0;
    }
 
+   //XXTH memleak
    ~ConsoleValueStack()
    {
+      while (stack.size() > 0)
+      {
+         popFrame();
+      }
+
+      for (S32 i = 0; i < allocatorSize; i += sizeof(ConsoleValue))
+      {
+         destructInPlace<ConsoleValue>(reinterpret_cast<ConsoleValue*>(memory + i));
+      }
+
       dFree(memory);
    }
+
+   // orig:
+   // ~ConsoleValueStack()
+   // {
+   //    dFree(memory);
+   // }
 
    TORQUE_FORCEINLINE void pushFrame(S32 count)
    {
@@ -81,6 +98,21 @@ public:
       stack.push_back(frame);
    }
 
+   //XXTH memleak
+   // TORQUE_FORCEINLINE void popFrame()
+   // {
+   //    AssertISV(stack.size() > 0, "Stack Underflow");
+   //
+   //    Frame& frame = stack.last();
+   //    for (S32 i = 0; i < frame.count; ++i)
+   //    {
+   //       frame.values[i].cleanupData();
+   //    }
+   //
+   //    deAlloc(frame.count);
+   //    stack.pop_back();
+   // }
+   // orig:
    TORQUE_FORCEINLINE void popFrame()
    {
       AssertISV(stack.size() > 0, "Stack Underflow");
@@ -89,11 +121,18 @@ public:
       stack.pop_back();
    }
 
-   TORQUE_FORCEINLINE void push(ConsoleValue val)
+   //XXTH memleak
+   TORQUE_FORCEINLINE void push(const ConsoleValue& val) // Per const-Referenz!
    {
       Frame& frame = stack.last();
-      frame.values[frame.internalCounter++] = (val);
+      frame.values[frame.internalCounter++] = val;
    }
+   //orig
+   // TORQUE_FORCEINLINE void push(ConsoleValue val)
+   // {
+   //    Frame& frame = stack.last();
+   //    frame.values[frame.internalCounter++] = (val);
+   // }
 
    TORQUE_FORCEINLINE void argvc(StringTableEntry fn, S32& argc, ConsoleValue** argv)
    {
