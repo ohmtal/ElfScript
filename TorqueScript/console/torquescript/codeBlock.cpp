@@ -616,7 +616,8 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    gIsEvalCompile = fileName == NULL || setFrame == 0;
    gFuncVars = gIsEvalCompile ? &gEvalFuncVars : &gGlobalScopeFuncVars;
 
-   // Set up the parser. XXTH memleak!
+   // Set up the parser.
+   // XXTH memleak!
    smCurrentParser = new TorqueScriptParser();
    AssertISV(smCurrentParser, avar("CodeBlock::compile - no parser available for '%s'!", fileName));
 
@@ -624,6 +625,11 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    smCurrentParser->setScanBuffer(string, fileName);
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
+
+   //XXTH memleak: TEST HERE !! because of nested exec
+   SAFE_DELETE(smCurrentParser);
+   smCurrentParser = nullptr;
+   //<<<<<
 
    if (!Script::gStatementList)
    {
@@ -679,6 +685,10 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
       Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", codeSize, lastIp);
 
    // repurpose argc as local register counter for global state
+   // XXTH FIXME nested exec cause small memleak on OP_PUSH
+   //            no idea how to fix this and what string it is ..
+   //            maybe smCurrentLine since it's a global variable
+   //            but i also tried scheduled exec in script did cause a other memleak
    Con::EvalResult execResult = (exec(0, fileName, NULL, localRegisterCount, 0, noCalls, NULL, setFrame));
 
    smCurrentLineText = "\0";

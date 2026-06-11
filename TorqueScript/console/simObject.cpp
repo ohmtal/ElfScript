@@ -1586,7 +1586,7 @@ bool SimObject::onAdd()
 void SimObject::onRemove()
 {
   // Call onRemove in script!
-  onRemove_callback(getId());
+   if (!Sim::isShuttingDown()) onRemove_callback(getId());
 
    mFlags.clear(Added);
 
