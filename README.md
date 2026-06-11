@@ -18,11 +18,10 @@ It need to be more stripped down because there are much more files than needed a
     - added some classes to test Sprite/Texture/Label/Font/Audio instance ....
 
 [Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
+
 ---
 
 # ElfScript (canceled)
-
-![ElfScript Logo](./ElfScript/res/logo256.png)
 
 ~~The stripdown to minimum of Torque3D's TorqueScript :)~~
 I canceled it and work on the TorqueScript folder, because i had to add
