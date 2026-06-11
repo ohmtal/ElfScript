@@ -6,16 +6,18 @@ Based on the current (2026-05-xx) Torque3D source code this is my first working 
 It need to be more stripped down because there are much more files than needed and on the other hand i maybe removed to much (threads/mutex).
 
 ## Notable changes:
-    - Made it standalone
-    - Ripped out some stuff i dont need like Taml
-    - Fixed some memory leaks :)
-    - Every created Object based on SimObject is added to a GarbageCollections which is clean on shutdown.
-    
+
+- Made it standalone
+- Ripped out some stuff i dont need like Taml
+- Fixed some memory leaks :)
+- Every created Object based on SimObject is added to a GarbageCollections which is clean on shutdown.
+
 ---
 # Example / TestBed Application using OhmFlux:
-    - added math (using also Ohmflux functions)
-    - added Platform functions (not complete)
-    - added some classes to test Sprite/Texture/Label/Font/Audio instance ....
+
+- added math (using also Ohmflux functions)
+- added Platform functions (not complete)
+- added some classes to test Sprite/Texture/Label/Font/Audio instance ....
 
 [Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
 
