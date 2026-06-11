@@ -43,6 +43,11 @@
 
 using namespace Compiler;
 
+//XXTH macro to cleanup stack
+// XXTH I simply did not set:  ConsoleValue::resetConversionBuffer();  in my mainloop!
+// was a funny digging many hours long ;)
+#define POP_STK() { /*stack[_STK].cleanupData();*/ _STK--; }
+
 enum EvalConstants
 {
    MaxStackSize = 1024,
@@ -424,11 +429,11 @@ TORQUE_NOINLINE void doSlowMathOp()
    if constexpr (Op == FloatOperation::NE)
       stack[_STK - 1].setInt(a.getFloat() != b.getFloat());
 
-   _STK--;
+   POP_STK(); //XXTH memfix attempt orig: _STK--;
 }
 
 template<FloatOperation Op>
-TORQUE_FORCEINLINE void doFloatMathOperation()
+TORQUE_FORCEINLINE inline void doFloatMathOperation()
 {
    ConsoleValue& a = stack[_STK];
    ConsoleValue& b = stack[_STK - 1];
@@ -460,7 +465,7 @@ TORQUE_FORCEINLINE void doFloatMathOperation()
       if constexpr (Op == FloatOperation::NE)
          stack[_STK - 1].setFastInt(a.getFastFloat() != b.getFastFloat());
 
-      _STK--;
+      POP_STK(); //XXTH memfix attempt orig: _STK--;
    }
    else
    {
@@ -506,11 +511,11 @@ TORQUE_NOINLINE void doSlowIntegerOp()
    if constexpr (Op == IntegerOperation::LogicalOr)
       stack[_STK - 1].setBool(a.getInt() || b.getInt());
 
-   _STK--;
+   POP_STK(); //XXTH memfix attempt orig: _STK--;
 }
 
 template<IntegerOperation Op>
-TORQUE_FORCEINLINE void doIntOperation()
+TORQUE_FORCEINLINE inline void doIntOperation()
 {
    ConsoleValue& a = stack[_STK];
    ConsoleValue& b = stack[_STK - 1];
@@ -535,7 +540,7 @@ TORQUE_FORCEINLINE void doIntOperation()
       if constexpr (Op == IntegerOperation::LogicalOr)
          stack[_STK - 1].setBool(a.getFastInt() || b.getFastInt());
 
-      _STK--;
+      POP_STK(); //XXTH memfix attempt orig: _STK--;
    }
    else
    {
@@ -865,13 +870,13 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_DEFAULT_END:
       {
          returnValue = stack[_STK];
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
 
          while (iterDepth > 0)
          {
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
          }
 
          goto execFinished;
@@ -1246,7 +1251,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          // our group reference.
          bool placeAtRoot = code[ip++];
          if (!placeAtRoot)
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
       }
 
@@ -1306,7 +1311,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_JMPIFNOT_NP:
          if (stack[_STK].getInt())
          {
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
             ip++;
             break;
          }
@@ -1315,7 +1320,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_JMPIF_NP:
          if (!stack[_STK].getInt())
          {
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
             ip++;
             break;
          }
@@ -1335,7 +1340,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                iterStack[--_ITER].mIsStringIter = false;
                --iterDepth;
 
-               _STK--; // this is a pop from foreach()
+               POP_STK(); //XXTH memfix attempt orig: _STK--;    // this is a pop from foreach()
             }
          }
 
@@ -1347,7 +1352,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_RETURN:
       {
          returnValue = (stack[_STK]);
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1355,14 +1360,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
          }
 
          goto execFinished;
       }
       case OP_RETURN_FLT:
          returnValue.setFloat(stack[_STK].getFloat());
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1370,14 +1375,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
          }
 
          goto execFinished;
 
       case OP_RETURN_UINT:
          returnValue.setInt(stack[_STK].getInt());
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1385,7 +1390,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            _STK--;
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
          }
 
          goto execFinished;
@@ -1477,7 +1482,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             stack[_STK - 1].setInt(stack[_STK].getInt() % divisor);
          else
             stack[_STK - 1].setInt(0);
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
       }
 
@@ -1829,7 +1834,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
       case OP_POP_STK:
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
 
       case OP_LOADIMMED_UINT:
@@ -2162,13 +2167,13 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
 
          stack[_STK - 1].setStringRef(concat, len);
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
       }
 
       case OP_COMPARE_STR:
          stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
 
       case OP_PUSH:
@@ -2263,7 +2268,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
                ip = failIp;
                // Pop the iterated value
-               _STK--;
+               POP_STK(); //XXTH memfix attempt orig: _STK--;
                continue;
             }
 
@@ -2364,7 +2369,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          --_ITER;
          --iterDepth;
 
-         _STK--;
+         POP_STK(); //XXTH memfix attempt orig: _STK--;
 
          iterStack[_ITER].mIsStringIter = false;
          break;
@@ -2437,6 +2442,19 @@ execFinished:
    AssertFatal(!(_STK > stackStart), "String stack not popped enough in script exec");
    AssertFatal(!(_STK < stackStart), "String stack popped too much in script exec");
 #endif
+
+   //XXTH HARDCORE CLEANUP! FIXME try to find out MaxStackDepth could be
+   // the macro does it job and did reduce the mem / sec from ~5MB to 1.5MB
+   // but this does nothing
+   // for (U32 i = _STK + 1; i < MaxStackSize; i++)
+   // {
+   //       stack[i].cleanupData();
+   // }
+
+   // XXTH maybe this: NOTE this must be done in MainLoop
+   //
+   // ConsoleValue::resetConversionBuffer();
+   //<<<<<<<<< XXTH
 
    return Con::EvalResult((returnValue));
 }

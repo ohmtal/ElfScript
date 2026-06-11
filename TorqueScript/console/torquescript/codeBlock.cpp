@@ -684,11 +684,6 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    if (lastIp + 1 != codeSize)
       Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", codeSize, lastIp);
 
-   // repurpose argc as local register counter for global state
-   // XXTH FIXME nested exec cause small memleak on OP_PUSH
-   //            no idea how to fix this and what string it is ..
-   //            maybe smCurrentLine since it's a global variable
-   //            but i also tried scheduled exec in script did cause a other memleak
    Con::EvalResult execResult = (exec(0, fileName, NULL, localRegisterCount, 0, noCalls, NULL, setFrame));
 
    smCurrentLineText = "\0";
