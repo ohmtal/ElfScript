@@ -44,22 +44,19 @@ namespace engineGlue
         engineAPI::gIsInitialized = true;
         Sim::init();
 
-        // FIXME add logger
         if (!LogFunc) {
             Con::addConsumer(DefaultLogger);
         } else {
             Con::addConsumer(*LogFunc);
         }
-
     }
-
+    // -----------------------------------------------------------------------------
     // SimTime U32 ms since last Loop
     void process(SimTime delta) {
         Sim::advanceTime(delta);
         ConsoleValue::resetConversionBuffer();
     }
-
-
+    // -----------------------------------------------------------------------------
     void shutDown() {
         Sim::shutdown();
 

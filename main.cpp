@@ -31,6 +31,8 @@ int main() {
         $foo.bar();
         warn("FIXME basic math here:");
         echo(mSin(3.14)); //math not impemented so far
+
+        schedule(0, 0, "echo", "hello scheduler");
     )";
     Con::evaluatef(code.c_str());
 
@@ -47,7 +49,7 @@ int main() {
     //
     // Con::unlockLog();
 
-    // --------- fake loop
+    // --------- advance time for scheduler this should be placed in the main loop
     engineGlue::process(0);
 
     // -------- finallize
