@@ -212,6 +212,7 @@ elseif(UNIX)
 endif()
 
 set(TORQUESCRIPT_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/main/engineGlue.cpp
     ${CONSOLE_SRC}
     ${CORE_SRC}
     ${PLATFORM_SRC}
