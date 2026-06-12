@@ -1,5 +1,6 @@
 #pragma once
 #include "console/console.h"
+#include "console/sim.h"
 
 namespace engineGlue
 {
