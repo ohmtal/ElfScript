@@ -77,6 +77,15 @@ inline bool dCompareAndSwap( volatile U64& ref, U64 oldVal, U64 newVal )
    #endif
 }
 
+#if defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+inline bool dCompareAndSwap( volatile unsigned long& ref, unsigned long oldVal, unsigned long newVal )
+{
+   //FIXME macos ?
+   return __sync_bool_compare_and_swap( &ref, oldVal, newVal );
+}
+#endif
+
+
 /// Performs an atomic read operation.
 inline U32 dAtomicRead( volatile U32 &ref )
 {

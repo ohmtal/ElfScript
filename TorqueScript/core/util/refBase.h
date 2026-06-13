@@ -108,7 +108,9 @@ public:
    [[nodiscard]] constexpr operator T*()        const { return getPointer(); }
    
    /// Returns the pointer.
-   [[nodiscard]] constexpr T* getPointer() const
+   // XXTH Variable of non-literal type 'shared_ptr<WeakControlBlock>' cannot be defined in a constexpr function before C++23
+   //orig: [[nodiscard]] constexpr T* getPointer() const
+   [[nodiscard]] T* getPointer() const
    {
       auto ctrl = mWeak.lock();
       if (!ctrl || !ctrl->object)
