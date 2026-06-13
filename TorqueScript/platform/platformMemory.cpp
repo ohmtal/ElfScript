@@ -24,7 +24,7 @@
 #include <string.h>    // For memcpy, memmove, memset, memcmp
 #include <stdlib.h>    // For malloc, free
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(TORQUE_CPU_ARM64)
 #include <immintrin.h> // For _mm_malloc, _mm_free (x86/x64 only)
 #endif
 

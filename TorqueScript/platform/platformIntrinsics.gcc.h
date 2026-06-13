@@ -77,7 +77,7 @@ inline bool dCompareAndSwap( volatile U64& ref, U64 oldVal, U64 newVal )
    #endif
 }
 
-#if defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+#if defined(__EMSCRIPTEN__) /*|| defined(__ANDROID__)*/
 inline bool dCompareAndSwap( volatile unsigned long& ref, unsigned long oldVal, unsigned long newVal )
 {
    //FIXME macos ?

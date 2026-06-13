@@ -120,7 +120,7 @@ typedef uint64_t    U64;
 //#     define TORQUE_SUPPORTS_NASM
 #  endif
 
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) ||  defined(__android__)
 #  define TORQUE_OS_STRING "Android"
 #   define TORQUE_OS_ANDROID
 #  include "platform/types.posix.h"
@@ -147,15 +147,19 @@ typedef uint64_t    U64;
 #  define TORQUE_CPU_X64
 #  define TORQUE_LITTLE_ENDIAN
 
+#elif defined(__ANDROID__) ||  defined(__android__)
+#  define TORQUE_LITTLE_ENDIAN
+#  define TORQUE_CPU_ARM64
+
+
 #elif (defined( __arm64__ ) && defined( __APPLE__ )) || defined( __arch64__ )
 #  define TORQUE_CPU_STRING "Arm 64"
 #  define TORQUE_CPU_ARM64
 #  define TORQUE_LITTLE_ENDIAN
 
-#elif defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__)
+#elif defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__) ||  defined(__ANDROID__) ||  defined(__android__)
 #  define TORQUE_LITTLE_ENDIAN
 #  define TORQUE_CPU_X86
-
 
 #else
 #  error "GCC: Unsupported Target CPU"

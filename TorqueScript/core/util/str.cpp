@@ -1461,14 +1461,34 @@ S32 String::StrFormat::formatAppend( const char *format, va_list args )
    // Format into the dynamic buffer, if the buffer is not large enough, then
    // keep doubling it's size until it is.  The buffer is not reallocated
    // using reallocate() to avoid unnecessary buffer copying.
-   _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+
+   //XXTH orig:
+   // _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+   // while (_len < 0 || _len >= _dynamicSize)
+   // {
+   //    _len = startLen;
+   //    _dynamicBuffer = (char*)dRealloc(_dynamicBuffer, _dynamicSize *= 2);
+   //    _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+   // }
+   // XXTH android fix:
+
+   va_list argsCopy;
+   va_copy(argsCopy, args);
+   _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, argsCopy);
+   va_end(argsCopy);
+
    while (_len < 0 || _len >= _dynamicSize)
    {
-      _len = startLen;
-      _dynamicBuffer = (char*)dRealloc(_dynamicBuffer, _dynamicSize *= 2);
-      _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+         _len = startLen;
+         _dynamicBuffer = (char*)dRealloc(_dynamicBuffer, _dynamicSize *= 2);
+
+         va_copy(argsCopy, args);
+         _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, argsCopy);
+         va_end(argsCopy);
    }
 
+
+   // <<<<<<<<<<<<<<<<
    return _len;
 }
 
