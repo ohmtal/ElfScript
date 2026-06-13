@@ -42,9 +42,7 @@
 #undef max
 #endif
 
-namespace ElfFlux {
-
-
+namespace ElfMath {
 
 // class MatrixF;
 // class PlaneF;
@@ -128,9 +126,37 @@ inline void m_matF_x_vectorF(const F32 *m, const F32 *v, F32 *vresult)
    vresult[2] = m[8]*v[0] + m[9]*v[1] + m[10]*v[2];
 }
 
-// U32 getNextPow2(U32 io_num);
+inline U32 getNextPow2(U32 io_num)
+{
+    S32 oneCount   = 0;
+    S32 shiftCount = -1;
+    while (io_num) {
+        if(io_num & 1)
+            oneCount++;
+        shiftCount++;
+        io_num >>= 1;
+    }
+    if(oneCount > 1)
+        shiftCount++;
 
-U32 getBinLog2(U32 io_num);
+    return U32(1 << shiftCount);
+}
+
+// note: impl from T2D
+inline U32 getBinLog2(U32 io_num)
+{
+    //AssertFatal(io_num != 0 && isPow2(io_num) == true,
+    //            "Error, this only works on powers of 2 > 0");
+
+    S32 shiftCount = 0;
+    while (io_num) {
+        shiftCount++;
+        io_num >>= 1;
+    }
+
+    return U32(shiftCount - 1);
+}
+
 
 
 /// Determines if the given U32 is some 2^n

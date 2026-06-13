@@ -536,7 +536,7 @@ SimObject* SimSet::findObjectByLineNumber(const char* fileName, S32 declarationL
 SimObject* SimSet::getRandom()
 {
    if (size() > 0)
-      return mObjectList[mRandI(0, size() - 1)];
+      return mObjectList[ElfMath::mRandI(0, size() - 1)];
 
    return NULL;
 }
