@@ -204,6 +204,10 @@ set(WIN_SRC
 )
 
 
+set(MATH_SRC
+   ${CMAKE_CURRENT_LIST_DIR}/math/mConsoleFunctions.cpp
+)
+
 
 if(WIN32)
     list(APPEND PLATFORM_SRC ${WIN_SRC})
@@ -216,5 +220,6 @@ set(TORQUESCRIPT_SRC
     ${CONSOLE_SRC}
     ${CORE_SRC}
     ${PLATFORM_SRC}
+    ${MATH_SRC}
 )
 

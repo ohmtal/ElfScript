@@ -29,8 +29,8 @@ int main() {
         $foo = new ScriptObject() { class = "FOO"; };
         $foo.userValue = 4711;
         $foo.bar();
-        warn("FIXME basic math here:");
-        echo(mSin(3.14)); //math not impemented so far
+
+        echo("mSin(3.14) =" SPC mSin(3.14));
 
         schedule(0, 0, "echo", "hello scheduler");
     )";

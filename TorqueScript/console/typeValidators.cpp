@@ -25,7 +25,7 @@
 #include "console/consoleObject.h"
 #include "console/typeValidators.h"
 #include "console/simBase.h"
-#include "core/XXTHMath.h"
+#include "math/mMathRand.h"
 #include <stdarg.h>
 
 void TypeValidator::consoleError(SimObject *object, StringTableEntry varname, const char *format, ...)

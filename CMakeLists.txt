@@ -20,7 +20,7 @@ if (BUILD_TORQUESCRIPT)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
     add_executable(${TARGET_NAME} main.cpp
         ${TORQUESCRIPT_SRC}
-        ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/platform/XXTHPlatformProcess.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/platform/stub/platformProcess.cpp
     )
     target_include_directories(${TARGET_NAME} PRIVATE "./" "./TorqueScript/" )
 endif()
