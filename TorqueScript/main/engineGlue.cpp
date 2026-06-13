@@ -4,6 +4,7 @@
 #include "sim/netStringTable.h"
 #include "console/engineAPI.h"
 #include <platform/platformVolume.h>
+#include "engineGlue.h"
 //--------------------------------------------------------------------------------------
 namespace engineAPI
 {
@@ -23,7 +24,7 @@ namespace engineGlue
 
     }
     // -----------------------------------------------------------------------------
-    void init( ConsumerCallback LogFunc = nullptr, String initialDirectory = "assets:/")
+    void init( ConsumerCallback LogFunc, String initialDirectory )
     {
         // Asserts should be created FIRST
         PlatformAssert::create();
@@ -45,9 +46,10 @@ namespace engineGlue
         Sim::init();
 
         if (!LogFunc) {
-            Con::addConsumer(DefaultLogger);
+            Con::addConsumer(mLogger);
         } else {
-            Con::addConsumer(*LogFunc);
+            Con::addConsumer(LogFunc);
+            mLogger = LogFunc;
         }
     }
     // -----------------------------------------------------------------------------
@@ -70,6 +72,8 @@ namespace engineGlue
         // asserts should be destroyed LAST
         PlatformAssert::destroy();
 
+        Con::removeConsumer(mLogger);
         engineAPI::gIsInitialized = false;
+
     }
 } //engineGlue
