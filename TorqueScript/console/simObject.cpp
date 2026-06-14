@@ -1580,7 +1580,7 @@ bool SimObject::onAdd()
    // so Sim::getGarbageCollectionSet() is a dangling pointer ?!
    // this can also happen to RootGroup .... FIMXE deny this by checking on delete or unregisterObject ?!
    //
-   Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
+   // Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
 
 
    if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
