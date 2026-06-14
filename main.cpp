@@ -7,24 +7,50 @@
 #include "console/engineAPI.h"
 
 
+// register enum >>>>
+#include "console/consoleExtras.h"
+// <<<<
+
+
+enum MyEnum {
+    None = 0,
+    One,
+    Two,
+    Three
+};
+
 DefineEngineFunction(helloWorld, void, (String name), , "hello world")
 {
     Con::printf("Hello World: %s", name.c_str());
 }
 
 
+
+
+
 int main() {
     printf("Startup ....\n");
+
+
     engineGlue::init();
+
+    // register enum Test >>
+    Con::registerEnumS32<MyEnum>("$MyEnum::");
+    // <<<<<
+
+
     // filesystem not implemented   Con::setLogMode(0);
     std::string code= R"(
+        echo("EnumTest ..................");
+        echo($MyEnum::None SPC $MyEnum::One SPC $MyEnum::Two);
+        echo("......................");
         helloWorld("tom");
         error("This is NOT a error!");
         warn("This is NOT a warning!");
         echo( 5 + 5 );
 
         function FOO::bar(%this) {
-            %this.dump();
+            echo(%this.getClassName());
         }
         $foo = new ScriptObject() { class = "FOO"; };
         $foo.userValue = 4711;

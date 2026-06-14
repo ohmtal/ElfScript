@@ -111,6 +111,10 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/parser.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/runtime.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/runtime.h
+
+    # XXTH my extras ...
+    ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.cpp
 )
 
 set(CORE_SRC
