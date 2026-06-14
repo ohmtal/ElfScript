@@ -1576,6 +1576,13 @@ bool SimObject::onAdd()
    onAdd_callback(getId());
 
    //XXTH i added it on SimObject so far maybe move to EngineObject
+   // funny this can be accessed in script which is basicly fine, but it can be also deleted!
+   // so Sim::getGarbageCollectionSet() is a dangling pointer ?!
+   // this can also happen to RootGroup .... FIMXE deny this by checking on delete or unregisterObject ?!
+   //
+   Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
+
+
    if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
 
    return true;
