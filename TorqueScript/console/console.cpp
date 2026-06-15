@@ -520,7 +520,22 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
          // Look up the object identifier.
          dStrncpy(completionBuffer, inputBuffer + p, objLast - p);
          completionBuffer[objLast - p] = 0;
-         tabObject = Sim::findObject(completionBuffer);
+
+         //XXTH autocomplete $ objects findObject need the id!
+         char c = *completionBuffer;
+         if (c == '$') {
+            // Con::errorf("[debug] we got a global variable at %s id:%s"
+            // , completionBuffer
+            // , Con::getVariable(completionBuffer)
+            // );
+            tabObject = Sim::findObject(Con::getVariable(completionBuffer));
+        } else {
+            tabObject = Sim::findObject(completionBuffer);
+        }
+        // <<<< XXTH
+
+
+         //orig: tabObject = Sim::findObject(completionBuffer);
          if (tabObject == NULL) 
          {
             // Bail if not found.
