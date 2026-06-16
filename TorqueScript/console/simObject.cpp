@@ -3071,7 +3071,34 @@ DefineEngineMethod( SimObject, setFieldValue, bool, ( const char* fieldName, con
 }
 
 //-----------------------------------------------------------------------------
+// XXTH like setFieldValue + setFieldType == ROCK 'N ROLL
+DefineEngineMethod( SimObject, addTypeField, bool,
+                    ( const char* fieldName, const char* type, const char* value  ), ,
+                    "Set the value and console type of the given field on this object.\n"
+                    "NOTE: this cant be used with arrays like setFieldValue"
+                    "@param fieldName The name of the field to assign to.  If it includes an array index, the index will be parsed out.\n"
+                    "@param type The name of the console type.\n"
+                    "@param value The new value to assign to the field.\n"
+                    "@return True." )
+{
 
+      if( !fieldName || !fieldName[0] )
+      {
+            AssertFatal(false, "SimObject::addTypeField - Invalid field name.");
+            Con::errorf( "SimObject::addTypeField - Invalid field name." );
+            return false;
+      }
+
+
+
+      fieldName = StringTable->insert( fieldName );
+
+      object->setDataField( fieldName, nullptr, value );
+      object->setDataFieldType( type,  fieldName, NULL );
+
+      return true;
+}
+//-----------------------------------------------------------------------------
 DefineEngineMethod( SimObject, getFieldType, const char*, ( const char* fieldName ),,
    "Get the console type code of the given field.\n"
    "@return The numeric type code for the underlying console type of the given field." )

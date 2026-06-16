@@ -21,7 +21,6 @@ namespace engineGlue
             case 2: dPrintf("[error] %s\n",  consoleLine); break;
             default: dPrintf("%s\n",  consoleLine); break;
         }
-
     }
     // -----------------------------------------------------------------------------
     void init( ConsumerCallback LogFunc, String initialDirectory )
