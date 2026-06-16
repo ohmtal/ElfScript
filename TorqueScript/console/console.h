@@ -81,6 +81,8 @@ struct ConsoleLogEntry
       Normal = 0,
       Warning,
       Error,
+      Info,
+      Debug,
       NUM_CLASS
    } mLevel;
 
@@ -976,10 +978,20 @@ namespace Con
    /// @param ...       Variables to be written
    void warnf(const char *_format, ...);
 
-   /// @note The console window colors warning text as RED.
+   /// @note The console window colors errors text as RED.
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void errorf(const char *_format, ...);
+
+   /// @note The console window colors info text as YELLOW.
+   /// @param _format   A stdlib printf style formatted out put string
+   /// @param ...       Variables to be written
+   void infof(const char *_format, ...);
+
+   /// @note The console window colors debug text as BLUE.
+   /// @param _format   A stdlib printf style formatted out put string
+   /// @param ...       Variables to be written
+   void debugf(const char *_format, ...);
 
    /// @note The console window colors warning text as LIGHT GRAY.
    /// @param type      Allows you to associate the warning message with an internal module.

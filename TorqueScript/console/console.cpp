@@ -783,6 +783,20 @@ void errorf(const char* fmt,...)
    va_end(argptr);
 }
 
+void infof(const char* fmt,...)
+{
+      va_list argptr;
+      va_start(argptr, fmt);
+      _printf(ConsoleLogEntry::Info, ConsoleLogEntry::General, fmt, argptr);
+      va_end(argptr);
+}
+void debugf(const char* fmt,...)
+{
+      va_list argptr;
+      va_start(argptr, fmt);
+      _printf(ConsoleLogEntry::Debug, ConsoleLogEntry::General, fmt, argptr);
+      va_end(argptr);
+}
 //---------------------------------------------------------------------------
 
 bool getVariableObjectField(const char *name, SimObject **object, const char **field)
