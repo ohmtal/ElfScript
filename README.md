@@ -1,25 +1,40 @@
-# TorqueScript
+# TorqueScript aka ElfScript
 
 👾 Now it's alive :D. 
 
-Based on the current (2026-05-xx) Torque3D source code this is my first working version of TorqueScript without Torque3D. 
+Based on the Torque3D (4.x) source code this is my first working version of TorqueScript without Torque3D. 
 It need to be more stripped down because there are much more files than needed and on the other hand i maybe removed to much (threads/mutex).
 
 ## Notable changes:
 
 - Made it standalone
+- EngineGlue for init/process/shutdown
 - Ripped out some stuff i dont need like Taml
 - Fixed some memory leaks :)
 - Every created Object based on SimObject is added to a GarbageCollections which is clean on shutdown.
+- Added auto enum binding as constants
+- Added new Log functions
+- Added an GarabageCollectionSet
+- Fixed Emscripten and Android Build  (Android untested)
+- Relaced Math with Light Version since the Types like Vector are removed
 
 ---
 # Example / TestBed Application using OhmFlux:
 
-- added math (using also Ohmflux functions)
+- ~~added math (using also Ohmflux functions)~~
 - added Platform functions (not complete)
 - added some classes to test Sprite/Texture/Label/Font/Audio instance ....
 
 [Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
+
+# Raylib Bindings (raylib-elfscript):
+
+- Using the raylib commands but in three Main-Callbacks:
+    - function MainInit() { return true;}
+    - function MainUpdate() {}
+    - function MainShutDown() {}
+
+[raylib-elfscript](https://github.com/ohmtal/raylib-elfscript)
 
 ---
 
