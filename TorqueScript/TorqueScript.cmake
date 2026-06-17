@@ -202,9 +202,12 @@ set(PLATFORM_SRC
 
 set(POSIX_SRC
    ${CMAKE_CURRENT_LIST_DIR}/platform/posix/posixVolume.cpp
+   ${CMAKE_CURRENT_LIST_DIR}/platform/posix/POSIXConsole.cpp
 )
 set(WIN_SRC
+# FIXME Test / fix this :
    ${CMAKE_CURRENT_LIST_DIR}/platform/win/winVolume.cpp
+   # ${CMAKE_CURRENT_LIST_DIR}/platform/win/winConsole.cpp
 )
 
 

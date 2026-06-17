@@ -304,6 +304,7 @@ static void makeCleanPathInPlace( char* path )
 
 char * Platform::makeFullPathName(const char *path, char *buffer, U32 size, const char *cwd /* = NULL */)
 {
+   if (!path) return nullptr; //XXTH sanity
    char bspath[1024];
    dStrncpy(bspath, path, sizeof(bspath));
    bspath[sizeof(bspath)-1] = 0;
@@ -329,8 +330,12 @@ char * Platform::makeFullPathName(const char *path, char *buffer, U32 size, cons
    //    that much sense to me to base things off the current working directory here.
 
    #ifndef TORQUE_SCECURE_VFS
-   if(cwd == NULL)
+   if(cwd == NULL) {
       cwd = Con::isCurrentScriptToolScript() ? Platform::getMainDotCsDir() : Platform::getCurrentDirectory();
+   }
+
+   // XXTH fallback
+   if (cwd == NULL) cwd = "game:/";
    #else
    if (cwd == NULL)
       cwd = "game:/";
@@ -442,6 +447,7 @@ String Platform::stripExtension( String fileName, Vector< String >& validExtensi
 StringTableEntry Platform::makeRelativePathName(const char *path, const char *to)
 {
    // Make sure 'to' is a proper absolute path terminated with a forward slash.
+   if (!path) return StringTable->EmptyString(); //XXTH sanitiy
 
    char buffer[ 2048 ];
    if( !to )

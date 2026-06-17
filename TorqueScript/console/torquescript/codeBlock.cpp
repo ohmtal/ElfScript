@@ -601,7 +601,9 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
       if (fullPath == NULL)
       {
          char buf[1024];
-         fullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
+         //XXTH sanity if path not set
+         const char * fullPath = Platform::makeFullPathName(fileName, buf, sizeof(buf));
+         fullPath = fullPath ? StringTable->insert(fullPath, true) : StringTable->EmptyString();
       }
 
       modPath = Con::getModNameFromPath(fileName);

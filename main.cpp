@@ -11,6 +11,9 @@
 #include "console/consoleExtras.h"
 // <<<<
 
+#if defined(__unix__)
+#include <platform/posix/POSIXStdConsole.h>
+#endif
 
 enum MyEnum {
     None = 0,
@@ -25,14 +28,56 @@ DefineEngineFunction(helloWorld, void, (String name), , "hello world")
 }
 
 
+bool gShutDownRequest = false;
+
+int argParser(int argc, char* argv[]) {
+
+    gShutDownRequest = true; //default no loop!
+    String argStr;
+    // argv[0] is program name
+    for (int i = 1; i < argc; ++i) {
+        if (!argv[i]) continue;
+        argStr = argv[i];
+
+        if (argStr.equal("--loop")) {
+            gShutDownRequest = false;
+            continue;
+        }
+
+        // filename test
+        if (argStr.equal("--script")) {
+            if (i + 1 < argc) {
+                String tmpFile = argv[++i];
+                Con::infof("Script File test: %s", tmpFile.c_str());
+            } else {
+                Con::errorf("--script but no file parameter usage: --script myFile.cs");
+                return 1;
+            }
+            continue;
+        }
+
+    } //for ...
+    return 0;
+}
 
 
-
-int main() {
+int main(int argc, char* argv[]) {
     printf("Startup ....\n");
 
 
     engineGlue::init();
+    int ret = argParser(argc, argv);
+    if (ret != 0) return ret;
+
+    Con::addVariable("ShutDownRequest", TypeBool, &gShutDownRequest, "");
+
+#if defined(__unix__)
+    // console test:
+    StdConsole::create();
+    stdConsole->enable(!gShutDownRequest);
+    stdConsole->enableInput(!gShutDownRequest);
+#endif
+
 
     // register enum Test >>
     Con::registerEnumS32<MyEnum>("$MyEnum::");
@@ -59,8 +104,16 @@ int main() {
         echo("mSin(3.14) =" SPC mSin(3.14));
 
         schedule(0, 0, "echo", "hello scheduler");
+
+        // -------------------------
+        // ... overwrite quit ...
+        function quit() {
+            $ShutDownRequest = true;
+        }
+        // -------------------------
+
     )";
-    Con::evaluatef(code.c_str());
+    Con::evaluate(code.c_str(), false, "");
 
     // // ------ output log entries:
     // ConsoleLogEntry *log;
@@ -76,7 +129,17 @@ int main() {
     // Con::unlockLog();
 
     // --------- advance time for scheduler this should be placed in the main loop
-    engineGlue::process(0);
+    while (!gShutDownRequest) {
+          engineGlue::process(0);
+
+          #if defined(__unix__)
+          stdConsole->process();
+          #endif
+
+          Platform::sleep(16);
+
+    }
+
 
     // -------- finallize
     engineGlue::shutDown();
