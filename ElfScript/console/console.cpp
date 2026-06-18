@@ -1580,34 +1580,34 @@ const char *getFormattedData(S32 type, const char *data, const EnumTable *tbl, B
 
 //------------------------------------------------------------------------------
 
-bool isCurrentScriptToolScript()
-{
-   // With a player build we ALWAYS return false
-#ifndef TORQUE_TOOLS
-   return false;
-#else
-   const StringTableEntry cbFullPath = getCurrentScriptModulePath();
-   if(cbFullPath == NULL)
-      return false;
-   const StringTableEntry exePath = Platform::getMainDotCsDir();
-
-   return dStrnicmp(exePath, cbFullPath, dStrlen(exePath)) == 0;
-#endif
-}
+// bool isCurrentScriptToolScript()
+// {
+//    // With a player build we ALWAYS return false
+// #ifndef TORQUE_TOOLS
+//    return false;
+// #else
+//    const StringTableEntry cbFullPath = getCurrentScriptModulePath();
+//    if(cbFullPath == NULL)
+//       return false;
+//    const StringTableEntry exePath = Platform::getMainDotCsDir();
+//
+//    return dStrnicmp(exePath, cbFullPath, dStrlen(exePath)) == 0;
+// #endif
+// }
 
 //------------------------------------------------------------------------------
 
-bool isScriptFile(const char* pFilePath)
-{
-   return (Torque::FS::IsFile(pFilePath)
-      || Torque::FS::IsFile(pFilePath + String(".dso"))
-      || Torque::FS::IsFile(pFilePath + String(".mis"))
-      || Torque::FS::IsFile(pFilePath + String(".mis.dso"))
-      || Torque::FS::IsFile(pFilePath + String(".gui"))
-      || Torque::FS::IsFile(pFilePath + String(".gui.dso"))
-      || Torque::FS::IsFile(pFilePath + String("." TORQUE_SCRIPT_EXTENSION))
-      || Torque::FS::IsFile(pFilePath + String("." TORQUE_SCRIPT_EXTENSION) + String(".dso")));
-}
+// bool isScriptFile(const char* pFilePath)
+// {
+//    return (Torque::FS::IsFile(pFilePath)
+//       || Torque::FS::IsFile(pFilePath + String(".dso"))
+//       || Torque::FS::IsFile(pFilePath + String(".mis"))
+//       || Torque::FS::IsFile(pFilePath + String(".mis.dso"))
+//       || Torque::FS::IsFile(pFilePath + String(".gui"))
+//       || Torque::FS::IsFile(pFilePath + String(".gui.dso"))
+//       || Torque::FS::IsFile(pFilePath + String("." TORQUE_SCRIPT_EXTENSION))
+//       || Torque::FS::IsFile(pFilePath + String("." TORQUE_SCRIPT_EXTENSION) + String(".dso")));
+// }
 
 //------------------------------------------------------------------------------
 
@@ -1684,11 +1684,11 @@ void popInstantGroup()
 }
 
 
-typedef HashMap<StringTableEntry, StringTableEntry> typePathExpandoMap;
-static typePathExpandoMap PathExpandos;
+// typedef HashMap<StringTableEntry, StringTableEntry> typePathExpandoMap;
+// static typePathExpandoMap PathExpandos;
 
 //-----------------------------------------------------------------------------
-
+/*
 void addPathExpando(const char* pExpandoName, const char* pPath)
 {
    // Sanity!
@@ -1857,254 +1857,254 @@ StringTableEntry getPathExpandoValue(U32 expandoIndex)
    while (expandoIndex > 0) { ++expandoItr; --expandoIndex; }
 
    return expandoItr->value;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 
-bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint, const bool ensureTrailingSlash)
-{
-   char pathBuffer[2048] = {};
-   const char* pSrc = pSrcPath;
-   char* pSlash;
-
-   // Fetch leading character.
-   const char leadingToken = *pSrc;
-
-   // Fetch following token.
-   const char followingToken = leadingToken != 0 ? pSrc[1] : 0;
-
-   // Expando.
-   if (leadingToken == '^')
-   {
-      // Initial prefix search.
-      const char* pPrefixSrc = pSrc + 1;
-      char* pPrefixDst = pathBuffer;
-
-      // Search for end of expando.
-      while (*pPrefixSrc != '/' && *pPrefixSrc != 0)
-      {
-         // Copy prefix character.
-         *pPrefixDst++ = *pPrefixSrc++;
-      }
-
-      // Yes, so terminate the expando string.
-      *pPrefixDst = 0;
-
-      // Fetch the expando path.
-      StringTableEntry expandoPath = getPathExpando(pathBuffer);
-
-      // Does the expando exist?
-      if (expandoPath == NULL)
-      {
-         // No, so error.
-         Con::errorf("expandPath() : Could not find path expando '%s' for path '%s'.", pathBuffer, pSrcPath);
-
-         // Are we ensuring the trailing slash?
-         if (ensureTrailingSlash)
-         {
-            // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
-         }
-         else
-         {
-            // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath, size);
-         }
-
-         return false;
-      }
-
-      // Skip the expando and the following slash.
-      pSrc += dStrlen(pathBuffer) + 1;
-
-      // Format the output path.
-      dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", expandoPath, pSrc);
-
-      // Are we ensuring the trailing slash?
-      if (ensureTrailingSlash)
-      {
-         // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
-      }
-
-      // Strip repeat slashes.
-      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
-
-      return true;
-   }
-
-   // Script-Relative.
-   if (leadingToken == '.')
-   {
-      // Fetch the code-block file-path.
-      const StringTableEntry codeblockFullPath = getCurrentScriptModulePath();
-
-      // Do we have a code block full path?
-      if (codeblockFullPath == NULL)
-      {
-         // No, so error.
-         Con::errorf("expandPath() : Could not find relative path from code-block for path '%s'.", pSrcPath);
-
-         // Are we ensuring the trailing slash?
-         if (ensureTrailingSlash)
-         {
-            // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
-         }
-         else
-         {
-            // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath, size);
-         }
-
-         return false;
-      }
-
-      // Yes, so use it as the prefix.
-      dStrncpy(pathBuffer, codeblockFullPath, sizeof(pathBuffer) - 1);
-
-      // Find the final slash in the code-block.
-      pSlash = dStrrchr(pathBuffer, '/');
-
-      // Is this a parent directory token?
-      if (followingToken == '.')
-      {
-         // Yes, so terminate after the slash so we include it.
-         pSlash[1] = 0;
-      }
-      else
-      {
-         // No, it's a current directory token so terminate at the slash so we don't include it.
-         pSlash[0] = 0;
-
-         // Skip the current directory token.
-         pSrc++;
-      }
-
-      // Format the output path.
-      dStrncat(pathBuffer, "/", sizeof(pathBuffer) - 1 - strlen(pathBuffer));
-      dStrncat(pathBuffer, pSrc, sizeof(pathBuffer) - 1 - strlen(pathBuffer));
-
-      // Are we ensuring the trailing slash?
-      if (ensureTrailingSlash)
-      {
-         // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
-      }
-
-      // Strip repeat slashes.
-      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
-
-      return true;
-   }
-
-   // All else.
-
-   //Using a special case here because the code below barfs on trying to build a full path for apk reading
-#ifdef TORQUE_OS_ANDROID
-   if (leadingToken == '/' || strstr(pSrcPath, "/") == NULL)
-      Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
-   else
-      dSprintf(pathBuffer, sizeof(pathBuffer), "/%s", pSrcPath);
-#else
-   Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
-#endif
-
-   // Are we ensuring the trailing slash?
-   if (ensureTrailingSlash)
-   {
-      // Yes, so ensure it.
-      Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
-   }
-
-   // Strip repeat slashes.
-   Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
-
-   return true;
-}
-
-//-----------------------------------------------------------------------------
-
-bool isBasePath(const char* SrcPath, const char* pBasePath)
-{
-   char expandBuffer[1024], expandBaseBuffer[1024];
-   Con::expandPath(expandBuffer, sizeof(expandBuffer), SrcPath);
-   Con::expandPath(expandBaseBuffer, sizeof(expandBaseBuffer), pBasePath);
-   return dStrnicmp(expandBaseBuffer, expandBuffer, dStrlen(expandBaseBuffer)) == 0;
-}
+// bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint, const bool ensureTrailingSlash)
+// {
+//    char pathBuffer[2048] = {};
+//    const char* pSrc = pSrcPath;
+//    char* pSlash;
+//
+//    // Fetch leading character.
+//    const char leadingToken = *pSrc;
+//
+//    // Fetch following token.
+//    const char followingToken = leadingToken != 0 ? pSrc[1] : 0;
+//
+//    // Expando.
+//    if (leadingToken == '^')
+//    {
+//       // Initial prefix search.
+//       const char* pPrefixSrc = pSrc + 1;
+//       char* pPrefixDst = pathBuffer;
+//
+//       // Search for end of expando.
+//       while (*pPrefixSrc != '/' && *pPrefixSrc != 0)
+//       {
+//          // Copy prefix character.
+//          *pPrefixDst++ = *pPrefixSrc++;
+//       }
+//
+//       // Yes, so terminate the expando string.
+//       *pPrefixDst = 0;
+//
+//       // Fetch the expando path.
+//       StringTableEntry expandoPath = getPathExpando(pathBuffer);
+//
+//       // Does the expando exist?
+//       if (expandoPath == NULL)
+//       {
+//          // No, so error.
+//          Con::errorf("expandPath() : Could not find path expando '%s' for path '%s'.", pathBuffer, pSrcPath);
+//
+//          // Are we ensuring the trailing slash?
+//          if (ensureTrailingSlash)
+//          {
+//             // Yes, so ensure it.
+//             Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
+//          }
+//          else
+//          {
+//             // No, so just use the source path.
+//             dStrcpy(pDstPath, pSrcPath, size);
+//          }
+//
+//          return false;
+//       }
+//
+//       // Skip the expando and the following slash.
+//       pSrc += dStrlen(pathBuffer) + 1;
+//
+//       // Format the output path.
+//       dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", expandoPath, pSrc);
+//
+//       // Are we ensuring the trailing slash?
+//       if (ensureTrailingSlash)
+//       {
+//          // Yes, so ensure it.
+//          Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
+//       }
+//
+//       // Strip repeat slashes.
+//       Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+//
+//       return true;
+//    }
+//
+//    // Script-Relative.
+//    if (leadingToken == '.')
+//    {
+//       // Fetch the code-block file-path.
+//       const StringTableEntry codeblockFullPath = getCurrentScriptModulePath();
+//
+//       // Do we have a code block full path?
+//       if (codeblockFullPath == NULL)
+//       {
+//          // No, so error.
+//          Con::errorf("expandPath() : Could not find relative path from code-block for path '%s'.", pSrcPath);
+//
+//          // Are we ensuring the trailing slash?
+//          if (ensureTrailingSlash)
+//          {
+//             // Yes, so ensure it.
+//             Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
+//          }
+//          else
+//          {
+//             // No, so just use the source path.
+//             dStrcpy(pDstPath, pSrcPath, size);
+//          }
+//
+//          return false;
+//       }
+//
+//       // Yes, so use it as the prefix.
+//       dStrncpy(pathBuffer, codeblockFullPath, sizeof(pathBuffer) - 1);
+//
+//       // Find the final slash in the code-block.
+//       pSlash = dStrrchr(pathBuffer, '/');
+//
+//       // Is this a parent directory token?
+//       if (followingToken == '.')
+//       {
+//          // Yes, so terminate after the slash so we include it.
+//          pSlash[1] = 0;
+//       }
+//       else
+//       {
+//          // No, it's a current directory token so terminate at the slash so we don't include it.
+//          pSlash[0] = 0;
+//
+//          // Skip the current directory token.
+//          pSrc++;
+//       }
+//
+//       // Format the output path.
+//       dStrncat(pathBuffer, "/", sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+//       dStrncat(pathBuffer, pSrc, sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+//
+//       // Are we ensuring the trailing slash?
+//       if (ensureTrailingSlash)
+//       {
+//          // Yes, so ensure it.
+//          Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
+//       }
+//
+//       // Strip repeat slashes.
+//       Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+//
+//       return true;
+//    }
+//
+//    // All else.
+//
+//    //Using a special case here because the code below barfs on trying to build a full path for apk reading
+// #ifdef TORQUE_OS_ANDROID
+//    if (leadingToken == '/' || strstr(pSrcPath, "/") == NULL)
+//       Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
+//    else
+//       dSprintf(pathBuffer, sizeof(pathBuffer), "/%s", pSrcPath);
+// #else
+//    Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
+// #endif
+//
+//    // Are we ensuring the trailing slash?
+//    if (ensureTrailingSlash)
+//    {
+//       // Yes, so ensure it.
+//       Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
+//    }
+//
+//    // Strip repeat slashes.
+//    Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+//
+//    return true;
+// }
 
 //-----------------------------------------------------------------------------
 
-void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint)
-{
-   // Check path against expandos.  If there are multiple matches, choose the
-   // expando that produces the shortest relative path.
-
-   char pathBuffer[2048];
-
-   // Fetch expando count.
-   const U32 expandoCount = getPathExpandoCount();
-
-   // Iterate expandos.
-   U32 expandoRelativePathLength = U32_MAX;
-   for (U32 expandoIndex = 0; expandoIndex < expandoCount; ++expandoIndex)
-   {
-      // Fetch expando value (path).
-      StringTableEntry expandoValue = getPathExpandoValue(expandoIndex);
-
-      // Skip if not the base path.
-      if (!isBasePath(pSrcPath, expandoValue))
-         continue;
-
-      // Fetch path relative to expando path.
-      StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, expandoValue);
-
-      // If the relative path is simply a period
-      if (relativePath[0] == '.')
-         relativePath++;
-
-      if (dStrlen(relativePath) > expandoRelativePathLength)
-      {
-         // This expando covers less of the path than any previous one found.
-         // We will keep the previous one.
-         continue;
-      }
-
-      // Keep track of the relative path length
-      expandoRelativePathLength = dStrlen(relativePath);
-
-      // Fetch expando key (name).
-      StringTableEntry expandoName = getPathExpandoKey(expandoIndex);
-
-      // Format against expando.
-      dSprintf(pathBuffer, sizeof(pathBuffer), "^%s/%s", expandoName, relativePath);
-   }
-
-   // Check if we've found a suitable expando
-   if (expandoRelativePathLength != U32_MAX)
-   {
-      // Strip repeat slashes.
-      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
-
-      return;
-   }
-
-   // Fetch the working directory.
-   StringTableEntry workingDirectory = pWorkingDirectoryHint != NULL ? pWorkingDirectoryHint : Platform::getCurrentDirectory();
-
-   // Fetch path relative to current directory.
-   StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, workingDirectory);
-
-   // If the relative path is simply a period
-   if (relativePath[0] == '.'  && relativePath[1] != '.')
-      relativePath++;
-
-   // Format against expando.
-   dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", workingDirectory, relativePath);
-
-   // Strip repeat slashes.
-   Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
-}
+// bool isBasePath(const char* SrcPath, const char* pBasePath)
+// {
+//    char expandBuffer[1024], expandBaseBuffer[1024];
+//    Con::expandPath(expandBuffer, sizeof(expandBuffer), SrcPath);
+//    Con::expandPath(expandBaseBuffer, sizeof(expandBaseBuffer), pBasePath);
+//    return dStrnicmp(expandBaseBuffer, expandBuffer, dStrlen(expandBaseBuffer)) == 0;
+// }
+//
+// //-----------------------------------------------------------------------------
+//
+// void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint)
+// {
+//    // Check path against expandos.  If there are multiple matches, choose the
+//    // expando that produces the shortest relative path.
+//
+//    char pathBuffer[2048];
+//
+//    // Fetch expando count.
+//    const U32 expandoCount = getPathExpandoCount();
+//
+//    // Iterate expandos.
+//    U32 expandoRelativePathLength = U32_MAX;
+//    for (U32 expandoIndex = 0; expandoIndex < expandoCount; ++expandoIndex)
+//    {
+//       // Fetch expando value (path).
+//       StringTableEntry expandoValue = getPathExpandoValue(expandoIndex);
+//
+//       // Skip if not the base path.
+//       if (!isBasePath(pSrcPath, expandoValue))
+//          continue;
+//
+//       // Fetch path relative to expando path.
+//       StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, expandoValue);
+//
+//       // If the relative path is simply a period
+//       if (relativePath[0] == '.')
+//          relativePath++;
+//
+//       if (dStrlen(relativePath) > expandoRelativePathLength)
+//       {
+//          // This expando covers less of the path than any previous one found.
+//          // We will keep the previous one.
+//          continue;
+//       }
+//
+//       // Keep track of the relative path length
+//       expandoRelativePathLength = dStrlen(relativePath);
+//
+//       // Fetch expando key (name).
+//       StringTableEntry expandoName = getPathExpandoKey(expandoIndex);
+//
+//       // Format against expando.
+//       dSprintf(pathBuffer, sizeof(pathBuffer), "^%s/%s", expandoName, relativePath);
+//    }
+//
+//    // Check if we've found a suitable expando
+//    if (expandoRelativePathLength != U32_MAX)
+//    {
+//       // Strip repeat slashes.
+//       Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+//
+//       return;
+//    }
+//
+//    // Fetch the working directory.
+//    StringTableEntry workingDirectory = pWorkingDirectoryHint != NULL ? pWorkingDirectoryHint : Platform::getCurrentDirectory();
+//
+//    // Fetch path relative to current directory.
+//    StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, workingDirectory);
+//
+//    // If the relative path is simply a period
+//    if (relativePath[0] == '.'  && relativePath[1] != '.')
+//       relativePath++;
+//
+//    // Format against expando.
+//    dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", workingDirectory, relativePath);
+//
+//    // Strip repeat slashes.
+//    Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+// }
 
 
 void ensureTrailingSlash(char* pDstPath, const char* pSrcPath, S32 dstSize)
@@ -2142,7 +2142,7 @@ void shutdown()
    AbstractClassRep::shutdown();
    Compiler::freeConsoleParserList();
    gGlobalVars.reset();
-   PathExpandos.clear();
+   // PathExpandos.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -2258,53 +2258,53 @@ bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction(expandPath, const char*, (const char* path),, "(string path) - Expands an expando or relative path into a full path.")
-{
-   char* ret = Con::getReturnBuffer(1024);
-   Con::expandPath(ret, 1024, path);
-   return ret;
-}
+// DefineEngineFunction(expandPath, const char*, (const char* path),, "(string path) - Expands an expando or relative path into a full path.")
+// {
+//    char* ret = Con::getReturnBuffer(1024);
+//    Con::expandPath(ret, 1024, path);
+//    return ret;
+// }
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction(collapsePath, const char*, (const char* path), , "(string path) - Collapses a path into either an expando path or a relative path.")
-{
-   char* ret = Con::getReturnBuffer(1024);
-   Con::collapsePath(ret, 1024, path);
-   return ret;
-}
-
-
-DefineEngineFunction( log, void, ( const char* message ),,
-   "@brief Logs a message to the console.\n\n"
-   "@param message The message text.\n"
-   "@note By default, messages will appear white in the console.\n"
-   "@ingroup Logging")
-{
-   Con::printf( "%s", message );
-}
-
-//-----------------------------------------------------------------------------
-
-DefineEngineFunction( logError, void, ( const char* message ),,
-   "@brief Logs an error message to the console.\n\n"
-   "@param message The message text.\n"
-   "@note By default, errors will appear red in the console.\n"
-   "@ingroup Logging")
-{
-   Con::errorf( "%s", message );
-}
-
-//-----------------------------------------------------------------------------
-
-DefineEngineFunction( logWarning, void, ( const char* message ),,
-   "@brief Logs a warning message to the console.\n\n"
-   "@param message The message text.\n\n"
-   "@note By default, warnings will appear turquoise in the console.\n"
-   "@ingroup Logging")
-{
-   Con::warnf( "%s", message );
-}
+// DefineEngineFunction(collapsePath, const char*, (const char* path), , "(string path) - Collapses a path into either an expando path or a relative path.")
+// {
+//    char* ret = Con::getReturnBuffer(1024);
+//    Con::collapsePath(ret, 1024, path);
+//    return ret;
+// }
+//
+//
+// DefineEngineFunction( log, void, ( const char* message ),,
+//    "@brief Logs a message to the console.\n\n"
+//    "@param message The message text.\n"
+//    "@note By default, messages will appear white in the console.\n"
+//    "@ingroup Logging")
+// {
+//    Con::printf( "%s", message );
+// }
+//
+// //-----------------------------------------------------------------------------
+//
+// DefineEngineFunction( logError, void, ( const char* message ),,
+//    "@brief Logs an error message to the console.\n\n"
+//    "@param message The message text.\n"
+//    "@note By default, errors will appear red in the console.\n"
+//    "@ingroup Logging")
+// {
+//    Con::errorf( "%s", message );
+// }
+//
+// //-----------------------------------------------------------------------------
+//
+// DefineEngineFunction( logWarning, void, ( const char* message ),,
+//    "@brief Logs a warning message to the console.\n\n"
+//    "@param message The message text.\n\n"
+//    "@note By default, warnings will appear turquoise in the console.\n"
+//    "@ingroup Logging")
+// {
+//    Con::warnf( "%s", message );
+// }
 
 //------------------------------------------------------------------------------
 

@@ -744,16 +744,16 @@ namespace Con
    bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize);
    StringTableEntry getDSOPath(const char *scriptPath);
 
-   void addPathExpando(const char* pExpandoName, const char* pPath);
-   void removePathExpando(const char* pExpandoName);
-   bool isPathExpando(const char* pExpandoName);
-   StringTableEntry getPathExpando(const char* pExpandoName);
-   U32 getPathExpandoCount(void);
-   StringTableEntry getPathExpandoKey(U32 expandoIndex);
-   StringTableEntry getPathExpandoValue(U32 expandoIndex);
+   // void addPathExpando(const char* pExpandoName, const char* pPath);
+   // void removePathExpando(const char* pExpandoName);
+   // bool isPathExpando(const char* pExpandoName);
+   // StringTableEntry getPathExpando(const char* pExpandoName);
+   // U32 getPathExpandoCount(void);
+   // StringTableEntry getPathExpandoKey(U32 expandoIndex);
+   // StringTableEntry getPathExpandoValue(U32 expandoIndex);
 
-   bool isCurrentScriptToolScript();
-   bool isScriptFile(const char* path);
+   // bool isCurrentScriptToolScript();
+   // bool isScriptFile(const char* path);
 
    StringTableEntry getModNameFromPath(const char *path);
 

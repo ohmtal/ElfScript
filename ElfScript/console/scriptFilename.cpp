@@ -40,7 +40,7 @@ namespace Con
 struct PathExpando
 {
    StringTableEntry mPath;
-   bool mIsToolsOnly;
+   // bool mIsToolsOnly;
 };
 
 static SimpleHashTable<PathExpando> sgPathExpandos(64, false);
@@ -49,168 +49,168 @@ static SimpleHashTable<PathExpando> sgPathExpandos(64, false);
 // Global Functions
 //-----------------------------------------------------------------------------
 
-void setScriptPathExpando(const char *expando, const char *path, bool toolsOnly /*= false*/)
-{
-   PathExpando *exp = sgPathExpandos.retreive(expando);
-   if(exp)
-   {
-      exp->mPath = StringTable->insert(path);
-      exp->mIsToolsOnly = toolsOnly;
-   }
-   else
-   {
-      exp = new PathExpando;
-      exp->mPath = StringTable->insert(path);
-      exp->mIsToolsOnly = toolsOnly;
-      sgPathExpandos.insert(exp, expando);
-   }
-}
-
-void removeScriptPathExpando(const char *expando)
-{
-   PathExpando *exp = sgPathExpandos.remove(expando);
-   if(exp)
-      delete exp;
-}
-
-bool isScriptPathExpando(const char *expando)
-{
-   PathExpando *exp = sgPathExpandos.retreive(expando);
-   return ( exp != NULL);
-}
+// void setScriptPathExpando(const char *expando, const char *path/*, bool toolsOnly*/ /*= false*/)
+// {
+//    PathExpando *exp = sgPathExpandos.retreive(expando);
+//    if(exp)
+//    {
+//       exp->mPath = StringTable->insert(path);
+//       // exp->mIsToolsOnly = toolsOnly;
+//    }
+//    else
+//    {
+//       exp = new PathExpando;
+//       exp->mPath = StringTable->insert(path);
+//       // exp->mIsToolsOnly = toolsOnly;
+//       sgPathExpandos.insert(exp, expando);
+//    }
+// }
+//
+// void removeScriptPathExpando(const char *expando)
+// {
+//    PathExpando *exp = sgPathExpandos.remove(expando);
+//    if(exp)
+//       delete exp;
+// }
+//
+// bool isScriptPathExpando(const char *expando)
+// {
+//    PathExpando *exp = sgPathExpandos.retreive(expando);
+//    return ( exp != NULL);
+// }
 
 //-----------------------------------------------------------------------------
 
 // [tom, 5/18/2006] FIXME: This needs some bounds checking
-bool expandToolScriptFilename(char *filename, U32 size, const char *src)
-{
-   // [tom, 10/16/2006] Note: I am purposefully not early-outing here in the
-   // same way the old code did as it is now possible that something could
-   // be expanded if the name or mod is NULL. This was previously not the case.
-
-   const StringTableEntry cbMod = Con::getCurrentScriptModuleName();
-   const StringTableEntry cbFullPath = Con::getCurrentScriptModulePath();
-
-   char varBuf[1024], modBuf[1024];
-   const char *ptr = src;
-   char *retPtr = filename;
-   char *slash;
-
-   const char *catPath = NULL;
-
-#ifndef TORQUE_DEBUG
-   bool isTools = Con::isCurrentScriptToolScript();
-#endif
-
-   // Check leading character
-   switch(*ptr)
-   {
-      case '^':
-         {
-            // Variable
-            const char *varPtr = ptr+1;
-            char *insertPtr = varBuf;
-            bool valid = true;
-            while(*varPtr != '/')
-            {
-               if(*varPtr == 0)
-               {
-                  valid = false;
-                  break;
-               }
-               *insertPtr++ = *varPtr++;
-            }
-
-            if(valid)
-            {
-               // Got a valid variable
-               *insertPtr = 0;
-
-               PathExpando *exp = sgPathExpandos.retreive(varBuf);
-               
-               if(exp == NULL)
-               {
-                  Con::errorf("expandScriptFilename - Ignoring invalid path expando \"%s\"", varBuf);
-                  break;
-               }
-
-#ifndef TORQUE_DEBUG
-               // [tom, 12/13/2006] This stops tools expandos from working in the console,
-               // which is useful behavior when debugging so I'm ifdefing this out for debug builds.
-
-               if(! isTools && exp->mIsToolsOnly)
-               {
-                  Con::errorf("expandScriptFilename - attempting to use tools only expando \"%s\" from outside of tools", varBuf);
-
-                  *filename = 0;
-                  return false;
-               }
-#endif
-
-               catPath = exp ? exp->mPath : "";
-               // swallow the expando and the slash after the expando
-               ptr += dStrlen(varBuf) + 1;
-               if(*ptr == '/')
-                  ptr++;
-            }
-         }
-         break;
-
-      case '~':
-         // Relative to mod
-         if(cbMod && cbFullPath)
-         {
-            Platform::makeFullPathName(cbMod, modBuf, sizeof(modBuf));
-            catPath = modBuf;
-         }
-         else
-         {
-            // Probably not a mod, so we'll use the ^game expando
-            PathExpando *exp = sgPathExpandos.retreive("game");
-
-            if(exp == NULL)
-            {
-               Con::errorf("expandScriptFilename - ~ expansion failed for mod and ^game when processing '%s'", src);
-               break;
-            }
-
-            catPath = exp ? exp->mPath : "";
-         }
-         // swallow ~ and optional slash
-         switch(ptr[1])
-         {
-            case '/': ptr += 2; break;
-            default: ptr++;
-         }
-         
-         break;
-
-      case '.':
-         // Relative to script directory
-         if(cbFullPath)
-         {
-            dStrcpy(varBuf, cbFullPath, 1024);
-            slash = dStrrchr(varBuf, '/');
-            if(slash) *slash = 0;
-
-            catPath = varBuf;
-            
-            // swallow dot and optional slash, but dont swallow .. relative path token
-            switch(ptr[1])
-            {
-               case '.': break;
-               case '/': ptr += 2; break;
-               default: ptr++;
-            }
-         }
-         break;
-   }
-
-   // [tom, 11/20/2006] Handing off to makeFullPathName() allows us to process .. correctly.
-   Platform::makeFullPathName(ptr, retPtr, size, catPath);
-
-   return true;
-}
+// bool expandToolScriptFilename(char *filename, U32 size, const char *src)
+// {
+//    // [tom, 10/16/2006] Note: I am purposefully not early-outing here in the
+//    // same way the old code did as it is now possible that something could
+//    // be expanded if the name or mod is NULL. This was previously not the case.
+//
+//    const StringTableEntry cbMod = Con::getCurrentScriptModuleName();
+//    const StringTableEntry cbFullPath = Con::getCurrentScriptModulePath();
+//
+//    char varBuf[1024], modBuf[1024];
+//    const char *ptr = src;
+//    char *retPtr = filename;
+//    char *slash;
+//
+//    const char *catPath = NULL;
+//
+// // #ifndef TORQUE_DEBUG
+// //    bool isTools = Con::isCurrentScriptToolScript();
+// // #endif
+//
+//    // Check leading character
+//    switch(*ptr)
+//    {
+//       case '^':
+//          {
+//             // Variable
+//             const char *varPtr = ptr+1;
+//             char *insertPtr = varBuf;
+//             bool valid = true;
+//             while(*varPtr != '/')
+//             {
+//                if(*varPtr == 0)
+//                {
+//                   valid = false;
+//                   break;
+//                }
+//                *insertPtr++ = *varPtr++;
+//             }
+//
+//             if(valid)
+//             {
+//                // Got a valid variable
+//                *insertPtr = 0;
+//
+//                PathExpando *exp = sgPathExpandos.retreive(varBuf);
+//
+//                if(exp == NULL)
+//                {
+//                   Con::errorf("expandScriptFilename - Ignoring invalid path expando \"%s\"", varBuf);
+//                   break;
+//                }
+//
+// // #ifndef TORQUE_DEBUG
+// //                // [tom, 12/13/2006] This stops tools expandos from working in the console,
+// //                // which is useful behavior when debugging so I'm ifdefing this out for debug builds.
+// //
+// //                if(! isTools && exp->mIsToolsOnly)
+// //                {
+// //                   Con::errorf("expandScriptFilename - attempting to use tools only expando \"%s\" from outside of tools", varBuf);
+// //
+// //                   *filename = 0;
+// //                   return false;
+// //                }
+// // #endif
+//
+//                catPath = exp ? exp->mPath : "";
+//                // swallow the expando and the slash after the expando
+//                ptr += dStrlen(varBuf) + 1;
+//                if(*ptr == '/')
+//                   ptr++;
+//             }
+//          }
+//          break;
+//
+//       case '~':
+//          // Relative to mod
+//          if(cbMod && cbFullPath)
+//          {
+//             Platform::makeFullPathName(cbMod, modBuf, sizeof(modBuf));
+//             catPath = modBuf;
+//          }
+//          else
+//          {
+//             // Probably not a mod, so we'll use the ^game expando
+//             PathExpando *exp = sgPathExpandos.retreive("game");
+//
+//             if(exp == NULL)
+//             {
+//                Con::errorf("expandScriptFilename - ~ expansion failed for mod and ^game when processing '%s'", src);
+//                break;
+//             }
+//
+//             catPath = exp ? exp->mPath : "";
+//          }
+//          // swallow ~ and optional slash
+//          switch(ptr[1])
+//          {
+//             case '/': ptr += 2; break;
+//             default: ptr++;
+//          }
+//
+//          break;
+//
+//       case '.':
+//          // Relative to script directory
+//          if(cbFullPath)
+//          {
+//             dStrcpy(varBuf, cbFullPath, 1024);
+//             slash = dStrrchr(varBuf, '/');
+//             if(slash) *slash = 0;
+//
+//             catPath = varBuf;
+//
+//             // swallow dot and optional slash, but dont swallow .. relative path token
+//             switch(ptr[1])
+//             {
+//                case '.': break;
+//                case '/': ptr += 2; break;
+//                default: ptr++;
+//             }
+//          }
+//          break;
+//    }
+//
+//    // [tom, 11/20/2006] Handing off to makeFullPathName() allows us to process .. correctly.
+//    Platform::makeFullPathName(ptr, retPtr, size, catPath);
+//
+//    return true;
+// }
 
 //-----------------------------------------------------------------------------
 //XXTH this sucks ... cant load the inital main.cs with only set main.cs !!!
@@ -376,33 +376,33 @@ DefineEngineFunction(expandOldFilename, const char*, (const char* filename),,
 // Tool Functions
 //-----------------------------------------------------------------------------
 
-ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
-               "@internal Editor use only")
-{
-   TORQUE_UNUSED(argc);
-   static const U32 bufSize = 1024;
-   char* ret = Con::getReturnBuffer( bufSize );
-   Con::collapseScriptFilename(ret, bufSize, argv[1]);
-   return ret;
-}
-
-ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string path[, bool toolsOnly])"
-               "@internal Editor use only")
-{
-   if(argc == 4)
-      Con::setScriptPathExpando(argv[1], argv[2], dAtob(argv[3]));
-   else
-      Con::setScriptPathExpando(argv[1], argv[2]);
-}
-
-ConsoleToolFunction(removeScriptPathExpando, void, 2, 2, "(string expando)"
-               "@internal Editor use only")
-{
-   Con::removeScriptPathExpando(argv[1]);
-}
-
-ConsoleToolFunction(isScriptPathExpando, bool, 2, 2, "(string expando)"
-               "@internal Editor use only")
-{
-   return Con::isScriptPathExpando(argv[1]);
-}
+// ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
+//                "@internal Editor use only")
+// {
+//    TORQUE_UNUSED(argc);
+//    static const U32 bufSize = 1024;
+//    char* ret = Con::getReturnBuffer( bufSize );
+//    Con::collapseScriptFilename(ret, bufSize, argv[1]);
+//    return ret;
+// }
+//
+// ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string path[, bool toolsOnly])"
+//                "@internal Editor use only")
+// {
+//    if(argc == 4)
+//       Con::setScriptPathExpando(argv[1], argv[2], dAtob(argv[3]));
+//    else
+//       Con::setScriptPathExpando(argv[1], argv[2]);
+// }
+//
+// ConsoleToolFunction(removeScriptPathExpando, void, 2, 2, "(string expando)"
+//                "@internal Editor use only")
+// {
+//    Con::removeScriptPathExpando(argv[1]);
+// }
+//
+// ConsoleToolFunction(isScriptPathExpando, bool, 2, 2, "(string expando)"
+//                "@internal Editor use only")
+// {
+//    return Con::isScriptPathExpando(argv[1]);
+// }

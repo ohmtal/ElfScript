@@ -36,7 +36,7 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypeInfo.h
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/engineTypes.h
-    ${CMAKE_CURRENT_LIST_DIR}/console/fileSystemFunctions.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/fileSystemFunctions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/fixedTuple.h
     ${CMAKE_CURRENT_LIST_DIR}/console/ICallMethod.h
     ${CMAKE_CURRENT_LIST_DIR}/console/module.h

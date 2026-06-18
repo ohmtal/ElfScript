@@ -1,3 +1,4 @@
+
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
 //
@@ -148,23 +149,24 @@ static bool deleteDirectoryRecusrive(const char* pPath)
 
 bool Platform::deleteDirectory(const char* pPath)
 {
-   // Sanity!
-   AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
-
-   // Is the path a file?
-   if (Platform::isFile(pPath))
-   {
-      // Yes, so warn.
-      Con::warnf("Cannot delete directory '%s' as it specifies a file.", pPath);
-      return false;
-   }
-
-   // Expand module location.
-   char pathBuffer[1024];
-   Con::expandPath(pathBuffer, sizeof(pathBuffer), pPath, NULL, true);
-
-   // Delete directory recursively.
-   return deleteDirectoryRecusrive(pathBuffer);
+      return false; //XXTH
+   // // Sanity!
+   // AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
+   //
+   // // Is the path a file?
+   // if (Platform::isFile(pPath))
+   // {
+   //    // Yes, so warn.
+   //    Con::warnf("Cannot delete directory '%s' as it specifies a file.", pPath);
+   //    return false;
+   // }
+   //
+   // // Expand module location.
+   // char pathBuffer[1024];
+   // Con::expandPath(pathBuffer, sizeof(pathBuffer), pPath, NULL, true);
+   //
+   // // Delete directory recursively.
+   // return deleteDirectoryRecusrive(pathBuffer);
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +334,7 @@ char * Platform::makeFullPathName(const char *path, char *buffer, U32 size, cons
 
    #ifndef TORQUE_SCECURE_VFS
    if(cwd == NULL) {
-      cwd = Con::isCurrentScriptToolScript() ? Platform::getMainDotCsDir() : Platform::getCurrentDirectory();
+      cwd = /*Con::isCurrentScriptToolScript() ? Platform::getMainDotCsDir() :*/ Platform::getCurrentDirectory();
    }
 
    // XXTH fallback

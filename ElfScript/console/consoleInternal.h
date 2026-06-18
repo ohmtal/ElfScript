@@ -522,7 +522,13 @@ namespace Con
    Con::Module* findScriptModuleForFile(const char* fileName);
    // Convenience functions for getting the execution context
    inline const char* getCurrentScriptModulePath() { return getCurrentStackFrame() && getCurrentStackFrame()->module ? getCurrentStackFrame()->module->getPath() : NULL; }
-   inline const char* getCurrentScriptModuleName() { return getCurrentStackFrame() && getCurrentStackFrame()->module ? getCurrentStackFrame()->module->getName() : NULL; }
+   inline const char* getCurrentScriptModuleName() {
+      if ( getCurrentStackFrame() && getCurrentStackFrame()->module) {
+            return  getCurrentStackFrame()->module->getName();
+      } else {
+            return NULL;
+      }
+   }
    inline Con::Module* getCurrentScriptModule() { return getCurrentStackFrame() ? getCurrentStackFrame()->module : NULL; }
 
    inline bool gTraceOn;

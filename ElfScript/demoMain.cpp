@@ -129,6 +129,9 @@ int main(int argc, char* argv[]) {
     //
     // Con::unlockLog();
 
+
+    Con::executeFile("ElfScript/test.cs");
+
     // --------- advance time for scheduler this should be placed in the main loop
     while (!gShutDownRequest) {
           engineGlue::process(0);

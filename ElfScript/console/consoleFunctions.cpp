@@ -2582,12 +2582,12 @@ DefineEngineFunction( isDefined, bool, ( const char* varName, const char* varVal
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( isCurrentScriptToolScript, bool, (), , "()" 
-   "Returns true if the calling script is a tools script.\n"
-   "@hide")
-{
-   return Con::isCurrentScriptToolScript();
-}
+// DefineEngineFunction( isCurrentScriptToolScript, bool, (), , "()"
+//    "Returns true if the calling script is a tools script.\n"
+//    "@hide")
+// {
+//    return Con::isCurrentScriptToolScript();
+// }
 
 DefineEngineFunction( getModNameFromPath, const char *, ( const char* path ), , "(string path)" 
             "@brief Attempts to extract a mod directory from path. Returns empty string on failure.\n\n"

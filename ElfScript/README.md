@@ -24,7 +24,14 @@ and replace the ugly expand filename ~/ ./ ^ logic.
 I guess dso is also loaded saved as text ... maybe i dont 
 need dso anyway. 
 
-- [ ] removed log to file and buffer (only use consumers)
+- [X] removed log to file and buffer (only use consumers)
+- [ ] FIXME: 
+    - [ ] file platformFileIO.cpp
+    - [ ] Platform::makeFullPathName
+    - [ ] StringTableEntry getModNameFromPath(const char *path)
+    - [ ] expandOldScriptFilename, expandToolScriptFilename in expandScriptFilename
+    - [ ] Platform::getMainDotCsDir
+
 
 - [ ] core/util/path
 - [ ] core/volume

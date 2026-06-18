@@ -19,7 +19,7 @@ namespace Con
 
    bool runStream(Stream* byteCode, const char* fileName);
 
-   bool isCurrentScriptToolScript();
+   // bool isCurrentScriptToolScript();
 
 
    Module* getCurrentModule();
