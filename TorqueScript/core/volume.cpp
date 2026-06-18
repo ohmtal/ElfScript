@@ -1167,7 +1167,7 @@ bool Unmount(FileSystemRef fs)
 {
    return sgMountSystem.unmount(fs);
 }
-
+// XXTH must have a traling slash!!!
 bool SetCwd(const Path &file)
 {
    return sgMountSystem.setCwd(file);
@@ -1303,4 +1303,14 @@ bool CreatePath(const Path& path)
 
 } // Namespace Torque
 
+//XXTH moved here !!!
+StringTableEntry Platform::getCurrentDirectory()
+{
+      return Torque::FS::GetCwd().getFullPath();
+}
+
+bool Platform::setCurrentDirectory(StringTableEntry newDir)
+{
+      return Torque::FS::SetCwd(newDir);
+}
 

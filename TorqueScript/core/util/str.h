@@ -114,6 +114,10 @@ public:
    */
    bool equal(const String &str, U32 mode = Case) const;
 
+   /**
+    * find return position or String::NPos if not found
+    */
+
    SizeType find(StringChar c, SizeType pos = 0, U32 mode = Case|Left) const;
    SizeType find(const StringChar *str, SizeType pos = 0, U32 mode = Case|Left) const;
    SizeType find(const String &str, SizeType pos = 0, U32 mode = Case|Left) const;

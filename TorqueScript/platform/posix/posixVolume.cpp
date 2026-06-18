@@ -671,16 +671,17 @@ Torque::FS::FileSystemRef  Platform::FS::createNativeFS( const String &volume )
 
 #endif
 
-String   Platform::FS::getAssetDir()
-{
-   return Platform::getExecutablePath();
-}
+// String   Platform::FS::getAssetDir()
+// {
+//    return Platform::getExecutablePath();
+// }
 
 /// Function invoked by the kernel layer to install OS specific
 /// file systems.
 bool Platform::FS::InstallFileSystems()
 {
    Platform::FS::Mount( "/", Platform::FS::createNativeFS( String() ) );
+
 
    // Setup the current working dir.
    char buffer[PATH_MAX];
@@ -689,10 +690,10 @@ bool Platform::FS::InstallFileSystems()
       // add trailing '/' if it isn't there
       if (buffer[dStrlen(buffer) - 1] != '/')
          dStrcat(buffer, "/", PATH_MAX);
-         
+
       Platform::FS::SetCwd(buffer);
    }
-   
+
    // Mount the home directory
    if (char* home = getenv("HOME"))
       Platform::FS::Mount( "home", Platform::FS::createNativeFS(home) );

@@ -35,7 +35,7 @@ namespace FS
 
    FileSystemRef  createNativeFS( const String &volume );
 
-   String   getAssetDir();
+   // String   getAssetDir();
 
    /// Mount default OS file systems.
    /// On POSIX environment this means mounting a root FileSystem "/", mounting

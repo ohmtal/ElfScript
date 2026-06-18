@@ -18,6 +18,11 @@ It need to be more stripped down because there are much more files than needed a
 - Fixed Emscripten and Android Build  (Android untested)
 - Relaced Math with Light Version since the Types like Vector are removed
 
+
+## TODO
+
+- should remove Torque::FS/Platform::FS and replace it with more native file loading ....
+
 ---
 # Example / TestBed Application using OhmFlux:
 

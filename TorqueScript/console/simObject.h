@@ -48,7 +48,7 @@
 // #endif
 
 class Stream;
-class LightManager;
+// class LightManager;
 class SimFieldDictionary;
 class SimPersistID;
 // class GuiInspector;

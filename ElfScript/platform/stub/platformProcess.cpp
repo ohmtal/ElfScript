@@ -212,32 +212,32 @@ void outputDebugString(const char *string)
 }
 
 /// File IO.
-StringTableEntry getWorkingDirectory()
-{
-   Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
+// StringTableEntry getWorkingDirectory()
+// {
+//    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
+//
+//    return nullptr;
+//
+// }
+//
+// bool setWorkingDirectory(StringTableEntry newDir)
+// {
+//     Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
+//
+//    (void)newDir;
+//    return false;
+//
+// }
 
-   return nullptr;
-
-}
-
-bool setWorkingDirectory(StringTableEntry newDir)
-{
-    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-
-   (void)newDir;
-   return false;
-
-}
-
-StringTableEntry getCurrentDirectory()
-{
-   return getWorkingDirectory();
-}
-
-bool setCurrentDirectory(StringTableEntry newDir)
-{
-   return setWorkingDirectory(newDir);
-}
+// StringTableEntry getCurrentDirectory()
+// {
+//    return getWorkingDirectory();
+// }
+//
+// bool setCurrentDirectory(StringTableEntry newDir)
+// {
+//    return setWorkingDirectory(newDir);
+// }
 
 StringTableEntry getExecutableName()
 {

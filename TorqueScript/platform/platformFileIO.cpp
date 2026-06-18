@@ -184,6 +184,7 @@ void Platform::setMainDotCsDir(const char *dir)
    sgMainCSDir = StringTable->insert(dir);
 }
 
+
 //-----------------------------------------------------------------------------
 
 typedef Vector<char*> CharVector;

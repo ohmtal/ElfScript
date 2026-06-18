@@ -45,13 +45,13 @@ namespace FS
 
 bool  MountDefaults()
 {
-   String  path = getAssetDir();
+   String  path = Platform::getExecutablePath();
 
 //XXTH 2024-03-17 game ?!    bool  mounted = Mount( "game", createNativeFS( path ));
 //nope    bool  mounted = Mount("", createNativeFS(path));
    bool  mounted  = false;
 
-   mounted = Mount("assets", createNativeFS(path));
+   mounted = Mount("", createNativeFS(path));
    if ( !mounted ) mounted = Mount("game", createNativeFS(path));
    if ( !mounted )
          return false;
@@ -59,9 +59,9 @@ bool  MountDefaults()
 
 #ifndef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM
    // Note that the VirtualMountSystem must be enabled in volume.cpp for zip support to work.
-//XXTH 2024-03-17 game ?!   return MountZips("game");
-   //nope return MountZips("");
    return MountZips("game");
+   // return MountZips("");
+
 #else
    return true;
 #endif

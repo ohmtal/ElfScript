@@ -728,34 +728,34 @@ Torque::FS::FileSystemRef  Platform::FS::createNativeFS( const String &volume )
    return new Win32::Win32FileSystem( volume );
 }
 
-String   Platform::FS::getAssetDir()
-{
-   char cen_buf[2048];
-#ifdef TORQUE_UNICODE
-   if (!Platform::getWebDeployment())
-   {
-      TCHAR buf[ 2048 ];
-      ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, cen_buf );
-   }
-   else
-   {
-      TCHAR buf[ 2048 ];
-      GetCurrentDirectoryW( sizeof( buf ) / sizeof( buf[ 0 ] ), buf );
-      convertUTF16toUTF8( buf, cen_buf );
-      return Path::CleanSeparators(cen_buf);
-   }
-#else
-   ::GetModuleFileNameA( NULL, cen_buf, 2047);
-#endif
-
-   char *delimiter = dStrrchr( cen_buf, '\\' );
-
-   if( delimiter != NULL )
-      *delimiter = '\0';
-
-   return Path::CleanSeparators(cen_buf);
-}
+// String   Platform::FS::getAssetDir()
+// {
+//    char cen_buf[2048];
+// #ifdef TORQUE_UNICODE
+//    if (!Platform::getWebDeployment())
+//    {
+//       TCHAR buf[ 2048 ];
+//       ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
+//       convertUTF16toUTF8( buf, cen_buf );
+//    }
+//    else
+//    {
+//       TCHAR buf[ 2048 ];
+//       GetCurrentDirectoryW( sizeof( buf ) / sizeof( buf[ 0 ] ), buf );
+//       convertUTF16toUTF8( buf, cen_buf );
+//       return Path::CleanSeparators(cen_buf);
+//    }
+// #else
+//    ::GetModuleFileNameA( NULL, cen_buf, 2047);
+// #endif
+//
+//    char *delimiter = dStrrchr( cen_buf, '\\' );
+//
+//    if( delimiter != NULL )
+//       *delimiter = '\0';
+//
+//    return Path::CleanSeparators(cen_buf);
+// }
 
 /// Function invoked by the kernel layer to install OS specific
 /// file systems.
