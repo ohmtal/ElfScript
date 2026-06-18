@@ -24,6 +24,17 @@ and replace the ugly expand filename ~/ ./ ^ logic.
 I guess dso is also loaded saved as text ... maybe i dont 
 need dso anyway. 
 
+- [ ] core/util/path
+- [ ] core/volume
+- [ ] core/virtualMountSystem
+- [ ] core/resourceManager 
+- [ ] core/resource
+- [ ] platform/win|posix volume stuff
+
+ modifing:
+- [ ] console/console
+- [ ] core/fileObject 
+- [ ] console/scriptFilename << no longer needed then ??
 
 ---
 ---

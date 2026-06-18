@@ -153,9 +153,6 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/unicode.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/unicode.h
 
-
-    # ------ FIXME other group:
-    # util
     ${CMAKE_CURRENT_LIST_DIR}/core/util/messaging/message.cpp
 )
 
@@ -173,9 +170,7 @@ set(POSIX_SRC
 
 )
 set(WIN_SRC
-
    ${CMAKE_CURRENT_LIST_DIR}/platform/win/winVolume.cpp
-
 )
 
 
