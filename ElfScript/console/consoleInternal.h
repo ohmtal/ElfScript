@@ -40,9 +40,6 @@
 #endif
 #include "module.h"
 
-#include "core/util/tSignal.h"
-
-
 /// @ingroup console_system Console System
 /// @{
 

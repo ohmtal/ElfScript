@@ -34,111 +34,88 @@
 #ifndef _PLATFORMASSERT_H_
 #include "platform/platformAssert.h"
 #endif
-
-#ifndef _TORQUE_STRING_H_
-#include "core/strings/String.h"
-#endif
-// #ifndef _TORQUE_SAFEDELETE_H_
-// #include "core/util/safeDelete.h"
+// #ifndef _MSGBOX_H_
+// #include "platform/nativeDialogs/msgBox.h"
 // #endif
+// #ifndef _VERSION_H_
+// #include "app/version.h"
+// #endif
+#ifndef _TORQUE_STRING_H_
+#include "core/util/str.h"
+#endif
+#ifndef _TORQUE_SAFEDELETE_H_
+#include "core/util/safeDelete.h"
+#endif
 
 #include <new>
 #include <typeinfo>
 
 
-// /// Global processor identifiers.
-// ///
-// /// @note These enums must be globally scoped so that they work with the inline assembly
-// enum ProcessorType
-// {
-//    CPU_X86Compatible,
-//    CPU_ArmCompatible,
-//    CPU_Intel,
-//    CPU_AMD,
-//    CPU_Apple
-// };
-//
-// /// Properties for CPU.
-// enum ProcessorProperties
-// {
-//    CPU_PROP_C         = (1<<0),  ///< We should use C fallback math functions.
-//    CPU_PROP_FPU       = (1<<1),  ///< Has an FPU. (It better!)
-//    CPU_PROP_MMX       = (1<<2),  ///< Supports MMX instruction set extension.
-//    CPU_PROP_SSE       = (1<<3),  ///< Supports SSE instruction set extension.
-//    CPU_PROP_SSE2      = (1<<4),  ///< Supports SSE2 instruction set extension.
-//    CPU_PROP_SSE3      = (1<<5),  ///< Supports SSE3 instruction set extension.
-//    CPU_PROP_SSE3ex    = (1<<6),  ///< Supports Supplemental SSE3 instruction set
-//    CPU_PROP_SSE4_1    = (1<<7),  ///< Supports SSE4_1 instruction set extension.
-//    CPU_PROP_SSE4_2    = (1<<8),  ///< Supports SSE4_2 instruction set extension.
-//    CPU_PROP_AVX       = (1<<9), ///< Supports AVX256 instruction set extension.
-//    CPU_PROP_AVX2      = (1<<10), ///< Supports AVX256 instruction set extension.
-//    CPU_PROP_AVX512    = (1<<11), ///< Supports AVX512 instruction set extension.
-//    CPU_PROP_MP        = (1<<12), ///< This is a multi-processor system.
-//    CPU_PROP_LE        = (1<<13), ///< This processor is LITTLE ENDIAN.
-//    CPU_PROP_64bit     = (1<<14), ///< This processor is 64-bit capable
-//    CPU_PROP_NEON      = (1<<15), ///< Supports the Arm Neon instruction set extension.
-// };
-//
-// /// Processor info manager.
-// struct Processor
-// {
-//    /// Gather processor state information.
-//    static void init();
-// };
-//
-// #if defined(TORQUE_SUPPORTS_GCC_INLINE_X86_ASM)
-// #define TORQUE_DEBUGBREAK() { asm ( "int 3"); }
-// #elif defined (TORQUE_SUPPORTS_VC_INLINE_X86_ASM) // put this test second so that the __asm syntax doesn't break the Visual Studio Intellisense parser
-// #define TORQUE_DEBUGBREAK() { __asm { int 3 }; }
-// #else
-// /// Macro to do in-line debug breaks, used for asserts.  Does inline assembly when possible.
-// #define TORQUE_DEBUGBREAK() Platform::debugBreak();
-// #endif
-//
-// /// Physical type of a drive.
-// enum DriveType
-// {
-//    DRIVETYPE_FIXED = 0,       ///< Non-removable fixed drive.
-//    DRIVETYPE_REMOVABLE = 1,   ///< Removable drive.
-//    DRIVETYPE_REMOTE = 2,      ///< Networked/remote drive.
-//    DRIVETYPE_CDROM = 3,       ///< CD-Rom.
-//    DRIVETYPE_RAMDISK = 4,     ///< A ramdisk!
-//    DRIVETYPE_UNKNOWN = 5      ///< Don't know.
-// };
-//
-// // Some forward declares for later.
-// class Point2I;
-// template<class T> class Vector;
-// template<typename Signature> class Signal;
-// struct InputEventInfo;
+/// Global processor identifiers.
+///
+/// @note These enums must be globally scoped so that they work with the inline assembly
+enum ProcessorType
+{
+   CPU_X86Compatible,
+   CPU_ArmCompatible,
+   CPU_Intel,
+   CPU_AMD,
+   CPU_Apple
+};
 
-// FIXME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+/// Properties for CPU.
+enum ProcessorProperties
+{ 
+   CPU_PROP_C         = (1<<0),  ///< We should use C fallback math functions.
+   CPU_PROP_FPU       = (1<<1),  ///< Has an FPU. (It better!)
+   CPU_PROP_MMX       = (1<<2),  ///< Supports MMX instruction set extension.
+   CPU_PROP_SSE       = (1<<3),  ///< Supports SSE instruction set extension.
+   CPU_PROP_SSE2      = (1<<4),  ///< Supports SSE2 instruction set extension.
+   CPU_PROP_SSE3      = (1<<5),  ///< Supports SSE3 instruction set extension.  
+   CPU_PROP_SSE3ex    = (1<<6),  ///< Supports Supplemental SSE3 instruction set  
+   CPU_PROP_SSE4_1    = (1<<7),  ///< Supports SSE4_1 instruction set extension.  
+   CPU_PROP_SSE4_2    = (1<<8),  ///< Supports SSE4_2 instruction set extension.
+   CPU_PROP_AVX       = (1<<9), ///< Supports AVX256 instruction set extension.
+   CPU_PROP_AVX2      = (1<<10), ///< Supports AVX256 instruction set extension.
+   CPU_PROP_AVX512    = (1<<11), ///< Supports AVX512 instruction set extension.
+   CPU_PROP_MP        = (1<<12), ///< This is a multi-processor system.
+   CPU_PROP_LE        = (1<<13), ///< This processor is LITTLE ENDIAN.
+   CPU_PROP_64bit     = (1<<14), ///< This processor is 64-bit capable
+   CPU_PROP_NEON      = (1<<15), ///< Supports the Arm Neon instruction set extension.
+};
 
+/// Processor info manager. 
+struct Processor
+{
+   /// Gather processor state information.
+   static void init();
+};
 
-// ---- FIXME fake stub stuff -------------
-#include <cstdio>
-#include <stdarg.h>
-namespace Con{
-      #ifndef warnf
+#if defined(TORQUE_SUPPORTS_GCC_INLINE_X86_ASM)
+#define TORQUE_DEBUGBREAK() { asm ( "int 3"); }
+#elif defined (TORQUE_SUPPORTS_VC_INLINE_X86_ASM) // put this test second so that the __asm syntax doesn't break the Visual Studio Intellisense parser
+#define TORQUE_DEBUGBREAK() { __asm { int 3 }; } 
+#else
+/// Macro to do in-line debug breaks, used for asserts.  Does inline assembly when possible.
+#define TORQUE_DEBUGBREAK() Platform::debugBreak();
+#endif
 
-      inline void warnf(const char* fmt,...)
-      {
-            va_list argptr;
-            va_start(argptr, fmt);
-            vprintf(fmt, argptr);
-            printf("\n");
-            va_end(argptr);
-      }
+/// Physical type of a drive.
+enum DriveType
+{
+   DRIVETYPE_FIXED = 0,       ///< Non-removable fixed drive.
+   DRIVETYPE_REMOVABLE = 1,   ///< Removable drive.
+   DRIVETYPE_REMOTE = 2,      ///< Networked/remote drive.
+   DRIVETYPE_CDROM = 3,       ///< CD-Rom.
+   DRIVETYPE_RAMDISK = 4,     ///< A ramdisk!
+   DRIVETYPE_UNKNOWN = 5      ///< Don't know.
+};
 
-
-      #endif
-} //namespace Con
-
-
-
-class InputEventInfo;
-// FIXME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+// Some forward declares for later.
+class Point2I;
+template<class T> class Vector;
+template<typename Signature> class Signal;
+struct InputEventInfo;
 
 namespace Platform
 {
@@ -269,10 +246,10 @@ namespace Platform
    bool isFullPath(const char *path);
    StringTableEntry makeRelativePathName(const char *path, const char *to);
 
-   // String stripExtension( String fileName, Vector< String >& validExtensions );
+   String stripExtension( String fileName, Vector< String >& validExtensions );
 
-   // bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth = -1);
-   // bool dumpDirectories( const char *path, Vector<StringTableEntry> &directoryVector, S32 depth = 0, bool noBasePath = false );
+   bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth = -1);
+   bool dumpDirectories( const char *path, Vector<StringTableEntry> &directoryVector, S32 depth = 0, bool noBasePath = false );
    bool hasSubDirectory( const char *pPath );
    bool getFileTimes(const char *filePath, FileTime *createTime, FileTime *modifyTime);
    bool isFile(const char *pFilePath);
@@ -297,37 +274,37 @@ namespace Platform
    ALERT_ASSERT_RESULT AlertAssert(const char *windowTitle, const char *message);
 
    // Volumes
-   // struct VolumeInformation
-   // {
-   //    StringTableEntry  RootPath;
-   //    StringTableEntry  Name;
-   //    StringTableEntry  FileSystem;
-   //    U32               SerialNumber;
-   //    U32               Type;
-   //    bool              ReadOnly;
-   // };
-   // extern struct VolumeInformation  *PVolumeInformation;
+   struct VolumeInformation
+   {
+      StringTableEntry  RootPath;
+      StringTableEntry  Name;
+      StringTableEntry  FileSystem;
+      U32               SerialNumber;
+      U32               Type;
+      bool              ReadOnly;
+   };
+   extern struct VolumeInformation  *PVolumeInformation;
 
    // Volume functions.
-   // void getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bOnlyFixedDrives = false );
-   // void getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeInfoVector, bool bOnlyFixedDrives = false );
+   void getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bOnlyFixedDrives = false );
+   void getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeInfoVector, bool bOnlyFixedDrives = false );
 
-   // struct SystemInfo_struct
-   // {
-   //       struct Processor
-   //       {
-   //          ProcessorType  type;
-   //          const char*    name;
-   //          U32            mhz;
-   //          bool           isMultiCore;
-   //          bool           isHyperThreaded;
-   //          U32            numLogicalProcessors;
-   //          U32            numPhysicalProcessors;
-   //          U32            properties;      // CPU type specific enum
-   //       } processor;
-   // };
-   // extern Signal<void(void)> SystemInfoReady;
-   // extern SystemInfo_struct  SystemInfo;
+   struct SystemInfo_struct
+   {
+         struct Processor
+         {
+            ProcessorType  type;
+            const char*    name;
+            U32            mhz;
+            bool           isMultiCore;
+            bool           isHyperThreaded;
+            U32            numLogicalProcessors;
+            U32            numPhysicalProcessors;
+            U32            properties;      // CPU type specific enum
+         } processor;
+   };
+   extern Signal<void(void)> SystemInfoReady;
+   extern SystemInfo_struct  SystemInfo;
 
    // Web page launch function:
    bool openWebBrowser( const char* webAddress );

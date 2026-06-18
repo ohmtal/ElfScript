@@ -2,7 +2,6 @@
 #define _SCRIPT_H_
 
 #include "runtime.h"
-#include "core/stream/stream.h"
 #include "module.h"
 #include "core/util/tDictionary.h"
 
@@ -64,11 +63,12 @@ namespace Con
    ///
    /// @param  string   File name that is the script to be executed and compiled.
    /// @param fileName Path to the file to execute
-   /// @param noCalls Deprecated
-   /// @param journalScript Deprecated
+   /// @param noCalls only load the script and does not execute commands , default false
+   /// @param journalScript Deprecated , default false
    ///
    /// @return True if the script was successfully executed, false if not.
-   inline bool executeFile(const char* fileName, bool noCalls, bool journalScript) { return getRuntime()->executeFile(fileName, noCalls, journalScript); };
+   //
+   inline bool executeFile(const char* fileName, bool noCalls = false, bool journalScript = false) { return getRuntime()->executeFile(fileName, noCalls, journalScript); };
 }
 
 #endif

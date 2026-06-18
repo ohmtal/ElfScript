@@ -27,10 +27,9 @@
 #include "core/strings/stringFunctions.h"
 
 // #include "platform/profiler.h"
-// #include "console/console.h"
+#include "console/console.h"
 
 #define TORQUE_ENABLE_UTF16_CACHE
-
 
 #ifdef TORQUE_ENABLE_UTF16_CACHE
 #include "core/util/tDictionary.h"
@@ -292,9 +291,7 @@ UTF8*  createUTF8string( const UTF16* unistring)
 
 void UTF16ClearCache()
 {
-#ifdef TORQUE_ENABLE_UTF16_CACHE
    sgUTF16Cache.clear();
-#endif
 }
 
 //-----------------------------------------------------------------------------

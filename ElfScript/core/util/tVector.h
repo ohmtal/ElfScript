@@ -29,8 +29,8 @@
 #include "platform/platform.h"
 #endif
 #include <algorithm>
-// #include "console/engineTypes.h"
-// #include "console/engineTypeInfo.h"
+#include "console/engineTypes.h"
+#include "console/engineTypeInfo.h"
 
 //-----------------------------------------------------------------------------
 // Helper definitions for the vector class.
@@ -193,26 +193,25 @@ class Vector
 
 class VectorFieldEngineExport
 {
-      //XXTH STUB
-// public:
-//    template <class T>
-//    static EngineFieldTable::Field getElementCountField()
-//    {
-//       typedef Vector<T> ThisType;
-//       return _FIELD(mElementCount, elementCount, 1, "");
-//    };
-//    template <class T>
-//    static EngineFieldTable::Field getArraySizeField()
-//    {
-//       typedef Vector<T> ThisType;
-//       return _FIELD(mArraySize, arraySize, 1, "");
-//    };
-//    template <class T>
-//    static EngineFieldTable::Field getArrayField()
-//    {
-//       typedef Vector<T> ThisType;
-//       return _FIELD(mArray, array, 1, "");
-//    };
+public:
+   template <class T>
+   static EngineFieldTable::Field getElementCountField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mElementCount, elementCount, 1, "");
+   };
+   template <class T>
+   static EngineFieldTable::Field getArraySizeField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mArraySize, arraySize, 1, "");
+   };
+   template <class T>
+   static EngineFieldTable::Field getArrayField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mArray, array, 1, "");
+   };
 };
 
 template<class T> inline Vector<T>::~Vector()

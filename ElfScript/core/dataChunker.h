@@ -290,6 +290,14 @@ public:
    {
    }
 
+   //XXTH aSan test:
+   ~FreeListChunker() {
+      if (mChunker) {
+            SAFE_DELETE(mChunker);
+            mChunker = nullptr;
+      }
+   }
+
    FreeListChunker(dsize_t size = BaseDataChunker<T>::ChunkSize)
    {
       mChunker = new BaseDataChunker<T>(size);

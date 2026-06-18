@@ -1,5 +1,32 @@
-# ElfScript - DEAD
+# ElfScript
 
+## 2026-06-18 Attempt II
+Copy from TorqueScript and start cleanup.
+
+### [done] Milestone I: cleanup : check which sources are unused 
+
+- [X] SimDataBlock
+- [X] NetString/tagged strings 
+- [X] sim is unused
+- [X] ./util used stuff moved to core/util then removed 
+- [X] core/util/zip
+
+There is some stuff left in platform and maybe in core but it's ok for now. 
+
+
+### Milestone II [open]: replace MountSystem / Virtual 
+
+While it's basicly a good idea to have a mountsystem 
+and virtual filesystem it's overpowered for loading a 
+script or export doc/variables/objects. So I only need
+to set a base directory, implement loading a test file
+and replace the ugly expand filename ~/ ./ ^ logic. 
+I guess dso is also loaded saved as text ... maybe i dont 
+need dso anyway. 
+
+
+---
+---
 ## CANCLED - i concentrate on torqueScript folder - i started modifing it 
 ##  and dont want to sync this.
 ##  Another reason is it seams that i don't get it as small as i hoped ;)

@@ -213,7 +213,9 @@ bool expandToolScriptFilename(char *filename, U32 size, const char *src)
 }
 
 //-----------------------------------------------------------------------------
-
+//XXTH this sucks ... cant load the inital main.cs with only set main.cs !!!
+// or i have to set a ScriptModulePath ......
+// NOTE FIXED !!!
 bool expandOldScriptFilename(char *filename, U32 size, const char *src)
 {
    const StringTableEntry cbName = Con::getCurrentScriptModuleName();
@@ -251,9 +253,13 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
 
    if (slash == NULL)
    {
-      Con::errorf("Illegal CodeBlock path detected (no mod directory): %s", cbName);
-      *filename = 0;
-      return false;
+      if (dStrlen(src) < 3) return false;
+         //XXTH +2 because it must be ~/ or ./
+      Platform::makeFullPathName(src + 2, filename, size);
+      return true;
+      // Con::errorf("Illegal CodeBlock path detected (no mod directory): %s", cbName);
+      // *filename = 0;
+      // return false;
    }
 
    U32 length = slash-cbName;

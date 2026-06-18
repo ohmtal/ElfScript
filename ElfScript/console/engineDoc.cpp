@@ -26,6 +26,7 @@
 #include "console/engineAPI.h"
 #include "core/stream/fileStream.h"
 #include "console/consoleInternal.h"
+#include "core/util/tDictionary.h"
 
 #define USE_UNDOCUMENTED_GROUP
 

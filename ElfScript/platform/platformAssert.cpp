@@ -22,7 +22,6 @@
 
 #include <stdarg.h>
 
-#include "platform/platformAssert.h"
 #include "core/strings/stringFunctions.h"
 #include "console/engineAPI.h"
 

@@ -29,14 +29,26 @@
 
 
 //--------------------------------------
+// XXTH test .....
 // Types
-#if defined(TORQUE_X86)
-typedef signed long long    S64;
-typedef unsigned long long  U64;
-#else
-typedef signed long    S64;
-typedef unsigned long  U64;
+#ifdef S64
+#undef S64
 #endif
+#ifdef U64
+#undef U64
+#endif
+
+
+typedef int64_t     S64;
+typedef uint64_t    U64;
+
+// #if defined(TORQUE_X86)
+// typedef signed long long    S64;
+// typedef unsigned long long  U64;
+// #else
+// typedef signed long    S64;
+// typedef unsigned long  U64;
+// #endif
 
 
 //--------------------------------------
@@ -73,8 +85,8 @@ typedef unsigned long  U64;
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN
 #  define TORQUE_OS_WIN32
-#  define TORQUE_SUPPORTS_NASM
-#  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
+// #  define TORQUE_SUPPORTS_NASM
+// #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
 #  include "platform/types.win.h"
 
 #elif defined(linux) || defined(LINUX) || defined(__linux__)
@@ -87,15 +99,15 @@ typedef unsigned long  U64;
 #elif defined(__OpenBSD__)
 #  define TORQUE_OS_STRING "OpenBSD"
 #  define TORQUE_OS_OPENBSD
-#  define TORQUE_SUPPORTS_NASM
-#  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
+// #  define TORQUE_SUPPORTS_NASM
+// #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
 #  include "platform/types.posix.h"
 
 #elif defined(__FreeBSD__)
 #  define TORQUE_OS_STRING "FreeBSD"
 #  define TORQUE_OS_FREEBSD
-#  define TORQUE_SUPPORTS_NASM
-#  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
+// #  define TORQUE_SUPPORTS_NASM
+// #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
 #  include "platform/types.posix.h"
 
 #elif defined(__APPLE__)
@@ -107,6 +119,17 @@ typedef unsigned long  U64;
 // This could be reconfigured for static builds, though minimal impact
 //#     define TORQUE_SUPPORTS_NASM
 #  endif
+
+#elif defined(__ANDROID__) ||  defined(__android__)
+#  define TORQUE_OS_STRING "Android"
+#   define TORQUE_OS_ANDROID
+#  include "platform/types.posix.h"
+
+#elif defined(__emscripten__) || defined(__EMSCRIPTEN__)
+#  define TORQUE_OS_STRING "Emscripten"
+#  define TORQUE_OS_EMSCRIPTEN
+#  include "platform/types.posix.h"
+
 #else
 #  error "GCC: Unsupported Operating System"
 #endif
@@ -124,10 +147,19 @@ typedef unsigned long  U64;
 #  define TORQUE_CPU_X64
 #  define TORQUE_LITTLE_ENDIAN
 
+#elif defined(__ANDROID__) ||  defined(__android__)
+#  define TORQUE_LITTLE_ENDIAN
+#  define TORQUE_CPU_ARM64
+
+
 #elif (defined( __arm64__ ) && defined( __APPLE__ )) || defined( __arch64__ )
 #  define TORQUE_CPU_STRING "Arm 64"
 #  define TORQUE_CPU_ARM64
 #  define TORQUE_LITTLE_ENDIAN
+
+#elif defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__) ||  defined(__ANDROID__) ||  defined(__android__)
+#  define TORQUE_LITTLE_ENDIAN
+#  define TORQUE_CPU_X86
 
 #else
 #  error "GCC: Unsupported Target CPU"

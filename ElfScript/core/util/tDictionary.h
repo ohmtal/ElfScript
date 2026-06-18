@@ -30,7 +30,7 @@
 #include "core/util/hashFunction.h"
 #endif
 #ifndef _TORQUE_STRING_H_
-#include "core/strings/String.h"
+#include "core/util/str.h"
 #endif
 
 #ifndef _DATACHUNKER_H_

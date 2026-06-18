@@ -29,8 +29,6 @@
 #include "parser.h"
 #include "console/runtime.h"
 
-class Stream; //XXTH forward
-
 struct CompilerLocalVariableToRegisterMappingTable
 {
    struct RemappingTable

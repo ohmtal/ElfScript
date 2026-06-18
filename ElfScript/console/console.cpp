@@ -272,7 +272,7 @@ static DataChunker consoleLogChunker;
 static Vector<ConsoleLogEntry> consoleLog(__FILE__, __LINE__);
 static bool consoleLogLocked;
 bool scriptWarningsAsAsserts = true;
-static bool logBufferEnabled=true;
+static bool logBufferEnabled=false; //XXTH default to false! use consumer
 static S32 printLevel = 10;
 static FileStream consoleLogFile;
 static const char *defLogFileName = "console.log";
@@ -520,7 +520,22 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
          // Look up the object identifier.
          dStrncpy(completionBuffer, inputBuffer + p, objLast - p);
          completionBuffer[objLast - p] = 0;
-         tabObject = Sim::findObject(completionBuffer);
+
+         //XXTH autocomplete $ objects findObject need the id!
+         char c = *completionBuffer;
+         if (c == '$') {
+            // Con::errorf("[debug] we got a global variable at %s id:%s"
+            // , completionBuffer
+            // , Con::getVariable(completionBuffer)
+            // );
+            tabObject = Sim::findObject(Con::getVariable(completionBuffer));
+        } else {
+            tabObject = Sim::findObject(completionBuffer);
+        }
+        // <<<< XXTH
+
+
+         //orig: tabObject = Sim::findObject(completionBuffer);
          if (tabObject == NULL) 
          {
             // Bail if not found.
@@ -768,6 +783,20 @@ void errorf(const char* fmt,...)
    va_end(argptr);
 }
 
+void infof(const char* fmt,...)
+{
+      va_list argptr;
+      va_start(argptr, fmt);
+      _printf(ConsoleLogEntry::Info, ConsoleLogEntry::General, fmt, argptr);
+      va_end(argptr);
+}
+void debugf(const char* fmt,...)
+{
+      va_list argptr;
+      va_start(argptr, fmt);
+      _printf(ConsoleLogEntry::Debug, ConsoleLogEntry::General, fmt, argptr);
+      va_end(argptr);
+}
 //---------------------------------------------------------------------------
 
 bool getVariableObjectField(const char *name, SimObject **object, const char **field)
@@ -1230,6 +1259,7 @@ ConsoleValue execute(S32 argc, const char *argv[])
 // Internal execute for object method which does not save the stack
 static ConsoleValue _internalExecute(SimObject *object, S32 argc, ConsoleValue argv[], bool thisCallOnly)
 {
+
    if (object == NULL)
       return (ConsoleValue());
 

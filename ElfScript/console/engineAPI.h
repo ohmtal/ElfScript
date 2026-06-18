@@ -1195,7 +1195,8 @@ public:
       }
       else
       {
-            Con::errorf("Threads not supported!");
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+            return R();
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc + sizeof...(ArgTs), NULL, false, &cb);
 //          evt->populateArgs(mArgv);
@@ -1241,6 +1242,8 @@ public:
       }
       else
       {
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+             return R();
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, true, &cb);
 //          evt->populateArgs(mArgv);
@@ -1282,6 +1285,8 @@ public:
       }
       else
       {
+            Con::errorf("Callback not executed ! Threaded execute not implemented!!!!");
+            return R();
             //XXTH FIXME
 //          SimConsoleThreadExecCallback cb;
 //          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, false, &cb);
@@ -1301,7 +1306,7 @@ public:
 // XXTH TGE Compat! but better
 // NOTE: better use: DefineEngineMethod
 #define ConsoleMethod(className, name, returnType, minArgs, maxArgs, usage) \
-      ConsoleMethod(className, name, returnType, minArgs, maxArgs, usage)
+      DefineEngineStringlyVariadicMethod(className, name,returnType,minArgs,maxArgs,usage)
 
 // NOTE: better use: DefineEngineFunction
 #define ConsoleFunction(name,returnType,minArgs,maxArgs,usage) \

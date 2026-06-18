@@ -379,7 +379,7 @@ void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDoc
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
-   f.networkMask  = 0;
+   // f.networkMask  = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -404,7 +404,7 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
-   f.networkMask  = 0;
+   // f.networkMask  = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -427,7 +427,7 @@ void ConsoleObject::addArray( const char *arrayName, S32 count )
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
-   f.networkMask = 0;
+   // f.networkMask = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -449,7 +449,7 @@ void ConsoleObject::endArray( const char *arrayName )
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
-   f.networkMask = 0;
+   // f.networkMask = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -528,7 +528,7 @@ void ConsoleObject::addField(const char*  in_pFieldname,
    f.setDataFn = &defaultProtectedSetFn;
    f.getDataFn = &defaultProtectedGetFn;
    f.writeDataFn = in_writeDataFn;
-   f.networkMask = 0;
+   // f.networkMask = 0;
 
    f.table = conType->getEnumTable();
 
@@ -623,7 +623,7 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
    f.setDataFn = in_setDataFn;
    f.getDataFn = in_getDataFn;
    f.writeDataFn = in_writeDataFn;
-   f.networkMask = 0;
+   // f.networkMask = 0;
    f.table = conType->getEnumTable();
 
    sg_tempFieldList.push_back(f);
@@ -657,7 +657,7 @@ void ConsoleObject::addProtectedFieldV(const char* in_pFieldname,
    f.setDataFn = in_setDataFn;
    f.getDataFn = in_getDataFn;
    f.writeDataFn = in_writeDataFn;
-   f.networkMask = 0;
+   // f.networkMask = 0;
    sg_tempFieldList.push_back(f);
 }
 
@@ -727,7 +727,7 @@ void ConsoleObject::addFieldV(const char* in_pFieldname,
    f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = in_elementCount;
    f.validator = v;
-   f.networkMask = 0;
+   // f.networkMask = 0;
 
    sg_tempFieldList.push_back(f);
 }
@@ -757,7 +757,7 @@ void ConsoleObject::addDeprecatedField(const char *fieldName)
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
-   f.networkMask = 0;
+   // f.networkMask = 0;
 
    sg_tempFieldList.push_back(f);
 }

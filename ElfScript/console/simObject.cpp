@@ -24,6 +24,10 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+//
+// XXTH: 2026-06-09 moved script onAdd onRemove from ScriptObject to SimObject !!!!
+//
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
 #include "platform/platform.h"
 #include "platform/platformMemory.h"
@@ -40,7 +44,6 @@
 #include "core/fileObject.h"
 #include "console/script.h"
 
-#include "sim/netObject.h"
 
 IMPLEMENT_CONOBJECT( SimObject );
 
@@ -59,6 +62,17 @@ bool SimObject::preventNameChanging = false;
 IMPLEMENT_CALLBACK(SimObject, onInspectPostApply, void, (SimObject* obj), (obj), "Generic callback for when an object is edited");
 IMPLEMENT_CALLBACK(SimObject, onSelected, void, (SimObject* obj), (obj), "Generic callback for when an object is selected");
 IMPLEMENT_CALLBACK(SimObject, onUnselected, void, (SimObject* obj), (obj), "Generic callback for when an object is un-selected");
+
+
+IMPLEMENT_CALLBACK( SimObject, onAdd, void, ( SimObjectId ID ), ( ID ),
+   "Called when this SimObject is added to the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
+);
+
+IMPLEMENT_CALLBACK( SimObject, onRemove, void, ( SimObjectId ID ), ( ID ),
+   "Called when this SimObject is removed from the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
+);
 
 namespace Sim
 {
@@ -886,11 +900,11 @@ void SimObject::assignFieldsFrom(SimObject *parent)
             if((*f->setDataFn)( this, elementIdxBuffer, bufferSecure ) )
                Con::setData(f->type, (void *) (((const char *)this) + f->offset), j, 1, &fieldVal, f->table);
 
-            if (f->networkMask != 0)
-            {
-               NetObject* netObj = static_cast<NetObject*>(this);
-               netObj->setMaskBits(f->networkMask);
-            }
+            // if (f->networkMask != 0)
+            // {
+            //    NetObject* netObj = static_cast<NetObject*>(this);
+            //    netObj->setMaskBits(f->networkMask);
+            // }
          }
       }
    }
@@ -922,26 +936,26 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
          // Here we check to see if <this> is a datablock and if <value>
          // starts with "$$". If both true than save value as a runtime substitution.
-         if (dynamic_cast<SimDataBlock*>(this) && value[0] == '$' && value[1] == '$')
-         {
-            if (!this->allowSubstitutions())
-            {
-               Con::errorf("Substitution Error: %s datablocks do not allow \"$$\" field substitutions. [%s]", 
-                  this->getClassName(), this->getName());
-               return;
-            }
-
-            if (fld->doNotSubstitute)
-            {
-               Con::errorf("Substitution Error: field \"%s\" of datablock %s prohibits \"$$\" field substitutions. [%s]", 
-                  slotName, this->getClassName(), this->getName());
-               return;
-            }
-
-            // add the substitution
-            ((SimDataBlock*)this)->addSubstitution(slotName, array1, value);
-            return;
-         }
+         // if (dynamic_cast<SimDataBlock*>(this) && value[0] == '$' && value[1] == '$')
+         // {
+         //    if (!this->allowSubstitutions())
+         //    {
+         //       Con::errorf("Substitution Error: %s datablocks do not allow \"$$\" field substitutions. [%s]",
+         //          this->getClassName(), this->getName());
+         //       return;
+         //    }
+         //
+         //    if (fld->doNotSubstitute)
+         //    {
+         //       Con::errorf("Substitution Error: field \"%s\" of datablock %s prohibits \"$$\" field substitutions. [%s]",
+         //          slotName, this->getClassName(), this->getName());
+         //       return;
+         //    }
+         //
+         //    // add the substitution
+         //    ((SimDataBlock*)this)->addSubstitution(slotName, array1, value);
+         //    return;
+         // }
 		 
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
@@ -967,11 +981,11 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             if(fld->validator)
                fld->validator->validateType(this, fld->pFieldname,  (void *) (((const char *)this) + fld->offset));
 
-            if (fld->networkMask != 0)
-            {
-               NetObject* netObj = static_cast<NetObject*>(this);
-               netObj->setMaskBits(fld->networkMask);
-            }
+            // if (fld->networkMask != 0)
+            // {
+            //    NetObject* netObj = static_cast<NetObject*>(this);
+            //    netObj->setMaskBits(fld->networkMask);
+            // }
 
             onStaticModified( slotName, value );
 
@@ -1557,6 +1571,19 @@ bool SimObject::onAdd()
 
    linkNamespaces();
 
+   // Call onAdd in script!
+   onAdd_callback(getId());
+
+   //XXTH i added it on SimObject so far maybe move to EngineObject
+   // funny this can be accessed in script which is basicly fine, but it can be also deleted!
+   // so Sim::getGarbageCollectionSet() is a dangling pointer ?!
+   // this can also happen to RootGroup .... FIMXE deny this by checking on delete or unregisterObject ?!
+   //
+   // Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
+
+
+   if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
+
    return true;
 }
 
@@ -1564,9 +1591,13 @@ bool SimObject::onAdd()
 
 void SimObject::onRemove()
 {
+  // Call onRemove in script!
+   if (!Sim::isShuttingDown()) onRemove_callback(getId());
+
    mFlags.clear(Added);
 
    unlinkNamespaces();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -2214,13 +2245,13 @@ bool SimObject::setInheritFrom(void* obj, const char* index, const char* data)
       object->assignFieldsFrom(parent);
 
       // copy any substitution statements
-      SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
-      if (parent_db)
-      {
-         SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(object);
-         if (currentNewObject_db)
-            currentNewObject_db->copySubstitutionsFrom(parent_db);
-      }
+      // SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+      // if (parent_db)
+      // {
+      //    SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(object);
+      //    if (currentNewObject_db)
+      //       currentNewObject_db->copySubstitutionsFrom(parent_db);
+      // }
    }
 
    return true;
@@ -2827,14 +2858,7 @@ DefineEngineMethod( SimObject, dump, void, ( bool detailed ), ( false ),
 
    // If the object is a datablock with substitution statements,
    // they get printed out as part of the dump.
-   if (dynamic_cast<SimDataBlock*>(object))
-   {
-      if (((SimDataBlock*)object)->getSubstitutionCount() > 0)
-      {
-         Con::printf("Substitution Fields:");
-         ((SimDataBlock*)object)->printSubstitutions();
-      }
-   }
+
    Con::printf( "Dynamic Fields:" );
    if(object->getFieldDictionary())
       object->getFieldDictionary()->printFields(object);
@@ -3039,7 +3063,34 @@ DefineEngineMethod( SimObject, setFieldValue, bool, ( const char* fieldName, con
 }
 
 //-----------------------------------------------------------------------------
+// XXTH like setFieldValue + setFieldType == ROCK 'N ROLL
+DefineEngineMethod( SimObject, addTypeField, bool,
+                    ( const char* fieldName, const char* type, const char* value  ), ,
+                    "Set the value and console type of the given field on this object.\n"
+                    "NOTE: this cant be used with arrays like setFieldValue"
+                    "@param fieldName The name of the field to assign to.  If it includes an array index, the index will be parsed out.\n"
+                    "@param type The name of the console type.\n"
+                    "@param value The new value to assign to the field.\n"
+                    "@return True." )
+{
 
+      if( !fieldName || !fieldName[0] )
+      {
+            AssertFatal(false, "SimObject::addTypeField - Invalid field name.");
+            Con::errorf( "SimObject::addTypeField - Invalid field name." );
+            return false;
+      }
+
+
+
+      fieldName = StringTable->insert( fieldName );
+
+      object->setDataField( fieldName, nullptr, value );
+      object->setDataFieldType( type,  fieldName, NULL );
+
+      return true;
+}
+//-----------------------------------------------------------------------------
 DefineEngineMethod( SimObject, getFieldType, const char*, ( const char* fieldName ),,
    "Get the console type code of the given field.\n"
    "@return The numeric type code for the underlying console type of the given field." )

@@ -412,6 +412,12 @@ namespace TorqueScript
 
          newCodeBlock->compileExec(name, script, noCalls, 0);
          ret = true;
+
+         //XXTH memleak - delete here is a bad idea !!
+         // if (newCodeBlock) {
+         //    SAFE_DELETE(newCodeBlock);
+         //    newCodeBlock = nullptr;
+         // }
       }
       else
       {

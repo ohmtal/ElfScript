@@ -34,9 +34,10 @@
 #include "core/strings/stringUnit.h"
 #include "core/strings/unicode.h"
 // #include "core/stream/fileStream.h"
-// #include "core/util/journal/journal.h"
-// #include "core/util/uuid.h"
+#include "core/util/journal/journal.h"
+#include "core/util/uuid.h"
 #include "torquescript/runtime.h"
+#include <core/volume.h>
 
 // This is a temporary hack to get tools using the library to
 // link in this module which contains no other references.
@@ -2083,7 +2084,6 @@ DefineEngineFunction( setLogMode, void, ( S32 mode ),,
 // MARK: ---- Misc ----
 
 //-----------------------------------------------------------------------------
-
 DefineEngineFunction( quit, void, ( ),,
    "Shut down the engine and exit its process.\n"
    "This function cleanly uninitializes the engine and then exits back to the system with a process "

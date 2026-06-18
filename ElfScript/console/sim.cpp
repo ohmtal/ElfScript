@@ -52,34 +52,9 @@
 
 namespace Sim
 {
-   // Don't forget to InstantiateNamed* in simManager.cc - DMM
-   ImplementNamedSet(ActiveActionMapSet)
-   ImplementNamedSet(GhostAlwaysSet)
-   ImplementNamedSet(WayPointSet)
-   ImplementNamedSet(fxReplicatorSet)
-   ImplementNamedSet(fxFoliageSet)
-   ImplementNamedSet(BehaviorSet)
-   ImplementNamedSet(MaterialSet)
-   ImplementNamedSet(SFXSourceSet)
-   ImplementNamedSet(SFXDescriptionSet)
-   ImplementNamedSet(SFXTrackSet)
-   ImplementNamedSet(SFXEnvironmentSet)
-   ImplementNamedSet(SFXStateSet)
-   ImplementNamedSet(SFXAmbienceSet)
-   ImplementNamedSet(TerrainMaterialSet)
-   ImplementNamedSet(DataBlockSet);
-   ImplementNamedSet(ForestBrushSet);
-   ImplementNamedSet(ForestItemDataSet);
-   ImplementNamedGroup(ActionMapGroup)
-   ImplementNamedGroup(ClientGroup)
-   ImplementNamedGroup(GuiGroup)
-   ImplementNamedGroup(GuiDataGroup)
-   ImplementNamedGroup(TCPGroup)
-   ImplementNamedGroup(SFXParameterGroup);
 
-   //groups created on the client
-   ImplementNamedGroup(ClientConnectionGroup)
-   ImplementNamedSet(sgMissionLightingFilterSet)
+   //XXTH auto garbageCollection
+   ImplementNamedSet(GarbageCollectionSet); //XXTH
 }
 
 //-----------------------------------------------------------------------------
@@ -113,51 +88,6 @@ DefineEngineFunction( isObject, bool, (const char * objectName), ,"isObject(obje
    }
 }
 
-ConsoleDocFragment _spawnObject1(
-   "@brief Global function used for spawning any type of object.\n\n"
-
-   "Note: This is separate from SpawnSphere::spawnObject(). This function is not called off any "
-   "other class and uses different parameters than the SpawnSphere's function. In the source, "
-   "SpawnSphere::spawnObject() actually calls this function and passes its properties "
-   "(spawnClass, spawnDatablock, etc).\n\n"
-
-   "@param class Mandatory field specifying the object class, such as Player or TSStatic.\n\n"
-   "@param datablock Field specifying the object's datablock, optional for objects such as TSStatic, mandatory for game objects like Player.\n\n"
-   "@param name Optional field specifying a name for this instance of the object.\n\n"
-   "@param properties Optional set of parameters applied to the spawn object during creation.\n\n"
-   "@param script Optional command(s) to execute when spawning an object.\n\n"
-
-   "@tsexample\n"
-      "// Set the parameters for the spawn function\n"
-      "%objectClass = \"Player\";\n"
-      "%objectDatablock = \"DefaultPlayerData\";\n"
-      "%objectName = \"PlayerName\";\n"
-      "%additionalProperties = \"health = \\\"0\\\";\"; // Note the escape sequence \\ in front of quotes\n"
-      "%spawnScript = \"echo(\\\"Player Spawned\\\");\" // Note the escape sequence \\ in front of quotes\n"
-      "// Spawn with the engine's Sim::spawnObject() function\n"
-      "%player = spawnObject(%objectClass, %objectDatablock, %objectName, %additionalProperties, %spawnScript);\n"
-   "@endtsexample\n\n"
-
-   "@ingroup Game",
-   NULL,
-   "bool spawnObject(class [, dataBlock, name, properties, script]);"
-);
-
-DefineEngineFunction( spawnObject, S32, (   const char * spawnClass
-                                         ,   const char * spawnDataBlock
-                                         ,   const char * spawnName
-                                         ,   const char * spawnProperties
-                                         ,   const char * spawnScript 
-                                         ),("","","","") ,"spawnObject(class [, dataBlock, name, properties, script])"
-            "@hide")
-{
-   SimObject* spawnObject = Sim::spawnObject(spawnClass, spawnDataBlock, spawnName, spawnProperties, spawnScript);
-
-   if (spawnObject)
-      return spawnObject->getId();
-   else
-      return -1;
-}
 
 DefineEngineFunction( cancel, void, (S32 eventId), ,"cancel(eventId)")
 {

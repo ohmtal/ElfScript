@@ -204,4 +204,10 @@ DeclareTemplatizedMinMax( F64 )
 #define STDCALL
 #endif
 
+
+#ifndef Offset
+#define Offset(x, cls) \
+((size_t) &((cls*)0x1000)->x - 0x1000)
+#endif
+
 #endif //_TORQUE_TYPES_H_

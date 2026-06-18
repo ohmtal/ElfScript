@@ -48,7 +48,7 @@
 // #endif
 
 class Stream;
-class LightManager;
+// class LightManager;
 class SimFieldDictionary;
 class SimPersistID;
 // class GuiInspector;
@@ -762,7 +762,7 @@ class SimObject: public ConsoleObject
       void unregisterObject();
 
       /// Unregister, mark as deleted, and free the object.
-      void deleteObject();
+      virtual void deleteObject();
 
       /// Performs a safe delayed delete of the object using a sim event.
       void safeDeleteObject();
@@ -984,6 +984,8 @@ class SimObject: public ConsoleObject
       DECLARE_CALLBACK(void, onInspectPostApply, (SimObject* obj));
       DECLARE_CALLBACK(void, onSelected, (SimObject* obj));
       DECLARE_CALLBACK(void, onUnselected, (SimObject* obj));
+      DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
+      DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
       
       static SimObject* __findObject( const char* id ) { return Sim::findObject( id ); }
       static const char* __getObjectId( ConsoleObject* object )

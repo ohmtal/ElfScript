@@ -46,8 +46,8 @@ public:
 
    DECLARE_CONOBJECT(ScriptObject);
 
-   DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
-   DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
+   // DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
+   // DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
 };
 
 //-----------------------------------------------------------------------------

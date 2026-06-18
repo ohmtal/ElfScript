@@ -102,6 +102,11 @@ void EngineObject::destroySelf()
    IEngineObjectPool* pool = this->mEngineObjectPool;
    void* object = this;
    
+   //XXTH TEST!!!!!!!!!
+   // somewhere the pool get lost ?! == Memleak
+   if (!pool) pool =  IEngineObjectPool::DEFAULT;
+   //<<<<<
+
    destructInPlace( this );
    if( pool )
       pool->freeObject( object );

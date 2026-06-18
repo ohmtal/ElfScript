@@ -1,7 +1,16 @@
-#include "platform/types.h"
-#include "platform/platformAssert.h"
-#include "core/strings/stringTable.h"
-#include "core/util/tVector.h"
+//-----------------------------------------------------------------------------
+// FIXME this is only to get over linker errors ....
+// FIXME scripts will not work until you fixed this
+//-----------------------------------------------------------------------------
+
+
+// ~~~ 1. add includes... ~~~
+// #include <SDL3/SDL.h>
+#include <console/console.h>
+#include <string>
+// #include <vector>
+// #include <platform/platformProcess.h>
+
 
 
 StringTableEntry osGetTemporaryDirectory(){
@@ -142,10 +151,23 @@ void shutdown()
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
 }
 
-void sleep(U32 ms)
-{
-   Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
+#if defined(_WIN32) || defined(__WIN32__) || defined(MSC_VER)
+#include <windows.h>
+#define platform_sleep(ms) Sleep(ms)
+#elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+#include <time.h>
+void sleep(unsigned int ms) {
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
 }
+#else
+#error "UNKNOWN OS"
+#endif
+
+
+
 
 void restartInstance()
 {

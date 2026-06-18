@@ -601,7 +601,9 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
       if (fullPath == NULL)
       {
          char buf[1024];
-         fullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
+         //XXTH sanity if path not set
+         const char * fullPath = Platform::makeFullPathName(fileName, buf, sizeof(buf));
+         fullPath = fullPath ? StringTable->insert(fullPath, true) : StringTable->EmptyString();
       }
 
       modPath = Con::getModNameFromPath(fileName);
@@ -617,6 +619,7 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    gFuncVars = gIsEvalCompile ? &gEvalFuncVars : &gGlobalScopeFuncVars;
 
    // Set up the parser.
+   // XXTH memleak!
    smCurrentParser = new TorqueScriptParser();
    AssertISV(smCurrentParser, avar("CodeBlock::compile - no parser available for '%s'!", fileName));
 
@@ -625,10 +628,21 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
 
+   //XXTH memleak: TEST HERE !! because of nested exec
+   SAFE_DELETE(smCurrentParser);
+   smCurrentParser = nullptr;
+   //<<<<<
+
    if (!Script::gStatementList)
    {
       smCurrentLineText = "\0";
       delete this;
+
+      //XXTH memleak:
+      SAFE_DELETE(smCurrentParser);
+      smCurrentParser = nullptr;
+      //<<<<<
+
       return Con::EvalResult(Con::getVariable("$ScriptError"));
    }
 
@@ -672,10 +686,15 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    if (lastIp + 1 != codeSize)
       Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", codeSize, lastIp);
 
-   // repurpose argc as local register counter for global state
    Con::EvalResult execResult = (exec(0, fileName, NULL, localRegisterCount, 0, noCalls, NULL, setFrame));
 
    smCurrentLineText = "\0";
+
+   //XXTH memleak:
+   SAFE_DELETE(smCurrentParser);
+   smCurrentParser = nullptr;
+   //<<<<<
+
    return execResult;
 }
 

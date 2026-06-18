@@ -33,9 +33,6 @@
 #include "console/engineAPI.h"
 #include "core/idGenerator.h"
 #include "core/util/safeDelete.h"
-//FIXME  #include "platform/platformIntrinsics.h"
-//FIXME #include "platform/profiler.h"
-// #include "math/mMathFn.h"
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -404,42 +401,6 @@ SimObject* findObject(SimObjectId id)
    return gIdDictionary->find(id);
 }
 
-SimObject *spawnObject(String spawnClass, String spawnDataBlock, String spawnName,
-                       String spawnProperties, String spawnScript)
-{
-   if (spawnClass.isEmpty())
-   {
-      Con::errorf("Unable to spawn an object without a spawnClass");
-      return NULL;
-   }
-
-   String spawnString;
-
-   spawnString += "$SpawnObject = new " + spawnClass + "(" + spawnName + ") { ";
-
-   if (spawnDataBlock.isNotEmpty() && !spawnDataBlock.equal( "None", String::NoCase ) )
-      spawnString += "datablock = " + spawnDataBlock + "; ";
-
-   if (spawnProperties.isNotEmpty())
-      spawnString += spawnProperties + " ";
-
-   spawnString += "};";
-
-   // Evaluate our spawn string
-   Con::evaluate(spawnString.c_str());
-
-   // Get our spawnObject id
-   const char* spawnObjectId = Con::getVariable("$SpawnObject");
-
-   // Get the actual spawnObject
-   SimObject* spawnObject = findObject(spawnObjectId);
-
-   // If we have a spawn script go ahead and execute it last
-   if (spawnScript.isNotEmpty())
-      Con::evaluate(spawnScript.c_str());
-
-   return spawnObject;
-}
 
 SimGroup *getRootGroup()
 {
@@ -538,11 +499,11 @@ bool isValidObjectName( const char* name )
 
 static bool sgIsShuttingDown;
 
-SimDataBlockGroup *gDataBlockGroup;
-SimDataBlockGroup *getDataBlockGroup()
-{
-   return gDataBlockGroup;
-}
+// SimDataBlockGroup *gDataBlockGroup;
+// SimDataBlockGroup *getDataBlockGroup()
+// {
+//    return gDataBlockGroup;
+// }
 
 
 void init()
@@ -550,47 +511,39 @@ void init()
    initEventQueue();
    initRoot();
 
-   InstantiateNamedSet(ActiveActionMapSet);
-   InstantiateNamedSet(GhostAlwaysSet);
-   InstantiateNamedSet(WayPointSet);
-   InstantiateNamedSet(fxReplicatorSet);
-   InstantiateNamedSet(fxFoliageSet);
-   InstantiateNamedSet(MaterialSet);
-   InstantiateNamedSet(SFXSourceSet);
-   InstantiateNamedSet(SFXDescriptionSet);
-   InstantiateNamedSet(SFXTrackSet);
-   InstantiateNamedSet(SFXEnvironmentSet);
-   InstantiateNamedSet(SFXStateSet);
-   InstantiateNamedSet(SFXAmbienceSet);
-   InstantiateNamedSet(TerrainMaterialSet);
-   InstantiateNamedSet(DataBlockSet);
-   InstantiateNamedSet(ForestBrushSet); 
-   InstantiateNamedSet(ForestItemDataSet);
-   InstantiateNamedGroup(ActionMapGroup);
-   InstantiateNamedGroup(ClientGroup);
-   InstantiateNamedGroup(GuiGroup);
-   InstantiateNamedGroup(GuiDataGroup);
-   InstantiateNamedGroup(TCPGroup);
-   InstantiateNamedGroup(ClientConnectionGroup);
-   InstantiateNamedGroup(SFXParameterGroup);
-   InstantiateNamedSet(BehaviorSet);
-   InstantiateNamedSet(sgMissionLightingFilterSet);
+   InstantiateNamedSet(GarbageCollectionSet); //XXTH
 
-   gDataBlockGroup = new SimDataBlockGroup();
-   gDataBlockGroup->registerObject("DataBlockGroup");
-   gRootGroup->addObject(gDataBlockGroup);
-   
    SimPersistID::init();
 }
 
 void shutdown()
 {
    sgIsShuttingDown = true;
-   
+
+   //XXTH auto GarbageCollection
+   if (Sim::getGarbageCollectionSet())
+   {
+#ifdef TORQUE_DEBUG
+         dPrintf(" * Shutdown Script GarbageCollection on %d Object(s).\n", Sim::getGarbageCollectionSet()->size());
+#endif
+         while (Sim::getGarbageCollectionSet()->size() > 0)
+         {
+               SimObject* obj = Sim::getGarbageCollectionSet()->at(0);
+               Sim::getGarbageCollectionSet()->removeObject(obj);
+               obj->deleteObject();
+         }
+   }
+
+
+
    shutdownRoot();
    shutdownEventQueue();
    
    SimPersistID::shutdown();
+
+
+
+
 }
 
 bool isShuttingDown()
@@ -603,25 +556,3 @@ bool isShuttingDown()
 
 #endif // DOXYGENIZING.
 
-SimDataBlockGroup::SimDataBlockGroup()
-{
-   mLastModifiedKey = 0;
-}
-
-S32 QSORT_CALLBACK SimDataBlockGroup::compareModifiedKey(const void* a,const void* b)
-{
-   const SimDataBlock* dba = *((const SimDataBlock**)a);
-   const SimDataBlock* dbb = *((const SimDataBlock**)b);
-
-   return dba->getModifiedKey() - dbb->getModifiedKey();
-}
-
-
-void SimDataBlockGroup::sort()
-{
-   if(mLastModifiedKey != SimDataBlock::getNextModifiedKey())
-   {
-      mLastModifiedKey = SimDataBlock::getNextModifiedKey();
-      dQsort(mObjectList.address(), mObjectList.size(),sizeof(SimObject *),compareModifiedKey);
-   }
-}

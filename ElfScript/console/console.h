@@ -34,13 +34,10 @@
 #endif
 #include <stdarg.h>
 
-#include "core/strings/String.h"
+#include "core/util/str.h"
 #include "core/util/journal/journaledSignal.h"
-#include "core/strings/stringTable.h"
-#include "core/strings/stringFunctions.h"
+#include "core/stringTable.h"
 #include <iostream>
-#include "core/util/rawData.h"
-#include "core/util/delegate.h"
 
 class SimObject;
 class Namespace;
@@ -84,6 +81,8 @@ struct ConsoleLogEntry
       Normal = 0,
       Warning,
       Error,
+      Info,
+      Debug,
       NUM_CLASS
    } mLevel;
 
@@ -202,8 +201,16 @@ public:
 
    ConsoleValue& operator=(const ConsoleValue& other)
    {
+      //XXTH memleak
       if (this != &other)
-         copyFrom(other);
+      {
+            cleanupData(); // clean old data!
+            copyFrom(other);
+      }
+
+      // orig:
+      // if (this != &other)
+      //    copyFrom(other);
       return *this;
    }
 
@@ -687,11 +694,11 @@ namespace Con
    void addConsumer(ConsumerCallback cb);
    void removeConsumer(ConsumerCallback cb);
 
-   // FIXME typedef JournaledSignal<void(RawData)> ConsoleInputEvent;
+   typedef JournaledSignal<void(RawData)> ConsoleInputEvent;
 
    /// Called from the native consoles to provide lines of console input
    /// to process. This will schedule it for execution ASAP.
-    // FIXME extern ConsoleInputEvent smConsoleInput;
+   extern ConsoleInputEvent smConsoleInput;
 
    /// @}
 
@@ -971,10 +978,20 @@ namespace Con
    /// @param ...       Variables to be written
    void warnf(const char *_format, ...);
 
-   /// @note The console window colors warning text as RED.
+   /// @note The console window colors errors text as RED.
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void errorf(const char *_format, ...);
+
+   /// @note The console window colors info text as YELLOW.
+   /// @param _format   A stdlib printf style formatted out put string
+   /// @param ...       Variables to be written
+   void infof(const char *_format, ...);
+
+   /// @note The console window colors debug text as BLUE.
+   /// @param _format   A stdlib printf style formatted out put string
+   /// @param ...       Variables to be written
+   void debugf(const char *_format, ...);
 
    /// @note The console window colors warning text as LIGHT GRAY.
    /// @param type      Allows you to associate the warning message with an internal module.

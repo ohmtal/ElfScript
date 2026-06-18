@@ -24,7 +24,7 @@
 #include <string.h>    // For memcpy, memmove, memset, memcmp
 #include <stdlib.h>    // For malloc, free
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(TORQUE_CPU_ARM64)
 #include <immintrin.h> // For _mm_malloc, _mm_free (x86/x64 only)
 #endif
 
@@ -80,29 +80,64 @@ void* dRealloc_r(void* in_pResize, dsize_t in_size, const char* fileName, const 
 }
 
 // -------------------------------------------------------------------------------------------
-void *dMalloc_aligned(dsize_t in_size, int alignment)
+// void *dMalloc_aligned(dsize_t in_size, int alignment)
+// {
+// #if defined(_MSC_VER)
+//     return _aligned_malloc(in_size, alignment);
+// #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+//     return aligned_alloc(alignment, in_size);
+// #elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+//     void *ptr = NULL;
+//     if (posix_memalign(&ptr, alignment, in_size) != 0) return NULL;
+//     return ptr;
+// #else
+//     return _mm_malloc(in_size, alignment);
+// #endif
+// }
+//
+// void dFree_aligned(void* p)
+// {
+// #if defined(_MSC_VER)
+//     _aligned_free(p);
+// #elif (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || defined(_POSIX_C_SOURCE)
+//     free(p);
+// #else
+//     _mm_free(p);
+// #endif
+// }
+
+
+void *dMalloc_aligned(size_t in_size, int alignment)
 {
-#if defined(_MSC_VER)
+    #if defined(_MSC_VER)
     return _aligned_malloc(in_size, alignment);
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-    return aligned_alloc(alignment, in_size);
-#elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+    #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__)
     void *ptr = NULL;
     if (posix_memalign(&ptr, alignment, in_size) != 0) return NULL;
     return ptr;
-#else
+    #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+    return aligned_alloc(alignment, in_size);
+    #elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+    void *ptr = NULL;
+    if (posix_memalign(&ptr, alignment, in_size) != 0) return NULL;
+    return ptr;
+    #else
+    #include <xmmintrin.h>
     return _mm_malloc(in_size, alignment);
-#endif
+    #endif
 }
 
 void dFree_aligned(void* p)
 {
-#if defined(_MSC_VER)
+    #if defined(_MSC_VER)
     _aligned_free(p);
-#elif (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || defined(_POSIX_C_SOURCE)
+    #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
+    defined(_POSIX_C_SOURCE)
     free(p);
-#else
+    #else
     _mm_free(p);
-#endif
+    #endif
 }
+
 

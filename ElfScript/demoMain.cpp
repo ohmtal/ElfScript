@@ -1,67 +1,149 @@
 #include <cstdio>
-#include "platform/platform.h"
-#include "core/frameAllocator.h"
-#include "core/strings/stringFunctions.h"
-#include "core/strings/stringTable.h"
-#include "core/util/tVector.h"
+// glue it together ;)
+#include "main/engineGlue.h"
 
-#include "core/strings/String.h"
+#include "console/console.h"
+#include "console/script.h"
+#include "console/engineAPI.h"
 
-// testing includes from unfinshed port
-#include "platform/typetraits.h"
-#include "core/util/autoPtr.h"
 
-int main() {
+// register enum >>>>
+#include "console/consoleExtras.h"
+// <<<<
 
+// #if defined(__unix__)
+// #include <platform/posix/POSIXStdConsole.h>
+// #endif
+
+enum MyEnum {
+    None = 0,
+    One,
+    Two,
+    Three
+};
+
+DefineEngineFunction(helloWorld, void, (String name), , "hello world")
+{
+    Con::printf("Hello World: %s", name.c_str());
+}
+
+
+bool gShutDownRequest = false;
+
+int argParser(int argc, char* argv[]) {
+
+    gShutDownRequest = true; //default no loop!
+    String argStr;
+    // argv[0] is program name
+    for (int i = 1; i < argc; ++i) {
+        if (!argv[i]) continue;
+        argStr = argv[i];
+
+        if (argStr.equal("--loop")) {
+            gShutDownRequest = false;
+            continue;
+        }
+
+        // filename test
+        if (argStr.equal("--script")) {
+            if (i + 1 < argc) {
+                String tmpFile = argv[++i];
+                Con::infof("Script File test: %s", tmpFile.c_str());
+            } else {
+                Con::errorf("--script but no file parameter usage: --script myFile.cs");
+                return 1;
+            }
+            continue;
+        }
+
+    } //for ...
+    return 0;
+}
+
+
+int main(int argc, char* argv[]) {
     printf("Startup ....\n");
 
-    printf("\n1. Platform -----------------------------------------\n");
-    // types loaded ?
-    S32 myInt = -66; U32 myUInt = 66; F32 myFloat = 66.66f;
-    char myChar[66];
-    // memory loaded ?
-    dMemset(myChar, 0,66);
-    dMemset(myChar, 'A',8);
-    dMemset(myChar + 8, 'B',8);
-    dMemset(myChar + 16, 'C',8);
 
-    printf(" * Types loaded: %d, %d, %f\n", myInt, myUInt, myFloat);
-    printf(" * Memory test: %s\n", myChar);
-    printf(" * Platform Stub test:"); Platform::postQuitMessage(0);
+    engineGlue::init();
+    int ret = argParser(argc, argv);
+    if (ret != 0) return ret;
+
+    Con::addVariable("ShutDownRequest", TypeBool, &gShutDownRequest, "");
+
+// moved to addons/shellConsole
+// #if defined(__unix__)
+//     // console test:
+//     StdConsole::create();
+//     stdConsole->enable(!gShutDownRequest);
+//     stdConsole->enableInput(!gShutDownRequest);
+// #endif
 
 
-    printf("\n2. Basic Core -----------------------------------------\n");
-    AlignedBufferAllocator<U32> alloc32;
-    alloc32.initWithElements(new U32[10], 10);
-    void* ptr = alloc32.allocBytes(2);
-    // Reset back to start
-    alloc32.setPosition(0);
-    printf(" * frameAllocator test: size=%d (10) pointer:%p\n"
-        , alloc32.getSize(), (void*) ptr);
+    // register enum Test >>
+    Con::registerEnumS32<MyEnum>("$MyEnum::");
+    // <<<<<
 
-    printf("\n3. StringTable && stringFunctions ------------------------\n");
-    dPrintf(" * Test stringFunctions: %d %f (now with dPrintf)\n", dAtoi("66"), dAtof("66.66"));
-    dPrintf(" * Test stringTable: %s\n", StringTable->insert("Hello World - ElfScript"));
 
-    dPrintf("\n4. Vector ---------------------------------------------\n");
+    // filesystem not implemented   Con::setLogMode(0);
+    std::string code= R"(
+        echo("EnumTest ..................");
+        echo($MyEnum::None SPC $MyEnum::One SPC $MyEnum::Two);
+        echo("......................");
+        helloWorld("tom");
+        error("This is NOT a error!");
+        warn("This is NOT a warning!");
+        echo( 5 + 5 );
 
-    Vector<S32> myNumbers;
-    dPrintf(" * Test Vector countdown: ");
-    for(S32 i = 10; i > 0; i--) { myNumbers.push_back(i); }
-    for (S32 i = 0; i < myNumbers.size(); i++) dPrintf("%d ", myNumbers[i]);
-    dPrintf("\n");
+        function FOO::bar(%this) {
+            echo(%this.getClassName());
+        }
+        $foo = new ScriptObject() { class = "FOO"; };
+        $foo.userValue = 4711;
+        $foo.bar();
 
-    dPrintf("\n5/6. String ---------------------------------------------\n");
-    String myString = "Hello ElfString:D, this String class is amazing!";
-    myString += " append like with std::string :)";
-    dPrintf(" * String: %s\n",myString.c_str());
-    myString = "Hello";
-    if (myString.compare("hello", 0,  String::NoCase|String::Left ) == 0) {
-        dPrintf(" * String: compare Hello with hello match noCase - thats cool.\n");
-    } else {
-        dPrintf (" * String compare failed !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        echo("mSin(3.14) =" SPC mSin(3.14));
+
+        schedule(0, 0, "echo", "hello scheduler");
+
+        // -------------------------
+        // ... overwrite quit ...
+        function quit() {
+            $ShutDownRequest = true;
+        }
+        // -------------------------
+
+    )";
+    Con::evaluate(code.c_str(), false, "");
+
+    // // ------ output log entries:
+    // ConsoleLogEntry *log;
+    // U32 size;
+    //
+    // Con::getLockLog(log, size);
+    // for (U32 i = 0; i < size; ++i)
+    // {
+    //     ConsoleLogEntry &entry = log[i];
+    //     printf("%d:[%d]:[%d] %s\n", i,entry.mLevel, entry.mType, entry.mString);
+    // }
+    //
+    // Con::unlockLog();
+
+    // --------- advance time for scheduler this should be placed in the main loop
+    while (!gShutDownRequest) {
+          engineGlue::process(0);
+
+          // #if defined(__unix__)
+          // stdConsole->process();
+          // #endif
+
+          Platform::sleep(16);
+
     }
 
-    printf("\n:: Bye Bye - reached the end. good sign -----------------\n");
+
+    // -------- finallize
+    engineGlue::shutDown();
+
     return 0;
 }

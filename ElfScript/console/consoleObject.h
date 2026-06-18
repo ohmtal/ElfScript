@@ -511,8 +511,8 @@ public:
             validator( NULL ),
             setDataFn( NULL ),
             getDataFn( NULL ),
-            writeDataFn(NULL),
-            networkMask(0)
+            writeDataFn(NULL)/*,
+            networkMask(0)*/
       {
          doNotSubstitute = keepClearSubsOnly = false;
       }
@@ -536,7 +536,7 @@ public:
       bool           doNotSubstitute;
       bool           keepClearSubsOnly;
 
-      U32            networkMask;
+      // U32            networkMask;
    };
    typedef Vector<Field> FieldList;
 

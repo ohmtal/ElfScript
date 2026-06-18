@@ -25,7 +25,6 @@
 #include "console/consoleInternal.h"
 #include "console/engineAPI.h"
 #include "core/stream/fileStream.h"
-// #include "platform/platformInput.h"
 #include "torqueConfig.h"
 #include "core/frameAllocator.h"
 

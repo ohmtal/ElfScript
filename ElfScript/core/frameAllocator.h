@@ -214,7 +214,9 @@ protected:
 
 public:
 
-   inline TORQUE_FORCEINLINE static void init(const dsize_t byteSize) { return smFrameAllocator.init(byteSize); }
+   inline TORQUE_FORCEINLINE static void init(const dsize_t byteSize) {
+         return smFrameAllocator.init(byteSize);
+   }
    inline TORQUE_FORCEINLINE static void destroy() { smFrameAllocator.destroy(); }
 
    inline TORQUE_FORCEINLINE static void* alloc(const dsize_t numBytes)

@@ -45,9 +45,8 @@ It need to be more stripped down because there are much more files than needed a
 
 # ElfScript (canceled)
 
-~~The stripdown to minimum of Torque3D's TorqueScript :)~~
-I canceled it and work on the TorqueScript folder, because i had to add
-so many source that the difference is not so big.
+Like the stuff in the TorqueScript folder but more cleanup unused Files and
+Functions
 
 - [ElfScript](./ElfScript/)
 
