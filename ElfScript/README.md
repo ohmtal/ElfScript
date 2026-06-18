@@ -24,6 +24,8 @@ and replace the ugly expand filename ~/ ./ ^ logic.
 I guess dso is also loaded saved as text ... maybe i dont 
 need dso anyway. 
 
+NOTE: Not sure i want to remove this but i need to check why getMainDotCsDir is used and not getCurrentDir as BasePath 
+
 - [X] removed log to file and buffer (only use consumers)
 - [ ] FIXME: 
     - [ ] file platformFileIO.cpp

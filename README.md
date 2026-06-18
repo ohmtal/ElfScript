@@ -43,7 +43,7 @@ It need to be more stripped down because there are much more files than needed a
 
 ---
 
-# ElfScript (canceled)
+# ElfScript
 
 Like the stuff in the TorqueScript folder but more cleanup unused Files and
 Functions
