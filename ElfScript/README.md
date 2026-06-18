@@ -24,6 +24,8 @@ and replace the ugly expand filename ~/ ./ ^ logic.
 I guess dso is also loaded saved as text ... maybe i dont 
 need dso anyway. 
 
+- [ ] removed log to file and buffer (only use consumers)
+
 - [ ] core/util/path
 - [ ] core/volume
 - [ ] core/virtualMountSystem

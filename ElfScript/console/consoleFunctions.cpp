@@ -48,36 +48,39 @@ static char scriptFilenameBuffer[1024];
 
 bool isInt(const char* str)
 {
-   int len = dStrlen(str);
-   if(len <= 0)
-      return false;
+      int len = dStrlen(str);
+      if(len <= 0)
+            return false;
 
-   // Ignore whitespace
-   int start = 0;
-   for(int i = start; i < len; i++)
-      if(str[i] != ' ')
-      {
-         start = i;
-         break;
+      // Ignore whitespace
+      int start = 0;
+      for(int i = start; i < len; i++) {
+            if(str[i] != ' ')
+            {
+                  start = i;
+                  break;
+            }
       }
 
-      for(int i = start; i < len; i++)
-         switch(str[i])
-      {
-         case '+': case '-':
-            if(i != 0)
-               return false;
-            break;
-         case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
-            break;
-         case ' ': // ignore whitespace
-            for(int j = i+1; j < len; j++)
-               if(str[j] != ' ')
-                  return false;
-            return true;
-            break;
-         default:
-            return false;
+
+      for(int i = start; i < len; i++){
+            switch(str[i])
+            {
+                  case '+': case '-':
+                        if(i != 0)
+                              return false;
+                  break;
+                  case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0':
+                        break;
+                  case ' ': // ignore whitespace
+                        for(int j = i+1; j < len; j++)
+                              if(str[j] != ' ')
+                                    return false;
+                  return true;
+                  break;
+                  default:
+                        return false;
+            }
       }
       return true;
 }
@@ -2058,25 +2061,25 @@ DefineEngineFunction( collapseEscape, const char*, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( setLogMode, void, ( S32 mode ),,
-   "@brief Determines how log files are written.\n\n"
-   "Sets the operational mode of the console logging system.\n\n"
-   "@param mode Parameter specifying the logging mode.  This can be:\n"
-      "- 1: Open and close the console log file for each seperate string of output.  This will ensure that all "
-         "parts get written out to disk and that no parts remain in intermediate buffers even if the process crashes.\n"
-      "- 2: Keep the log file open and write to it continuously.  This will make the system operate faster but "
-         "if the process crashes, parts of the output may not have been written to disk yet and will be missing from "
-         "the log.\n\n"
-         
-      "Additionally, when changing the log mode and thus opening a new log file, either of the two mode values may be "
-      "combined by binary OR with 0x4 to cause the logging system to flush all console log messages that had already been "
-      "issued to the console system into the newly created log file.\n\n"
-
-   "@note Xbox 360 does not support logging to a file. Use Platform::OutputDebugStr in C++ instead."
-   "@ingroup Logging" )
-{
-   Con::setLogMode( mode );
-}
+// DefineEngineFunction( setLogMode, void, ( S32 mode ),,
+//    "@brief Determines how log files are written.\n\n"
+//    "Sets the operational mode of the console logging system.\n\n"
+//    "@param mode Parameter specifying the logging mode.  This can be:\n"
+//       "- 1: Open and close the console log file for each seperate string of output.  This will ensure that all "
+//          "parts get written out to disk and that no parts remain in intermediate buffers even if the process crashes.\n"
+//       "- 2: Keep the log file open and write to it continuously.  This will make the system operate faster but "
+//          "if the process crashes, parts of the output may not have been written to disk yet and will be missing from "
+//          "the log.\n\n"
+//
+//       "Additionally, when changing the log mode and thus opening a new log file, either of the two mode values may be "
+//       "combined by binary OR with 0x4 to cause the logging system to flush all console log messages that had already been "
+//       "issued to the console system into the newly created log file.\n\n"
+//
+//    "@note Xbox 360 does not support logging to a file. Use Platform::OutputDebugStr in C++ instead."
+//    "@ingroup Logging" )
+// {
+//    Con::setLogMode( mode );
+// }
 
 //=============================================================================
 //    Misc.

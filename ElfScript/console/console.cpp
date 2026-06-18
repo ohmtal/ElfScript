@@ -27,7 +27,7 @@
 #include "console/consoleInternal.h"
 #include "console/consoleObject.h"
 #include "console/consoleParser.h"
-#include "core/stream/fileStream.h" // << used for logfile and exec
+// #include "core/stream/fileStream.h" // << used for logfile and exec
 #include "core/tAlgorithm.h"
 #include "console/consoleTypes.h"
 // #include "console/telnetDebugger.h"
@@ -269,14 +269,14 @@ namespace Con
 static Vector<ConsumerCallback> gConsumers(__FILE__, __LINE__);
 static Vector< String > sInstantGroupStack( __FILE__, __LINE__ );
 static DataChunker consoleLogChunker;
-static Vector<ConsoleLogEntry> consoleLog(__FILE__, __LINE__);
-static bool consoleLogLocked;
+// static Vector<ConsoleLogEntry> consoleLog(__FILE__, __LINE__);
+// static bool consoleLogLocked;
 bool scriptWarningsAsAsserts = true;
 static bool logBufferEnabled=false; //XXTH default to false! use consumer
 static S32 printLevel = 10;
-static FileStream consoleLogFile;
-static const char *defLogFileName = "console.log";
-static S32 consoleLogMode = 0;
+// static FileStream consoleLogFile;
+// static const char *defLogFileName = "console.log";
+// static S32 consoleLogMode = 0;
 static bool active = false;
 static bool newLogFile;
 static const char *logFileName;
@@ -310,15 +310,15 @@ static U32 startTime = initTime;
 
 ConsoleFunctionGroupBegin( Clipboard, "Miscellaneous functions to control the clipboard and clear the console.");
 
-DefineEngineFunction( cls, void, (), , "()"
-            "@brief Clears the console output.\n\n"
-            "@ingroup Console")
-{
-   if(consoleLogLocked)
-      return;
-   consoleLogChunker.freeBlocks();
-   consoleLog.setSize(0);
-};
+// DefineEngineFunction( cls, void, (), , "()"
+//             "@brief Clears the console output.\n\n"
+//             "@ingroup Console")
+// {
+//    if(consoleLogLocked)
+//       return;
+//    consoleLogChunker.freeBlocks();
+//    consoleLog.setSize(0);
+// };
 
 DefineEngineFunction( getClipboard, const char*, (), , "()"
             "@brief Get text from the clipboard.\n\n"
@@ -447,17 +447,17 @@ bool isMainThread()
 
 //--------------------------------------
 
-void getLockLog(ConsoleLogEntry *&log, U32 &size)
-{
-   consoleLogLocked = true;
-   log = consoleLog.address();
-   size = consoleLog.size();
-}
-
-void unlockLog()
-{
-   consoleLogLocked = false;
-}
+// void getLockLog(ConsoleLogEntry *&log, U32 &size)
+// {
+//    consoleLogLocked = true;
+//    log = consoleLog.address();
+//    size = consoleLog.size();
+// }
+//
+// void unlockLog()
+// {
+//    consoleLogLocked = false;
+// }
 
 U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forwardTab)
 {
@@ -594,65 +594,65 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
 }
 
 //------------------------------------------------------------------------------
-static void log(const char *string)
-{
-   // Bail if we ain't logging.
-   if (!consoleLogMode) 
-   {
-      return;
-   }
-
-   // In mode 1, we open, append, close on each log write.
-   if ((consoleLogMode & 0x3) == 1) 
-   {
-      consoleLogFile.open(defLogFileName, Torque::FS::File::ReadWrite);
-   }
-
-   // Write to the log if its status is hunky-dory.
-   if ((consoleLogFile.getStatus() == Stream::Ok) || (consoleLogFile.getStatus() == Stream::EOS)) 
-   {
-      consoleLogFile.setPosition(consoleLogFile.getStreamSize());
-      // If this is the first write...
-      if (newLogFile) 
-      {
-         // Make a header.
-         Platform::LocalTime lt;
-         Platform::getLocalTime(lt);
-         char buffer[128];
-         dSprintf(buffer, sizeof(buffer), "//-------------------------- %d/%d/%d -- %02d:%02d:%02d -----\r\n",
-               lt.month + 1,
-               lt.monthday,
-               lt.year + 1900,
-               lt.hour,
-               lt.min,
-               lt.sec);
-         consoleLogFile.write(dStrlen(buffer), buffer);
-         newLogFile = false;
-         if (consoleLogMode & 0x4) 
-         {
-            // Dump anything that has been printed to the console so far.
-            consoleLogMode -= 0x4;
-            U32 size, line;
-            ConsoleLogEntry *log;
-            getLockLog(log, size);
-            for (line = 0; line < size; line++) 
-            {
-               consoleLogFile.write(dStrlen(log[line].mString), log[line].mString);
-               consoleLogFile.write(2, "\r\n");
-            }
-            unlockLog();
-         }
-      }
-      // Now write what we came here to write.
-      consoleLogFile.write(dStrlen(string), string);
-      consoleLogFile.write(2, "\r\n");
-   }
-
-   if ((consoleLogMode & 0x3) == 1) 
-   {
-      consoleLogFile.close();
-   }
-}
+// static void log(const char *string)
+// {
+//    // Bail if we ain't logging.
+//    if (!consoleLogMode)
+//    {
+//       return;
+//    }
+//
+//    // In mode 1, we open, append, close on each log write.
+//    if ((consoleLogMode & 0x3) == 1)
+//    {
+//       consoleLogFile.open(defLogFileName, Torque::FS::File::ReadWrite);
+//    }
+//
+//    // Write to the log if its status is hunky-dory.
+//    if ((consoleLogFile.getStatus() == Stream::Ok) || (consoleLogFile.getStatus() == Stream::EOS))
+//    {
+//       consoleLogFile.setPosition(consoleLogFile.getStreamSize());
+//       // If this is the first write...
+//       if (newLogFile)
+//       {
+//          // Make a header.
+//          Platform::LocalTime lt;
+//          Platform::getLocalTime(lt);
+//          char buffer[128];
+//          dSprintf(buffer, sizeof(buffer), "//-------------------------- %d/%d/%d -- %02d:%02d:%02d -----\r\n",
+//                lt.month + 1,
+//                lt.monthday,
+//                lt.year + 1900,
+//                lt.hour,
+//                lt.min,
+//                lt.sec);
+//          consoleLogFile.write(dStrlen(buffer), buffer);
+//          newLogFile = false;
+//          if (consoleLogMode & 0x4)
+//          {
+//             // Dump anything that has been printed to the console so far.
+//             consoleLogMode -= 0x4;
+//             U32 size, line;
+//             ConsoleLogEntry *log;
+//             getLockLog(log, size);
+//             for (line = 0; line < size; line++)
+//             {
+//                consoleLogFile.write(dStrlen(log[line].mString), log[line].mString);
+//                consoleLogFile.write(2, "\r\n");
+//             }
+//             unlockLog();
+//          }
+//       }
+//       // Now write what we came here to write.
+//       consoleLogFile.write(dStrlen(string), string);
+//       consoleLogFile.write(2, "\r\n");
+//    }
+//
+//    if ((consoleLogMode & 0x3) == 1)
+//    {
+//       consoleLogFile.close();
+//    }
+// }
 
 //------------------------------------------------------------------------------
 
@@ -694,50 +694,50 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
    for(S32 i = 0; i < gConsumers.size(); i++)
       gConsumers[i](level, buffer);
 
-   if(logBufferEnabled || consoleLogMode)
-   {
-      char *pos = buffer;
-      while(*pos)
-      {
-         if(*pos == '\t')
-            *pos = '^';
-         pos++;
-      }
-      pos = buffer;
-
-      for(;;)
-      {
-         char *eofPos = dStrchr(pos, '\n');
-         if(eofPos)
-            *eofPos = 0;
-
-         log(pos);
-         if(logBufferEnabled && !consoleLogLocked)
-         {
-            ConsoleLogEntry entry;
-            entry.mLevel  = level;
-            entry.mType   = type;
-#ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build            
-            U64 logStringLen = dStrlen(pos) + 1;
-            entry.mString = (const char *)consoleLogChunker.alloc(logStringLen);
-            dStrcpy(const_cast<char*>(entry.mString), pos, logStringLen);
-            
-            // This prevents infinite recursion if the console itself needs to
-            // re-allocate memory to accommodate the new console log entry, and 
-            // LOG_PAGE_ALLOCS is defined. It is kind of a dirty hack, but the
-            // uses for LOG_PAGE_ALLOCS are limited, and it is not worth writing
-            // a lot of special case code to support this situation. -patw
-            const bool save = Con::active;
-            Con::active = false;
-            consoleLog.push_back(entry);
-            Con::active = save;
-#endif
-         }
-         if(!eofPos)
-            break;
-         pos = eofPos + 1;
-      }
-   }
+//    if(logBufferEnabled || consoleLogMode)
+//    {
+//       char *pos = buffer;
+//       while(*pos)
+//       {
+//          if(*pos == '\t')
+//             *pos = '^';
+//          pos++;
+//       }
+//       pos = buffer;
+//
+//       for(;;)
+//       {
+//          char *eofPos = dStrchr(pos, '\n');
+//          if(eofPos)
+//             *eofPos = 0;
+//
+//          log(pos);
+//          if(logBufferEnabled && !consoleLogLocked)
+//          {
+//             ConsoleLogEntry entry;
+//             entry.mLevel  = level;
+//             entry.mType   = type;
+// #ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build
+//             U64 logStringLen = dStrlen(pos) + 1;
+//             entry.mString = (const char *)consoleLogChunker.alloc(logStringLen);
+//             dStrcpy(const_cast<char*>(entry.mString), pos, logStringLen);
+//
+//             // This prevents infinite recursion if the console itself needs to
+//             // re-allocate memory to accommodate the new console log entry, and
+//             // LOG_PAGE_ALLOCS is defined. It is kind of a dirty hack, but the
+//             // uses for LOG_PAGE_ALLOCS are limited, and it is not worth writing
+//             // a lot of special case code to support this situation. -patw
+//             const bool save = Con::active;
+//             Con::active = false;
+//             consoleLog.push_back(entry);
+//             Con::active = save;
+// #endif
+//          }
+//          if(!eofPos)
+//             break;
+//          pos = eofPos + 1;
+//       }
+//    }
 
    Con::active = true;
 }
@@ -1383,29 +1383,29 @@ bool isFunction(const char *fn)
 
 //------------------------------------------------------------------------------
 
-void setLogMode(S32 newMode)
-{
-   if ((newMode & 0x3) != (consoleLogMode & 0x3)) {
-      if (newMode && !consoleLogMode) {
-         // Enabling logging when it was previously disabled.
-         newLogFile = true;
-      }
-      if ((consoleLogMode & 0x3) == 2) {
-         // Changing away from mode 2, must close logfile.
-         consoleLogFile.close();
-      }
-      else if ((newMode & 0x3) == 2) {
-#ifdef _XBOX
-         // Xbox is not going to support logging to a file. Use the OutputDebugStr
-         // log consumer
-         Platform::debugBreak();
-#endif
-         // Starting mode 2, must open logfile.
-         consoleLogFile.open(defLogFileName, Torque::FS::File::Write);
-      }
-      consoleLogMode = newMode;
-   }
-}
+// void setLogMode(S32 newMode)
+// {
+//    if ((newMode & 0x3) != (consoleLogMode & 0x3)) {
+//       if (newMode && !consoleLogMode) {
+//          // Enabling logging when it was previously disabled.
+//          newLogFile = true;
+//       }
+//       if ((consoleLogMode & 0x3) == 2) {
+//          // Changing away from mode 2, must close logfile.
+//          consoleLogFile.close();
+//       }
+//       else if ((newMode & 0x3) == 2) {
+// #ifdef _XBOX
+//          // Xbox is not going to support logging to a file. Use the OutputDebugStr
+//          // log consumer
+//          Platform::debugBreak();
+// #endif
+//          // Starting mode 2, must open logfile.
+//          consoleLogFile.open(defLogFileName, Torque::FS::File::Write);
+//       }
+//       consoleLogMode = newMode;
+//    }
+// }
 
 //------------------------------------------------------------------------------
 
@@ -2137,7 +2137,7 @@ void shutdown()
 
    smConsoleInput.remove(postConsoleInput);
 
-   consoleLogFile.close();
+   // consoleLogFile.close();
    Namespace::shutdown();
    AbstractClassRep::shutdown();
    Compiler::freeConsoleParserList();
