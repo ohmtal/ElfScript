@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 # -----------------------------------------------------------------------------
 # ----------  options ----------
-option(BUILD_TORQUESCRIPT "Build the Torque Script" ON)
+option(BUILD_TORQUESCRIPT "Build the Torque Script" OFF)
 option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
 # -----------------------------------------------------------------------------
 if (BUILD_TORQUESCRIPT)

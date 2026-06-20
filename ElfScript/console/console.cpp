@@ -741,6 +741,12 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
 
    Con::active = true;
 }
+//------------------------------------------------------------------------------
+// wrapper for _printf
+void LogEntry(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char* fmt, va_list argptr) {
+      _printf(level,type,fmt,argptr);
+}
+
 
 //------------------------------------------------------------------------------
 void printf(const char* fmt,...)

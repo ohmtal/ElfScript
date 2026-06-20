@@ -969,6 +969,10 @@ namespace Con
    /// @see removeConsumer()
    /// @{
 
+   // wrapper for _printf
+   void LogEntry(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char* fmt, va_list argptr);
+
+
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void printf(const char *_format, ...);

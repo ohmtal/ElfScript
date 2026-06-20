@@ -1374,6 +1374,10 @@ namespace {
    /// Return the type name to show in documentation for the given C++ type.
    const char* sGetDocTypeString(const char* nativeType)
    {
+      //XXTH sanity:
+      if (!nativeType || dStrlen(nativeType) == 0) {
+            return "";
+      }
       if (dStrncmp(nativeType, "const ", 6) == 0)
          nativeType += 6;
 
