@@ -112,6 +112,28 @@ int main(int argc, char* argv[]) {
             $ShutDownRequest = true;
         }
         // -------------------------
+        echo("---------------------------------");
+        $foo = new ScriptObject();
+        $foo.point = "11 666";
+        echo("POINT #1:" SPC $foo.point.x SPC $foo.point.y); // 11 666
+        $foo.point.y -=  655; //<<< this is ok
+        echo("POINT #2:" SPC $foo.point.x SPC $foo.point.y); // 11 11
+
+        $foo.p[1] = "11 666";
+        echo("fake point #1:" SPC $foo.p[1].x SPC $foo.p[1].y); // 11 666
+        $foo.p[1].y -= 655; //<<< fail!!!
+        echo("fake point #2:" SPC $foo.p[1].x SPC $foo.p[1].y); // 11 666 !
+
+        $bar[1] = "11 666";
+        $bar[1].y -= 655;
+        echo("bar fake var:" SPC $bar[1].x SPC $bar[1].y); // 11 11 !
+
+
+        $foo.p2 = "11 666";
+        echo("fake point #1:" SPC $foo.p2.x SPC $foo.p2.y); // 11 666
+        $foo.p2.y -= 655; //<<< fail!!!
+        echo("fake point #2:" SPC $foo.p2.x SPC $foo.p2.y); // 11 666 !
+
 
     )";
     Con::evaluate(code.c_str(), false, "");
