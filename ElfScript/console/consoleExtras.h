@@ -5,12 +5,13 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <string>
 
 #include "ext/magic_enum.hpp"
 #include "console.h"
 #include "consoleTypes.h"
+
 
 namespace Con {
 
@@ -20,31 +21,31 @@ namespace Con {
      * NOTE only for interger types .. can be enhanced i guess ..
      */
 
+
+    inline std::deque<S32> dynamicConst32Storage;
+
     template <typename TEnum>
     void registerEnumS32(const std::string& prefix) {
-
         constexpr std::size_t count = magic_enum::enum_count<TEnum>();
-
-        // ** static variable storage
-        static std::vector<S32> storedValues(count);
-
         constexpr auto enumValues = magic_enum::enum_values<TEnum>();
         constexpr auto enumNames = magic_enum::enum_names<TEnum>();
 
-        // ** generate
         for (std::size_t i = 0; i < count; ++i) {
-            storedValues[i] = static_cast<S32>(enumValues[i]);
+            dynamicConst32Storage.push_back(static_cast<S32>(enumValues[i]));
+            S32* permanentPointer = &dynamicConst32Storage.back();
             std::string fullName = prefix + std::string(enumNames[i]);
+
             Con::addConstant(
                 fullName.c_str(),
                              TypeS32,
-                             &storedValues[i],
+                             permanentPointer,
                              ""
             );
         }
     }
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------------------
+
 } //namespace Con
 
 
