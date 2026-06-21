@@ -30,6 +30,9 @@ if (BUILD_ELFSCRIPT)
     set(TARGET_NAME HelloElf)
     include("${CMAKE_CURRENT_LIST_DIR}/ElfScript/ElfScript.cmake")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+    if(UNIX)
+      list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/shellConsole/POSIXConsole.cpp)
+    endif()
     add_executable(${TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demoMain.cpp
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp

@@ -1,5 +1,10 @@
 # ElfScript
 
+While the source in TorqueScript folder also works, this is where i 
+put in my latest changes and fixes. It's uses in Ohmflux/ElfTest and
+raylib-elfscript.
+
+
 ## 2026-06-18 Attempt II
 Copy from TorqueScript and start cleanup.
 
@@ -49,10 +54,6 @@ NOTE: Not sure i want to remove this but i need to check why getMainDotCsDir is 
 
 ---
 ---
-## CANCLED - i concentrate on torqueScript folder - i started modifing it 
-##  and dont want to sync this.
-##  Another reason is it seams that i don't get it as small as i hoped ;)
-
 ---
 
 ![ElfScript Logo](./res/logo256.png)

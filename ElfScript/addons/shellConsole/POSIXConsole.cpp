@@ -1,29 +1,14 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-
-// #include "platformPOSIX/platformPOSIX.h"
-// #include "platformPOSIX/POSIXStdConsole.h"
-// #include "platformPOSIX/POSIXUtils.h"
-// #include "platform/input/event.h"
+// 2026-06-22 XXTH added:
+//      - cursor left / right for edit line
+//      - shift tab for backward complete
+//      - ctrl-a for beginning and ctrl-e for end
+//-----------------------------------------------------------------------------
 #include "platform/platform.h"
 #include "core/util/rawData.h"
 #include "core/strings/stringFunctions.h"
@@ -258,11 +243,15 @@ void StdConsole::process()
       if( !stdConsoleInputEnabled )
          return;
 
+//-------------------------------------------------------------
+
       typedData[numEvents] = '\0';
       if (numEvents > 0)
       {
-        char outbuf[512];
+        char outbuf[1024]; // Large buffer to handle escape sequences and redraws safely
         S32 outpos = 0;
+
+        // REMOVED: Do NOT null-terminate at 'inpos' here! It truncates the buffer when using Left Arrow.
 
         for (int i = 0; i < numEvents; i++)
         {
@@ -273,36 +262,70 @@ void StdConsole::process()
             /* backspace */
                if (inpos > 0)
                {
-                  outbuf[outpos++] = '\b';
-                  outbuf[outpos++] = ' ';
-                  outbuf[outpos++] = '\b';
+                  S32 len = (S32)strlen(inbuf);
+                  // Shift characters to the left to delete the character in memory
+                  for (S32 j = inpos - 1; j < len; j++)
+                     inbuf[j] = inbuf[j + 1];
+
                   inpos--;
+                  len--;
+
+                  // Redraw terminal line
+                  outbuf[outpos++] = '\b';
+                  for (S32 j = inpos; j < len; j++)
+                     outbuf[outpos++] = inbuf[j];
+                  outbuf[outpos++] = ' ';
+
+                  for (S32 j = len + 1; j > inpos; j--)
+                     outbuf[outpos++] = '\b';
                }
                break;
+            case 1:
+                /* Ctrl+A - Move cursor to the beginning of the line */
+                {
+                    // Move the terminal cursor back to the very start of the prompt
+                    for (S32 j = 0; j < inpos; j++)
+                        outbuf[outpos++] = '\b';
 
-            // XXX Don't know if we can detect shift-TAB.  So, only handling
-            // TAB for now.
+                    // Set logical position to the start
+                    inpos = 0;
+                }
+                break;
+
+            case 5:
+                /* Ctrl+E - Move cursor to the end of the line */
+                {
+                    S32 len = (S32)strlen(inbuf);
+
+                    // Move the terminal cursor forward until it reaches the end of the string
+                    for (S32 j = inpos; j < len; j++)
+                    {
+                        outbuf[outpos++] = '\033';
+                        outbuf[outpos++] = '[';
+                        outbuf[outpos++] = 'C';
+                    }
+
+                    // Set logical position to the very end
+                    inpos = len;
+                }
+                break;
+
 
             case '\t':
-                        // In the output buffer, we're going to have to erase the current line (in case
-                        // we're cycling through various completions) and write out the whole input
-                        // buffer, so (inpos * 3) + complen <= 512.  Should be OK.  The input buffer is
-                        // also 512 chars long so that constraint will also be fine for the input buffer.
                         {
-                           // Erase the current line.
-                           U32 i;
-                           for (i = 0; i < inpos; i++) {
+                           // Erase the current line visually
+                           U32 j;
+                           for (j = 0; j < (U32)inpos; j++) {
                               outbuf[outpos++] = '\b';
                               outbuf[outpos++] = ' ';
                               outbuf[outpos++] = '\b';
                            }
-                           // Modify the input buffer with the completion.
                            U32 maxlen = 512 - (inpos * 3);
                            inpos = Con::tabComplete(inbuf, inpos, maxlen, true);
-                           // Copy the input buffer to the output.
-                           for (i = 0; i < inpos; i++) {
-                              outbuf[outpos++] = inbuf[i];
+                           for (j = 0; j < (U32)inpos; j++) {
+                              outbuf[outpos++] = inbuf[j];
                            }
+                           inbuf[inpos] = '\0';
                         }
                         break;
 
@@ -311,112 +334,162 @@ void StdConsole::process()
             /* new line */
                   outbuf[outpos++] = '\n';
 
-                  inbuf[inpos] = 0;
+                  {
+                     S32 len = (S32)strlen(inbuf);
+                     // Submit the WHOLE line, do not cut off at cursor position
+                     inbuf[len] = '\0';
+                     inpos = len;
+                  }
+
                   outbuf[outpos] = 0;
                   printf("%s", outbuf);
-
-                  S32 eventSize;
-                  eventSize = 1;
 
                   {
                      RawData rd;
                      rd.size = inpos + 1;
                      rd.data = (S8*) inbuf;
-                     
                      Con::smConsoleInput.trigger(rd);
                   }
-                  
-                  // If we've gone off the end of our array, wrap
-                  // back to the beginning
+
                   if (iCmdIndex >= MAX_CMDS)
                       iCmdIndex %= MAX_CMDS;
 
-                  // Put the new command into the array
                   strcpy(rgCmds[iCmdIndex ++], inbuf);
 
                   printf("%s", Con::getVariable("Con::Prompt"));
                   inpos = outpos = 0;
-                  inbuf[0] = 0x00; // Ensure inbuf is NULL terminated after sending out command
+                  inbuf[0] = 0x00;
                   break;
+
             case 27:
-               // JMQTODO: are these magic numbers keyboard map specific?
-               if (typedData[i+1] == 91 || typedData[i+1] == 79)
+               if (i + 1 < numEvents && (typedData[i+1] == 91 || typedData[i+1] == 79))
                {
                   i += 2;
-                  // an arrow key was pressed.
                   switch(typedData[i])
                   {
+                      case 'Z':
+                          /* Shift+TAB - Backward Tab Completion */
+                          {
+                              // 1. Erase the current line visually
+                              U32 j;
+                              for (j = 0; j < (U32)inpos; j++) {
+                                  outbuf[outpos++] = '\b';
+                                  outbuf[outpos++] = ' ';
+                                  outbuf[outpos++] = '\b';
+                              }
+
+                              // 2. Call tabComplete with forwardTab set to FALSE
+                              U32 maxlen = 512 - (inpos * 3);
+                              inpos = Con::tabComplete(inbuf, inpos, maxlen, false); // <-- FALSE here
+
+                              // 3. Redraw the line with the backward completion result
+                              for (j = 0; j < (U32)inpos; j++) {
+                                  outbuf[outpos++] = inbuf[j];
+                              }
+                              inbuf[inpos] = '\0';
+                          }
+                          break;
+
                      case 'A':
                         /* up arrow */
-                        // Go to the previous command in the cyclic array
                         if ((-- iCmdIndex) < 0)
                            iCmdIndex = MAX_CMDS - 1;
 
-                        // If this command isn't empty ...
                         if (rgCmds[iCmdIndex][0] != '\0')
                         {
-                           // Obliterate current displayed text
-                           for (S32 i = outpos = 0; i < inpos; i ++)
-                           {
-                              outbuf[outpos++] = '\b';
-                              outbuf[outpos++] = ' ';
-                              outbuf[outpos++] = '\b';
-                           }
+                           S32 len = (S32)strlen(inbuf);
+                           for (S32 j = 0; j < inpos; j++) outbuf[outpos++] = '\b';
+                           for (S32 j = 0; j < len; j++) outbuf[outpos++] = ' ';
+                           for (S32 j = 0; j < len; j++) outbuf[outpos++] = '\b';
 
-                           // Copy command into command and display buffers
                            for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos++, outpos++)
                            {
                               outbuf[outpos] = rgCmds[iCmdIndex][inpos];
                               inbuf [inpos ] = rgCmds[iCmdIndex][inpos];
                            }
+                           inbuf[inpos] = '\0';
                         }
-                        // If previous is empty, stay on current command
                         else if ((++ iCmdIndex) >= MAX_CMDS)
                         {
                            iCmdIndex = 0;
                         }
                         break;
+
                      case 'B':
                         /* down arrow */
-                        // Go to the next command in the command array, if
-                        // it isn't empty
                         if (rgCmds[iCmdIndex][0] != '\0' && (++ iCmdIndex) >= MAX_CMDS)
                            iCmdIndex = 0;
 
-                        // Obliterate current displayed text
-                        for (S32 i = outpos = 0; i < inpos; i ++)
                         {
-                           outbuf[outpos++] = '\b';
-                           outbuf[outpos++] = ' ';
-                           outbuf[outpos++] = '\b';
+                           S32 len = (S32)strlen(inbuf);
+                           for (S32 j = 0; j < inpos; j++) outbuf[outpos++] = '\b';
+                           for (S32 j = 0; j < len; j++) outbuf[outpos++] = ' ';
+                           for (S32 j = 0; j < len; j++) outbuf[outpos++] = '\b';
                         }
 
-                        // Copy command into command and display buffers
                         for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos++, outpos++)
                         {
                            outbuf[outpos] = rgCmds[iCmdIndex][inpos];
                            inbuf [inpos ] = rgCmds[iCmdIndex][inpos];
                         }
+                        inbuf[inpos] = '\0';
                         break;
+
                      case 'C':
-                        /* right arrow */
-                        break;
+                         /* right arrow */
+                         // Works perfectly now because strlen(inbuf) is no longer truncated
+                         if (inpos < (S32)strlen(inbuf))
+                         {
+                             outbuf[outpos++] = '\033';
+                             outbuf[outpos++] = '[';
+                             outbuf[outpos++] = 'C';
+                             inpos++;
+                         }
+                         break;
+
                      case 'D':
-                        /* left arrow */
-                        break;
+                         /* left arrow */
+                         if (inpos > 0)
+                         {
+                             outbuf[outpos++] = '\033';
+                             outbuf[outpos++] = '[';
+                             outbuf[outpos++] = 'D';
+                             inpos--;
+                         }
+                         break;
                   }
-                  // read again to get rid of a bad char.
-                  //read(stdIn, &key, sizeof(char));
                   break;
                } else {
-                  inbuf[inpos++] = typedData[i];
-                  outbuf[outpos++] = typedData[i];
-                  break;
+                  goto default_handling;
                }
                break;
+
             default:
-               inbuf[inpos++] = typedData[i];
-               outbuf[outpos++] = typedData[i];
+            default_handling:
+               {
+                  S32 len = (S32)strlen(inbuf);
+                  if (len < 510)
+                  {
+                     // Shift characters to the right to make space for insertion
+                     for (S32 j = len; j >= inpos; j--)
+                        inbuf[j + 1] = inbuf[j];
+
+                     // Insert the character
+                     inbuf[inpos] = typedData[i];
+                     len++;
+                     inbuf[len] = '\0'; // Strictly maintain string end at the true dynamic length
+
+                     // Redraw the line from the insertion point onwards
+                     for (S32 j = inpos; j < len; j++)
+                        outbuf[outpos++] = inbuf[j];
+
+                     inpos++;
+
+                     // Move terminal cursor back to the correct position
+                     for (S32 j = len; j > inpos; j--)
+                        outbuf[outpos++] = '\b';
+                  }
+               }
                break;
          }
         }
@@ -426,5 +499,195 @@ void StdConsole::process()
            printf("%s", outbuf);
         }
       }
+
+//-------------------------------------------------------------
+//       typedData[numEvents] = '\0';
+//       if (numEvents > 0)
+//       {
+//         char outbuf[512];
+//         S32 outpos = 0;
+//
+//         for (int i = 0; i < numEvents; i++)
+//         {
+//          switch(typedData[i])
+//          {
+//             case 8:
+//             case 127:
+//             /* backspace */
+//                if (inpos > 0)
+//                {
+//                   outbuf[outpos++] = '\b';
+//                   outbuf[outpos++] = ' ';
+//                   outbuf[outpos++] = '\b';
+//                   inpos--;
+//                }
+//                break;
+//
+//             // XXX Don't know if we can detect shift-TAB.  So, only handling
+//             // TAB for now.
+//
+//             case '\t':
+//                         // In the output buffer, we're going to have to erase the current line (in case
+//                         // we're cycling through various completions) and write out the whole input
+//                         // buffer, so (inpos * 3) + complen <= 512.  Should be OK.  The input buffer is
+//                         // also 512 chars long so that constraint will also be fine for the input buffer.
+//                         {
+//                            // Erase the current line.
+//                            U32 i;
+//                            for (i = 0; i < inpos; i++) {
+//                               outbuf[outpos++] = '\b';
+//                               outbuf[outpos++] = ' ';
+//                               outbuf[outpos++] = '\b';
+//                            }
+//                            // Modify the input buffer with the completion.
+//                            U32 maxlen = 512 - (inpos * 3);
+//                            inpos = Con::tabComplete(inbuf, inpos, maxlen, true);
+//                            // Copy the input buffer to the output.
+//                            for (i = 0; i < inpos; i++) {
+//                               outbuf[outpos++] = inbuf[i];
+//                            }
+//                         }
+//                         break;
+//
+//             case '\n':
+//             case '\r':
+//             /* new line */
+//                   outbuf[outpos++] = '\n';
+//
+//                   inbuf[inpos] = 0;
+//                   outbuf[outpos] = 0;
+//                   printf("%s", outbuf);
+//
+//                   S32 eventSize;
+//                   eventSize = 1;
+//
+//                   {
+//                      RawData rd;
+//                      rd.size = inpos + 1;
+//                      rd.data = (S8*) inbuf;
+//
+//                      Con::smConsoleInput.trigger(rd);
+//                   }
+//
+//                   // If we've gone off the end of our array, wrap
+//                   // back to the beginning
+//                   if (iCmdIndex >= MAX_CMDS)
+//                       iCmdIndex %= MAX_CMDS;
+//
+//                   // Put the new command into the array
+//                   strcpy(rgCmds[iCmdIndex ++], inbuf);
+//
+//                   printf("%s", Con::getVariable("Con::Prompt"));
+//                   inpos = outpos = 0;
+//                   inbuf[0] = 0x00; // Ensure inbuf is NULL terminated after sending out command
+//                   break;
+//             case 27:
+//                // JMQTODO: are these magic numbers keyboard map specific?
+//                if (typedData[i+1] == 91 || typedData[i+1] == 79)
+//                {
+//                   i += 2;
+//                   // an arrow key was pressed.
+//                   switch(typedData[i])
+//                   {
+//                      case 'A':
+//                         /* up arrow */
+//                         // Go to the previous command in the cyclic array
+//                         if ((-- iCmdIndex) < 0)
+//                            iCmdIndex = MAX_CMDS - 1;
+//
+//                         // If this command isn't empty ...
+//                         if (rgCmds[iCmdIndex][0] != '\0')
+//                         {
+//                            // Obliterate current displayed text
+//                            for (S32 i = outpos = 0; i < inpos; i ++)
+//                            {
+//                               outbuf[outpos++] = '\b';
+//                               outbuf[outpos++] = ' ';
+//                               outbuf[outpos++] = '\b';
+//                            }
+//
+//                            // Copy command into command and display buffers
+//                            for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos++, outpos++)
+//                            {
+//                               outbuf[outpos] = rgCmds[iCmdIndex][inpos];
+//                               inbuf [inpos ] = rgCmds[iCmdIndex][inpos];
+//                            }
+//                         }
+//                         // If previous is empty, stay on current command
+//                         else if ((++ iCmdIndex) >= MAX_CMDS)
+//                         {
+//                            iCmdIndex = 0;
+//                         }
+//                         break;
+//                      case 'B':
+//                         /* down arrow */
+//                         // Go to the next command in the command array, if
+//                         // it isn't empty
+//                         if (rgCmds[iCmdIndex][0] != '\0' && (++ iCmdIndex) >= MAX_CMDS)
+//                            iCmdIndex = 0;
+//
+//                         // Obliterate current displayed text
+//                         for (S32 i = outpos = 0; i < inpos; i ++)
+//                         {
+//                            outbuf[outpos++] = '\b';
+//                            outbuf[outpos++] = ' ';
+//                            outbuf[outpos++] = '\b';
+//                         }
+//
+//                         // Copy command into command and display buffers
+//                         for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos++, outpos++)
+//                         {
+//                            outbuf[outpos] = rgCmds[iCmdIndex][inpos];
+//                            inbuf [inpos ] = rgCmds[iCmdIndex][inpos];
+//                         }
+//                         break;
+//
+//                     //XXTH added arrow keys
+//                      case 'C':
+//                          /* right arrow */
+//                          // Wir dürfen nur nach rechts, wenn inpos kleiner als die Textlänge in inbuf ist
+//                          if (inpos < (S32)strlen(inbuf))
+//                          {
+//                              outbuf[outpos++] = '\033'; // Escape-Zeichen
+//                              outbuf[outpos++] = '[';
+//                              outbuf[outpos++] = 'C';    // Sende "Cursor rechts" ans Terminal
+//                              inpos++;                   // Erhöhe die logische Position im Text
+//                          }
+//                          break;
+//
+//                      case 'D':
+//                          /* left arrow */
+//                          // Wir dürfen nur nach links, wenn wir nicht ganz am Anfang (0) stehen
+//                          if (inpos > 0)
+//                          {
+//                              outbuf[outpos++] = '\033'; // Escape-Zeichen
+//                              outbuf[outpos++] = '[';
+//                              outbuf[outpos++] = 'D';    // Sende "Cursor links" ans Terminal
+//                              inpos--;                   // Verringere die logische Position im Text
+//                          }
+//                          break;
+//
+//                   }
+//                   // read again to get rid of a bad char.
+//                   //read(stdIn, &key, sizeof(char));
+//                   break;
+//                } else {
+//                   inbuf[inpos++] = typedData[i];
+//                   outbuf[outpos++] = typedData[i];
+//                   break;
+//                }
+//                break;
+//             default:
+//                inbuf[inpos++] = typedData[i];
+//                outbuf[outpos++] = typedData[i];
+//                break;
+//          }
+//         }
+//         if (outpos)
+//         {
+//            outbuf[outpos] = 0;
+//            printf("%s", outbuf);
+//         }
+//       }
    }
 }

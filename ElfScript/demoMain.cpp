@@ -11,9 +11,9 @@
 #include "console/consoleExtras.h"
 // <<<<
 
-// #if defined(__unix__)
-// #include <platform/posix/POSIXStdConsole.h>
-// #endif
+#if defined(__unix__)
+#include "addons/shellConsole/POSIXStdConsole.h"
+#endif
 
 enum MyEnum {
     None = 0,
@@ -72,12 +72,12 @@ int main(int argc, char* argv[]) {
     Con::addVariable("ShutDownRequest", TypeBool, &gShutDownRequest, "");
 
 // moved to addons/shellConsole
-// #if defined(__unix__)
-//     // console test:
-//     StdConsole::create();
-//     stdConsole->enable(!gShutDownRequest);
-//     stdConsole->enableInput(!gShutDownRequest);
-// #endif
+#if defined(__unix__)
+    // console test:
+    StdConsole::create();
+    stdConsole->enable(!gShutDownRequest);
+    stdConsole->enableInput(!gShutDownRequest);
+#endif
 
 
     // register enum Test >>
@@ -158,9 +158,9 @@ int main(int argc, char* argv[]) {
     while (!gShutDownRequest) {
           engineGlue::process(0);
 
-          // #if defined(__unix__)
-          // stdConsole->process();
-          // #endif
+          #if defined(__unix__)
+          stdConsole->process();
+          #endif
 
           Platform::sleep(16);
 
