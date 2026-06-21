@@ -2893,6 +2893,13 @@ static int Sc_ScanHex()
 
 void expandEscape(char *dest, const char *src)
 {
+	//XXTH sanity
+	if (src == NULL || *src == '\0')
+	{
+		if (dest) *dest = '\0';
+		return;
+	}
+
    U8 c;
    while((c = (U8) *src++) != 0)
    {
