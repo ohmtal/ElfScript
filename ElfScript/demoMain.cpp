@@ -60,12 +60,23 @@ int argParser(int argc, char* argv[]) {
     return 0;
 }
 
+void MyLogger(U32 level, const char *consoleLine) {
+#if defined(__unix__)
+    // we use console
+#else
+    switch (level) {
+        case 1: dPrintf("[warn] %s\n",  consoleLine); break;
+        case 2: dPrintf("[error] %s\n",  consoleLine); break;
+        default: dPrintf("%s\n",  consoleLine); break;
+    }
+#endif
+}
 
 int main(int argc, char* argv[]) {
     printf("Startup ....\n");
 
 
-    engineGlue::init();
+    engineGlue::init(MyLogger);
     int ret = argParser(argc, argv);
     if (ret != 0) return ret;
 

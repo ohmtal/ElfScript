@@ -185,6 +185,7 @@ void StdConsole::printf(const char *s, ...)
 
 void StdConsole::processConsoleLine(const char *consoleLine)
 {
+
    if(stdConsoleEnabled)
    {
       if(lineOutput)
@@ -356,7 +357,7 @@ void StdConsole::process()
 
                   strcpy(rgCmds[iCmdIndex ++], inbuf);
 
-                  printf("%s", Con::getVariable("Con::Prompt"));
+                  // XXTH printf("%s", Con::getVariable("Con::Prompt"));
                   inpos = outpos = 0;
                   inbuf[0] = 0x00;
                   break;

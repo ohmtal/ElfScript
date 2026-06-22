@@ -105,6 +105,7 @@ set(CONSOLE_SRC
     # XXTH my extras ...
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.cpp
 )
 
 set(CORE_SRC

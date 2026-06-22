@@ -31,6 +31,8 @@
 #include "core/stringTable.h"
 #include "core/stream/fileStream.h"
 
+#include "console/scriptPreprocessor.h" // //XXTH preprocessor
+
 using namespace Compiler;
 
 bool           CodeBlock::smInFunction = false;
@@ -577,8 +579,33 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    char *string;
    chompUTF8BOM(inString, &string);
 
+//XXHT preprocessor
+#define ELF_PREPROCESSOR
+#ifdef ELF_PREPROCESSOR
+
+   // --- PREPROCESSOR PREPARATION ---
+   // Store the preprocessed code safely on the C++ stack
+   std::string processedSource = Con::preprocessTorqueScript(string);
+
+   STEtoCode = evalSTEtoCode;
+
+   // Wipes the temporary memory where the original inString might have lived
+   consoleAllocReset();
+
+   // --- PREPROCESSOR INSERTION START ---
+   // Allocate fresh, safe memory AFTER the reset
+   dsize_t allocatedSize = processedSource.length() + 1;
+   char* processedString = (char*)consoleAlloc(allocatedSize);
+   dStrcpy(processedString, processedSource.c_str(), allocatedSize);
+
+   // Redirect both the compiler string AND the engine's current line tracker
+   string = processedString;
+   inString = processedString; //  Update the original pointer
+   // --- PREPROCESSOR INSERTION END ---
+#else
    STEtoCode = evalSTEtoCode;
    consoleAllocReset();
+#endif
 
    name = fileName;
    smCurrentLineText = inString;
