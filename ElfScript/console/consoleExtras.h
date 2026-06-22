@@ -11,6 +11,7 @@
 #include "ext/magic_enum.hpp"
 #include "console.h"
 #include "consoleTypes.h"
+#include "scriptPreprocessor.h"
 
 
 namespace Con {
@@ -22,7 +23,7 @@ namespace Con {
      */
 
 
-    inline std::deque<S32> dynamicConst32Storage;
+    // inline std::deque<S32> dynamicConst32Storage;
 
     template <typename TEnum>
     void registerEnumS32(const std::string& prefix) {
@@ -30,17 +31,23 @@ namespace Con {
         constexpr auto enumValues = magic_enum::enum_values<TEnum>();
         constexpr auto enumNames = magic_enum::enum_names<TEnum>();
 
+        S32 value = 0;
         for (std::size_t i = 0; i < count; ++i) {
-            dynamicConst32Storage.push_back(static_cast<S32>(enumValues[i]));
-            S32* permanentPointer = &dynamicConst32Storage.back();
+            value = static_cast<S32>(enumValues[i]);
             std::string fullName = prefix + std::string(enumNames[i]);
 
-            Con::addConstant(
-                fullName.c_str(),
-                             TypeS32,
-                             permanentPointer,
-                             ""
-            );
+            Con::setScriptConstant(fullName, value);
+
+            // dynamicConst32Storage.push_back(static_cast<S32>(enumValues[i]));
+            // S32* permanentPointer = &dynamicConst32Storage.back();
+            // std::string fullName = prefix + std::string(enumNames[i]);
+            //
+            // Con::addConstant(
+            //     fullName.c_str(),
+            //                  TypeS32,
+            //                  permanentPointer,
+            //                  ""
+            // );
         }
     }
 

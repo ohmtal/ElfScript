@@ -21,6 +21,7 @@
 #include <regex>
 #include <vector>
 #include <algorithm>
+#include <format>
 #include <core/strings/stringFunctions.h>
 
 namespace Con {
@@ -28,6 +29,14 @@ namespace Con {
 
 // Global table that persists across multiple exec() calls
 std::unordered_map<std::string, std::string> gScriptConstants;
+
+void setScriptConstant(std::string key, S32 value) {
+    gScriptConstants[key] = std::format("{}", value);
+}
+
+void setScriptConstant(std::string key, std::string value) {
+    gScriptConstants[key] = value;
+}
 
 std::string preprocessTorqueScript(const char* inString) {
     if (inString == nullptr) return "";

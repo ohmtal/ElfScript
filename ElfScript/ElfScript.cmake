@@ -105,6 +105,9 @@ set(CONSOLE_SRC
     # XXTH my extras ...
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.h
     ${CMAKE_CURRENT_LIST_DIR}/console/consoleExtras.cpp
+
+    # this is rock and roll!!
+    ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.h
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.cpp
 )
 
