@@ -5,7 +5,7 @@
 // Script preprocessor using regex.
 // Torquescript have no concept to use "fast" constants bevor i start
 // changing bison/ast with adding this i try this first.
-// TODO: find the best place to add this ;)
+// NOTE: used in: Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // #define _LOOP_COUNT_ 5000
