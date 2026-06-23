@@ -22,6 +22,10 @@
 
 #pragma once
 
+// make slots type save but same slotname always have the same type
+#define ELFSCRIPT_STRICT_SLOT_TYPE
+
+
 #define TORQUE_SCRIPT_EXTENSION   "cs"
 #define TORQUE_APP_NAME            "ElfTestBed"
 #define TORQUE_APP_VERSION         1000

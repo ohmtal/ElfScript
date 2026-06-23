@@ -501,6 +501,11 @@ struct SlotAccessNode : ExprNode
    U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
    TypeReq getPreferredType() override;
    DBG_STMT_TYPE(SlotAccessNode);
+
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+   U32 typeID = -1;
+#endif
+
 };
 
 struct InternalSlotDecl

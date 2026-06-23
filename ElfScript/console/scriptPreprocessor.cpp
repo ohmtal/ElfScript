@@ -21,7 +21,6 @@
 #include <regex>
 #include <vector>
 #include <algorithm>
-#include <format>
 #include <core/strings/stringFunctions.h>
 
 #include <cctype>
@@ -34,7 +33,9 @@ std::unordered_map<std::string, std::string> gScriptConstants;
 
 
 void setScriptConstant(std::string key, S32 value) {
-    gScriptConstants[key] = std::format("{}", value);
+    StringBuilder str;
+    str.format("%d", value);
+    gScriptConstants[key] = str.end();
 }
 
 void setScriptConstant(std::string key, std::string value) {

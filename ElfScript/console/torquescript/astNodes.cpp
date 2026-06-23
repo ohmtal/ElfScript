@@ -29,6 +29,7 @@
 
 #include "console/simBase.h"
 
+
 template< typename T >
 struct Token
 {
@@ -1188,6 +1189,13 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    codeStream.emitSTE(nameSpace);
    codeStream.emit(callType);
 
+   // XXTH >>>
+   // RESERVED FOR INLINE CACHE: Emit two empty slots (0) to store the Namespace::Entry* pointer later at runtime
+   codeStream.emit(0);
+   codeStream.emit(0);
+   // <<< XXTH
+
+
    if (type == TypeReqNone)
       codeStream.emit(OP_POP_STK);
 
@@ -1222,7 +1230,59 @@ TypeReq AssertCallExprNode::getPreferredType()
 }
 
 //------------------------------------------------------------
+// XXTH TypeSafety
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
+{
+      if (type == TypeReqNone)
+            return ip;
 
+      precompileIdent(slotName);
+
+      if (arrayExpr)
+      {
+            ip = arrayExpr->compile(codeStream, ip, TypeReqString);
+      }
+      ip = objectExpr->compile(codeStream, ip, TypeReqString);
+      codeStream.emit(OP_SETCUROBJECT);
+
+      // 1. ALWAYS emit the standard field setup so "curField" is populated in the VM!
+      codeStream.emit(OP_SETCURFIELD);
+      codeStream.emitSTE(slotName);
+
+      // 2. NOW, if we know the strict type, inform the VM about it as well
+      if (typeID == TypeS32 || typeID == TypeF32)
+      {
+            codeStream.emit(OP_SETCURFIELD_TYPE);
+            codeStream.emit(typeID);
+      }
+
+      codeStream.emit(OP_POP_STK);
+
+      if (arrayExpr)
+      {
+            codeStream.emit(OP_SETCURFIELD_ARRAY);
+            codeStream.emit(OP_POP_STK);
+      }
+
+      switch (type)
+      {
+            case TypeReqUInt:
+                  codeStream.emit(OP_LOADFIELD_UINT);
+                  break;
+            case TypeReqFloat:
+                  codeStream.emit(OP_LOADFIELD_FLT);
+                  break;
+            case TypeReqString:
+                  codeStream.emit(OP_LOADFIELD_STR);
+                  break;
+            case TypeReqNone:
+                  break;
+      }
+      return codeStream.tell();
+}
+
+#else //ELFSCRIPT_STRICT_SLOT_TYPE
 U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    if (type == TypeReqNone)
@@ -1264,7 +1324,7 @@ U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    }
    return codeStream.tell();
 }
-
+#endif // ELFSCRIPT_STRICT_SLOT_TYPE
 TypeReq SlotAccessNode::getPreferredType()
 {
    return TypeReqNone;
@@ -1296,6 +1356,91 @@ TypeReq InternalSlotAccessNode::getPreferredType()
 }
 
 //-----------------------------------------------------------------------------
+//XXTH Typesafety attempt:
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+
+U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
+{
+      precompileIdent(slotName);
+
+      // Determine the required type based on the dynamic console type variables
+      TypeReq valueTypeReq = TypeReqString;
+
+      // TypeS32 and TypeF32 are extern S32 variables registered by the engine
+      if (typeID == TypeS32)
+      {
+            valueTypeReq = TypeReqUInt;
+      }
+      else if (typeID == TypeF32)
+      {
+            valueTypeReq = TypeReqFloat;
+      }
+
+      // Compile the value expression with the strict type requirement
+      ip = valueExpr->compile(codeStream, ip, valueTypeReq);
+
+      if (arrayExpr)
+      {
+            ip = arrayExpr->compile(codeStream, ip, TypeReqString);
+      }
+
+      if (objectExpr)
+      {
+            ip = objectExpr->compile(codeStream, ip, TypeReqString);
+            codeStream.emit(OP_SETCUROBJECT);
+      }
+      else
+      {
+            codeStream.emit(OP_SETCUROBJECT_NEW);
+      }
+
+      codeStream.emit(OP_SETCURFIELD);
+      codeStream.emitSTE(slotName);
+
+      if (objectExpr)
+      {
+            codeStream.emit(OP_POP_STK);
+      }
+
+      if (arrayExpr)
+      {
+            codeStream.emit(OP_SETCURFIELD_ARRAY);
+            codeStream.emit(OP_POP_STK);
+      }
+
+      // Emit the strict type opcodes before saving the field data
+      if (typeID == TypeS32)
+      {
+            codeStream.emit(OP_SETCURFIELD_TYPE);
+            codeStream.emit(typeID);
+            codeStream.emit(OP_SAVEFIELD_UINT);
+      }
+      else if (typeID == TypeF32)
+      {
+            codeStream.emit(OP_SETCURFIELD_TYPE);
+            codeStream.emit(typeID);
+            codeStream.emit(OP_SAVEFIELD_FLT);
+      }
+      else
+      {
+            // Fallback for generic or unhandled types
+            codeStream.emit(OP_SAVEFIELD_STR);
+            if (typeID != -1)
+            {
+                  codeStream.emit(OP_SETCURFIELD_TYPE);
+                  codeStream.emit(typeID);
+            }
+      }
+
+      if (type == TypeReqNone)
+      {
+            codeStream.emit(OP_POP_STK);
+      }
+
+      return codeStream.tell();
+}
+
+#else // orig code
 
 U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
@@ -1342,7 +1487,7 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
    return codeStream.tell();
 }
-
+#endif
 TypeReq SlotAssignNode::getPreferredType()
 {
    return TypeReqString;

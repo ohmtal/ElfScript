@@ -24,6 +24,11 @@
 #include "compiler.h"
 #include "console/consoleInternal.h"
 
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+#include <map> //XXTH type safety for slots
+static std::map<StringTableEntry, U32> gCompilerFieldTypes;
+#endif
+
 using namespace Compiler;
 
 /// @file
@@ -390,6 +395,19 @@ SlotAccessNode* SlotAccessNode::alloc(S32 lineNumber, ExprNode* objectExpr, Expr
    ret->objectExpr = objectExpr;
    ret->arrayExpr = arrayExpr;
    ret->slotName = slotName;
+
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+   // Default to -1 (generic string/dynamic field)
+   ret->typeID = -1;
+
+   // Look up the slot name in the global memory to see if its type was defined earlier
+   std::map<StringTableEntry, U32>::iterator it = gCompilerFieldTypes.find(slotName);
+   if (it != gCompilerFieldTypes.end())
+   {
+         ret->typeID = it->second; // Jackpot! We now know the type even during a read operation!
+   }
+#endif
+
    return ret;
 }
 
@@ -407,6 +425,27 @@ InternalSlotAccessNode* InternalSlotAccessNode::alloc(S32 lineNumber, ExprNode* 
 
 SlotAssignNode* SlotAssignNode::alloc(S32 lineNumber, ExprNode* objectExpr, ExprNode* arrayExpr, StringTableEntry slotName, ExprNode* valueExpr, U32 typeID /* = -1 */)
 {
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+// XXTH type safety for slots ------
+// slot_acc '=' expr overwrites
+// the type!
+// insert >>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+      if (typeID != 4294967295 && typeID != -1)
+      {
+            gCompilerFieldTypes[slotName] = typeID;
+      }
+      else
+      {
+            std::map<StringTableEntry, U32>::iterator it = gCompilerFieldTypes.find(slotName);
+            if (it != gCompilerFieldTypes.end())
+            {
+                  typeID = it->second; // restoring the type !
+            }
+      }
+#endif
+// <<<<<<<<<<<<<<<<<<<<<<<insert end
    SlotAssignNode* ret = (SlotAssignNode*)consoleAlloc(sizeof(SlotAssignNode));
    constructInPlace(ret);
    ret->dbgLineNumber = lineNumber;

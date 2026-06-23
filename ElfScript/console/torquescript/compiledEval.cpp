@@ -2145,7 +2145,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
          }
          break;
-      }
+      } //OP_CALLFUNC
 
       case OP_ADVANCE_STR_APPENDCHAR:
       {
