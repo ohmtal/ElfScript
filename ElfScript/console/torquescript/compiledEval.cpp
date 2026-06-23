@@ -2141,12 +2141,185 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
                   break;
                }
-               }
+               } // switch (nsEntry->mType)
             }
          }
          break;
       } //OP_CALLFUNC
 
+      // ===========================================================================================
+#ifdef ELF_CALLFUNC_CACHED
+      // XXTH the monster get some new stuff to eat:
+      case OP_CALLFUNC_CACHED:
+      {
+            fnName = CodeToSTE(code, ip);
+            fnNamespace = CodeToSTE(code, ip + 2);
+            U32 callType = code[ip + 4];
+
+            // Read the cached pointer (offset +5 from current ip)
+            Namespace::Entry** cachedEntryPtr = (Namespace::Entry**)&code[ip + 5];
+            Namespace::Entry* nsEntry = *cachedEntryPtr;
+
+            // Advance IP past all metadata (7 slots)
+            ip += 7;
+
+            // ROBUST CHECK: If we have a cached entry, verify it matches the function name we want
+            if (nsEntry != NULL && nsEntry->mFunctionName == fnName)
+            {
+                  gCallStack.argvc(fnName, callArgc, &callArgv);
+
+                  if (callType == FuncCallExprNode::MethodCall || callType == FuncCallExprNode::ParentCall)
+                  {
+                        ConsoleValue& simObjectLookupValue = callArgv[1];
+                        thisObject = getThisObject(simObjectLookupValue);
+                  }
+
+                  goto execute_cached_callback;
+            }
+
+            // If name didn't match (highly unlikely unless memory was corrupted), reset it
+            nsEntry = NULL;
+
+            // --- CACHE MISS: Run the original lookup logic ---
+            gCallStack.argvc(fnName, callArgc, &callArgv);
+
+            if (callType == FuncCallExprNode::FunctionCall)
+            {
+                  nsEntry = Namespace::global()->lookup(fnName);
+            }
+            else if (callType == FuncCallExprNode::StaticCall)
+            {
+                  ns = Namespace::find(fnNamespace);
+                  if (ns) nsEntry = ns->lookup(fnName);
+            }
+            else if (callType == FuncCallExprNode::MethodCall || callType == FuncCallExprNode::ParentCall)
+            {
+                  ConsoleValue& simObjectLookupValue = callArgv[1];
+                  thisObject = getThisObject(simObjectLookupValue);
+                  if (thisObject)
+                  {
+                        ns = thisObject->getNamespace();
+                        if (ns) nsEntry = ns->lookup(fnName);
+                  }
+            }
+
+            // Fill the inline cache (ip - 2 points exactly to the reserved pointer slots)
+            if (nsEntry && !noCalls)
+            {
+                  Namespace::Entry** cacheLoc = (Namespace::Entry**)&code[ip - 2];
+                  *cacheLoc = nsEntry;
+            }
+
+execute_cached_callback:
+
+            if (!nsEntry || noCalls)
+            {
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  break;
+            }
+
+            // Run the callbacks exactly like the original code
+            if (nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
+            {
+                  if (nsEntry->mFunctionOffset)
+                  {
+                        ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+                        stack[_STK + 1] = (returnFromFn);
+                  }
+                  else
+                        stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  gCallStack.popFrame();
+            }
+            else
+            {
+                  switch (nsEntry->mType)
+                  {
+                  case Namespace::Entry::StringCallbackType:
+                  {
+                        const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
+                        gCallStack.popFrame();
+                        stack[_STK + 1].setString(result);
+                        _STK++;
+                        break;
+                  }
+                  case Namespace::Entry::IntCallbackType:
+                  {
+                        S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
+                        gCallStack.popFrame();
+
+                        if (code[ip] == OP_POP_STK)
+                        {
+                              ip++;
+                              break;
+                        }
+
+                        stack[_STK + 1].setInt(result);
+                        _STK++;
+                        break;
+                  }
+                  case Namespace::Entry::FloatCallbackType:
+                  {
+                        F64 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
+                        gCallStack.popFrame();
+
+                        if (code[ip] == OP_POP_STK)
+                        {
+                              ip++;
+                              break;
+                        }
+
+                        stack[_STK + 1].setFloat(result);
+                        _STK++;
+                        break;
+                  }
+                  case Namespace::Entry::VoidCallbackType:
+                  {
+                        nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
+                        gCallStack.popFrame();
+
+                        if (code[ip] == OP_POP_STK)
+                        {
+                              ip++;
+                              break;
+                        }
+
+                        if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
+                        {
+                              Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
+                        }
+
+                        stack[_STK + 1].setEmptyString();
+                        _STK++;
+
+                        break;
+                  }
+                  case Namespace::Entry::BoolCallbackType:
+                  {
+                        bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
+                        gCallStack.popFrame();
+
+                        if (code[ip] == OP_POP_STK)
+                        {
+                              ip++;
+                              break;
+                        }
+
+                        stack[_STK + 1].setBool(result);
+                        _STK++;
+
+                        break;
+                  }
+                  } // switch (nsEntry->mType) II
+
+            }
+            break;
+      }
+#endif // #ifdef ELF_CALLFUNC_CACHED
+
+      // ===========================================================================================
       case OP_ADVANCE_STR_APPENDCHAR:
       {
          char buff[2];

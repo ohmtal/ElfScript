@@ -1183,17 +1183,20 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       ip = walk->compile(codeStream, ip, walkType);
       codeStream.emit(OP_PUSH);
    }
-
+#ifdef ELF_CALLFUNC_CACHED
+   //XXTH cached function
+   codeStream.emit(OP_CALLFUNC_CACHED);
+   codeStream.emitSTE(funcName);
+   codeStream.emitSTE(nameSpace);
+   codeStream.emit(callType);
+   codeStream.emit(U32(0)); // Slot 1 for pointer
+   codeStream.emit(U32(0)); // Slot 2 for pointer
+#else
    codeStream.emit(OP_CALLFUNC);
    codeStream.emitSTE(funcName);
    codeStream.emitSTE(nameSpace);
    codeStream.emit(callType);
-
-   // XXTH >>>
-   // RESERVED FOR INLINE CACHE: Emit two empty slots (0) to store the Namespace::Entry* pointer later at runtime
-   codeStream.emit(0);
-   codeStream.emit(0);
-   // <<< XXTH
+#endif
 
 
    if (type == TypeReqNone)
