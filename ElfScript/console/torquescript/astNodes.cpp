@@ -1183,7 +1183,7 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       ip = walk->compile(codeStream, ip, walkType);
       codeStream.emit(OP_PUSH);
    }
-#ifdef ELF_CALLFUNC_CACHED
+#ifdef ELFSCRIPT_CALLFUNC_CACHED
    //XXTH cached function
    codeStream.emit(OP_CALLFUNC_CACHED);
    codeStream.emitSTE(funcName);

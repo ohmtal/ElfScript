@@ -167,7 +167,7 @@ namespace Compiler
       OP_ITER,             ///< Enter foreach loop.
       OP_ITER_END,         ///< End foreach loop.
 
-#ifdef ELF_CALLFUNC_CACHED
+#ifdef ELFSCRIPT_CALLFUNC_CACHED
       OP_CALLFUNC_CACHED, //XXTH new for cached function calls!
 #endif
       OP_INVALID,   // 90

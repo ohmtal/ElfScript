@@ -1,5 +1,12 @@
 # Type ID Notes
 
+### static fields have typeid STRING!!!!!!! also if defined as TypeS32 or TypeF32
+
+i did test with type definition on dynamic fields works fine but objects fields added
+with addfield sucks! 
+
+
+
 ```
    enum CompiledInstructions
    {

@@ -2148,7 +2148,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       } //OP_CALLFUNC
 
       // ===========================================================================================
-#ifdef ELF_CALLFUNC_CACHED
+#ifdef ELFSCRIPT_CALLFUNC_CACHED
       // XXTH the monster get some new stuff to eat:
       case OP_CALLFUNC_CACHED:
       {
@@ -2317,7 +2317,7 @@ execute_cached_callback:
             }
             break;
       }
-#endif // #ifdef ELF_CALLFUNC_CACHED
+#endif // #ifdef ELFSCRIPT_CALLFUNC_CACHED
 
       // ===========================================================================================
       case OP_ADVANCE_STR_APPENDCHAR:
