@@ -5,6 +5,8 @@
 i did test with type definition on dynamic fields works fine but objects fields added
 with addfield sucks! 
 
+i filled up the fields but it's cleared after it (EngineMarshall) the fields are initialzed 
+on the very beginning i guess the stringtable is cleared after it 
 
 
 ```

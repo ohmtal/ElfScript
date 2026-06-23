@@ -1233,7 +1233,7 @@ TypeReq AssertCallExprNode::getPreferredType()
 }
 
 //------------------------------------------------------------
-// XXTH TypeSafety
+// XXTH TypeSafety READ
 #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
 U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {

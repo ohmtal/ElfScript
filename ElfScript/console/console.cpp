@@ -1455,7 +1455,8 @@ char* getArgBuffer(U32 bufferSize)
 char* getFloatArg(F64 arg)
 {
    char* ret = STR.getArgBuffer(32);
-   dSprintf(ret, 32, "%g", arg);
+   // XXTH my change since ages ;) dSprintf(ret, 32, "%g", arg);
+   dSprintf(ret, 32, "%.10g", arg);
    return ret;
 }
 
