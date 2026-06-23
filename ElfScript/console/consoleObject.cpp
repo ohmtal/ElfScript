@@ -531,7 +531,10 @@ void ConsoleObject::addField(const char*  in_pFieldname,
    // f.networkMask = 0;
 
    f.table = conType->getEnumTable();
-
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+   //XXTH THIS DOES NOT WORK AS IT SHOULD !!!
+   gCompilerFieldTypes[f.pFieldname] = f.type;
+#endif
    sg_tempFieldList.push_back(f);
 }
 

@@ -51,6 +51,11 @@ typedef U32 StringStackPtr;
 template< typename T > S32 TYPEID();
 
 
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+#include <map> //XXTH type safety for slots
+static std::map<StringTableEntry, U32> gCompilerFieldTypes;
+#endif
+
 /// @defgroup console_system Console System
 /// The Console system is the basis for logging, SimObject, and TorqueScript itself.
 ///

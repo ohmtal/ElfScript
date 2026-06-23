@@ -24,10 +24,7 @@
 #include "compiler.h"
 #include "console/consoleInternal.h"
 
-#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
-#include <map> //XXTH type safety for slots
-static std::map<StringTableEntry, U32> gCompilerFieldTypes;
-#endif
+
 
 using namespace Compiler;
 
