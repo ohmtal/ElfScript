@@ -33,7 +33,7 @@
 // #include "platform/threads/mutex.h"
 // #endif
 
-#include "torqueConfig.h"
+// #include "torqueConfig.h"
 
 class SimObject;
 

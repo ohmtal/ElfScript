@@ -22,14 +22,14 @@ enum MyEnum {
     Three
 };
 
+bool gShutDownRequest = false;
+// ----------------------------------------------------------------------------
 DefineEngineFunction(helloWorld, void, (String name), , "hello world")
 {
     Con::printf("Hello World: %s", name.c_str());
 }
 
-
-bool gShutDownRequest = false;
-
+// ----------------------------------------------------------------------------
 int argParser(int argc, char* argv[]) {
 
     gShutDownRequest = true; //default no loop!
@@ -59,10 +59,11 @@ int argParser(int argc, char* argv[]) {
     } //for ...
     return 0;
 }
-
+// ----------------------------------------------------------------------------
 void MyLogger(U32 level, const char *consoleLine) {
 #if defined(__unix__)
     // we use console
+    if (!stdConsole) dPrintf("%s\n", consoleLine);
 #else
     switch (level) {
         case 1: dPrintf("[warn] %s\n",  consoleLine); break;
@@ -71,7 +72,7 @@ void MyLogger(U32 level, const char *consoleLine) {
     }
 #endif
 }
-
+// ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     printf("Startup ....\n");
 

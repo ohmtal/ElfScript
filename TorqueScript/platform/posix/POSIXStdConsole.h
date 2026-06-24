@@ -35,8 +35,7 @@
 
 class StdConsole
 {
-   bool stdConsoleEnabled;
-   bool stdConsoleInputEnabled;
+
    // true if we're running in the background
    bool inBackground;
 
@@ -58,6 +57,9 @@ class StdConsole
    void printf(const char *s, ...);
 
 public:
+   bool stdConsoleEnabled;
+   bool stdConsoleInputEnabled;
+
    StdConsole();
    virtual ~StdConsole();
    void process();

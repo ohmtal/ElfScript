@@ -37,6 +37,6 @@ if (BUILD_ELFSCRIPT)
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
-    target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" )
+    target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" "./ElfScript/demo")
 endif()
 # -----------------------------------------------------------------------------
