@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 
     // --------- advance time for scheduler this should be placed in the main loop
     while (!gShutDownRequest) {
-          engineGlue::process(0);
+          engineGlue::process(gFrameTime);
 
           #if defined(__unix__)
           stdConsole->process();

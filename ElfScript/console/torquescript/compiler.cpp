@@ -290,6 +290,7 @@ U32 CompilerStringTable::addIntString(U32 value)
 
 U32 CompilerStringTable::addFloatString(F64 value)
 {
+   // dSprintf(buf, sizeof(buf), "%.10g", value); //XXTH
    dSprintf(buf, sizeof(buf), "%g", value);
    return add(buf);
 }

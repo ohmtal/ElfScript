@@ -462,6 +462,7 @@ ConsoleGetType( TypeF32 )
 {
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
+   // dSprintf(returnBuffer, bufSize, "%.10g", *((F32 *) dptr) ); //XXTH float
    dSprintf(returnBuffer, bufSize, "%g", *((F32 *) dptr) );
    return returnBuffer;
 }

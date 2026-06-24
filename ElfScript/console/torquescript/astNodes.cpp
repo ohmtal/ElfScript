@@ -1184,6 +1184,7 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_PUSH);
    }
 #ifdef ELFSCRIPT_CALLFUNC_CACHED
+#error do not use this!
    //XXTH cached function
    codeStream.emit(OP_CALLFUNC_CACHED);
    codeStream.emitSTE(funcName);

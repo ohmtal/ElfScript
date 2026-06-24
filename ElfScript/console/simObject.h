@@ -498,7 +498,7 @@ class SimObject: public ConsoleObject
       /// @param   slotName    Field to access.
       /// @param   array       String containing index into array; if NULL, it is ignored.
       /// @param   value       Value to store.
-      virtual void setDataField(StringTableEntry slotName, const char *array, const char *value);
+      void setDataField(StringTableEntry slotName, const char *array, const char *value);
 
       //XXTH Speed HACK FastPath
       virtual bool setDataField(const AbstractClassRep::Field *fld, F64 value);

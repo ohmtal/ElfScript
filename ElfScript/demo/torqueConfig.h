@@ -12,6 +12,9 @@
 // cache function calls WARNING: inconsitent
 // #define ELFSCRIPT_CALLFUNC_CACHED
 
+// fast path for int and float fields
+#define ELFSCRIPT_FASTPATH_FLD
+
 // ----------------------------------------------------------------------------
 #define TORQUE_SCRIPT_EXTENSION   "cs"
 #define TORQUE_APP_NAME            "ElfTestBed"

@@ -1,26 +1,37 @@
 #include "console/engineAPI.h"
 
-class TestObject: public SimObject
+class EmptyObject : public SimObject
 {
-    typedef Parent SimObject;
-public:
-    DECLARE_CONOBJECT(TestObject);
-    F32 mX, mY, mZ;
-    StringTableEntry mName;
+    typedef SimObject Parent;
 
-    TestObject() {
+public:
+    DECLARE_CONOBJECT(EmptyObject);
+};
+IMPLEMENT_CONOBJECT(EmptyObject);
+//--------------
+
+class TestObj: public SimObject
+{
+    typedef SimObject Parent;
+public:
+    DECLARE_CONOBJECT(TestObj);
+    F32 mX, mY, mZ;
+    // StringTableEntry mTestName;
+
+    TestObj() {
         mX = mY = mZ = 0.f;
-        mName = StringTable->insert("NoName");
+        // mTestName = StringTable->insert("NoName");
     }
 
     static void initPersistFields()
     {
-        Parent::initPersistFields();
-        addField("x",     TypeF32,     Offset(mX, TestObject));
-        addField("y",     TypeF32,     Offset(mY, TestObject));
-        addField("z",     TypeF32,     Offset(mZ, TestObject));
-        addField("testFloat",     TypeF32,     Offset(mX, TestObject));
-        addField("testName", TypeString, Offset(mName, TestObject));
+        // Parent::initPersistFields();
+        addField("x",     TypeF32,     Offset(mX, TestObj));
+        addField("y",     TypeF32,     Offset(mY, TestObj));
+        addField("z",     TypeF32,     Offset(mZ, TestObj));
+        addField("testFloat",     TypeF32,     Offset(mX, TestObj));
+        // addField("testName", TypeString, Offset(mTestName, TestObject));
+
     }
 
     void setPos(F32 x, F32 y, F32 z) {
@@ -30,26 +41,26 @@ public:
     }
 };
 
-IMPLEMENT_CONOBJECT(TestObject);
+IMPLEMENT_CONOBJECT(TestObj);
 
-DefineEngineMethod(TestObject, getPos, String, (), , "get the position") {
+DefineEngineMethod(TestObj, getPos, String, (), , "get the position") {
     // we do nothing special here
     StringBuilder str;
     str.format("%g %g %g", object->mX, object->mY, object->mZ);
     return Con::getStringArg(str.end());
 }
 
-DefineEngineMethod(TestObject, getX, F32, (), , "") {
+DefineEngineMethod(TestObj, getX, F32, (), , "") {
   return object->mX;
 }
-DefineEngineMethod(TestObject, getY, F32, (), , "") {
+DefineEngineMethod(TestObj, getY, F32, (), , "") {
     return object->mY;
 }
-DefineEngineMethod(TestObject, getZ, F32, (), , "") {
+DefineEngineMethod(TestObj, getZ, F32, (), , "") {
     return object->mZ;
 }
 
-DefineEngineMethod(TestObject, walk, void, (F32 x, F32 y, F32 z), , "Set point where to walk to") {
+DefineEngineMethod(TestObj, walk, void, (F32 x, F32 y, F32 z), , "Set point where to walk to") {
     // we do nothing special here
     object->setPos(x,y,z);
 }

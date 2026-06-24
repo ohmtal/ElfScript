@@ -921,7 +921,7 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 //-----------------------------------------------------------------------------
 //XXTH Speed HACK FastPath
 bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
-      // 1. Die gängigsten Float-Typen
+
       if (fld->type == TypeF64) {
             F64* target = (F64*)(((const char*)this) + fld->offset);
             *target = value;
@@ -933,7 +933,7 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
             return true;
       }
 
-      // 2. Integers (Ganzzahlen) korrekt casten
+
       if (fld->type == TypeS32) {
             S32* target = (S32*)(((const char*)this) + fld->offset);
             *target = (S32)value;
@@ -960,6 +960,7 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
 }
 
 // <<<< speed HACK
+
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
    // first search the static fields if enabled
@@ -976,7 +977,8 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
          S32 array1 = array ? dAtoi(array) : 0;
 
-         // XXTH SPEED HACK --------------------------------------- >
+#ifdef ELFSCRIPT_FASTPATH_FLD
+         // // XXTH SPEED HACK --------------------------------------- >
          // alignment ?!
          if (array1 == 0) //FAST PATH
          {
@@ -1005,7 +1007,8 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             }
          }
 
-         // < --------------------------------------- XXTH SPEED HACK
+         // // < --------------------------------------- XXTH SPEED HACK
+#endif
 
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
@@ -1076,7 +1079,6 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 //-----------------------------------------------------------------------------
 // XXTH Fastpath HACK version
 bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
-      // 1. Floats direkt auslesen
       if (fld->type == TypeF64) {
             F64* source = (F64*)(((const char*)this) + fld->offset);
             outValue = *source;
@@ -1088,7 +1090,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
             return true;
       }
 
-      // 2. Integers und Bools direkt auslesen und in F64 casten
+
       if (fld->type == TypeS32) {
             S32* source = (S32*)(((const char*)this) + fld->offset);
             outValue = (F64)(*source);
@@ -1101,7 +1103,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
       }
       if (fld->type == TypeBool) {
             bool* source = (bool*)(((const char*)this) + fld->offset);
-            outValue = *source ? 1.0 : 0.0;
+            outValue = *source ? 1.0f : 0.0f;
             return true;
       }
 

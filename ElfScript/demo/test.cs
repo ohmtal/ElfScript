@@ -12,10 +12,12 @@ function rl(%mode) {
 
 
 // benchmark
-$foo = new TestObject() {
+$foo = new TestObj() {
     bar = 0.0;
     TypeF32 myFloat = 0.0;
 };
+
+// $foo.dump();
 
 function setMy() {
     $foo.myFloat = 2.2;
@@ -82,8 +84,13 @@ function SpeedTest() {
             // // !!!!!!!!!!!!1 THIS IT IS !!!!!!!!!!!!!!!!!!!!
             // %foo.testFloat = %testFloat;
 
-            // 67 ms now !!!
-            %foo.testFloat +=   0.1;
+           // all three 87
+            %foo.testFloat += 0.1; // 67 ms now !!!
+            // %bar = %foo.testFloat * 1.001;
+            // %foo.testFloat = %bar;
+
+            if (%foo.testFloat > 1000000.0) %foo.testFloat = 0;
+           //if ($i % 3 == 0)  echo(%foo.testFloat);
 
         }
     }
@@ -112,7 +119,13 @@ function SpeedTest() {
             %z = %foo.getZ();
         }
     }
-
+    if ($mode == 7) {
+        $foo.x += 0.1415  ;
+        %a = $foo.x;
+        %a *= 1.001;
+        $foo.x = %a;
+        // echo($foo.x);
+    }
 
 }
 
@@ -126,7 +139,7 @@ function MainLoop() {
         $times += GetFrameTime();
         if ($i >= 10) {
             $i -= 10;
-            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10);
+            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat:" SPC $foo.testFloat);
             $times = 0;
         }
     }

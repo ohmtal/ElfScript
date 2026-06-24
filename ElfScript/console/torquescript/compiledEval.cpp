@@ -1752,6 +1752,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          ip++;
          break;
 
+#ifdef ELFSCRIPT_FASTPATH_FLD
       //XXTH FastPath HACK:
       case OP_LOADFIELD_UINT:
             if (curObject)
@@ -1796,23 +1797,25 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
             _STK++;
             break;
+#else
+      case OP_LOADFIELD_UINT:
+         if (curObject)
+            stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
+         else
+         {
+            // The field is not being retrieved from an object. Maybe it's
+            // a special accessor?
+            char buff[FieldBufferSizeNumeric];
+            memset(buff, 0, sizeof(buff));
+            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+            stack[_STK + 1].setInt(dAtol(buff));
+         }
+         _STK++;
+         break;
+#endif //#ifdef ELFSCRIPT_FASTPATH_FLD
 
-      // ORIG
-      // case OP_LOADFIELD_UINT:
-      //    if (curObject)
-      //       stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
-      //    else
-      //    {
-      //       // The field is not being retrieved from an object. Maybe it's
-      //       // a special accessor?
-      //       char buff[FieldBufferSizeNumeric];
-      //       memset(buff, 0, sizeof(buff));
-      //       getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-      //       stack[_STK + 1].setInt(dAtol(buff));
-      //    }
-      //    _STK++;
-      //    break;
-      //XXTH Fastpath HACK
+#ifdef ELFSCRIPT_FASTPATH_FLD
+         //XXTH Fastpath HACK
       case OP_LOADFIELD_FLT:
             if (curObject)
             {
@@ -1854,21 +1857,22 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
             _STK++;
             break;
-      // orig:
-      // case OP_LOADFIELD_FLT:
-      //    if (curObject)
-      //       stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
-      //    else
-      //    {
-      //       // The field is not being retrieved from an object. Maybe it's
-      //       // a special accessor?
-      //       char buff[FieldBufferSizeNumeric];
-      //       memset(buff, 0, sizeof(buff));
-      //       getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-      //       stack[_STK + 1].setFloat(dAtod(buff));
-      //    }
-      //    _STK++;
-      //    break;
+#else //#ifdef ELFSCRIPT_FASTPATH_FLD
+      case OP_LOADFIELD_FLT:
+         if (curObject)
+            stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+         else
+         {
+            // The field is not being retrieved from an object. Maybe it's
+            // a special accessor?
+            char buff[FieldBufferSizeNumeric];
+            memset(buff, 0, sizeof(buff));
+            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+            stack[_STK + 1].setFloat(dAtod(buff));
+         }
+         _STK++;
+         break;
+#endif
 
       case OP_LOADFIELD_STR:
          if (curObject)
@@ -1888,7 +1892,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          _STK++;
          break;
 
-      //XXTH fastPath HACK:
+#ifdef ELFSCRIPT_FASTPATH_FLD
+      //XXTH fastPath :
       case OP_SAVEFIELD_UINT:
             if (curObject)
             {
@@ -1923,18 +1928,18 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                   prevObject = NULL;
             }
             break;
-
-      // case OP_SAVEFIELD_UINT:
-      //    if (curObject)
-      //       curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-      //    else
-      //    {
-      //       // The field is not being set on an object. Maybe it's a special accessor?
-      //       setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-      //       prevObject = NULL;
-      //    }
-      //    break;
-
+#else //#ifdef ELFSCRIPT_FASTPATH_FLD
+      case OP_SAVEFIELD_UINT:
+         if (curObject)
+            curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+         else
+         {
+            // The field is not being set on an object. Maybe it's a special accessor?
+            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            prevObject = NULL;
+         }
+         break;
+#endif //#ifdef ELFSCRIPT_FASTPATH_FLD
       case OP_SAVEFIELD_FLT:
          if (curObject) {
             //XXTH Fastpath:
