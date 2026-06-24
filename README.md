@@ -1,4 +1,4 @@
-# TorqueScript aka ElfScript
+# ElfScript
 
 👾 Now it's alive :D. 
 
