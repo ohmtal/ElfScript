@@ -82,6 +82,7 @@ function SpeedTest() {
             // // !!!!!!!!!!!!1 THIS IT IS !!!!!!!!!!!!!!!!!!!!
             // %foo.testFloat = %testFloat;
 
+            // 67 ms now !!!
             %foo.testFloat +=   0.1;
 
         }

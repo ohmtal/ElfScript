@@ -6,7 +6,7 @@ Based on the Torque3D (4.x) source code this is my first working version of Torq
 It need to be more stripped down because there are much more files than needed and on the other hand i maybe removed to much (threads/mutex).
 
 ## Notable changes:
-- 🚀 **ElfScript:** Added fastpath for static fields setDataField which is 28 times faster than before.
+- 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before.
 - Made it standalone
 - EngineGlue for init/process/shutdown
 - Ripped out some stuff i dont need like Taml

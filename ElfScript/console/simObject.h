@@ -502,6 +502,7 @@ class SimObject: public ConsoleObject
 
       //XXTH Speed HACK FastPath
       virtual bool setDataField(const AbstractClassRep::Field *fld, F64 value);
+      virtual bool getDataField(const AbstractClassRep::Field *fld, F64 &outValue);
       // <<<< speed HACK
 
       const char *getPrefixedDataField(StringTableEntry fieldName, const char *array);

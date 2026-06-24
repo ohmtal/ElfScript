@@ -1752,35 +1752,123 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          ip++;
          break;
 
+      //XXTH FastPath HACK:
       case OP_LOADFIELD_UINT:
-         if (curObject)
-            stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
-         else
-         {
-            // The field is not being retrieved from an object. Maybe it's
-            // a special accessor?
-            char buff[FieldBufferSizeNumeric];
-            memset(buff, 0, sizeof(buff));
-            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-            stack[_STK + 1].setInt(dAtol(buff));
-         }
-         _STK++;
-         break;
+            if (curObject)
+            {
+                  bool fastPath = false;
+                  const AbstractClassRep::Field *fld = curObject->findField(curField);
 
+                  if (fld)
+                  {
+                        const char* array = (const char*) curFieldArray;
+                        S32 array1 = array ? dAtoi(array) : 0;
+
+                        // Fastpath safety check for unmanaged, standard C++ fields
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn)
+                        {
+                              F64 val = 0.0;
+                              if (curObject->getDataField(fld, val))
+                              {
+                                    // Convert the F64 from our fastpath directly to an integer on the stack
+                                    // Note: Adjust .setInt() to your stack's actual integer/uint method if needed
+                                    stack[_STK + 1].setInt((U32)val);
+                                    fastPath = true;
+                              }
+                        }
+                  }
+
+                  if (!fastPath)
+                  {
+                        // Fallback for dynamic fields or fields with custom C++ logic
+                        stack[_STK + 1].setInt(dAtoi(curObject->getDataField(curField, curFieldArray)));
+                  }
+            }
+            else
+            {
+                  // The field is not being retrieved from an object. Maybe it's
+                  // a special accessor?
+                  char buff[FieldBufferSizeNumeric];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setInt(dAtoi(buff));
+            }
+            _STK++;
+            break;
+
+      // ORIG
+      // case OP_LOADFIELD_UINT:
+      //    if (curObject)
+      //       stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
+      //    else
+      //    {
+      //       // The field is not being retrieved from an object. Maybe it's
+      //       // a special accessor?
+      //       char buff[FieldBufferSizeNumeric];
+      //       memset(buff, 0, sizeof(buff));
+      //       getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+      //       stack[_STK + 1].setInt(dAtol(buff));
+      //    }
+      //    _STK++;
+      //    break;
+      //XXTH Fastpath HACK
       case OP_LOADFIELD_FLT:
-         if (curObject)
-            stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
-         else
-         {
-            // The field is not being retrieved from an object. Maybe it's
-            // a special accessor?
-            char buff[FieldBufferSizeNumeric];
-            memset(buff, 0, sizeof(buff));
-            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-            stack[_STK + 1].setFloat(dAtod(buff));
-         }
-         _STK++;
-         break;
+            if (curObject)
+            {
+                  bool fastPath = false;
+                  const AbstractClassRep::Field *fld = curObject->findField(curField);
+
+                  if (fld)
+                  {
+                        const char* array = (const char*) curFieldArray;
+                        S32 array1 = array ? dAtoi(array) : 0;
+
+                        // Fastpath safety check for unmanaged, standard C++ fields
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn)
+                        {
+                              F64 val = 0.0;
+                              if (curObject->getDataField(fld, val))
+                              {
+                                    stack[_STK + 1].setFloat(val);
+                                    fastPath = true;
+                              }
+                        }
+                  }
+
+                  if (!fastPath)
+                  {
+                        // Fallback for dynamic fields or fields with custom C++ logic
+                        stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+                  }
+            }
+            else
+            {
+                  // The field is not being retrieved from an object. Maybe it's
+                  // a special accessor?
+                  char buff[FieldBufferSizeNumeric];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setFloat(dAtod(buff));
+            }
+            _STK++;
+            break;
+      // orig:
+      // case OP_LOADFIELD_FLT:
+      //    if (curObject)
+      //       stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+      //    else
+      //    {
+      //       // The field is not being retrieved from an object. Maybe it's
+      //       // a special accessor?
+      //       char buff[FieldBufferSizeNumeric];
+      //       memset(buff, 0, sizeof(buff));
+      //       getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+      //       stack[_STK + 1].setFloat(dAtod(buff));
+      //    }
+      //    _STK++;
+      //    break;
 
       case OP_LOADFIELD_STR:
          if (curObject)
@@ -1800,16 +1888,52 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          _STK++;
          break;
 
+      //XXTH fastPath HACK:
       case OP_SAVEFIELD_UINT:
-         if (curObject)
-            curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-         else
-         {
-            // The field is not being set on an object. Maybe it's a special accessor?
-            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-            prevObject = NULL;
-         }
-         break;
+            if (curObject)
+            {
+                  bool fastPath = false;
+                  const AbstractClassRep::Field *fld = curObject->findField(curField);
+
+                  if (fld)
+                  {
+                        const char* array = (const char*) curFieldArray;
+                        S32 array1 = array ? dAtoi(array) : 0;
+
+                        // Fastpath safety check for unmanaged, standard C++ fields
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn)
+                        {
+                              // Convert the stack's integer value to F64 for our fastpath
+                              // Note: Adjust .getInt() to your stack's actual integer/uint method if needed
+                              fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
+                        }
+                  }
+
+                  if (!fastPath)
+                  {
+                        // Fallback for dynamic fields or fields with custom C++ logic
+                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+                  }
+            }
+            else
+            {
+                  // The field is not being set on an object. Maybe it's a special accessor?
+                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+                  prevObject = NULL;
+            }
+            break;
+
+      // case OP_SAVEFIELD_UINT:
+      //    if (curObject)
+      //       curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+      //    else
+      //    {
+      //       // The field is not being set on an object. Maybe it's a special accessor?
+      //       setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+      //       prevObject = NULL;
+      //    }
+      //    break;
 
       case OP_SAVEFIELD_FLT:
          if (curObject) {

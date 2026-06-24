@@ -950,6 +950,12 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
             return true;
       }
 
+      // for future use:
+      // if (fld->type == TypeU32) {
+      //       U32* target = (U32*)(((const char*)this) + fld->offset);
+      //       *target = (U32)value;
+      //       return true;
+      // }
       return false;
 }
 
@@ -1065,6 +1071,49 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
          onDynamicModified( permanentSlotName, value );
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+// XXTH Fastpath HACK version
+bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
+      // 1. Floats direkt auslesen
+      if (fld->type == TypeF64) {
+            F64* source = (F64*)(((const char*)this) + fld->offset);
+            outValue = *source;
+            return true;
+      }
+      if (fld->type == TypeF32) {
+            F32* source = (F32*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+
+      // 2. Integers und Bools direkt auslesen und in F64 casten
+      if (fld->type == TypeS32) {
+            S32* source = (S32*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+      if (fld->type == TypeS8) {
+            S8* source = (S8*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+      if (fld->type == TypeBool) {
+            bool* source = (bool*)(((const char*)this) + fld->offset);
+            outValue = *source ? 1.0 : 0.0;
+            return true;
+      }
+
+      // for future use
+      // if (fld->type == TypeU32)
+      // {
+      //       U32* source = (U32*)(((const char*)this) + fld->offset);
+      //       outValue = (F64)(*source);
+      //       return true;
+      // }
+
+      return false;
 }
 
 //-----------------------------------------------------------------------------
