@@ -1813,22 +1813,20 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
       case OP_SAVEFIELD_FLT:
          if (curObject) {
-            //XXTH NOTE OP_SAVEFIELD_FLT is nice here but then it get the string
-            // and cast spell "Handbreak" same for int
-
+            //XXTH Fastpath:
             bool fastPath  = false;
-            //FIXME finish this ! new setDataField is missing.
-             // const AbstractClassRep::Field *fld = curObject->findField(curField);
-             // if (fld) {
-             //      const char* array = (const char*) curFieldArray;
-             //      S32 array1 = array ? dAtoi(array) : 0;
-             //      if (array1 == 0) {
-             //         // AbstractClassRep::Field *fld, F64 value
-             //         curObject->setDataField(fld,stack[_STK].getFloat() );
-             //         fastPath = true;
-             //      }
-             //
-             // }
+             const AbstractClassRep::Field *fld = curObject->findField(curField);
+             if (fld) {
+                  const char* array = (const char*) curFieldArray;
+                  S32 array1 = array ? dAtoi(array) : 0;
+
+                  if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn)
+                  {
+                     fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+                  }
+
+             }
              if (!fastPath) {
                   curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
              }

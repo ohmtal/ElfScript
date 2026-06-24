@@ -919,7 +919,41 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 }
 
 //-----------------------------------------------------------------------------
+//XXTH Speed HACK FastPath
+bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
+      // 1. Die gängigsten Float-Typen
+      if (fld->type == TypeF64) {
+            F64* target = (F64*)(((const char*)this) + fld->offset);
+            *target = value;
+            return true ;
+      }
+      if (fld->type == TypeF32) {
+            F32* target = (F32*)(((const char*)this) + fld->offset);
+            *target = (F32)value;
+            return true;
+      }
 
+      // 2. Integers (Ganzzahlen) korrekt casten
+      if (fld->type == TypeS32) {
+            S32* target = (S32*)(((const char*)this) + fld->offset);
+            *target = (S32)value;
+            return true;
+      }
+      if (fld->type == TypeS8) {
+            S8* target = (S8*)(((const char*)this) + fld->offset);
+            *target = (S8)value;
+            return true;
+      }
+      if (fld->type == TypeBool) {
+            bool* target = (bool*)(((const char*)this) + fld->offset);
+            *target = (value != 0.0);
+            return true;
+      }
+
+      return false;
+}
+
+// <<<< speed HACK
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
    // first search the static fields if enabled
@@ -950,7 +984,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
                         handled = true;
                   } else if (fld->type == TypeS32 ) {
                         S32* target = (S32*)(((const char*)this) + fld->offset);
-                        *target = dAtof(value);
+                        *target = dAtoi(value);
                         handled = true;
                   }
 
