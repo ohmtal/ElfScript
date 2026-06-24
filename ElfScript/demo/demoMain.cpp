@@ -6,14 +6,19 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 
+#if defined(__unix__)
+#include "addons/shellConsole/POSIXStdConsole.h"
+#include <platform/platformVolume.h>
+#endif
 
 // register enum >>>>
 #include "console/consoleExtras.h"
 // <<<<
 
-#if defined(__unix__)
-#include "addons/shellConsole/POSIXStdConsole.h"
-#endif
+// for timer
+#include <chrono>
+
+
 
 enum MyEnum {
     None = 0,
@@ -23,10 +28,11 @@ enum MyEnum {
 };
 
 bool gShutDownRequest = false;
+U64 gFrameTime = 0;
 // ----------------------------------------------------------------------------
-DefineEngineFunction(helloWorld, void, (String name), , "hello world")
+DefineEngineFunction(getFrameTime, S32, (), , "get the time in ms the last loop did need to finish")
 {
-    Con::printf("Hello World: %s", name.c_str());
+    return (S32)gFrameTime;
 }
 
 // ----------------------------------------------------------------------------
@@ -150,21 +156,20 @@ int main(int argc, char* argv[]) {
     )";
     Con::evaluate(code.c_str(), false, "");
 
-    // // ------ output log entries:
-    // ConsoleLogEntry *log;
-    // U32 size;
-    //
-    // Con::getLockLog(log, size);
-    // for (U32 i = 0; i < size; ++i)
-    // {
-    //     ConsoleLogEntry &entry = log[i];
-    //     printf("%d:[%d]:[%d] %s\n", i,entry.mLevel, entry.mType, entry.mString);
-    // }
-    //
-    // Con::unlockLog();
+    // argv[0] is not the best way to get it but since i dont have
+    // the platform source here and use the placeholder
+    // stub/platformProcess.cpp i use it for the demo.
+    // not!
 
+    // String dir = "/opt/TorqueScript/ElfScript/demo/";
+    // Platform::setMainDotCsDir(dir);
+    // Platform::FS::SetCwd(dir);
+    // Con::printf("Current script directory: %s (argv[0] %s)",Torque::FS::GetCwd().getFullPath().c_str(), argv[0] );
 
-    Con::executeFile("ElfScript/test.cs");
+    Con::executeFile("ElfScript/demo/test.cs");
+
+    bool doMainLoop = Con::isFunction("MainLoop");
+    auto start = std::chrono::steady_clock::now();
 
     // --------- advance time for scheduler this should be placed in the main loop
     while (!gShutDownRequest) {
@@ -174,7 +179,17 @@ int main(int argc, char* argv[]) {
           stdConsole->process();
           #endif
 
+          if (doMainLoop) Con::executef("MainLoop");
+
           Platform::sleep(16);
+
+          auto end = std::chrono::steady_clock::now();
+
+        // Differenz berechnen (z. B. in Millisekunden)
+          auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+          gFrameTime = duration.count();
+          start = end;
+
 
     }
 

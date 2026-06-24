@@ -925,6 +925,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
    // first search the static fields if enabled
    if(mFlags.test(ModStaticFields))
    {
+      //XXTH this should be fast since is stores only the fields which are defined
       const AbstractClassRep::Field *fld = findField(slotName);
       if(fld)
       {
@@ -932,31 +933,40 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
          if ( fld->type >= AbstractClassRep::ARCFirstCustomField )
             return;
 
+
          S32 array1 = array ? dAtoi(array) : 0;
 
-         // Here we check to see if <this> is a datablock and if <value>
-         // starts with "$$". If both true than save value as a runtime substitution.
-         // if (dynamic_cast<SimDataBlock*>(this) && value[0] == '$' && value[1] == '$')
-         // {
-         //    if (!this->allowSubstitutions())
-         //    {
-         //       Con::errorf("Substitution Error: %s datablocks do not allow \"$$\" field substitutions. [%s]",
-         //          this->getClassName(), this->getName());
-         //       return;
-         //    }
-         //
-         //    if (fld->doNotSubstitute)
-         //    {
-         //       Con::errorf("Substitution Error: field \"%s\" of datablock %s prohibits \"$$\" field substitutions. [%s]",
-         //          slotName, this->getClassName(), this->getName());
-         //       return;
-         //    }
-         //
-         //    // add the substitution
-         //    ((SimDataBlock*)this)->addSubstitution(slotName, array1, value);
-         //    return;
-         // }
-		 
+         // XXTH SPEED HACK --------------------------------------- >
+         // alignment ?!
+         if (array1 == 0) //FAST PATH
+         {
+            if (fld->writeDataFn == &defaultProtectedWriteFn
+               && fld->setDataFn == &defaultProtectedSetFn
+            ) {
+                  bool handled = false;
+                  if (fld->type == TypeF32 ) {
+                        F32* target = (F32*)(((const char*)this) + fld->offset);
+                        *target = dAtof(value);
+                        handled = true;
+                  } else if (fld->type == TypeS32 ) {
+                        S32* target = (S32*)(((const char*)this) + fld->offset);
+                        *target = dAtof(value);
+                        handled = true;
+                  }
+
+                  if (handled) {
+                        if(fld->validator)
+                              fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
+
+                        onStaticModified( slotName, value );
+                        return;
+                  }
+
+            }
+         }
+
+         // < --------------------------------------- XXTH SPEED HACK
+
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
             // If the set data notify callback returns true, then go ahead and
@@ -1012,6 +1022,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
       }
       else
       {
+      //XXTH handbreak here !!
          char buf[256];
          dStrcpy(buf, slotName, 256);
          dStrcat(buf, array, 256);

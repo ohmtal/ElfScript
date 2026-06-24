@@ -1812,10 +1812,28 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
       case OP_SAVEFIELD_FLT:
-         if (curObject)
-            curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-         else
-         {
+         if (curObject) {
+            //XXTH NOTE OP_SAVEFIELD_FLT is nice here but then it get the string
+            // and cast spell "Handbreak" same for int
+
+            bool fastPath  = false;
+            //FIXME finish this ! new setDataField is missing.
+             // const AbstractClassRep::Field *fld = curObject->findField(curField);
+             // if (fld) {
+             //      const char* array = (const char*) curFieldArray;
+             //      S32 array1 = array ? dAtoi(array) : 0;
+             //      if (array1 == 0) {
+             //         // AbstractClassRep::Field *fld, F64 value
+             //         curObject->setDataField(fld,stack[_STK].getFloat() );
+             //         fastPath = true;
+             //      }
+             //
+             // }
+             if (!fastPath) {
+                  curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+             }
+
+         } else {
             // The field is not being set on an object. Maybe it's a special accessor?
             setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
             prevObject = NULL;

@@ -48,7 +48,7 @@ public:
    struct Entry
    {
       Entry() : slotName(StringTable->EmptyString()), value(NULL), next(NULL), type(NULL) {};
-
+//XXTH FIXME also add a float and int field ?! but will be a lot of testing ^^
       StringTableEntry slotName;
       char *value;
       Entry *next;

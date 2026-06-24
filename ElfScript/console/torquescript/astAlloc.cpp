@@ -420,6 +420,9 @@ InternalSlotAccessNode* InternalSlotAccessNode::alloc(S32 lineNumber, ExprNode* 
    return ret;
 }
 
+/*
+ * slot "="
+ */
 SlotAssignNode* SlotAssignNode::alloc(S32 lineNumber, ExprNode* objectExpr, ExprNode* arrayExpr, StringTableEntry slotName, ExprNode* valueExpr, U32 typeID /* = -1 */)
 {
 #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
@@ -455,6 +458,9 @@ SlotAssignNode* SlotAssignNode::alloc(S32 lineNumber, ExprNode* objectExpr, Expr
    return ret;
 }
 
+/*
+ * Slot operator "+" "-" ...
+ */
 SlotAssignOpNode* SlotAssignOpNode::alloc(S32 lineNumber, ExprNode* objectExpr, StringTableEntry slotName, ExprNode* arrayExpr, S32 op, ExprNode* valueExpr)
 {
    SlotAssignOpNode* ret = (SlotAssignOpNode*)consoleAlloc(sizeof(SlotAssignOpNode));

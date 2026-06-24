@@ -10,7 +10,7 @@
 #define ELFSCRIPT_STRICT_SLOT_TYPE
 
 // cache function calls WARNING: inconsitent
-#define ELFSCRIPT_CALLFUNC_CACHED
+// #define ELFSCRIPT_CALLFUNC_CACHED
 
 // ----------------------------------------------------------------------------
 #define TORQUE_SCRIPT_EXTENSION   "cs"
