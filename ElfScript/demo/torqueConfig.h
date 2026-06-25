@@ -6,6 +6,9 @@
 #pragma once
 
 // ----------------------------------------------------------------------------
+// enable #define in torque script
+#define ELFSCRIPT_PREPROCESSOR
+
 // make slots type save but same slotname always have the same type
 #define ELFSCRIPT_STRICT_SLOT_TYPE
 

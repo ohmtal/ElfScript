@@ -74,18 +74,39 @@ public:
       return newChunk;
    }
 
+
+   //XXTH new version when numBytes > mChunkSize
    void* alloc(dsize_t numBytes)
    {
-      void* theAlloc = mChunkHead ? mChunkHead->allocBytes(numBytes) : NULL;
-      if (theAlloc == NULL)
-      {
-         dsize_t actualSize = std::max<dsize_t>(mChunkSize, numBytes);
-         allocChunk(actualSize);
-         theAlloc = mChunkHead->allocBytes(numBytes);
-         AssertFatal(theAlloc != NULL, "Something really odd going on here");
-      }
-      return theAlloc;
+         void* theAlloc = mChunkHead ? mChunkHead->allocBytes(numBytes) : NULL;
+         if (theAlloc == NULL)
+         {
+               // Add a safety buffer (e.g., 32 bytes) to satisfy memory alignment rules (Padding).
+               // This ensures that allocBytes has enough room after the structural overhead.
+               dsize_t alignmentPadding = 32;
+               dsize_t actualSize = std::max<dsize_t>(mChunkSize, numBytes + alignmentPadding);
+
+               allocChunk(actualSize);
+
+               theAlloc = mChunkHead->allocBytes(numBytes);
+               AssertFatal(theAlloc != NULL, "Something really odd going on here - DataChunker fastpath alignment failure");
+         }
+         return theAlloc;
    }
+
+   //XXTH orig:
+   // void* alloc(dsize_t numBytes)
+   // {
+   //    void* theAlloc = mChunkHead ? mChunkHead->allocBytes(numBytes) : NULL;
+   //    if (theAlloc == NULL)
+   //    {
+   //       dsize_t actualSize = std::max<dsize_t>(mChunkSize, numBytes);
+   //       allocChunk(actualSize);
+   //       theAlloc = mChunkHead->allocBytes(numBytes);
+   //       AssertFatal(theAlloc != NULL, "Something really odd going on here");
+   //    }
+   //    return theAlloc;
+   // }
 
    void freeBlocks(bool keepOne = false)
    {

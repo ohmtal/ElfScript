@@ -579,9 +579,9 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    char *string;
    chompUTF8BOM(inString, &string);
 
-//XXHT preprocessor
-#define ELF_PREPROCESSOR
-#ifdef ELF_PREPROCESSOR
+//XXTH preprocessor
+// #define ELFSCRIPT_PREPROCESSOR
+#ifdef ELFSCRIPT_PREPROCESSOR
 
    // --- PREPROCESSOR PREPARATION ---
    // Store the preprocessed code safely on the C++ stack

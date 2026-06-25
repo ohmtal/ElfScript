@@ -85,11 +85,11 @@ function SpeedTest() {
             // %foo.testFloat = %testFloat;
 
            // all three 87
-            %foo.testFloat += 0.1; // 67 ms now !!!
+                %foo.testFloat += 0.1; // 67 ms now !!!
             // %bar = %foo.testFloat * 1.001;
             // %foo.testFloat = %bar;
-
-            if (%foo.testFloat > 1000000.0) %foo.testFloat = 0;
+            //
+            // if (%bar > 10000.0) %foo.testFloat = 0.0;
            //if ($i % 3 == 0)  echo(%foo.testFloat);
 
         }
