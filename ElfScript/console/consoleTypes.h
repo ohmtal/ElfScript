@@ -69,6 +69,8 @@ DefineConsoleType( TypeBoolVector, Vector<bool>)
 DefineConsoleType( TypeS8,  S8 )
 DefineConsoleType( TypeS16, S16)
 DefineConsoleType( TypeS32, S32 )
+// DefineConsoleType( TypeS64, S64 ) //TODO ElfScript
+// DefineConsoleType( TypeU32, U32 ) //TODO ElfScript
 DefineConsoleType( TypeRangedS32, S32)
 DefineConsoleType( TypeS32Vector, Vector<S32> )
 DefineConsoleType( TypeF64, F64 )

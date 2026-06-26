@@ -1905,24 +1905,49 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                         const char* array = (const char*) curFieldArray;
                         S32 array1 = array ? dAtoi(array) : 0;
 
-                        // Fastpath safety check for unmanaged, standard C++ fields
                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn)
-                        {
-                              // Convert the stack's integer value to F64 for our fastpath
-                              // Note: Adjust .getInt() to your stack's actual integer/uint method if needed
+                              && fld->setDataFn == &defaultProtectedSetFn
+                              && fld->flag == 0
+                        ) {
                               fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
                         }
                   }
 
                   if (!fastPath)
                   {
-                        // Fallback for dynamic fields or fields with custom C++ logic
                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
                   }
             }
             else
             {
+                  // The field is not being set on an object. Maybe it's a special accessor?
+                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+                  prevObject = NULL;
+            }
+            break;
+
+      case OP_SAVEFIELD_FLT:
+            if (curObject) {
+                  //XXTH Fastpath:
+                  bool fastPath  = false;
+                  const AbstractClassRep::Field *fld = curObject->findField(curField);
+                  if (fld) {
+                        const char* array = (const char*) curFieldArray;
+                        S32 array1 = array ? dAtoi(array) : 0;
+
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn
+                              && fld->flag == 0
+                        ) {
+                              fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+                        }
+
+                  }
+                  if (!fastPath) {
+                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+                  }
+
+            } else {
                   // The field is not being set on an object. Maybe it's a special accessor?
                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
                   prevObject = NULL;
@@ -1939,33 +1964,17 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             prevObject = NULL;
          }
          break;
-#endif //#ifdef ELFSCRIPT_FASTPATH_FLD
+
       case OP_SAVEFIELD_FLT:
-         if (curObject) {
-            //XXTH Fastpath:
-            bool fastPath  = false;
-             const AbstractClassRep::Field *fld = curObject->findField(curField);
-             if (fld) {
-                  const char* array = (const char*) curFieldArray;
-                  S32 array1 = array ? dAtoi(array) : 0;
-
-                  if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn)
-                  {
-                     fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
-                  }
-
-             }
-             if (!fastPath) {
-                  curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-             }
-
-         } else {
-            // The field is not being set on an object. Maybe it's a special accessor?
-            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-            prevObject = NULL;
-         }
-         break;
+            if (curObject) {
+              curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+            } else {
+                  // The field is not being set on an object. Maybe it's a special accessor?
+                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+                  prevObject = NULL;
+            }
+            break;
+#endif //#ifdef ELFSCRIPT_FASTPATH_FLD
 
       case OP_SAVEFIELD_STR:
          if (curObject)

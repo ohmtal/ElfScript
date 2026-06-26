@@ -950,10 +950,16 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
             return true;
       }
 
-      // for future use:
+
       // if (fld->type == TypeU32) {
       //       U32* target = (U32*)(((const char*)this) + fld->offset);
       //       *target = (U32)value;
+      //       return true;
+      // }
+      //
+      // if (fld->type == TypeS64) {
+      //       S64* target = (S64*)(((const char*)this) + fld->offset);
+      //       *target = (S64)value;
       //       return true;
       // }
       return false;
@@ -978,37 +984,91 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
          S32 array1 = array ? dAtoi(array) : 0;
 
 #ifdef ELFSCRIPT_FASTPATH_FLD
-         // // XXTH SPEED HACK --------------------------------------- >
-         // alignment ?!
-         if (array1 == 0) //FAST PATH
-         {
+         // XXTH  --------------------------------------- >
+        if (array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
+        {
             if (fld->writeDataFn == &defaultProtectedWriteFn
                && fld->setDataFn == &defaultProtectedSetFn
+               && fld->flag == 0
             ) {
                   bool handled = false;
-                  if (fld->type == TypeF32 ) {
-                        F32* target = (F32*)(((const char*)this) + fld->offset);
-                        *target = dAtof(value);
+                  void* targetAddr = NULL;
+
+                  if (fld->type == TypeF32) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(F32)));
+                        *(F32*)targetAddr = dAtof(value);
                         handled = true;
-                  } else if (fld->type == TypeS32 ) {
-                        S32* target = (S32*)(((const char*)this) + fld->offset);
-                        *target = dAtoi(value);
+                  } else if (fld->type == TypeS32) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(S32)));
+                        *(S32*)targetAddr = dAtoi(value);
+                        handled = true;
+                  } else if (fld->type == TypeF64) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(F64)));
+                        *(F64*)targetAddr = dAtod(value);
+                        handled = true;
+                  } else if (fld->type == TypeBool) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(bool)));
+                        *(bool*)targetAddr = dAtob(value);
+                        handled = true;
+                  } else if (fld->type == TypeString) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(const char*)));
+                        *(const char**)targetAddr = StringTable->insert(value);
                         handled = true;
                   }
 
                   if (handled) {
                         if(fld->validator)
-                              fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
+                              fld->validator->validateType(this, fld->pFieldname, targetAddr);
 
                         onStaticModified( slotName, value );
                         return;
                   }
-
             }
          }
 
-         // // < --------------------------------------- XXTH SPEED HACK
+         // if (array1 == 0) //FAST PATH
+         // {
+         //    if (fld->writeDataFn == &defaultProtectedWriteFn
+         //       && fld->setDataFn == &defaultProtectedSetFn
+         //    ) {
+         //          bool handled = false;
+         //          if (fld->type == TypeF32 ) {
+         //                F32* target = (F32*)(((const char*)this) + fld->offset);
+         //                *target = dAtof(value);
+         //                handled = true;
+         //          } else if (fld->type == TypeS32 ) {
+         //                S32* target = (S32*)(((const char*)this) + fld->offset);
+         //                *target = dAtoi(value);
+         //                handled = true;
+         //          }  else if (fld->type == TypeF64 ) {
+         //                F64* target = (F64*)(((const char*)this) + fld->offset);
+         //                *target = dAtod(value);
+         //                handled = true;
+         //          } else if (fld->type == TypeBool ) {
+         //                bool* target = (bool*)(((const char*)this) + fld->offset);
+         //                *target = dAtob(value);
+         //                handled = true;
+         //          } else if (fld->type == TypeString ) {
+         //                const char** target = (const char**)(((const char*)this) + fld->offset);
+         //                *target = StringTable->insert(value);
+         //                handled = true;
+         //          }
+         //
+         //          if (handled) {
+         //                if(fld->validator)
+         //                      fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
+         //
+         //                onStaticModified( slotName, value );
+         //                return;
+         //          }
+         //
+         //    }
+         // }
+         // < --------------------------------------- XXTH
 #endif
+
+         //XXTH NOTE: the following is a real handbreak. And no matter which type the
+         // field is a "=" call this if fastpath failed or the field is not native
 
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
@@ -1107,14 +1167,20 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
             return true;
       }
 
-      // for future use
+
       // if (fld->type == TypeU32)
       // {
       //       U32* source = (U32*)(((const char*)this) + fld->offset);
       //       outValue = (F64)(*source);
       //       return true;
       // }
-
+      //
+      // if (fld->type == TypeS64)
+      // {
+      //       U32* source = (S64*)(((const char*)this) + fld->offset);
+      //       outValue = (F64)(*source);
+      //       return true;
+      // }
       return false;
 }
 

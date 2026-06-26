@@ -10,7 +10,7 @@
 #define ELFSCRIPT_PREPROCESSOR
 
 // make slots type save but same slotname always have the same type
-#define ELFSCRIPT_STRICT_SLOT_TYPE
+// #define ELFSCRIPT_STRICT_SLOT_TYPE
 
 // cache function calls WARNING: inconsitent
 // #define ELFSCRIPT_CALLFUNC_CACHED

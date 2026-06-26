@@ -1,13 +1,13 @@
 #include "console/engineAPI.h"
 
-class EmptyObject : public SimObject
-{
-    typedef SimObject Parent;
-
-public:
-    DECLARE_CONOBJECT(EmptyObject);
-};
-IMPLEMENT_CONOBJECT(EmptyObject);
+    // class EmptyObject : public SimObject
+    // {
+    //     typedef SimObject Parent;
+    //
+    // public:
+    //     DECLARE_CONOBJECT(EmptyObject);
+    // };
+    // IMPLEMENT_CONOBJECT(EmptyObject);
 //--------------
 
 class TestObj: public SimObject
@@ -16,11 +16,19 @@ class TestObj: public SimObject
 public:
     DECLARE_CONOBJECT(TestObj);
     F32 mX, mY, mZ;
-    // StringTableEntry mTestName;
+    F64 mDouble;
+    S32 mIndex;
+    bool mBool;
+    StringTableEntry mTestName;
+    S32 mSlots[3];
 
     TestObj() {
         mX = mY = mZ = 0.f;
-        // mTestName = StringTable->insert("NoName");
+        mDouble = 0.f;
+        mIndex = 0;
+        mBool = false;
+        mTestName = StringTable->insert("NoName");
+        for (S32 i = 0; i < 3; i++) mSlots[i]=0;
     }
 
     static void initPersistFields()
@@ -29,8 +37,11 @@ public:
         addField("x",     TypeF32,     Offset(mX, TestObj));
         addField("y",     TypeF32,     Offset(mY, TestObj));
         addField("z",     TypeF32,     Offset(mZ, TestObj));
-        addField("testFloat",     TypeF32,     Offset(mX, TestObj));
-        // addField("testName", TypeString, Offset(mTestName, TestObject));
+        addField("testFloat", TypeF64,   Offset(mDouble, TestObj));
+        addField("testInt",  TypeS32,    Offset(mIndex, TestObj));
+        addField("testBool", TypeBool,   Offset(mBool, TestObj));
+        addField("testString", TypeString, Offset(mTestName, TestObj));
+        addField("testSlot", TypeS32, Offset(mSlots, TestObj), 3); //WARNING count is not validated!!!
 
     }
 

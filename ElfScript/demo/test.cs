@@ -13,8 +13,7 @@ function rl(%mode) {
 
 // benchmark
 $foo = new TestObj() {
-    bar = 0.0;
-    TypeF32 myFloat = 0.0;
+    TypeF32 bar = 0.0;
 };
 
 // $foo.dump();
@@ -82,10 +81,11 @@ function SpeedTest() {
             // %testFloat = %foo.testFloat; //alone 60ms
             // %testFloat *= 0.1;
             // // !!!!!!!!!!!!1 THIS IT IS !!!!!!!!!!!!!!!!!!!!
-            // %foo.testFloat = %testFloat;
+            // %foo.testFloat = 4.2;
 
            // all three 87
-                %foo.testFloat += 0.1; // 67 ms now !!!
+            %foo.testFloat += 0.1; // 67 ms now !!!
+
             // %bar = %foo.testFloat * 1.001;
             // %foo.testFloat = %bar;
             //
@@ -115,18 +115,29 @@ function SpeedTest() {
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
             // NOTE a bit slower than getPos: 122ms
             %x = %foo.getX();
-            %y = %foo.getY();
-            %z = %foo.getZ();
+            %foo.testFloat = %x;
+            // %y = %foo.getY();
+            // %z = %foo.getZ();
         }
     }
     if ($mode == 7) {
-        $foo.x += 0.1415  ;
-        %a = $foo.x;
+        $foo.testFloat += 0.1415  ;
+        %a = $foo.testFloat;
         %a *= 1.001;
-        $foo.x = %a;
+        $foo.testFloat = %a;
         // echo($foo.x);
     }
-
+    if ($mode == 8) {
+        // $foo.testInt++;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            // $foo.testInt += 1;
+            // $foo.testInt = 1;
+            // $foo.testBool = 0;
+            // $foo.testString = "HUHU";
+            // %int = $foo.testInt;
+            $foo.testSlot[%i] = 1;
+        }
+    }
 }
 
 
@@ -139,7 +150,7 @@ function MainLoop() {
         $times += GetFrameTime();
         if ($i >= 10) {
             $i -= 10;
-            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat:" SPC $foo.testFloat);
+            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat/int/bool:" SPC $foo.testFloat SPC $foo.testInt SPC $foo.testBool);
             $times = 0;
         }
     }
