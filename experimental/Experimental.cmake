@@ -1,27 +1,27 @@
 # Experimental Source Files definition
 
 set(SCRIPT_SRC
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/astAlloc.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/ast.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/astNodes.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/bison.simple
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/cmdgram.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/CMDgram.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/CMDgram.y
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/CMDscan.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/CMDscan.l
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/codeBlock.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/codeBlock.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/compiledEval.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/compiler.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/compiler.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/evalState.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/evalState.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/optimizer.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/parser.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/parser.h
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/runtime.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/torquescript/runtime.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/astAlloc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/ast.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/astNodes.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/bison.simple
+    ${CMAKE_CURRENT_LIST_DIR}/script/cmdgram.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/CMDgram.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/CMDgram.y
+    ${CMAKE_CURRENT_LIST_DIR}/script/CMDscan.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/CMDscan.l
+    ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/compiledEval.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/compiler.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/compiler.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/evalState.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/evalState.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/optimizer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/parser.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/parser.h
+    ${CMAKE_CURRENT_LIST_DIR}/script/runtime.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/script/runtime.h
 )
 
 
