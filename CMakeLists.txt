@@ -10,20 +10,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 # -----------------------------------------------------------------------------
 # ----------  options ----------
-option(BUILD_TORQUESCRIPT "Build the Torque Script" OFF)
 option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
-# -----------------------------------------------------------------------------
-if (BUILD_TORQUESCRIPT)
-    #  defines TORQUESCRIPT_SRC
-    set(TARGET_NAME HelloConsole)
-    include("${CMAKE_CURRENT_LIST_DIR}/TorqueScript/TorqueScript.cmake")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
-    add_executable(${TARGET_NAME} main.cpp
-        ${TORQUESCRIPT_SRC}
-        ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/platform/stub/platformProcess.cpp
-    )
-    target_include_directories(${TARGET_NAME} PRIVATE "./" "./TorqueScript/" )
-endif()
+option(BUILD_TORQUESCRIPT "Build the Torque Script" OFF)
+option(BUILD_EXPERIMENTAL "Build the Experimental" OFF)
 # -----------------------------------------------------------------------------
 if (BUILD_ELFSCRIPT)
 
@@ -42,3 +31,27 @@ if (BUILD_ELFSCRIPT)
     target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" "./ElfScript/demo")
 endif()
 # -----------------------------------------------------------------------------
+if (BUILD_TORQUESCRIPT)
+    #  defines TORQUESCRIPT_SRC
+    set(TARGET_NAME HelloConsole)
+    include("${CMAKE_CURRENT_LIST_DIR}/TorqueScript/TorqueScript.cmake")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+    add_executable(${TARGET_NAME} main.cpp
+        ${TORQUESCRIPT_SRC}
+        ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/platform/stub/platformProcess.cpp
+    )
+    target_include_directories(${TARGET_NAME} PRIVATE "./" "./TorqueScript/" )
+endif()
+# -----------------------------------------------------------------------------
+
+if (BUILD_EXPERIMENTAL)
+    #  defines EXPERIMENTAL_SRC
+    set(TARGET_NAME HelloExperimental)
+    include("${CMAKE_CURRENT_LIST_DIR}/experimental/Experimental.cmake")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+    add_executable(${TARGET_NAME}
+        experimental/main.cpp
+        ${EXPERIMENTAL_SRC}
+    )
+    target_include_directories(${TARGET_NAME} PRIVATE "./experimental" )
+endif()

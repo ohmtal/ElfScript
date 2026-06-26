@@ -34,7 +34,7 @@ function SpeedTest() {
     // .. object as global var
     if ( $mode == 0 ) {
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
-            $foo.bar += 0.1;
+            // $foo.bar += 0.1;
         }
     }
     else
@@ -130,12 +130,12 @@ function SpeedTest() {
     if ($mode == 8) {
         // $foo.testInt++;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
-            // $foo.testInt += 1;
-            // $foo.testInt = 1;
-            // $foo.testBool = 0;
-            // $foo.testString = "HUHU";
-            // %int = $foo.testInt;
-            $foo.testSlot[%i] = 1;
+             // $foo.testInt += 1;
+             $foo.testInt = 1;
+             // $foo.testBool = 0;
+             // $foo.testString = "HUHU";
+             // %int = $foo.testInt;
+             // $foo.testSlot[1] ++;
         }
     }
 }
