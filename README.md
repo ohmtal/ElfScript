@@ -7,6 +7,7 @@ It need to be more stripped down because there are much more files than needed a
 
 ## Notable changes:
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before.
+- 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
 - Made it standalone
 - EngineGlue for init/process/shutdown
 - Ripped out some stuff i dont need like Taml
@@ -16,8 +17,7 @@ It need to be more stripped down because there are much more files than needed a
 - Added new Log functions
 - Added an GarabageCollectionSet
 - Fixed Emscripten and Android Build  (Android untested)
-- Relaced Math with Light Version since the Types like Vector are removed
-- 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
+- Replaced Math with Light Version since the Types like Vector are removed
 
 ## TODO
 
