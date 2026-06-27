@@ -10,18 +10,18 @@ set(SCRIPT_SRC
     ${CMAKE_CURRENT_LIST_DIR}/script/CMDgram.y
     ${CMAKE_CURRENT_LIST_DIR}/script/CMDscan.cpp
     ${CMAKE_CURRENT_LIST_DIR}/script/CMDscan.l
-    ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.h
-    ${CMAKE_CURRENT_LIST_DIR}/script/compiledEval.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/script/codeBlock.h
+    # ${CMAKE_CURRENT_LIST_DIR}/script/compiledEval.cpp
     ${CMAKE_CURRENT_LIST_DIR}/script/compiler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/script/compiler.h
-    ${CMAKE_CURRENT_LIST_DIR}/script/evalState.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/script/evalState.h
-    ${CMAKE_CURRENT_LIST_DIR}/script/optimizer.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/script/evalState.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/script/evalState.h
+    # ${CMAKE_CURRENT_LIST_DIR}/script/optimizer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/script/parser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/script/parser.h
-    ${CMAKE_CURRENT_LIST_DIR}/script/runtime.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/script/runtime.h
+    # ${CMAKE_CURRENT_LIST_DIR}/script/runtime.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/script/runtime.h
 )
 
 

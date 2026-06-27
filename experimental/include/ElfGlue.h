@@ -27,7 +27,10 @@ typedef unsigned int       U32;     ///< Compiler independent Unsigned 32-bit in
 typedef float              F32;     ///< Compiler independent 32-bit float
 typedef double             F64;     ///< Compiler independent 64-bit float
 
+typedef int64_t           S64;
 typedef size_t            dsize_t;
+
+typedef const char* StringTableEntry;
 //-------------------------------------- Some all-around useful inlines and globals
 //
 
@@ -300,21 +303,21 @@ inline bool dIsquote(const char c)
 //------------------------------------------------------------------------------
 // non-standard string functions [defined in stringFunctions.cpp]
 
-#define dStrdup(x) dStrdup_r(x, __FILE__, __LINE__)
-extern char *dStrdup_r(const char *src, const char*, dsize_t);
+// #define dStrdup(x) dStrdup_r(x, __FILE__, __LINE__)
+// extern char *dStrdup_r(const char *src, const char*, dsize_t);
+//
+// extern char *dStrcpyl(char *dst, dsize_t dstSize, ...);
+// extern char *dStrcatl(char *dst, dsize_t dstSize, ...);
+//
+// extern char *dStrupr(char *str);
+// extern char *dStrlwr(char *str);
+//
+// extern char* dStrichr( char* str, char ch );
+// extern const char* dStrichr( const char* str, char ch );
 
-extern char *dStrcpyl(char *dst, dsize_t dstSize, ...);
-extern char *dStrcatl(char *dst, dsize_t dstSize, ...);
-
-extern char *dStrupr(char *str);
-extern char *dStrlwr(char *str);
-
-extern char* dStrichr( char* str, char ch );
-extern const char* dStrichr( const char* str, char ch );
-
-extern S32        dStrcmp(const UTF16 *str1, const UTF16 *str2);
-extern S32        dStrnatcmp( const char* str1, const char* str2 );
-extern S32        dStrnatcasecmp( const char* str1, const char* str2 );
+// extern S32        dStrcmp(const UTF16 *str1, const UTF16 *str2);
+// extern S32        dStrnatcmp( const char* str1, const char* str2 );
+// extern S32        dStrnatcasecmp( const char* str1, const char* str2 );
 
 inline bool dAtob(const char* str)
 {

@@ -10,10 +10,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "console/console.h"
-#include "console/torquescript/compiler.h"
-#include "console/consoleInternal.h"
-#include "core/strings/stringFunctions.h"
+#include "platform/platform.h"
+#include "compiler.h"
 
 #ifndef YYDEBUG
 #define YYDEBUG 0

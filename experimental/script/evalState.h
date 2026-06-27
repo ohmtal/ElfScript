@@ -1,5 +1,6 @@
 #ifndef _EVALSTATE_H
 #define _EVALSTATE_H
+#include "platform/platform.h"
 #include "console/consoleInternal.h"
 
 class ExprEvalState
