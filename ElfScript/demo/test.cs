@@ -14,13 +14,17 @@ function rl(%mode) {
 // benchmark
 $foo = new TestObj() {
     TypeF32 bar = 0.0;
+    pointSize = LOOP_COUNT;
 };
+
 
 // $foo.dump();
 
 function setMy() {
     $foo.myFloat = 2.2;
 }
+
+
 
 #define LOOP_COUNT 50000
 
@@ -100,8 +104,10 @@ function SpeedTest() {
         %foo = $foo;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
             %foo.walk(0.1, 0.4, 0.2); //NOTE FAST! 50-60ms
+             // %foo.walk(0.1 * 1, 0.4 * 1, 0.2 * 1); //same speed with type casting
         }
     }
+    else
     // .. object as local var + call getPos to a local var
     if ( $mode == 5 ) {
         %foo = $foo;
@@ -109,6 +115,7 @@ function SpeedTest() {
             %posVec = %foo.getPos(); //not bad 111ms
         }
     }
+    else
      // .. object as local var + call getx/y/z to a local vars
     if ( $mode == 6 ) {
         %foo = $foo;
@@ -120,6 +127,7 @@ function SpeedTest() {
             // %z = %foo.getZ();
         }
     }
+    else
     if ($mode == 7) {
         $foo.testFloat += 0.1415  ;
         %a = $foo.testFloat;
@@ -127,15 +135,60 @@ function SpeedTest() {
         $foo.testFloat = %a;
         // echo($foo.x);
     }
+    else
     if ($mode == 8) {
         // $foo.testInt++;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
              // $foo.testInt += 1;
-             $foo.testInt = 1;
+             // $foo.testInt = 1; //50ms
+             $foo.testInt = 1 * 1.0; // also 50ms
              // $foo.testBool = 0;
              // $foo.testString = "HUHU";
              // %int = $foo.testInt;
              // $foo.testSlot[1] ++;
+        }
+    }
+    else
+    // 145 ms
+    if ($mode == 9) {
+        %foo = $foo;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            %x = %foo.x + %i;
+            %y = %foo.y + %i;
+            %foo.setPoint(%i, %x, %y);
+        }
+    }
+    else
+    // 109 ms
+    if ($mode == 10) {
+        %foo = $foo;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            // this push the Vector2F to .x, .y
+            %foo.pushPoint(%i);
+            // with type casting it's faster!!
+            %x = %foo.x * 1;
+            %y = %foo.y * 1;
+        }
+    }
+    // 150ms
+    if ($mode == 11) {
+         %foo = $foo;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+
+            %p = %foo.getPoint(%i);
+            //here it is the same with type casting
+            %x = %p.x * 1;
+            %y = %p.y * 1;
+        }
+    }
+    // 110 ms ** same as 10 but with Engine function ! << exaxt same speed
+    if ($mode == 12) {
+        %foo = $foo;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            // this push the Vector2F to .x, .y
+            Test_PushPoint(%foo, %i);
+            %x = %foo.x * 1;
+            %y = %foo.y * 1;
         }
     }
 }

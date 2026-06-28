@@ -1,4 +1,5 @@
 #include "console/engineAPI.h"
+#include <console/consoleTypes.h>
 
     // class EmptyObject : public SimObject
     // {
@@ -9,6 +10,11 @@
     // };
     // IMPLEMENT_CONOBJECT(EmptyObject);
 //--------------
+
+struct Point2F{
+    F32 x = 0;
+    F32 y = 0;
+};
 
 class TestObj: public SimObject
 {
@@ -21,6 +27,7 @@ public:
     bool mBool;
     StringTableEntry mTestName;
     S32 mSlots[3];
+    Vector<Point2F> mPoints;
 
     TestObj() {
         mX = mY = mZ = 0.f;
@@ -30,6 +37,28 @@ public:
         mTestName = StringTable->insert("NoName");
         for (S32 i = 0; i < 3; i++) mSlots[i]=0;
     }
+
+    static bool _setPointSize(void* obj,const char* , const char* data) {
+        TestObj* object = static_cast<TestObj*>(obj);
+        if (!object || !data) {
+            Con::errorf("Failed to set pointSize!");
+            return false;
+        }
+        S32 size = dAtoi(data);
+        if ( size >= 0 ) {
+            object->mPoints.setSize(size);
+            dMemset(object->mPoints.address(), 0, object->mPoints.size() * sizeof(Point2F));
+            Con::printf("New point size is: %d", size);
+            //NOT! return true;
+        }
+        return false;
+    }
+    static const char *_getPointSize(void* obj, const char* data) {
+        TestObj* object = static_cast<TestObj*>(obj);
+        if (!object) return "";
+        return Con::getIntArg(object->mPoints.size());
+    }
+
 
     static void initPersistFields()
     {
@@ -42,6 +71,9 @@ public:
         addField("testBool", TypeBool,   Offset(mBool, TestObj));
         addField("testString", TypeString, Offset(mTestName, TestObj));
         addField("testSlot", TypeS32, Offset(mSlots, TestObj), 3); //WARNING count is not validated!!!
+        //----
+        addProtectedField("pointSize", TypeS32, 0, &_setPointSize,&_getPointSize, "Set the point size (element count).");
+
 
     }
 
@@ -74,4 +106,38 @@ DefineEngineMethod(TestObj, getZ, F32, (), , "") {
 DefineEngineMethod(TestObj, walk, void, (F32 x, F32 y, F32 z), , "Set point where to walk to") {
     // we do nothing special here
     object->setPos(x,y,z);
+}
+
+DefineEngineMethod(TestObj, setPoint, bool, (S32 index, F32 x, F32 y), , "Set point at index") {
+    if (index < 0 || index >= object->mPoints.size()) return false;
+    object->mPoints[index] = { x, y};
+    return true;
+}
+
+
+DefineEngineMethod(TestObj, getPoint, Vector<F32>, (S32 index), , "Get point at index") {
+    if (index < 0 || index >= object->mPoints.size()) return {};
+    Vector<F32> tmpVector;
+    tmpVector.clear();
+    tmpVector.push_back(object->mPoints[index].x);
+    tmpVector.push_back(object->mPoints[index].y);
+    return tmpVector;
+}
+
+DefineEngineMethod(TestObj, pushPoint, bool, (S32 index), , "push point at index to x,y") {
+    if (index < 0 || index >= object->mPoints.size()) return false;
+
+    object->mX =  object->mPoints[index].x;
+    object->mY = object->mPoints[index].y;
+    return true;
+}
+
+// this is executed at the same speed as .pushPoint. so the VM does NOT cache %this object in functions
+// Console value need a pointer field
+DefineEngineFunction(Test_PushPoint, bool, (S32 pId, S32 index), , "same as pushpoint but as function") {
+    TestObj* object = static_cast<TestObj*>(Sim::findObject(pId));
+    if (!object || index < 0 || index >= object->mPoints.size()) return false;
+    object->mX =  object->mPoints[index].x;
+    object->mY = object->mPoints[index].y;
+    return true;
 }

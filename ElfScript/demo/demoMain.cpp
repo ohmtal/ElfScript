@@ -78,6 +78,11 @@ void MyLogger(U32 level, const char *consoleLine) {
     }
 #endif
 }
+
+
+DefineEngineFunction(HelloWorld, void, (String name), ("fooBar"),""){
+    Con::printf("Hello World %s!", name.c_str());
+}
 // ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     printf("Startup ....\n");
@@ -99,7 +104,9 @@ int main(int argc, char* argv[]) {
 
 
     // register enum Test >>
-    Con::registerEnumS32<MyEnum>("$MyEnum::");
+    Con::registerEnumS32<MyEnum>("$MyEnum::", true);
+    Con::setScriptConstant("_LEFT_", 1); //real constant using preprocessor
+    Con::setScriptConstant("_RIGHT_", 2); //real constant using preprocessor
     // <<<<<
 
 
@@ -107,6 +114,7 @@ int main(int argc, char* argv[]) {
     std::string code= R"(
         echo("EnumTest ..................");
         echo($MyEnum::None SPC $MyEnum::One SPC $MyEnum::Two);
+        echo("LEFT/RIGHT" SPC _LEFT_ SPC _RIGHT_);
         echo("......................");
         helloWorld("tom");
         error("This is NOT a error!");
@@ -190,9 +198,7 @@ int main(int argc, char* argv[]) {
           gFrameTime = duration.count();
           start = end;
 
-
     }
-
 
     // -------- finallize
     engineGlue::shutDown();
