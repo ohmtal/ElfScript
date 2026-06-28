@@ -28,7 +28,7 @@ if (BUILD_ELFSCRIPT)
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
-    target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" "./ElfScript/demo")
+    target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" "./ElfScript/demo/")
 endif()
 # -----------------------------------------------------------------------------
 if (BUILD_TORQUESCRIPT)
@@ -36,11 +36,12 @@ if (BUILD_TORQUESCRIPT)
     set(TARGET_NAME HelloConsole)
     include("${CMAKE_CURRENT_LIST_DIR}/TorqueScript/TorqueScript.cmake")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
-    add_executable(${TARGET_NAME} main.cpp
+    add_executable(${TARGET_NAME}
+        ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/demo/main.cpp
         ${TORQUESCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/platform/stub/platformProcess.cpp
     )
-    target_include_directories(${TARGET_NAME} PRIVATE "./" "./TorqueScript/" )
+    target_include_directories(${TARGET_NAME} PRIVATE "./TorqueScript/demo/" "./TorqueScript/" )
 endif()
 # -----------------------------------------------------------------------------
 

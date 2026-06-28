@@ -21,7 +21,8 @@ $foo = new TestObj() {
 // $foo.dump();
 
 function setMy() {
-    $foo.myFloat = 2.2;
+    %foo = $foo;
+    %foo.myFloat = 2.2;
 }
 
 

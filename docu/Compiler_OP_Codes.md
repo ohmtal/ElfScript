@@ -1,6 +1,10 @@
 # Compiler OP Codes
 
 ```
+$Debug::DumpByteCode = 1; //enable debug instruction dump
+```
+
+```
    enum CompiledInstructions
    {
       OP_FUNC_DECL,
