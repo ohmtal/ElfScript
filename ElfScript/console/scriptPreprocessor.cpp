@@ -25,24 +25,62 @@
 
 #include <cctype>
 
+#include "engineAPI.h"
+
 namespace Con {
 
-
+    //----------------------------------------------------------------------
 // Global table that persists across multiple exec() calls
 std::unordered_map<std::string, std::string> gScriptConstants;
 
-
+//----------------------------------------------------------------------
 void setScriptConstant(std::string key, S32 value) {
     StringBuilder str;
     str.format("%d", value);
     gScriptConstants[key] = str.end();
 }
-
+//----------------------------------------------------------------------
 void setScriptConstant(std::string key, std::string value) {
     gScriptConstants[key] = value;
 }
+//----------------------------------------------------------------------
 
+DefineEngineFunction(dumpScriptConstants, void, (String filter), (""),
+                     "(String filter) - Dumps the script constants table to the console. Using filter for keys if not empty.")
+{
+    if (gScriptConstants.empty())
+    {
+        Con::printf("Script constants table is empty.");
+        return;
+    }
 
+    bool useFilter = !filter.isEmpty();
+    U32 matchCount = 0;
+
+    Con::printf("--- Script Constants Dump ---");
+
+    for (const auto& pair : gScriptConstants)
+    {
+        if (useFilter)
+        {
+            if (!dStristr(pair.first.c_str(), filter))
+                continue;
+        }
+
+        Con::printf("  %s = %s", pair.first.c_str(), pair.second.c_str());
+        matchCount++;
+    }
+
+    if (useFilter)
+    {
+        Con::printf("--- End of Dump (%u of %zu items matched) ---", matchCount, gScriptConstants.size());
+    }
+    else
+    {
+        Con::printf("--- End of Dump (%zu items) ---", gScriptConstants.size());
+    }
+}
+//----------------------------------------------------------------------
 
 /**
  * replace constant in code
@@ -85,7 +123,7 @@ std::string replaceConstantsSinglePass(const std::string& sourceCode,
     return result;
 }
 
-
+//----------------------------------------------------------------------
 std::string preprocessTorqueScript(const char* inString) {
     if (inString == nullptr) return "";
     bool foundHash = dStrchr(inString, '#') != nullptr;
@@ -122,7 +160,7 @@ std::string preprocessTorqueScript(const char* inString) {
 
     return outputCode;
 }
-
+//----------------------------------------------------------------------
 
 
 } //Con

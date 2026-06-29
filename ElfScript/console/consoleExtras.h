@@ -41,20 +41,19 @@ namespace Con {
             if (!asConstantVariable) {
                 std::string fullName = prefix + std::string(enumNames[i]);
                 Con::setScriptConstant(fullName, value);
-                return;
+
+            } else {
+                dynamicConst32Storage.push_back(static_cast<S32>(enumValues[i]));
+                S32* permanentPointer = &dynamicConst32Storage.back();
+                std::string fullName = prefix + std::string(enumNames[i]);
+
+                Con::addConstant(
+                    fullName.c_str(),
+                                 TypeS32,
+                                 permanentPointer,
+                                 ""
+                );
             }
-
-
-            dynamicConst32Storage.push_back(static_cast<S32>(enumValues[i]));
-            S32* permanentPointer = &dynamicConst32Storage.back();
-            std::string fullName = prefix + std::string(enumNames[i]);
-
-            Con::addConstant(
-                fullName.c_str(),
-                             TypeS32,
-                             permanentPointer,
-                             ""
-            );
 
         }
     }
