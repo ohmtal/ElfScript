@@ -214,7 +214,7 @@ static void getFieldComponent(SimObject* object, StringTableEntry field, const c
       else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
          dStrcpy(val, StringUnit::getUnit(prevVal, 2, " \t\n"), 128);
 
-      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[0])
+      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
          dStrcpy(val, StringUnit::getUnit(prevVal, 3, " \t\n"), 128);
 
       else
