@@ -145,6 +145,8 @@ std::string preprocessTorqueScript(const char* inString) {
                 std::string name = match[1].str();
                 std::string value = match[2].str();
                 gScriptConstants[name] = value;
+                // add an empty lime
+                outputCode += "\n";
             } else {
                 // Keep normal code line
                 outputCode += line + "\n";
