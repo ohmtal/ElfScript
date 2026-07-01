@@ -3631,3 +3631,73 @@ DefineEngineMethod( SimObject, getDebugInfo, ArrayObject*, (),,
 }
 
 #endif
+// -----------------------------------------------------------------------------
+//NOTE ElfScript: dumpFields a copy of dump but without methods
+// *** no idea why kdevelop think it have to add ident of 6 chars.... ***
+// -----------------------------------------------------------------------------
+DefineEngineMethod( SimObject, dumpFields, void,
+                    (  bool staticFields, bool dynamicFields, bool detailed )
+                    , (true,true, false ),
+                    "Dump a description of all fields defined on this object to the console.\n"
+                    "@param detailed Whether to print detailed information about members." )
+{
+      Con::printf( "Class: %s", object->getClassName() );
+
+      if (staticFields) {
+            const AbstractClassRep::FieldList &list = object->getFieldList();
+            char expandedBuffer[4096];
+
+            Con::printf( "Static Fields:" );
+            Vector<const AbstractClassRep::Field *> flist(__FILE__, __LINE__);
+
+            for(U32 i = 0; i < list.size(); i++)
+                  flist.push_back(&list[i]);
+
+            dQsort(flist.address(),flist.size(),sizeof(AbstractClassRep::Field *),compareFields);
+
+            for(Vector<const AbstractClassRep::Field *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
+            {
+                  const AbstractClassRep::Field* f = *itr;
+
+                  // The special field types can be skipped.
+                  if ( f->type >= AbstractClassRep::ARCFirstCustomField )
+                        continue;
+
+                  for(U32 j = 0; S32(j) < f->elementCount; j++)
+                  {
+                        // [neo, 07/05/2007 - #3000]
+                        // Some objects use dummy vars and projected fields so make sure we call the get functions
+                        //const char *val = Con::getData(f->type, (void *) (((const char *)object) + f->offset), j, f->table, f->flag);
+                        const char *val = (*f->getDataFn)( object, Con::getData(f->type, (void *) (((const char *)object) + f->offset), j, f->table, f->flag) );// + typeSizes[fld.type] * array1));
+
+                        ConsoleBaseType* conType = ConsoleBaseType::getType( f->type );
+                        const char* conTypeName = "<unknown>";
+                        if( conType )
+                              conTypeName = conType->getTypeClassName();
+
+                        if( !val /*|| !*val*/ )
+                              continue;
+                        if( f->elementCount == 1 )
+                              dSprintf( expandedBuffer, sizeof( expandedBuffer ), "  %s %s = \"", conTypeName, f->pFieldname );
+                        else
+                              dSprintf( expandedBuffer, sizeof( expandedBuffer ), "  %s %s[ %d ] = \"", conTypeName, f->pFieldname, j );
+                        expandEscape( expandedBuffer + dStrlen(expandedBuffer), val);
+                        Con::printf( "%s\"", expandedBuffer );
+
+                        if( detailed && f->pFieldDocs && f->pFieldDocs[ 0 ] )
+                              Con::printf( "    %s", f->pFieldDocs );
+                  }
+            }
+      }
+
+
+      // If the object is a datablock with substitution statements,
+      // they get printed out as part of the dump.
+      if (dynamicFields) {
+            Con::printf( "Dynamic Fields:" );
+            if(object->getFieldDictionary())
+                  object->getFieldDictionary()->printFields(object);
+      }
+
+}
+// -----------------------------------------------------------------------------

@@ -86,7 +86,7 @@ namespace Con
        && dStrchr(cmd.c_str(), '}') == nullptr
       ){
          cmd += "()";
-         Con::warnf("[debug] append () => %s", cmd.c_str());
+         // Con::warnf("[debug] append () => %s", cmd.c_str());
       }
       if (!cmd.endsWith(";")) {
          cmd += ";";

@@ -357,7 +357,7 @@ void StdConsole::process()
 
                   strcpy(rgCmds[iCmdIndex ++], inbuf);
 
-                  // XXTH printf("%s", Con::getVariable("Con::Prompt"));
+                  printf("%s", Con::getVariable("Con::Prompt"));
                   inpos = outpos = 0;
                   inbuf[0] = 0x00;
                   break;
