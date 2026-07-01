@@ -69,6 +69,32 @@ namespace Con
    /// @return True if the script was successfully executed, false if not.
    //
    inline bool executeFile(const char* fileName, bool noCalls = false, bool journalScript = false) { return getRuntime()->executeFile(fileName, noCalls, journalScript); };
+
+   // ElfScript evalAutoComplete complete (); for console
+   // like the function ConsoleEntry::eval() in TGE console script
+   inline EvalResult evalAutoComplete(String cmd) {
+      cmd = cmd.trim();
+      if (cmd.isEmpty()) {
+         return EvalResult();
+      }
+      // 1. check for (
+      if (
+          dStrchr(cmd.c_str(), '(') == nullptr
+       && dStrchr(cmd.c_str(), '=') == nullptr
+       && dStrchr(cmd.c_str(), ' ') == nullptr
+       && dStrchr(cmd.c_str(), '{') == nullptr
+       && dStrchr(cmd.c_str(), '}') == nullptr
+      ){
+         cmd += "()";
+         Con::warnf("[debug] append () => %s", cmd.c_str());
+      }
+      if (!cmd.endsWith(";")) {
+         cmd += ";";
+      }
+
+      return evaluate(cmd.c_str());
+   }
+
 }
 
 #endif
