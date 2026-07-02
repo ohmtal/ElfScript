@@ -22,6 +22,7 @@ if (BUILD_ELFSCRIPT)
     if(UNIX)
       list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/shellConsole/POSIXConsole.cpp)
     endif()
+      list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/console/consoleDocExporter.cpp)
     add_executable(${TARGET_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/demoMain.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/testObj.cpp

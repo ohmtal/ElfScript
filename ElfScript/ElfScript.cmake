@@ -147,6 +147,8 @@ set(CORE_SRC
 
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/stream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/fileStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/stream/streamObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/stream/fileStreamObject.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/findMatch.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/strings/findMatch.h
