@@ -4,6 +4,7 @@
 #include "console/engineAPI.h"
 #include <platform/platformVolume.h>
 #include "engineGlue.h"
+#include "core/iTickable.h"
 //--------------------------------------------------------------------------------------
 namespace engineAPI
 {
@@ -30,6 +31,8 @@ namespace engineGlue
         FrameAllocator::init(TORQUE_FRAME_SIZE);      // See comments in torqueConfig.h
         _StringTable::create();
         Con::init();
+
+        ITickable::init( 4 );
 
 
         Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
@@ -150,6 +153,7 @@ namespace engineGlue
     // SimTime U32 ms since last Loop
     void process(SimTime delta) {
         Sim::advanceTime(delta);
+        ITickable::advanceTime(delta);
         ConsoleValue::resetConversionBuffer();
     }
     // -----------------------------------------------------------------------------
