@@ -35,6 +35,8 @@ namespace engineGlue
         ITickable::init( 4 );
 
 
+
+
         Platform::FS::InstallFileSystems(); // install all drives for now until we have everything using the volume stuff
         //NOT Platform::FS::MountDefaults();
 
@@ -173,4 +175,13 @@ namespace engineGlue
         engineAPI::gIsInitialized = false;
 
     }
+
+    DefineEngineFunction(getOS, String, (), ,
+        "return the OS where it was compiled."
+        "Win64 | Win32 | Linux | OpenBSD | FreeBSD | MacOSX | Android | Emscripten"
+    ) {
+        return TORQUE_OS_STRING;
+    }
+
+
 } //engineGlue

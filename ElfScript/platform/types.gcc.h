@@ -111,7 +111,7 @@ typedef uint64_t    U64;
 #  include "platform/types.posix.h"
 
 #elif defined(__APPLE__)
-#  define TORQUE_OS_STRING "MacOS X"
+#  define TORQUE_OS_STRING "MacOSX"
 #  define TORQUE_OS_MAC
 #  include "platform/types.mac.h"
 #  if defined(i386)
