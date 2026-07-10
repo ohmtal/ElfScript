@@ -700,7 +700,10 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
 
    consoleAllocReset();
 
-#ifndef TORQUE_SHIPPING
+//XXTH changed to debug ! => #ifndef TORQUE_SHIPPING
+// FIXME if i need this i should change it to global var
+// reading a bool var here is a "handbreak".
+#ifdef TORQUE_DEBUG
    if (Con::getBoolVariable("$Debug::DumpByteCode"))
    {
       dumpInstructions();
