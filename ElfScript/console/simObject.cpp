@@ -1743,9 +1743,9 @@ bool SimObject::onAdd()
    //
    // Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
 
-
+   #ifdef ELFSCRIPT_GARBAGECOLLECTION
    if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
-
+   #endif
    return true;
 }
 

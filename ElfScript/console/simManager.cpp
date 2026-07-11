@@ -511,7 +511,9 @@ void init()
    initEventQueue();
    initRoot();
 
+#ifdef ELFSCRIPT_GARBAGECOLLECTION
    InstantiateNamedSet(GarbageCollectionSet); //XXTH
+#endif
 
    SimPersistID::init();
 }
@@ -520,6 +522,7 @@ void shutdown()
 {
    sgIsShuttingDown = true;
 
+#ifdef ELFSCRIPT_GARBAGECOLLECTION
    //XXTH auto GarbageCollection
    if (Sim::getGarbageCollectionSet())
    {
@@ -533,7 +536,7 @@ void shutdown()
                obj->deleteObject();
          }
    }
-
+#endif
 
 
    shutdownRoot();
