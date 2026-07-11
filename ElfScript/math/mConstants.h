@@ -49,6 +49,7 @@
 
 #define POINT_EPSILON (0.0001f) ///< Epsilon for point types.
 
+#define M_DEG2RAD   M_PI / 180.f;
 
 // #define M_MAXS32		2147483647
 
