@@ -9,13 +9,12 @@ It need to be more stripped down because there are much more files than needed a
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before.
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
 - Made it standalone
+- Added optional GarabageCollectionSet
 - EngineGlue for init/process/shutdown
 - Ripped out some stuff i dont need like Taml
 - Fixed some memory leaks :)
-- Every created Object based on SimObject is added to a GarbageCollections which is clean on shutdown.
 - Added auto enum binding as constants
 - Added new Log functions
-- Added an GarabageCollectionSet
 - Fixed Emscripten and Android Build  (Android untested)
 - Replaced Math with Light Version since the Types like Vector are removed
 
