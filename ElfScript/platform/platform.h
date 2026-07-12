@@ -112,7 +112,7 @@ enum DriveType
 };
 
 // Some forward declares for later.
-class Point2I;
+// class Point2I;
 template<class T> class Vector;
 template<typename Signature> class Signal;
 struct InputEventInfo;
