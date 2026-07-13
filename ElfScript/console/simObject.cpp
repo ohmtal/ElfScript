@@ -1580,8 +1580,9 @@ SimObject* SimObject::clone()
    
    simObject->assignFieldsFrom( this );
 
-   String name = Sim::getUniqueName( getName() );
-   if( !simObject->registerObject( name.c_str() ) )
+   //ElfScript why ? String name = Sim::getUniqueName( getName() );
+   // fail after 100 attemps
+   if( !simObject->registerObject( /*name.c_str()*/ ) )
    {
       delete simObject;
       return NULL;
