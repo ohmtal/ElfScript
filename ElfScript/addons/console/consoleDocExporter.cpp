@@ -90,8 +90,21 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool forDoxyGe
                       "@ingroup Docu")
 {
     BeginConsoleLines();
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("//                    C L A S S E S  ");
+    Con::printf("//------------------------------------------------------------------");
     Namespace::dumpClasses( dumpScript, dumpEngine );
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("//                  F U N C T I O N S ");
+    Con::printf("//------------------------------------------------------------------");
     Namespace::dumpFunctions( dumpScript, dumpEngine );
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("//                  C O N S T A N T S ");
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("/*");
+    Con::executef("dumpScriptConstants");
+    Con::printf("*/");
+
     bool ok = ExportConsoleLines(fileName, forDoxyGen, append);
     EndConsoleLines();
     return ok;

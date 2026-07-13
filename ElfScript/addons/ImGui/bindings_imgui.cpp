@@ -674,7 +674,7 @@ DefineEngineFunction(ImContextMenu, void, (
                      "Opens a context menu on right-click for the previous widget.\n"
                      "@param contextId Unique ID for the popup (optional)\n"
                      "@param ItemsTabSeparated TAB-separated list of menu items\n"
-                     "@param callbackFunctionName Script function called on click (receives index and item name)\n"
+                     "@param callbackFunctionName Script function  (not method!) called on click (receives index and item name)\n"
 ) {
     if (!ItemsTabSeparated || ItemsTabSeparated[0] == '\0') {
         return;
