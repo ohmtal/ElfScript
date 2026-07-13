@@ -7,16 +7,15 @@
 // HOWTO and Requirements:
 // - ImGui must be implemented and initialited..
 // - using structs:
-//      Color4F - float rgba
-//      Point2F - float x,y
+//      ImVec4 - float rgba
+//      ImVec2 - float x,y
 // - InitBindings_ImGui must be called on init to load constants
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
 #include "console/consoleExtras.h"
-#include "ConsoleTypes.h"
+#include "bindings_imgui.h"
 #include "core/strings/stringUnit.h"
-
 
 #include <string>
 #include <format>
@@ -24,15 +23,75 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+//-----------------------------------------------------------------------------
+// TypeImVec2
+//-----------------------------------------------------------------------------
+IMPLEMENT_STRUCT( ImVec2,
+                  ImVec2, ,
+                  "" )
+
+FIELD( x, x, 1, "X coordinate." )
+FIELD( y, y, 1, "Y coordinate." )
+END_IMPLEMENT_STRUCT;
+
+ConsoleType(ImVec2, TypeImVec2, ImVec2, "")
+ImplementConsoleTypeCasters( TypeImVec2, ImVec2 )
+
+ConsoleGetType( TypeImVec2 )
+{
+    ImVec2 *pt = (ImVec2 *) dptr;
+    static const U32 bufSize = 256;
+    char* returnBuffer = Con::getReturnBuffer(bufSize);
+    dSprintf(returnBuffer, bufSize, "%g %g", pt->x, pt->y);
+    return returnBuffer;
+}
+
+ConsoleSetType( TypeImVec2 )
+{
+    if(argc == 1)
+        dSscanf(argv[0], "%g %g", &((ImVec2 *) dptr)->x, &((ImVec2 *) dptr)->y);
+    else if(argc == 2)
+        *((ImVec2 *) dptr) = ImVec2(dAtof(argv[0]), dAtof(argv[1]));
+    else
+        Con::printf("ImVec2 must be set as { x, y } or \"x y\"");
+}
+//-----------------------------------------------------------------------------
+// TypeImVec4
+//-----------------------------------------------------------------------------
+IMPLEMENT_STRUCT( ImVec4,
+                  ImVec4, ,
+                  "" )
+
+FIELD( x, x, 1, "X coordinate." )
+FIELD( y, y, 1, "Y coordinate." )
+FIELD( z, z, 1, "Z coordinate." )
+FIELD( w, w, 1, "W coordinate." )
+END_IMPLEMENT_STRUCT;
+
+ConsoleType(ImVec4, TypeImVec4, ImVec4, "")
+ImplementConsoleTypeCasters(TypeImVec4, ImVec4)
+
+ConsoleGetType( TypeImVec4 )
+{
+    ImVec4 *pt = (ImVec4 *) dptr;
+    static const U32 bufSize = 256;
+    char* returnBuffer = Con::getReturnBuffer(bufSize);
+    dSprintf(returnBuffer, bufSize, "%g %g %g %g", pt->x, pt->y, pt->z, pt->w);
+    return returnBuffer;
+}
+
+ConsoleSetType( TypeImVec4 )
+{
+    if(argc == 1)
+        dSscanf(argv[0], "%g %g %g %g", &((ImVec4 *) dptr)->x, &((ImVec4 *) dptr)->y, &((ImVec4 *) dptr)->z , &((ImVec4 *) dptr)->w);
+    else if(argc == 4)
+        *((ImVec4 *) dptr) = ImVec4(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+    else
+        Con::printf("ImVec4 must be set as { x, y, z, w } or \"x y z w\"");
+}
 // -----------------------------------------------------------------------------
-inline ImVec4 ToImVec4(const Color4F& color) {
-    return ImVec4(color.r, color.g, color.b, color.a);
-}
-inline ImVec2 ToImVec2(const Point2F& p) {
-    return ImVec2(p.x,p.y);
-}
-
-
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 static ImU32 ParseColor(F32 r, F32 g, F32 b, F32 a = 1.0f) {
     return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
 }
@@ -170,10 +229,10 @@ void RegisterImGuiTableConstants() {
 // Borrowed from OhmFlux
 void RegisterColorConstants() {
 
-    #define REGISTER_COLOR_CONST(name, r, g, b, a) \
+    #define REGISTER_COLOR_CONST(name, x, y, z, w) \
     { \
         char colBuf[128]; \
-        std::snprintf(colBuf, sizeof(colBuf), "\"%f %f %f %f\"", r, g, b, a); \
+        std::snprintf(colBuf, sizeof(colBuf), "\"%f %f %f %f\"", x, y, z, w); \
         Con::setScriptConstant(#name, colBuf); \
     }
 
@@ -242,9 +301,9 @@ void InitBindings_ImGui() {
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupBegin( ImGui, "ImGui/BaseFlux functions");
 // -----------------------------------------------------------------------------
-DefineEngineFunction(ImSetNextWindowSize, void, (Point2F size, S32 condition ),(0),"")
+DefineEngineFunction(ImSetNextWindowSize, void, (ImVec2 size, S32 condition ),(0),"")
 {
-    ImGui::SetNextWindowSize(ToImVec2(size), condition);
+    ImGui::SetNextWindowSize(size, condition);
 }
 
 // -----------------------------------------------------------------------------
@@ -273,29 +332,31 @@ DefineEngineFunction(ImSameLine, void, (F32 offsetX, F32 spacing),(0.0f, -1.0f),
 }
 DefineEngineFunction(ImNewLine, void, (),,"") { ImGui::NewLine(); }
 DefineEngineFunction(ImSpacing, void, (),,"") { ImGui::Spacing(); }
-DefineEngineFunction(ImDummy, void, (Point2F size ),,"") { ImGui::Dummy(ToImVec2(size)); }
+DefineEngineFunction(ImDummy, void, (ImVec2 size ),,"") { ImGui::Dummy(size); }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImPushID, void, (const char* str_id),,"") { ImGui::PushID(str_id); }
 DefineEngineFunction(ImPopID, void, (),,"") { ImGui::PopID(); }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImText, void, (String text),,"") { ImGui::Text("%s", text.c_str()); }
-DefineEngineFunction(ImTextColored, void, (Color4F color, String text),,"") { ImGui::TextColored(ToImVec4(color), "%s", text.c_str()); }
+DefineEngineFunction(ImTextColored, void, (ImVec4 color, String text),,"") {
+    ImGui::TextColored(color, "%s", text.c_str());
+}
 DefineEngineFunction(ImTextLink, bool, (const char* label),,"") { return ImGui::TextLink(label); }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImBullet, void, (),,"draw a small circle + keep the cursor on the same line") { ImGui::Bullet(); }
 // -----------------------------------------------------------------------------
 // ProgressBar(float fraction, const ImVec2& size_arg = ImVec2(-FLT_MIN, 0), const char* overlay = NULL);
-DefineEngineFunction(ImProgressBar, void, (F32 fraction, Point2F size, String overlay),(Point2F(-FLT_MIN, 0.f), "")  ,"a ProgressBar") {
-    if (!overlay.isEmpty()) ImGui::ProgressBar(fraction, ToImVec2(size), overlay.c_str());
-    else ImGui::ProgressBar(fraction, ToImVec2(size));
+DefineEngineFunction(ImProgressBar, void, (F32 fraction, ImVec2 size, String overlay),(ImVec2(-FLT_MIN, 0.f), "")  ,"a ProgressBar") {
+    if (!overlay.isEmpty()) ImGui::ProgressBar(fraction, size, overlay.c_str());
+    else ImGui::ProgressBar(fraction, size);
 }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImSeparator, void, (),,"") { ImGui::Separator(); }
 DefineEngineFunction(ImSeparatorText, void, (const char* label),,"") { ImGui::SeparatorText(label); }
 // -----------------------------------------------------------------------------
 // IMGUI_API bool          Button(const char* label, const ImVec2& size = ImVec2(0, 0));   // button
-DefineEngineFunction(ImButton, bool, (const char* label, Point2F size ),(Point2F(0.f,0.f)),"") {
-    return ImGui::Button(label, ToImVec2(size));
+DefineEngineFunction(ImButton, bool, (const char* label, ImVec2 size ),(ImVec2(0.f,0.f)),"") {
+    return ImGui::Button(label, size);
 }
 // =============================================================================
 //  ImGui Tab Bars
@@ -771,60 +832,60 @@ DefineEngineFunction(ImIsItemFocused, bool, (), ,
 // =============================================================================
 // Window DrawList API
 // =============================================================================
-DefineEngineFunction(ImDrawLine, void, (F32 p1_x, F32 p1_y, F32 p2_x, F32 p2_y, Color4F color, F32 thickness), (1.0f),
-                     "Draws a line using raw coordinates and a native Color4F struct.\n") {
+DefineEngineFunction(ImDrawLine, void, (F32 p1_x, F32 p1_y, F32 p2_x, F32 p2_y, ImVec4 color, F32 thickness), (1.0f),
+                     "Draws a line using raw coordinates and a native ImVec4 struct.\n") {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     // Direct translation using your inline helper and ImGui's internal packing
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     drawList->AddLine(ImVec2(p1_x, p1_y), ImVec2(p2_x, p2_y), packedColor, thickness);
 }
 
-DefineEngineFunction(ImDrawRect, void, (F32 min_x, F32 min_y, F32 max_x, F32 max_y, Color4F color, F32 rounding, S32 flags, F32 thickness), (0.0f, 0, 1.0f),
+DefineEngineFunction(ImDrawRect, void, (F32 min_x, F32 min_y, F32 max_x, F32 max_y, ImVec4 color, F32 rounding, S32 flags, F32 thickness), (0.0f, 0, 1.0f),
                      "Draws an unfilled rectangle using flat coordinates.\n") {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     drawList->AddRect(ImVec2(min_x, min_y), ImVec2(max_x, max_y), packedColor, rounding, flags, thickness);
 }
 
-DefineEngineFunction(ImDrawRectFilled, void, (F32 min_x, F32 min_y, F32 max_x, F32 max_y, Color4F color, F32 rounding, S32 flags), (0.0f, 0),
+DefineEngineFunction(ImDrawRectFilled, void, (F32 min_x, F32 min_y, F32 max_x, F32 max_y, ImVec4 color, F32 rounding, S32 flags), (0.0f, 0),
                      "Draws a filled rectangle using flat coordinates.\n") {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     drawList->AddRectFilled(ImVec2(min_x, min_y), ImVec2(max_x, max_y), packedColor, rounding, flags);
 }
 
-DefineEngineFunction(ImDrawCircle, void, (F32 center_x, F32 center_y, F32 radius, Color4F color, S32 segments, F32 thickness), (0, 1.0f),
+DefineEngineFunction(ImDrawCircle, void, (F32 center_x, F32 center_y, F32 radius, ImVec4 color, S32 segments, F32 thickness), (0, 1.0f),
                      "Draws an unfilled circle using flat coordinates.\n") {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     drawList->AddCircle(ImVec2(center_x, center_y), radius, packedColor, segments, thickness);
 }
 
-DefineEngineFunction(ImDrawCircleFilled, void, (F32 center_x, F32 center_y, F32 radius, Color4F color, S32 segments), (0),
+DefineEngineFunction(ImDrawCircleFilled, void, (F32 center_x, F32 center_y, F32 radius, ImVec4 color, S32 segments), (0),
                      "Draws a filled circle using flat coordinates.\n") {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     drawList->AddCircleFilled(ImVec2(center_x, center_y), radius, packedColor, segments);
 }
 
-DefineEngineFunction(ImDrawText, void, (F32 pos_x, F32 pos_y, Color4F color, const char* text), ,
+DefineEngineFunction(ImDrawText, void, (F32 pos_x, F32 pos_y, ImVec4 color, const char* text), ,
     "Draws a text string directly onto the current window draw list using flat coordinates.\n"
     "@param pos_x X position on screen.\n"
     "@param pos_y Y position on screen.\n"
-    "@param color Native Color4F struct.\n"
+    "@param color Native ImVec4 struct.\n"
     "@param text The string message to draw.\n") {
     if (!text || text[0] == '\0') {
         return;
     }
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    ImU32 packedColor = ImGui::ColorConvertFloat4ToU32(color);
 
     // Renders using the default active font and font size
     drawList->AddText(ImVec2(pos_x, pos_y), packedColor, text);
@@ -833,11 +894,11 @@ DefineEngineFunction(ImDrawText, void, (F32 pos_x, F32 pos_y, Color4F color, con
 // =============================================================================
 // Helper ImGetCursorScreenPos
 // =============================================================================
-DefineEngineFunction(ImGetCursorScreenPos, Point2F, (), ,
-        "Returns the current screen coordinate position of the cursor as a native Point2F.\n")
+DefineEngineFunction(ImGetCursorScreenPos, ImVec2, (), ,
+        "Returns the current screen coordinate position of the cursor as a native ImVec2.\n")
 {
     ImVec2 pos = ImGui::GetCursorScreenPos();
-    return Point2F(pos.x, pos.y);
+    return ImVec2(pos.x, pos.y);
 }
 
 // =============================================================================
