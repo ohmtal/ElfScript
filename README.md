@@ -2,12 +2,12 @@
 
 👾 Now it's alive :D. 
 
-Based on the Torque3D (4.x) source code this is my first working version of TorqueScript without Torque3D. 
-It need to be more stripped down because there are much more files than needed and on the other hand i maybe removed to much (threads/mutex).
+Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
 
 ## Notable changes:
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before.
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
+- 🤘 Added **ImGui** bindings to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/ImGui). Demo: [BaseFlux](https://github.com/ohmtal/BaseFlux/tree/main/baseElf)
 - Made it standalone
 - Added optional GarabageCollectionSet
 - EngineGlue for init/process/shutdown
@@ -18,9 +18,36 @@ It need to be more stripped down because there are much more files than needed a
 - Fixed Emscripten and Android Build  (Android untested)
 - Replaced Math with Light Version since the Types like Vector are removed
 
-## TODO
+```
+// Hello World example:
+echo("Hello World");
 
-- should remove Torque::FS/Platform::FS and replace it with more native file loading ....
+// Variables:
+$value = 5; //global Variable
+%value = 5; //local Variable - inside function
+
+// Objects:
+$fooObj = new SimObject(Foo) {
+    TypeF32 myValue = 1.0; // dynamic field can be defined in script 
+    class = "FooClass"; // define a class name which can be used by different objects 
+}; 
+echo(Foo.myValue); // gives 1.0
+echo($fooObj.myValue); // gives 1.0
+function FooClass::print(%this) { // adding a custom method 
+    // %this is a local variable which holds the SimObject-ID    
+    echo(%this.myValue);
+}
+$fooObj.print();
+echo($fooObj SPC Foo.getId()); //print SPC (space separated) object id of the foo object 
+// You can also add a new dynamic field with assigning a value:
+$fooObj.name = "Tom"; //bad idea overwrites object name
+$fooObj.playerName = "Tom"; //a fields which is not defined by engine
+echo(Tom.playerName);  // since i renamed it with .name= Foo is gone and Tom is here ;) 
+$fooObj.dumpFields(); //list all fields of the object
+$fooObj.dump(); //list all fields and methods of the object 
+```
+Since ElfScript is based on TorqueScript you can also read this [Documentation](https://docs.torque3d.org/for-programmers/scripting/torquescript)
+
 
 ---
 # Example / TestBed Application using OhmFlux:
