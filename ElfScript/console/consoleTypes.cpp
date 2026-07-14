@@ -430,6 +430,50 @@ ConsoleSetType( TypeS32Vector )
    else
       Con::printf("Vector<S32> must be set as { a, b, c, ... } or \"a b c ...\"");
 }
+// //-----------------------------------------------------------------------------
+// // TypeU32 ElfScript
+// //-----------------------------------------------------------------------------
+// ConsoleType(int, TypeU32, U32, "")
+// ImplementConsoleTypeCasters(TypeU32, U32)
+//
+// ConsoleGetType( TypeU32 )
+// {
+//       static const U32 bufSize = 512;
+//       char* returnBuffer = Con::getReturnBuffer(bufSize);
+//       dSprintf(returnBuffer, bufSize, "%d", *((U32 *) dptr) );
+//       return returnBuffer;
+// }
+//
+// ConsoleSetType( TypeU32 )
+// {
+//       if(argc == 1)
+//             *((U32 *) dptr) = dAtoui(argv[0]);
+//       else
+//             Con::printf("(TypeU32) Cannot set multiple args to a single U32.");
+// }
+//-----------------------------------------------------------------------------
+// TypeS64 ElfScript
+// FIXME /opt/ElfScript/ElfScript/console/dynamicTypes.h:296:(.text.startup+0x385): undefined reference to `EngineTypeInfo const* TYPE<long>()'
+//-----------------------------------------------------------------------------
+// ConsoleType(int, TypeS64, S64, "")
+// ImplementConsoleTypeCasters(TypeS64, S64)
+//
+// ConsoleGetType( TypeS64 )
+// {
+//       static const S64 bufSize = 512;
+//       char* returnBuffer = Con::getReturnBuffer(bufSize);
+//       dSprintf(returnBuffer, bufSize, "%d", *((S64 *) dptr) );
+//       return returnBuffer;
+// }
+//
+// ConsoleSetType( TypeS64 )
+// {
+//       if(argc == 1)
+//             *((S64 *) dptr) = dAtol(argv[0]);
+//       else
+//             Con::printf("(TypeS64) Cannot set multiple args to a single S64.");
+// }
+
 //-----------------------------------------------------------------------------
 // TypeF64
 //-----------------------------------------------------------------------------
