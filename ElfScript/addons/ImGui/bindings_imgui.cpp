@@ -778,20 +778,16 @@ DefineEngineFunction(ImIsKeyPressed, bool, (S32 imguiKey, bool repeat), (true),
     return ImGui::IsKeyPressed(static_cast<ImGuiKey>(imguiKey), repeat);
 }
 
-DefineEngineFunction(ImShortcut, bool, (S32 imguiKeyChord, S32 flags), (0),
+DefineEngineFunction(ImShortcut, bool, (S32 imguiKeyChord),,
                      "Evaluates a full key chord shortcut (e.g., Ctrl+S).\n"
                      "Automatically handles modifier routing and avoids execution if an input text field is active.\n"
                      "@param imguiKeyChord ImGuiKey combined with modifiers like ImGuiMod_Ctrl.\n") {
-    // 1. Separate the raw key from the modifier flags
-    // ImGui Key Chords embed modifiers in the upper bits
     ImGuiKey key = static_cast<ImGuiKey>(imguiKeyChord & ~ImGuiMod_Mask_);
 
-    // 2. Check if the main key was pressed down this frame
     if (!ImGui::IsKeyPressed(key)) {
         return false;
     }
 
-    // 3. Extract and verify modifier states
     bool reqCtrl  = (imguiKeyChord & ImGuiMod_Ctrl)  != 0;
     bool reqShift = (imguiKeyChord & ImGuiMod_Shift) != 0;
     bool reqAlt   = (imguiKeyChord & ImGuiMod_Alt)   != 0;
@@ -799,15 +795,12 @@ DefineEngineFunction(ImShortcut, bool, (S32 imguiKeyChord, S32 flags), (0),
 
     ImGuiIO& io = ImGui::GetIO();
 
-    // Fallback block ensuring active modifiers match the exact request
     if (io.KeyCtrl  != reqCtrl)  return false;
     if (io.KeyShift != reqShift) return false;
     if (io.KeyAlt   != reqAlt)   return false;
     if (io.KeySuper != reqSuper) return false;
 
-    // 4. Guardrail: Prevent execution if the user is typing in a text field
     if (ImGui::GetActiveID() != 0) {
-        // If an input text field is focused, do not trigger global shortcuts
         return false;
     }
 

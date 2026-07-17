@@ -1,5 +1,9 @@
-#pragma once
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------#pragma once
 #include <string>
+#include "console/console.h"
 namespace Con {
     /// XXTH ElfScript preprocessor:
     void setScriptConstant(std::string key, S32 value);
