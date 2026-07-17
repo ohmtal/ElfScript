@@ -86,3 +86,47 @@ In your Mainloop:
     - dont use ExecuteFile load the script with sdl for example 
     - you need to overwrite exec view inline script to use you own
 
+My fix on OhmFlux:
+
+Defined in my ElfFlux Namespace:
+
+```
+// NOTE: Android hackfest use this instead of Con::executeFile
+bool executeFile(const char* fileName, bool noCalls , bool journalScript)  {
+    if (!fileName) return false;
+
+    // expand ./ 
+    char scriptFilenameBuffer[1024];
+    Con::expandScriptFilename(scriptFilenameBuffer, sizeof(scriptFilenameBuffer), fileName);
+
+    std::string script = "";
+    if (FluxFile::LoadTextFile(scriptFilenameBuffer, script)) {
+        if (script.empty()) return false;
+        // TODO? Con::EvalResult
+        StringTableEntry _fileName = StringTable->insert((scriptFilenameBuffer));
+        CodeBlock* newCodeBlock = new CodeBlock();
+        newCodeBlock->compileExec(_fileName, script.c_str(), false,  -1);
+        return true;
+    }
+    return false;
+}
+```
+
+My include binding:
+```
+DefineEngineFunction(include,bool, (String fileName, bool nocalls),(true), "include(fileName)" "exec a file without calls" ){
+    //ELFFLUX!!
+    return ElfFlux::executeFile(fileName, true);
+}
+
+```
+
+On Init I do:
+```
+    Con::evaluate( R"(
+        function exec(%filename) {
+            return include(%filename, false);
+        }
+    )"
+    );
+```
