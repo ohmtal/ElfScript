@@ -502,6 +502,8 @@ namespace Con
    /// The current $instantGroup setting.
    extern String gInstantGroup;
 
+   inline bool ConsoleDocForStub = false; //make it human readable
+
    /// Global variable storage
    inline Dictionary gGlobalVars;
 

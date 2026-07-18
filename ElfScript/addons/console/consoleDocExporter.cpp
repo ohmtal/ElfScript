@@ -47,7 +47,7 @@ void EndConsoleLines() {
 }
 
 //-----------------------------------------------------------------------------
-bool ExportConsoleLines(const char* fileName, bool forDoxyGen = false, bool append = false) {
+bool ExportConsoleLines(const char* fileName, bool append = false) {
     if (gConsoleLines.size() == 0) return false;
     if(Con::expandScriptFilename(buffer, sizeof(buffer), fileName))
         fileName = buffer;
@@ -68,11 +68,11 @@ bool ExportConsoleLines(const char* fileName, bool forDoxyGen = false, bool appe
     if (!strm) return false;
 
     for (S32 i = 0; i < gConsoleLines.size(); i++) {
-        if (!forDoxyGen) {
-             gConsoleLines[i].replace("((", "(");
-             gConsoleLines[i].replace("))", ")");
-             gConsoleLines[i].replace("virtual ", "");
-        }
+        // if (!forDoxyGen) {
+        //      gConsoleLines[i].replace("((", "(");
+        //      gConsoleLines[i].replace("))", ")");
+        //      gConsoleLines[i].replace("virtual ", "");
+        // }
         gConsoleLines[i] += "\n";
         strm->writeText(gConsoleLines[i].c_str());
     }
@@ -82,13 +82,18 @@ bool ExportConsoleLines(const char* fileName, bool forDoxyGen = false, bool appe
     return true;
 }
 //-----------------------------------------------------------------------------
+DefineEngineFunction( ConsoleDocForStub, void, (bool value),,
+        "@brief Set Con::ConsoleDocForStub - human readable output- exportConsoleDocu overwrites it."){
+    Con::ConsoleDocForStub  = value;
+}
 //-----------------------------------------------------------------------------
-DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool forDoxyGen, bool append, bool dumpScript, bool dumpEngine), ( false,false, true, true ),
+DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool humanreadable, bool append, bool dumpScript, bool dumpEngine), ( false,false, true, true ),
                       "@brief Export all declared console classes to the console.\n\n"
                       "@param dumpScript Optional parameter specifying whether or not classes defined in script should be dumped.\n"
                       "@param dumpEngine Optional parameter specifying whether or not classes defined in the engine should be dumped.\n"
                       "@ingroup Docu")
 {
+    Con::ConsoleDocForStub = !humanreadable;
     BeginConsoleLines();
     Con::printf("//------------------------------------------------------------------");
     Con::printf("//                    C L A S S E S  ");
@@ -105,8 +110,9 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool forDoxyGe
     Con::executef("dumpScriptConstants");
     Con::printf("*/");
 
-    bool ok = ExportConsoleLines(fileName, forDoxyGen, append);
+    bool ok = ExportConsoleLines(fileName,  append);
     EndConsoleLines();
+    Con::ConsoleDocForStub = false;
     return ok;
 }
 

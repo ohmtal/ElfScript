@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-// ElfScript FIXME dump to file
+// ElfScript make the output nicer to Stub Con::ConsoleDocForStub
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
@@ -32,6 +32,7 @@
 #include "console/consoleObject.h"
 #include "core/frameAllocator.h"
 #include "console/engineAPI.h"
+#include <core/strings/stringUnit.h>
 
 //--- Information pertaining to this page... ------------------
 /// @file
@@ -162,26 +163,55 @@ void printClassHeader(const char* usage, const char * className, const char * su
 
 void printClassMethod(const bool isVirtual, const char *retType, const char *methodName, const char* args, const char*usage)
 {
-   if(usage && usage[0] != ';' && usage[0] != 0)
-      Con::printf("   /*! %s */", usage);
-   Con::printf("   %s%s %s(%s) {}", isVirtual ? "virtual " : "", retType, methodName, args);
+
+
+   if (Con::ConsoleDocForStub) {
+      Con::printf("   /** --- %s %s ---",retType, methodName);
+      if(usage && usage[0] != ';' && usage[0] != 0) {
+            // Con::printf("   /*! %s */", usage);
+            U32 lineCount = StringUnit::getUnitCount(usage, "\n");
+            for (U32 i = 0; i < lineCount; i++) {
+                  const char* line = StringUnit::getUnit(usage,i, "\n" );
+                  if (line && dStrlen(line) > 0) Con::printf("    * %s", line);
+            }
+      }
+      if (dStrstr(retType, "void") == nullptr)  Con::printf("    * @return %s", retType);
+      Con::printf("    */");
+      Con::printf("      function %s%s;",  methodName, args, retType);
+
+   }  else {
+      if(usage && usage[0] != ';' && usage[0] != 0)
+            Con::printf("   /*! %s */", usage);
+      Con::printf("   %s%s %s(%s) {}", isVirtual ? "virtual " : "", retType, methodName, args);
+   }
 }
 
 void printGroupStart(const char * aName, const char * aDocs)
 {
-   Con::printf("");
-   Con::printf("   /*! @name %s", aName);
+  if (Con::ConsoleDocForStub) {
+      if(aDocs) {
+            Con::printf("   /** --- Group: %s ---", aName);
+            Con::printf("    * %s", aDocs);
+            Con::printf("    */");
+      } else {
+            Con::printf("   // --- Group: %s ---", aName);
+      }
 
-   if(aDocs)
-   {
-      Con::printf("   ");
-      Con::printf("   %s", aDocs);
-   }
+  } else {
 
-   Con::printf("   @{ */");
+      Con::printf("");
+      Con::printf("   /*! @name %s", aName);
 
-   // Add a blank comment in order to make sure groups are parsed properly.
-   Con::printf("   /*! */");
+      if(aDocs)
+      {
+            Con::printf("   ");
+            Con::printf("   %s", aDocs);
+      }
+
+      Con::printf("   @{ */");
+      // Add a blank comment in order to make sure groups are parsed properly.
+      Con::printf("   /*! */");
+  }
 }
 
 void printClassMember(const bool isDeprec, const char * aType, const char * aName, const char * aDocs, S32 aElementCount)
@@ -211,8 +241,10 @@ void printClassMember(const bool isDeprec, const char * aType, const char * aNam
 
 void printGroupEnd()
 {
-   Con::printf("   /// @}");
-   Con::printf("");
+   if (!Con::ConsoleDocForStub) {
+      Con::printf("   /// @}");
+      Con::printf("");
+   }
 }
 
 void printClassFooter()
