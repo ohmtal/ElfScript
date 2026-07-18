@@ -295,6 +295,9 @@ void InitBindings_ImGui() {
      RegisterImGuiKeyConstants();
      RegisterColorConstants();
 
+     Con::registerEnumS32<ImGuiCond_>("", false);
+
+
      // Con::registerEnumS32<ImGuiKey>("", true);
      //enum ImGuiKey : int
 }
