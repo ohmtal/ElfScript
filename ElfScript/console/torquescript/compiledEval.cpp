@@ -2219,7 +2219,9 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             {
                const char* nsName = ns ? ns->mName : "";
                Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments. got %d, expected %d to %d", getFileLine(ip - 4), nsName, fnName, S32(callArgc), nsEntry->mMinArgs, nsEntry->mMaxArgs);
-               Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s", getFileLine(ip - 4), nsEntry->mUsage);
+               // ElfScript:
+               Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s%s", getFileLine(ip - 4), nsEntry->mFunctionName,  nsEntry->getArgumentsString().c_str());
+               if (strlen(nsEntry->mUsage)>0) Con::warnf(ConsoleLogEntry::Script, "%s: docu: %s", getFileLine(ip - 4), nsEntry->mUsage);
                gCallStack.popFrame();
                stack[_STK + 1].setEmptyString();
                _STK++;

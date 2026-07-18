@@ -1195,7 +1195,9 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
    if ((mMinArgs && argc < mMinArgs) || (mMaxArgs && argc > mMaxArgs))
    {
       Con::warnf(ConsoleLogEntry::Script, "%s::%s - wrong number of arguments. got %d, expected %d to %d", mNamespace->mName, mFunctionName, argc, mMinArgs, mMaxArgs);
-      Con::warnf(ConsoleLogEntry::Script, "usage: %s", mUsage);
+      // ElfScript
+      Con::warnf(ConsoleLogEntry::Script, "usage: %s%s", mFunctionName,  getArgumentsString().c_str());
+      if (strlen(mUsage) > 0) Con::warnf(ConsoleLogEntry::Script, "docu: %s", mUsage);
       return (ConsoleValue());
    }
 
