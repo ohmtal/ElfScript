@@ -301,9 +301,14 @@ void InitBindings_ImGui() {
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupBegin( ImGui, "ImGui/BaseFlux functions");
 // -----------------------------------------------------------------------------
-DefineEngineFunction(ImSetNextWindowSize, void, (ImVec2 size, S32 condition ),(0),"")
+DefineEngineFunction(ImSetNextWindowSize, void, (ImVec2 size, S32 condition ),(0),"Set the next Window Size if not saved.")
 {
     ImGui::SetNextWindowSize(size, condition);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(ImSetNextWindowPos, void, (ImVec2 size, S32 condition, ImVec2 pivot ),(0, ImVec2(0.f,0.f)),"Set the next Window Position if not saved.")
+{
+    ImGui::SetNextWindowPos(size, condition, pivot);
 }
 
 // -----------------------------------------------------------------------------
