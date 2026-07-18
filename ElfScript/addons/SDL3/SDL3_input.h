@@ -2,7 +2,16 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// SDL3 Scancodes and IsKeyPressed, IsKeyDown, IsKeyReleased, IsKeyUp
+// - Implement polling SDL_IsKeyPressed, SDL_IsMouseButtonPressed ....
+// - Implement addional or alternativ events:
+//      function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat)
+//      DISABLED: function onSDLMouseMotionEvent(%x, %y, %deltaX, %deltaY)
+//      function onSDLMouseButtonEvent(%button, %isDown, %x, %y)
+//      function onSDLMouseWheelEvent(%wheelX, %wheelY)
+//  NOTE: is you use Events only you do not need to call ClearInputFrameTicks
+//  NOTE: you can disable the ElfScript polling bindings with ElfSDL3_DISABLE_POLL
+//        this will hide the bindings only if you do not call ClearInputFrameTicks
+//        you also can ignore this.
 //-----------------------------------------------------------------------------
 #pragma once
 
@@ -16,10 +25,9 @@ namespace ElfSDL3 {
     void ClearInputFrameTicks();
 
     // --------------- Keyboard via Scancodes: -----------------
-    void RegisterInputConstants();
 
-    // NOTE IMPLEMENTATION:  on SDL_EVENT_KEY_UP and SDL_EVENT_KEY_DOWN call this
-    void onKeyEvent(const SDL_Event& event);
+    // NOTE IMPLEMENTATION:  onEvent
+    void onEvent(const SDL_Event& event);
 
     bool IsKeyPressed(SDL_Scancode key);
     bool IsKeyDown(SDL_Scancode key);
@@ -30,8 +38,6 @@ namespace ElfSDL3 {
     bool IsShortcutPressed(Uint16 modifiers, SDL_Scancode key);
 
     // --------------- Mouse ----------------
-    // NOTE IMPLEMENTATION:  on SDL_EVENT_KEY_UP and SDL_EVENT_KEY_DOWN call this
-    void onMouseEvent(const SDL_Event& event);
 
     // --- mouse buttons  ---
     bool IsMouseButtonPressed(U32 button);
@@ -47,4 +53,7 @@ namespace ElfSDL3 {
     float GetMouseWheelX();
     float GetMouseWheelY();
 
+
+    // is done by InitKeyCodes but can be called separatyl
+    void RegisterInputConstants();
 }

@@ -225,15 +225,15 @@ ScriptGroup::ScriptGroup()
 {
 }
 
-IMPLEMENT_CALLBACK( ScriptGroup, onAdd, void, ( SimObjectId ID ), ( ID ),
-   "Called when this ScriptGroup is added to the system.\n"
-   "@param ID Unique object ID assigned when created (%this in script).\n" 
-);
-
-IMPLEMENT_CALLBACK( ScriptGroup, onRemove, void, ( SimObjectId ID ), ( ID ),
-   "Called when this ScriptObject is removed from the system.\n"
-   "@param ID Unique object ID assigned when created (%this in script).\n" 
-);
+// IMPLEMENT_CALLBACK( ScriptGroup, onAdd, void, ( SimObjectId ID ), ( ID ),
+//    "Called when this ScriptGroup is added to the system.\n"
+//    "@param ID Unique object ID assigned when created (%this in script).\n"
+// );
+//
+// IMPLEMENT_CALLBACK( ScriptGroup, onRemove, void, ( SimObjectId ID ), ( ID ),
+//    "Called when this ScriptObject is removed from the system.\n"
+//    "@param ID Unique object ID assigned when created (%this in script).\n"
+// );
 
 bool ScriptGroup::onAdd()
 {

@@ -2,16 +2,43 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// SDL3 Scancodes and IsKeyPressed, IsKeyDown, IsKeyReleased, IsKeyUp
+// SDL3 Keyboard (via scancodes) and Mouse event handling
 //-----------------------------------------------------------------------------
 #include "console/scriptPreprocessor.h"
 #include "console/engineAPI.h"
 
 #include <SDL3/SDL.h>
+#include <console/script.h>
+
+#ifndef ElfSDL3_DISABLE_POLL
+#define ElfSDL3_ENABLE_POLL
+#endif
+
+    IMPLEMENT_GLOBAL_CALLBACK(onSDLKeyBoardEvent,void
+        , (S32 scancode, S32 modifiers, bool isKeyDown, bool isKeyRepeat)
+        , (scancode, modifiers, isKeyDown, isKeyRepeat)
+        ,"Event triggered when a key is pressed or released." );
+
+    // to many calles ... disabled
+    // IMPLEMENT_GLOBAL_CALLBACK(onSDLMouseMotionEvent,void
+    // , (F32 mouseX, F32 mouseY, F32 DeltaX, F32 DeltaY)
+    // , ( mouseX, mouseY, DeltaX, DeltaY)
+    // ,"Event triggered when mouse is moved" );
+
+    IMPLEMENT_GLOBAL_CALLBACK(onSDLMouseButtonEvent,void
+    , (S32 button, bool isDown, F32 mouseX, F32 mouseY)
+    , ( button , isDown, mouseX, mouseY)
+    ,"Event triggered when mousebutton is pressed" );
+
+    IMPLEMENT_GLOBAL_CALLBACK(onSDLMouseWheelEvent,void
+    , (F32 wheelX, F32 wheelY)
+    , ( wheelX, wheelY)
+    ,"Event triggered when mouse wheel is moved" );
 
 namespace ElfSDL3 {
 
 namespace {
+
     // --- keyboard ---
     enum KeyFlags : Uint8 {
         KF_None     = 0,
@@ -54,8 +81,9 @@ void ClearInputFrameTicks() {
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
-
-void onKeyEvent(const SDL_Event& event) {
+// Mouse && Keyboard Events (on call)
+// -----------------------------------------------------------------------------
+void _onKeyEvent(const SDL_Event& event) {
     SDL_Scancode code = event.key.scancode;
     if (code >= SDL_SCANCODE_COUNT || code == SDL_SCANCODE_UNKNOWN) {
         return;
@@ -73,9 +101,64 @@ void onKeyEvent(const SDL_Event& event) {
         s_KeyState[code] &= ~KF_Down;
         s_KeyState[code] |= KF_Released;
     }
+
+    onSDLKeyBoardEvent_callback(code, event.key.mod, event.type == SDL_EVENT_KEY_DOWN, event.key.repeat);
+
+}
+// -----------------------------------------------------------------------------
+void onEvent(const SDL_Event& event) {
+    switch (event.type) {
+        case SDL_EVENT_MOUSE_MOTION:
+            s_MouseX = event.motion.x;
+            s_MouseY = event.motion.y;
+            s_MouseDeltaX += event.motion.xrel;
+            s_MouseDeltaY += event.motion.yrel;
+
+            // onSDLMouseMotionEvent_callback(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+            break;
+
+        case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+            Uint8 btn = event.button.button;
+            if (btn < MAX_MOUSE_BUTTONS) {
+                s_MouseButtonState[btn] |= KF_Down;
+                s_MouseButtonState[btn] |= KF_Pressed;
+                onSDLMouseButtonEvent_callback((S32)btn, true, s_MouseX, s_MouseY);
+            }
+            break;
+        }
+
+
+        case SDL_EVENT_MOUSE_BUTTON_UP: {
+            Uint8 btn = event.button.button;
+            if (btn < MAX_MOUSE_BUTTONS) {
+                s_MouseButtonState[btn] &= ~KF_Down;
+                s_MouseButtonState[btn] |= KF_Released;
+                onSDLMouseButtonEvent_callback((S32)btn, false, s_MouseX, s_MouseY);
+            }
+            break;
+        }
+
+
+        case SDL_EVENT_MOUSE_WHEEL:
+            s_MouseWheelX += event.wheel.x;
+            s_MouseWheelY += event.wheel.y;
+            onSDLMouseWheelEvent_callback(event.wheel.x, event.wheel.y);
+            break;
+
+        case SDL_EVENT_KEY_UP:
+        case SDL_EVENT_KEY_DOWN:
+        {
+            _onKeyEvent(event);
+        }
+        break;
+    }
+
 }
 
+
+
 // -----------------------------------------------------------------------------
+
 bool IsKeyPressed(SDL_Scancode key) {
     return (s_KeyState[key] & KF_Pressed) != 0;
 }
@@ -117,60 +200,24 @@ bool IsShortcutPressed(Uint16 modifiers, SDL_Scancode key) {
 
 
 // -----------------------------------------------------------------------------
-DefineEngineFunction(IsKeyPressed, bool, (S32 scancode),, "return if the key with value scancode is pressed."){
+#ifdef ElfSDL3_ENABLE_POLL
+DefineEngineFunction(SDL_IsKeyPressed, bool, (S32 scancode),, "return if the key with value scancode is pressed."){
     return IsKeyPressed((SDL_Scancode)scancode);
 }
-DefineEngineFunction(IsKeyDown, bool, (S32 scancode),, "return if the key with value scancode is just pressed."){
+DefineEngineFunction(SDL_IsKeyDown, bool, (S32 scancode),, "return if the key with value scancode is just pressed."){
     return IsKeyDown((SDL_Scancode)scancode);
 }
-DefineEngineFunction(IsKeyUp, bool, (S32 scancode),, "return if the key with value scancode is just released."){
+DefineEngineFunction(SDL_IsKeyUp, bool, (S32 scancode),, "return if the key with value scancode is just released."){
     return IsKeyUp((SDL_Scancode)scancode);
 }
-DefineEngineFunction(IsKeyRepeat, bool, (S32 scancode),, "return if the key with value scancode is repeated."){
+DefineEngineFunction(SDL_IsKeyRepeat, bool, (S32 scancode),, "return if the key with value scancode is repeated."){
     return IsKeyRepeat((SDL_Scancode)scancode);
 }
 
-DefineEngineFunction(IsShortcutPressed, bool, (S32 modifiers, S32 scancode),, "Returns true if the shortcut (modifier combo + key press) was triggered.") {
+DefineEngineFunction(SDL_IsShortcutPressed, bool, (S32 modifiers, S32 scancode),, "Returns true if the shortcut (modifier combo + key press) was triggered.") {
     return IsShortcutPressed((Uint16)modifiers, (SDL_Scancode)scancode);
 }
-
-// -----------------------------------------------------------------------------
-// Mouse
-// -----------------------------------------------------------------------------
-void onMouseEvent(const SDL_Event& event) {
-    switch (event.type) {
-        case SDL_EVENT_MOUSE_MOTION:
-            s_MouseX = event.motion.x;
-            s_MouseY = event.motion.y;
-            s_MouseDeltaX += event.motion.xrel; // Akkumulieren, falls mehrere Events pro Frame feuern
-            s_MouseDeltaY += event.motion.yrel;
-            break;
-
-        case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-            Uint8 btn = event.button.button;
-            if (btn < MAX_MOUSE_BUTTONS) {
-                s_MouseButtonState[btn] |= KF_Down;
-                s_MouseButtonState[btn] |= KF_Pressed;
-            }
-            break;
-        }
-
-        case SDL_EVENT_MOUSE_BUTTON_UP: {
-            Uint8 btn = event.button.button;
-            if (btn < MAX_MOUSE_BUTTONS) {
-                s_MouseButtonState[btn] &= ~KF_Down;
-                s_MouseButtonState[btn] |= KF_Released;
-            }
-            break;
-        }
-
-        case SDL_EVENT_MOUSE_WHEEL:
-            s_MouseWheelX += event.wheel.x;
-            s_MouseWheelY += event.wheel.y;
-            break;
-    }
-
-}
+#endif //#ifdef ElfSDL3_ENABLE_POLL
 
 bool IsMouseButtonPressed(U32 button)  { return button < MAX_MOUSE_BUTTONS && (s_MouseButtonState[button] & KF_Pressed) != 0; }
 bool IsMouseButtonDown(U32 button)     { return button < MAX_MOUSE_BUTTONS && (s_MouseButtonState[button] & KF_Down) != 0; }
@@ -183,33 +230,35 @@ float GetMouseDeltaX() { return s_MouseDeltaX; }
 float GetMouseDeltaY() { return s_MouseDeltaY; }
 float GetMouseWheelX() { return s_MouseWheelX; }
 float GetMouseWheelY() { return s_MouseWheelY; }
+
 // -----------------------------------------------------------------------------
 // Mouse script bindings:
 // -----------------------------------------------------------------------------
-DefineEngineFunction(IsMouseButtonPressed, bool, (S32 button),, "Return true if the mouse button was pressed this frame.") {
+#ifdef ElfSDL3_ENABLE_POLL
+DefineEngineFunction(SDL_IsMouseButtonPressed, bool, (S32 button),, "Return true if the mouse button was pressed this frame.") {
     return ElfSDL3::IsMouseButtonPressed((U32)button);
 }
 
-DefineEngineFunction(IsMouseButtonDown, bool, (S32 button),, "Return true if the mouse button is being held down.") {
+DefineEngineFunction(SDL_IsMouseButtonDown, bool, (S32 button),, "Return true if the mouse button is being held down.") {
     return ElfSDL3::IsMouseButtonDown((U32)button);
 }
 
-DefineEngineFunction(IsMouseButtonReleased, bool, (S32 button),, "Return true if the mouse button was released this frame.") {
+DefineEngineFunction(SDL_IsMouseButtonReleased, bool, (S32 button),, "Return true if the mouse button was released this frame.") {
     return ElfSDL3::IsMouseButtonReleased((U32)button);
 }
 
-DefineEngineFunction(IsMouseButtonUp, bool, (S32 button),, "Return true if the mouse button is up.") {
+DefineEngineFunction(SDL_IsMouseButtonUp, bool, (S32 button),, "Return true if the mouse button is up.") {
     return ElfSDL3::IsMouseButtonUp((U32)button);
 }
 
 
-DefineEngineFunction(GetMouseX, F32, (),, "Get absolute mouse X position.") { return ElfSDL3::GetMouseX(); }
-DefineEngineFunction(GetMouseY, F32, (),, "Get absolute mouse Y position.") { return ElfSDL3::GetMouseY(); }
-DefineEngineFunction(GetMouseDeltaX, F32, (),, "Get mouse movement delta X for this frame.") { return ElfSDL3::GetMouseDeltaX(); }
-DefineEngineFunction(GetMouseDeltaY, F32, (),, "Get mouse movement delta Y for this frame.") { return ElfSDL3::GetMouseDeltaY(); }
-DefineEngineFunction(GetMouseWheelY, F32, (),, "Get vertical mouse wheel scroll amount for this frame.") { return ElfSDL3::GetMouseWheelY(); }
-
-
+DefineEngineFunction(SDL_GetMouseDeltaX, F32, (),, "Get mouse movement delta X for this frame.") { return ElfSDL3::GetMouseDeltaX(); }
+DefineEngineFunction(SDL_GetMouseDeltaY, F32, (),, "Get mouse movement delta Y for this frame.") { return ElfSDL3::GetMouseDeltaY(); }
+DefineEngineFunction(SDL_GetMouseWheelY, F32, (),, "Get vertical mouse wheel scroll amount for this frame.") { return ElfSDL3::GetMouseWheelY(); }
+#endif //#ifdef ElfSDL3_ENABLE_POLL
+// this can be used also when polling is disabled
+DefineEngineFunction(SDL_GetMouseX, F32, (),, "Get absolute mouse X position.") { return ElfSDL3::GetMouseX(); }
+DefineEngineFunction(SDL_GetMouseY, F32, (),, "Get absolute mouse Y position.") { return ElfSDL3::GetMouseY(); }
 // -----------------------------------------------------------------------------
 // Keyboard Constants ...
 // -----------------------------------------------------------------------------
@@ -527,6 +576,15 @@ void RegisterInputConstants() {
 void InitKeyCodes() {
     RegisterInputConstants();
     dMemset(s_KeyState, KF_None, sizeof(s_KeyState));
+
+    // implement script stubs
+    Con::evaluate( R"(
+     function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat){}
+     function onSDLMouseButtonEvent(%button, %isDown, %x, %y){}
+     function onSDLMouseWheelEvent(%wheelX, %wheelY){}
+    )"
+    );
+
     s_initialized = true;
 
 }
