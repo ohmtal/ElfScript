@@ -62,7 +62,7 @@ int argParser(int argc, char* argv[]) {
                 String tmpFile = argv[++i];
                 Con::infof("Script File test: %s", tmpFile.c_str());
             } else {
-                Con::errorf("--script but no file parameter usage: --script myFile.cs");
+                Con::errorf("--script but no file parameter usage: --script myFile.elf");
                 return 1;
             }
             continue;
@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
     // Platform::FS::SetCwd(dir);
     // Con::printf("Current script directory: %s (argv[0] %s)",Torque::FS::GetCwd().getFullPath().c_str(), argv[0] );
 
-    Con::executeFile("ElfScript/demo/test.cs");
+    Con::executeFile("ElfScript/demo/test.elf");
 
     bool doMainLoop = Con::isFunction("MainLoop");
     auto start = std::chrono::steady_clock::now();

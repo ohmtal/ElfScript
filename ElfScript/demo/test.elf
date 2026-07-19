@@ -1,8 +1,8 @@
-echo("Hello from Test.cs");
-// exec("./test2.cs");
+echo("Hello from Test.elf");
+// exec("./test2.elf");
 
 function rl(%mode) {
-    exec("./test.cs");
+    exec("./test.elf");
 
     if (%mode !$= "") {
         $mode = %mode;
