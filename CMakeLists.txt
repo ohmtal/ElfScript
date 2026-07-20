@@ -23,6 +23,10 @@ if (BUILD_ELFSCRIPT)
       list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/shellConsole/POSIXConsole.cpp)
     endif()
       list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/console/consoleDocExporter.cpp)
+      #  Network test FIXME mutex
+      # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/core/dnet.cpp)
+      # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/core/stream/bitStream.cpp)
+      # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/platformNet.cpp)
     add_executable(${TARGET_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/demoMain.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/testObj.cpp

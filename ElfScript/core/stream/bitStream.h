@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+#pragma once
 
 #ifndef _BITSTREAM_H_
 #define _BITSTREAM_H_
@@ -37,7 +38,7 @@
 #ifndef _CRC_H_
 #include "core/crc.h"
 #endif
-#include <cmath>
+#include <math/mMathFn.h>
 //-------------------------------------- Some caveats when using this class:
 //                                        - Get/setPosition semantics are changed
 //                                         to indicate bit position rather than
@@ -173,6 +174,7 @@ public:
    void writeClassId(U32 classId, U32 classType, U32 classGroup);
    S32 readClassId(U32 classType, U32 classGroup); // returns -1 if the class type is out of range
 
+/*
    // writes a normalized vector
    void writeNormalVector(const Point3F& vec, S32 bitCount);
    void readNormalVector(Point3F *vec, S32 bitCount);
@@ -228,6 +230,7 @@ public:
    /// @see writeQuat
    ///
    void readQuat( QuatF *outQuat, U32 bitCount = 9 );
+*/
 
    virtual void writeBits(S32 bitCount, const void *bitPtr);
    virtual void readBits(S32 bitCount, void *bitPtr);
@@ -371,7 +374,8 @@ inline U32 BitStream::readRangedU32(U32 rangeStart, U32 rangeEnd)
 
 inline void BitStream::writeRangedS32( S32 value, S32 min, S32 max )
 {
-   value = std::clamp( value, min, max );
+   // value = std::clamp( value, min, max );
+   value = ElfMath::mClamp( value, min, max );
    writeRangedU32( ( value - min ), 0, ( max - min ) );
 }
 
@@ -382,7 +386,8 @@ inline S32 BitStream::readRangedS32( S32 min, S32 max )
 
 inline void BitStream::writeRangedF32( F32 value, F32 min, F32 max, U32 numBits )
 {
-   value = ( std::clamp( value, min, max ) - min ) / ( max - min );
+   // value = ( std::clamp( value, min, max ) - min ) / ( max - min );
+   value = ( ElfMath::mClamp( value, min, max ) - min ) / ( max - min );
    writeInt( (S32)std::floor(value * F32( (1 << numBits) - 1 )), numBits );
 }
 

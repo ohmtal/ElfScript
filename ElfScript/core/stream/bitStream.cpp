@@ -24,7 +24,7 @@
 #include "core/stream/bitStream.h"
 
 #include "core/strings/stringFunctions.h"
-#include "math/mathIO.h"
+#include "math/mMathFn.h"
 #include "console/consoleObject.h"
 #include "platform/platformNet.h"
 #include "core/bitVector.h"
@@ -156,7 +156,7 @@ void BitStream::setBuffer(void *bufPtr, S32 size, S32 maxSize)
       maxSize = size;
    maxWriteBitNum = maxSize << 3;
    error = false;
-   clearCompressionPoint();
+   // clearCompressionPoint();
 }
 
 U32 BitStream::getPosition() const
@@ -407,7 +407,7 @@ S32 BitStream::readSignedInt(S32 bitCount)
    else
       return readInt(bitCount - 1);
 }
-
+/*
 void BitStream::writeNormalVector(const Point3F& vec, S32 bitCount)
 {
    F32 phi   = mAtan2(vec.x, vec.y) / M_PI;
@@ -564,6 +564,7 @@ void BitStream::readQuat( QuatF *outQuat, U32 bitCount )
 
    outQuat->set(quatVals[0], quatVals[1], quatVals[2], quatVals[3]);
 }
+*/
 
 void BitStream::writeBits( const BitVector &bitvec )
 {
@@ -589,7 +590,7 @@ void BitStream::readBits( BitVector *bitvec )
 }
 
 //----------------------------------------------------------------------------
-
+/*
 void BitStream::clearCompressionPoint()
 {
    mCompressPoint.set(0,0,0);
@@ -661,7 +662,7 @@ void BitStream::readCompressedPoint(Point3F* p,F32 scale)
       p->z = mCompressPoint.z + p->z * scale;
    }
 }
-
+*/
 //------------------------------------------------------------------------------
 
 InfiniteBitStream::InfiniteBitStream()
