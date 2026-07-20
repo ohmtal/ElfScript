@@ -7,8 +7,8 @@
 // HOWTO and Requirements:
 // - ImGui must be implemented and initialited..
 // - using structs:
-//      ImVec4 - float rgba
-//      ImVec2 - float x,y
+//      ImVec4 - F32 rgba
+//      ImVec2 - F32 x,y
 // - InitBindings_ImGui must be called on init to load constants
 //-----------------------------------------------------------------------------
 
@@ -123,6 +123,164 @@ void RegisterImGuiWindowConstants() {
     REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoNav);                     // Combination of NoNavInputs and NoNavFocus
     REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoDecoration);              // Combination of NoTitleBar, NoResize, NoScrollbar, NoCollapse
     REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoInputs);                  // Combination of NoMouseInputs, NoNavInputs, NoNavFocus
+
+    // ------------ Node Flags:
+    // Tree Node Flags (ImGuiTreeNodeFlags_)
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_None);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Selected);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Framed);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_AllowOverlap);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NoTreePushOnOpen);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NoAutoOpenOnLog);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DefaultOpen);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_OpenOnDoubleClick);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_OpenOnArrow);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Leaf);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Bullet);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_FramePadding);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanAvailWidth);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanFullWidth);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanLabelWidth);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanAllColumns);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_LabelSpanAllColumns);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NavLeftJumpsToParent);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_CollapsingHeader);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesNone);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesFull);
+    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesToNodes);
+
+    // Popup Flags (ImGuiPopupFlags_)
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_None);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonLeft);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonRight);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMiddle);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMask_);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonDefault_);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoReopen);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverExistingPopup);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverItems);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopupId);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopupLevel);
+    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopup);
+
+    // Color Indices (ImGuiCol_)
+    REGISTER_IMGUI_CONST(ImGuiCol_Text);
+    REGISTER_IMGUI_CONST(ImGuiCol_TextDisabled);
+    REGISTER_IMGUI_CONST(ImGuiCol_WindowBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_ChildBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_PopupBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_Border);
+    REGISTER_IMGUI_CONST(ImGuiCol_BorderShadow);
+    REGISTER_IMGUI_CONST(ImGuiCol_FrameBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_FrameBgHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_FrameBgActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_TitleBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_TitleBgActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_TitleBgCollapsed);
+    REGISTER_IMGUI_CONST(ImGuiCol_MenuBarBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrab);
+    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrabHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrabActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_CheckMark);
+    REGISTER_IMGUI_CONST(ImGuiCol_SliderGrab);
+    REGISTER_IMGUI_CONST(ImGuiCol_SliderGrabActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_Button);
+    REGISTER_IMGUI_CONST(ImGuiCol_ButtonHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_ButtonActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_Header);
+    REGISTER_IMGUI_CONST(ImGuiCol_HeaderHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_HeaderActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_Separator);
+    REGISTER_IMGUI_CONST(ImGuiCol_SeparatorHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_SeparatorActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGrip);
+    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGripHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGripActive);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_Tab);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabSelected);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabSelectedOverline);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmed);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmedSelected);
+    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmedSelectedOverline);
+    REGISTER_IMGUI_CONST(ImGuiCol_PlotLines);
+    REGISTER_IMGUI_CONST(ImGuiCol_PlotLinesHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_PlotHistogram);
+    REGISTER_IMGUI_CONST(ImGuiCol_PlotHistogramHovered);
+    REGISTER_IMGUI_CONST(ImGuiCol_TableHeaderBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_TableBorderStrong);
+    REGISTER_IMGUI_CONST(ImGuiCol_TableBorderLight);
+    REGISTER_IMGUI_CONST(ImGuiCol_TableRowBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_TableRowBgAlt);
+    REGISTER_IMGUI_CONST(ImGuiCol_TextLink);
+    REGISTER_IMGUI_CONST(ImGuiCol_TextSelectedBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_DragDropTarget);
+    REGISTER_IMGUI_CONST(ImGuiCol_NavHighlight);
+    REGISTER_IMGUI_CONST(ImGuiCol_NavWindowingHighlight);
+    REGISTER_IMGUI_CONST(ImGuiCol_NavWindowingDimBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_ModalWindowDimBg);
+    REGISTER_IMGUI_CONST(ImGuiCol_COUNT);
+
+    // Style Variables (ImGuiStyleVar_)
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_Alpha);               // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_DisabledAlpha);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowPadding);       // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowRounding);      // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowBorderSize);    // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowMinSize);       // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowTitleAlign);    // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ChildRounding);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ChildBorderSize);     // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_PopupRounding);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_PopupBorderSize);     // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_FramePadding);        // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_FrameRounding);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_FrameBorderSize);     // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ItemSpacing);         // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ItemInnerSpacing);    // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_IndentSpacing);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_CellPadding);         // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ScrollbarSize);       // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ScrollbarRounding);    // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_GrabMinSize);         // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_GrabRounding);        // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabRounding);         // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabBarBorderSize);    // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabBarOverlineSize);  // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_TableAngledHeadersAngle); // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_TableAngledHeadersTextAlign); // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_ButtonTextAlign);     // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_SelectableTextAlign); // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextPadding); // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextAlign);  // ImVec2
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextBorderSize); // float
+    REGISTER_IMGUI_CONST(ImGuiStyleVar_COUNT);
+
+    // Input Text Flags (ImGuiInputTextFlags_)
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_None);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsDecimal);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsHexadecimal);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsUppercase);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsNoBlank);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AutoSelectAll);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_EnterReturnsTrue);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackCompletion);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackHistory);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackAlways);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackCharFilter);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AllowTabInput);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CtrlEnterForNewLine);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_NoHorizontalScroll);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AlwaysOverwrite);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_ReadOnly);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_Password);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_NoUndoRedo);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsScientific);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackResize);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackEdit);
+    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_EscapeClearsAll);
+
 
     #undef REGISTER_IMGUI_CONST
 }
@@ -353,7 +511,7 @@ DefineEngineFunction(ImTextLink, bool, (const char* label),,"") { return ImGui::
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImBullet, void, (),,"draw a small circle + keep the cursor on the same line") { ImGui::Bullet(); }
 // -----------------------------------------------------------------------------
-// ProgressBar(float fraction, const ImVec2& size_arg = ImVec2(-FLT_MIN, 0), const char* overlay = NULL);
+// ProgressBar(F32 fraction, const ImVec2& size_arg = ImVec2(-FLT_MIN, 0), const char* overlay = NULL);
 DefineEngineFunction(ImProgressBar, void, (F32 fraction, ImVec2 size, String overlay),(ImVec2(-FLT_MIN, 0.f), "")  ,"a ProgressBar") {
     if (!overlay.isEmpty()) ImGui::ProgressBar(fraction, size, overlay.c_str());
     else ImGui::ProgressBar(fraction, size);
@@ -944,6 +1102,132 @@ DefineEngineFunction(ImTableSetupScrollFreeze, void, (S32 cols, S32 rows), ,
     ImGui::TableSetupScrollFreeze(cols, rows);
 }
 
+// =============================================================================
+//  ImGui TreeNode / CollapsingHeader
+// =============================================================================
+
+DefineEngineFunction(ImCollapsingHeader, bool, (const char* label, S32 treeNodeFlags), (0),
+        "Creates a banner that toggles the visibility of the elements inside it.\n"
+        "@param label The text displayed on the header.\n"
+        "@param treeNodeFlags Example: ImGuiTreeNodeFlags_DefaultOpen, the header starts opened.\n") {
+
+    return ImGui::CollapsingHeader(label, treeNodeFlags);
+}
+
+DefineEngineFunction(ImTreeNode, bool, (const char* label,  S32 treeNodeFlags), (0),
+        "Creates a tree node with an arrow that can be expanded or collapsed.\n"
+        "Must be paired with ImGuiTreePop if it returns true.\n"
+        "@param label The text displayed on the node.\n"
+        "@param treeNodeFlags Example: ImGuiTreeNodeFlags_DefaultOpen, the node starts expanded.\n") {
+
+    // default ?! ImGuiTreeNodeFlags_DefaultOpen;
+
+    return ImGui::TreeNodeEx(label, treeNodeFlags);
+}
+
+DefineEngineFunction(ImTreePop, void, (), ,
+        "Closes a previously opened ImGuiTreeNode. Must be called if ImGuiTreeNode returned true.\n") {
+    ImGui::TreePop();
+}
+// ============================================================================
+// Parameters stacks (shared)
+// ============================================================================
+
+DefineEngineFunction(ImPushStyleColor, void, (S32 idx, ImVec4 col), ,
+        "Modifies a style color using an ImVec4.\n"
+        "@param idx The ImGuiCol_ constant.\n"
+        "@param col The color vector (RGBA) as ImVec4.\n") {
+    ImGui::PushStyleColor((ImGuiCol)idx, col);
+}
+
+DefineEngineFunction(ImPopStyleColor, void, (S32 count), (1),
+        "Pops one or multiple colors from the style color stack.\n"
+        "@param count Optional. Number of colors to pop from the stack.\n") {
+    ImGui::PopStyleColor(count);
+}
+
+DefineEngineFunction(ImPushStyleVar, void, (S32 idx, F32 val), ,
+        "Modifies a style F32 variable.\n"
+        "@param idx The ImGuiStyleVar_ constant.\n"
+        "@param val The F32 value to set.\n") {
+    ImGui::PushStyleVar((ImGuiStyleVar)idx, val);
+}
+
+DefineEngineFunction(ImPushStyleVarVec, void, (S32 idx, ImVec2 val), ,
+        "Modifies a style ImVec2 variable.\n"
+        "@param idx The ImGuiStyleVar_ constant.\n"
+        "@param val The ImVec2 vector value to set.\n") {
+    ImGui::PushStyleVar((ImGuiStyleVar)idx, val);
+}
+
+DefineEngineFunction(ImPushStyleVarX, void, (S32 idx, F32 val_x), ,
+        "Modifies the X component of a style ImVec2 variable.\n"
+        "@param idx The ImGuiStyleVar_ constant.\n"
+        "@param val_x The F32 value for the X component.\n") {
+    ImGui::PushStyleVarX((ImGuiStyleVar)idx, val_x);
+}
+
+DefineEngineFunction(ImPushStyleVarY, void, (S32 idx, F32 val_y), ,
+        "Modifies the Y component of a style ImVec2 variable.\n"
+        "@param idx The ImGuiStyleVar_ constant.\n"
+        "@param val_y The F32 value for the Y component.\n") {
+    ImGui::PushStyleVarY((ImGuiStyleVar)idx, val_y);
+}
+
+DefineEngineFunction(ImPopStyleVar, void, (S32 count), (1),
+        "Pops one or multiple variables from the style variable stack.\n"
+        "@param count Optional. Number of variables to pop from the stack.\n") {
+    ImGui::PopStyleVar(count);
+}
+
+DefineEngineFunction(ImPushItemFlag, void, (S32 option, bool enabled), ,
+        "Modifies a specified shared item flag (internal/advanced ImGui features).\n"
+        "@param option The ImGuiItemFlags_ constant.\n"
+        "@param enabled Whether the flag should be active or inactive.\n") {
+    ImGui::PushItemFlag((ImGuiItemFlags)option, enabled);
+}
+
+DefineEngineFunction(ImPopItemFlag, void, (), ,
+        "Pops an item flag from the item flags stack.\n") {
+    ImGui::PopItemFlag();
+}
+
+// ============================================================================
+// Parameters stacks (current window)
+// ============================================================================
+
+DefineEngineFunction(ImPushItemWidth, void, (F32 item_width), ,
+        "Pushes the width of items for common large widgets. >0.0f: pixels, <0.0f: align to right.\n"
+        "@param item_width The width configuration.\n") {
+    ImGui::PushItemWidth(item_width);
+}
+
+DefineEngineFunction(ImPopItemWidth, void, (), ,
+        "Pops an item width from the item width stack.\n") {
+    ImGui::PopItemWidth();
+}
+
+DefineEngineFunction(ImSetNextItemWidth, void, (F32 item_width), ,
+        "Sets the width of the NEXT common large widget only.\n"
+        "@param item_width The width configuration.\n") {
+    ImGui::SetNextItemWidth(item_width);
+}
+
+DefineEngineFunction(ImCalcItemWidth, F32, (), ,
+        "Calculates the width of the item given pushed settings and current cursor position.\n") {
+    return ImGui::CalcItemWidth();
+}
+
+DefineEngineFunction(ImPushTextWrapPos, void, (F32 wrap_local_pos_x), (0.0f),
+        "Pushes word-wrapping position for text commands. <0.0f: no wrap, 0.0f: wrap to window end.\n"
+        "@param wrap_local_pos_x Optional. Position in window local space.\n") {
+    ImGui::PushTextWrapPos(wrap_local_pos_x);
+}
+
+DefineEngineFunction(ImPopTextWrapPos, void, (), ,
+        "Pops a text wrap position from the stack.\n") {
+    ImGui::PopTextWrapPos();
+}
 
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(ImGui);
