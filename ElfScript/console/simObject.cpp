@@ -3261,11 +3261,27 @@ DefineEngineMethod( SimObject, getFieldType, const char*, ( const char* fieldNam
    U32 typeID = object->getDataFieldType( StringTable->insert( fieldName ), NULL );
    ConsoleBaseType* type = ConsoleBaseType::getType( typeID );
 
-   if( type )
+   if( type ) {
       return type->getTypeName();
+   }
 
    return "";
 }
+
+//-----------------------------------------------------------------------------
+// ElfScript
+DefineEngineMethod( SimObject, getFieldDoc, const char*, ( const char* fieldName ),,
+                    "Get the console documentation of the given field.")
+{
+      U32 typeID = object->getDataFieldType( StringTable->insert( fieldName ), NULL );
+      ConsoleBaseType* type = ConsoleBaseType::getType( typeID );
+
+      if( type )
+            return type->getDocString();
+
+      return "";
+}
+
 
 //-----------------------------------------------------------------------------
 
