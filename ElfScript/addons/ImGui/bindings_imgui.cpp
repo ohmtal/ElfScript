@@ -770,6 +770,16 @@ DefineEngineFunction(ImOpenPopup, void, (String contextId, S32 popupFlags),("",0
     ImGui::OpenPopup(!contextId.isEmpty() ? contextId.c_str() : nullptr, popupFlags);
 }
 
+DefineEngineFunction(ImOpenPopupOnItemClick, void, (String contextId, S32 popupFlags),("",1),
+                     "helper to open popup when clicked on last item. Default to ImGuiPopupFlags_MouseButtonRight == 1.\n"
+                     "(note: actually triggers on the mouse _released_ event to be consistent with popup behaviors)") {
+    ImGui::OpenPopupOnItemClick(!contextId.isEmpty() ? contextId.c_str() : nullptr, popupFlags);
+}
+
+DefineEngineFunction(ImCloseCurrentPopup, void, (String contextId, S32 popupFlags),("",0),"close the current popup") {
+    ImGui::CloseCurrentPopup();
+}
+
 DefineEngineFunction(ImEndPopup, void, (),,"") { ImGui::EndPopup();}
 // -----------------------------------------------------------------------------
 // =============================================================================
