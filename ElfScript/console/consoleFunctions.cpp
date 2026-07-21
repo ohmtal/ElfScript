@@ -2346,7 +2346,7 @@ DefineEngineFunction( compile, bool, ( const char* fileName, bool overrideNoDSO 
 }
 
 //-----------------------------------------------------------------------------
-
+#ifndef ELFSCRIPT_EXEC_OVERWRITE
 DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool journalScript ), ( false, false ),
    "Execute the given script file.\n"
    "@param fileName Path to the file to execute\n"
@@ -2363,7 +2363,7 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
 {
    return Con::executeFile(fileName, noCalls, journalScript);
 }
-
+#endif
 DefineEngineFunction( eval, const char*, ( const char* consoleString, bool echo ), (false), "eval(consoleString)")
 {
    Con::EvalResult returnValue = Con::evaluate(consoleString, echo, Platform::makeRelativePathName(Con::getCurrentScriptModulePath(), NULL));
