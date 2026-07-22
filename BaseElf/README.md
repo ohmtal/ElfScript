@@ -51,7 +51,7 @@ In assets/script_stub.elf you find the current class, functions and constants de
 
 ## Console Power ShowCase: 
 
-Start BaseFlux. Open Console with GraveAccent key (usually left from 1 key under ESC). 
+Start BaseElf. Open Console with GraveAccent key (usually left from 1 key under ESC). 
 Paste:
 
     function onRender() { DrawCircle(500,300,20,YELLOW);}
