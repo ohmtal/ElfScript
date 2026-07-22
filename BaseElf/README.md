@@ -82,9 +82,9 @@ I want to add a nicer grow shrink so i overwrite grow again
 
     function grow() { $rad = $rad + $value; if ($rad > 50 || $rad < 1 ) $value *= -1; }
     
-now $value is control it and max rad is 50. Value is empty so nothing happen. You need to set it:
+now $value is control it and max rad is 50. Value is empty so nothing happen. You need to set it. Also $rad can be too big so we adjust it also:
 
-    $value = 0.1;
+    $value = 0.1; $rad = 10;
 
 finally i want to make change the color of the circle so we need to overwrite render again:
 
