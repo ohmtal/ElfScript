@@ -1,7 +1,9 @@
 // -----------------------------------------------------------------------------
-// Minimal Script example with some Settings
-// call it with: ./BaseElf --script assets/minimal.elf
+// Minimal example - only to show what is enough - but better use basic for a
+// more detailed example.
+// call it with: ./BaseElf --script minimal
 // -----------------------------------------------------------------------------
 function onRender() {
+    // x, y, caption, scale, color, [doshadow], [shadowcolor]
     DrawText(80, 200 , "Congrats! You created your first window!", 2.0, GREEN);
 }

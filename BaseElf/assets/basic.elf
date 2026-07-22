@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // Basic Script example with Settings
-// call it with: ./BaseElf --script assets/basic.elf
+// call it with: ./BaseElf --script basic.elf
 // -----------------------------------------------------------------------------
 /*
  * OnLoad is called BEFORE window is open

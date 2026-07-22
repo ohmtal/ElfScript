@@ -25,7 +25,9 @@ Script Bindings are listed in assets/script_stub.elf.
 ### Command line parameters:
 
     --chdir /path/to/my/custom/assets/
-    --script /path/to/custom/script
+    --script myScript.elf
+      
+Note: --script uses the set path by --chdir or default assets/ so if you call basic.elf for example you only do `--script basic.elf`.
         
 ### Basic Script 
 
