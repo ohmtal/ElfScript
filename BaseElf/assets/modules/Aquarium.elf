@@ -34,7 +34,7 @@ function Aquarium::DrawSpriteSheet(%this) {
     %screenSize = getScreenSize();
     %screenSize.y /= 2;
     %x = 0; %y = 0;
-    %size = 26;
+    %size = 32;
     %mousePos = GetMousePosition();
     %this.cursorTexure = "";
     // BeginBlendMode();
@@ -60,14 +60,14 @@ function Aquarium::DrawSpriteSheet(%this) {
         // DrawText(%x , %y, %name,0.8);
     }
     if (%this.cursorTexure !$="")  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure, 1.8, "128 255 0", true, BLACK);
-    DrawText(0, %screenSize.y, "Press F5 to toggle Spritesheet", 1.2, WHITE, true);
+    DrawText(0, %screenSize.y, "Press left shift to enter paint mode", 1.2, WHITE, true);
     // EndBlendMode();
 }
 //----------------------------------------------------------------------
 function Aquarium::Render(%this) {
    %screenSize = getScreenSize();
     %mousePos = GetMousePosition();
-   if (%this.showSheet) %this.DrawSpriteSheet();
+   if (!%this.painting ) %this.DrawSpriteSheet();
    if (%this.selectedTexture !$= "") {
         %srcRect = Spritesheet.getFieldValue(%this.selectedTexture);
         %dstRect = (%screenSize.x - 128) SPC 0 SPC 128 SPC 128;
@@ -75,9 +75,9 @@ function Aquarium::Render(%this) {
             %dstRect.x -= 128;
         }
         Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+        if (SDL_IsKeyPressed(SDL_SCANCODE_LSHIFT)) %this.painting = !%this.painting;
+        if (%this.painting ) {
 
-        if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT)) {
-            %this.painting = true;
             %wheel = SDL_GetMouseWheelY();
             if (%wheel != 0) {
                 %this.paintSize += 8 * %wheel;
@@ -86,6 +86,7 @@ function Aquarium::Render(%this) {
             }
             %dstRect = (%mousePos.x - %this.paintSize / 2) SPC (%mousePos.y - %this.paintSize / 2) SPC %this.paintSize SPC %this.paintSize;
             Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+            DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize , 1.0);
         }
 
 
@@ -93,13 +94,14 @@ function Aquarium::Render(%this) {
         DrawRectRec(%dstRect, BLACK, false);
         if (SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
             %this.selectedTexture = "";
+            %this.painting = false;
         }
    }
 }
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
     if (%isDown) {
-        if (%scancode == SDL_SCANCODE_F5) %this.showSheet = !%this.showSheet;
+        // if (%scancode == SDL_SCANCODE_F5) %this.showSheet = !%this.showSheet;
     }
 }
 function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
