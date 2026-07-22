@@ -276,7 +276,7 @@ class  SimObject {
     * @return The result of the method call.
     * @return string
     */
-      function call( string method, string args... )...;
+      function call( string method, string args... );
    /** --- void setInternalName ---
     * Set the internal name of the object.
     * @param newInternalName The new internal name for the object.
@@ -332,7 +332,7 @@ class  SimObject {
     * @return The numeric ID of the created schedule.  Can be used to cancel the call.
     * @return int
     */
-      function schedule( float time, string method, string args... )...;
+      function schedule( float time, string method, string args... );
    /** --- S32 getDynamicFieldCount ---
     * Get the number of dynamic fields defined on the object.
     * @return The number of dynamic fields defined on the object.
@@ -504,12 +504,12 @@ class  SimSet : public SimObject {
     * Add the given objects to the set.
     * @param objects The objects to add to the set.
     */
-      function add( SimObject objects... )...;
+      function add( SimObject objects... );
    /** --- void remove ---
     * Remove the given objects from the set.
     * @param objects The objects to remove from the set.
     */
-      function remove( SimObject objects... )...;
+      function remove( SimObject objects... );
    /** --- void clear ---
     * Remove all objects from the set.
     */
@@ -535,7 +535,7 @@ class  SimSet : public SimObject {
     * @note This method recurses into all SimSets that are children to the set.
     * @see callOnChildrenNoRecurse
     */
-      function callOnChildren( string method, string args... )...;
+      function callOnChildren( string method, string args... );
    /** --- void callOnChildrenNoRecurse ---
     * Call a method on all objects contained in the set.
     * @param method The name of the method to call.
@@ -543,7 +543,7 @@ class  SimSet : public SimObject {
     * @note This method does not recurse into child SimSets.
     * @see callOnChildren
     */
-      function callOnChildrenNoRecurse( string method, string args... )...;
+      function callOnChildrenNoRecurse( string method, string args... );
    /** --- void reorderChild ---
     * Make sure child1 is ordered right before child2 in the set.
     * @param child1 The first child.  The object must already be contained in the set.
@@ -1895,7 +1895,7 @@ namespace Global {
    /** --- bool getFullScreen ---
     * @return bool
     */
-      function getFullScreen...;
+      function getFullScreen();
    /** --- bool setFullScreen ---
     * bool value
     * @return bool
@@ -1904,19 +1904,19 @@ namespace Global {
    /** --- float getGameTime ---
     * @return float
     */
-      function getGameTime...;
+      function getGameTime();
    /** --- float getFrameTime ---
     * @return float
     */
-      function getFrameTime...;
+      function getFrameTime();
    /** --- int getRealTime ---
     * @return int
     */
-      function getRealTime...;
+      function getRealTime();
    /** --- int getFPS ---
     * @return int
     */
-      function getFPS...;
+      function getFPS();
    /** --- Point2I GetMousePosition ---
     * @return Point2I
     */
@@ -1946,14 +1946,14 @@ namespace Global {
    /** --- void dEcho ---
     * debug echo ( string message... ) 
     */
-      function dEcho...;
+      function dEcho();
    /** --- void dWarn ---
     * debug warn( string message... ) 
     */
-      function dWarn...;
+      function dWarn();
    /** --- void dError ---
     */
-      function dError(debug error  string message... )...;
+      function dError(debug error  string message... );
    /** --- String getOS ---
     * return the OS where it was compiled.Win64 | Win32 | Linux | OpenBSD | FreeBSD | MacOSX | Android | Emscripten
     * @return String
@@ -2498,7 +2498,7 @@ namespace Global {
    /** --- void addCaseSensitiveStrings ---
     * [string1, string2, ...]Adds case sensitive strings to the StringTable.
     */
-      function addCaseSensitiveStrings...;
+      function addCaseSensitiveStrings();
    /** --- const char* getWord ---
     * Extract the word at the given @a index in the whitespace-separated list in @a text.
     * Words in @a text must be separated by newlines, spaces, and/or tabs.
@@ -2926,21 +2926,21 @@ namespace Global {
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function echo( string message... )...;
+      function echo( string message... );
    /** --- void warn ---
     * @brief Logs a warning message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as a warning message (in the in-game console, these will show up using a turquoise font by default). A newline is added automatically after the text.
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function warn( string message... )...;
+      function warn( string message... );
    /** --- void error ---
     * @brief Logs an error message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as an error message (in the in-game console, these will show up using a red font by default). A newline is added automatically after the text.
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function error( string message... )...;
+      function error( string message... );
    /** --- void debugv ---
     * @brief Logs the value of the given variable to the console.
     * Prints a string of the form "<variableName> = <variable value>" to the console.
@@ -3044,7 +3044,7 @@ namespace Global {
     * @ingroup Scripting
     * @return string
     */
-      function call( string functionName, string args... )...;
+      function call( string functionName, string args... );
    /** --- const char* getDSOPath ---
     * Get the absolute path to the file in which the compiled code for the given script file will be stored.
     * @param scriptFileName %Path to the .elf script file.
@@ -3439,7 +3439,7 @@ namespace Global {
     * schedule(time, refobject|0, command, <arg1...argN>)
     * @return int
     */
-      function schedule...;
+      function schedule();
    /** --- const char* getUniqueName ---
     * @brief Returns a unique unused SimObject name based on a given base name.
     * @baseName Name to conver to a unique string if another instance exists

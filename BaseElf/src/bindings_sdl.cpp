@@ -732,7 +732,7 @@ ConsoleFunctionGroupEnd(SDL);
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupBegin(BaseFlux, "BaseFlux Functions: getFPS, ...");
 
-ConsoleFunction(getFullScreen, bool, 1,1, "") {
+DefineEngineFunction(getFullScreen, bool, (),, "return true if in fullscreen mode") {
     Uint32 flags = SDL_GetWindowFlags(app.getWindow());
     return (flags & SDL_WINDOW_FULLSCREEN);
 }
@@ -740,21 +740,21 @@ DefineEngineFunction(setFullScreen, bool,(bool value),, "bool value") {
     return SDL_SetWindowFullscreen(app.getWindow(),value);
 }
 
-ConsoleFunction(getGameTime, F32, 1,1, "") {
+DefineEngineFunction(getGameTime, F32, (), , "Get the game time (sec since start)") {
     return (F32) BaseFlux::getGameTime();
 }
 
-ConsoleFunction(getFrameTime, F32, 1,1, "") {
+DefineEngineFunction(getFrameTime, F32,(),, "get the current frame time in seconds") {
     return (F32) BaseFlux::getFrameTime();
 }
 
 
 
-ConsoleFunction(getRealTime, S32, 1,1, "") {
+DefineEngineFunction(getRealTime, S32, (),, "get current time from script engine") {
     return Sim::getCurrentTime();
 }
 
-ConsoleFunction(getFPS, S32, 1,1, "") {
+DefineEngineFunction(getFPS, S32,(),, "Get the current fps") {
     return (S32)BaseFlux::getFPS();
 }
 DefineEngineFunction(GetMousePosition, Point2I, (),, "") {
@@ -781,69 +781,69 @@ DefineEngineFunction(getFullPath, String,(),, "get the current directory") {
 
 // ----------------- include = exec with nocalls ----------------------
 
-DefineEngineFunction(include,bool, (String fileName),, "include(fileName)" "exec a file without calls" ){
-    return Con::executeFile(fileName, true);
+DefineEngineFunction( include,bool, (String fileName, bool noCalls),(true), "include(fileName)" "exec a file without calls " ){
+    return Con::executeFile(fileName, noCalls);
 }
-// ----------------- debuglog ----------------------
-//-----------------------------------------------------------------------------
-
-DefineEngineStringlyVariadicFunction( dEcho, void, 2, 0, "debug echo ( string message... ) ")
-{
-    #ifdef TORQUE_DEBUG
-    U32 len = 0;
-    S32 i;
-    for(i = 1; i < argc; i++)
-        len += dStrlen(argv[i]);
-
-    char *ret = Con::getReturnBuffer(len + 1);
-    ret[0] = 0;
-    for(i = 1; i < argc; i++)
-        dStrcat(ret, argv[i], (U64)(len + 1));
-
-    Con::printf("%s", ret);
-    ret[0] = 0;
-    #endif
-}
-
-//-----------------------------------------------------------------------------
-
-DefineEngineStringlyVariadicFunction( dWarn, void, 2, 0, "debug warn( string message... ) " )
-{
-    #ifdef TORQUE_DEBUG
-    U32 len = 0;
-    S32 i;
-    for(i = 1; i < argc; i++)
-        len += dStrlen(argv[i]);
-
-    char *ret = Con::getReturnBuffer(len + 1);
-    ret[0] = 0;
-    for(i = 1; i < argc; i++)
-        dStrcat(ret, argv[i], (U64)(len + 1));
-
-    Con::warnf(ConsoleLogEntry::General, "%s", ret);
-    ret[0] = 0;
-    #endif
-}
-
-//-----------------------------------------------------------------------------
-
-DefineEngineStringlyVariadicFunction( dError, void, 2, 0, "(debug error  string message... ) ")
-{
-    #ifdef TORQUE_DEBUG
-    U32 len = 0;
-    S32 i;
-    for(i = 1; i < argc; i++)
-        len += dStrlen(argv[i]);
-
-    char *ret = Con::getReturnBuffer(len + 1);
-    ret[0] = 0;
-    for(i = 1; i < argc; i++)
-        dStrcat(ret, argv[i], (U64)(len + 1));
-
-    Con::errorf(ConsoleLogEntry::General, "%s", ret);
-    ret[0] = 0;
-    #endif
-}
+// // ----------------- debuglog ----------------------
+// //-----------------------------------------------------------------------------
+//
+// DefineEngineStringlyVariadicFunction( dEcho, void, 2, 0, "debug echo ( string message... ) ")
+// {
+//     #ifdef TORQUE_DEBUG
+//     U32 len = 0;
+//     S32 i;
+//     for(i = 1; i < argc; i++)
+//         len += dStrlen(argv[i]);
+//
+//     char *ret = Con::getReturnBuffer(len + 1);
+//     ret[0] = 0;
+//     for(i = 1; i < argc; i++)
+//         dStrcat(ret, argv[i], (U64)(len + 1));
+//
+//     Con::printf("%s", ret);
+//     ret[0] = 0;
+//     #endif
+// }
+//
+// //-----------------------------------------------------------------------------
+//
+// DefineEngineStringlyVariadicFunction( dWarn, void, 2, 0, "debug warn( string message... ) " )
+// {
+//     #ifdef TORQUE_DEBUG
+//     U32 len = 0;
+//     S32 i;
+//     for(i = 1; i < argc; i++)
+//         len += dStrlen(argv[i]);
+//
+//     char *ret = Con::getReturnBuffer(len + 1);
+//     ret[0] = 0;
+//     for(i = 1; i < argc; i++)
+//         dStrcat(ret, argv[i], (U64)(len + 1));
+//
+//     Con::warnf(ConsoleLogEntry::General, "%s", ret);
+//     ret[0] = 0;
+//     #endif
+// }
+//
+// //-----------------------------------------------------------------------------
+//
+// DefineEngineStringlyVariadicFunction( dError, void, 2, 0, "(debug error  string message... ) ")
+// {
+//     #ifdef TORQUE_DEBUG
+//     U32 len = 0;
+//     S32 i;
+//     for(i = 1; i < argc; i++)
+//         len += dStrlen(argv[i]);
+//
+//     char *ret = Con::getReturnBuffer(len + 1);
+//     ret[0] = 0;
+//     for(i = 1; i < argc; i++)
+//         dStrcat(ret, argv[i], (U64)(len + 1));
+//
+//     Con::errorf(ConsoleLogEntry::General, "%s", ret);
+//     ret[0] = 0;
+//     #endif
+// }
 //-----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(BaseFlux);
 // -----------------------------------------------------------------------------

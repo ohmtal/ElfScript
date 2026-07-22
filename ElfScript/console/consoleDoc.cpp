@@ -281,8 +281,19 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
          }
          else
          {
-            printClassMethod(true, typeNames[eType], funcName, (ewalk->getArgumentsString() + "...").c_str(),
-               ewalk->getDocString().c_str());
+            if (Con::ConsoleDocForStub) {
+                  // const char * args = ewalk->getArgumentsString().c_str();
+                  // NOTE when header in null we dont get the correct getArgumentsString
+                  // usually empty ?!
+                  printClassMethod(true,
+                              typeNames[eType],
+                              funcName,
+                              ewalk->getArgumentsString().isEmpty() ? "()" : ewalk->getArgumentsString().c_str(),
+                              ewalk->getDocString().c_str());
+            } else {
+                  printClassMethod(true, typeNames[eType], funcName, (ewalk->getArgumentsString() + "...").c_str(),
+                  ewalk->getDocString().c_str());
+            }
          }
       }
       else if(ewalk->mType == Entry::GroupMarker)
