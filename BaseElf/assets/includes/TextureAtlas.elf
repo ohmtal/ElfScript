@@ -14,7 +14,7 @@ include("./ScriptXML.elf"); //getXMLAttribute
  $t = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
  echo($t.background_rock_a);
  // NOTE for more enhanced use: DrawRotatedSrcDstRect
- // color white with forcing blend mode: in real rendering better use BeginBlendMode/EndBlendMode
+ // color white with forcing blend mode
  function onRender() { $t.DrawSrcDstRect($t.fish_blue, "0 0 64 64", "255 255 255 254"); }
  ....
  result is a TextureObject with loaded Texture or SimSet if filenme not set

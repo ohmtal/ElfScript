@@ -1,0 +1,106 @@
+exec("includes/TextureAtlas.elf");
+
+function createAquarium() {
+    %obj = new ScriptGroup() {
+        class = "Aquarium";
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function Aquarium::onAdd(%this) {
+    ClearBackground("176 233 252"); //only set once
+
+    %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
+    %this.Spritesheet.name = "SpriteSheet";
+    %this.add(%this.Spritesheet);
+
+    %this.showSheet = true;
+    %this.paintSize = 32;
+    %this.painting = false;
+
+    return true;
+}
+//----------------------------------------------------------------------
+function Aquarium::OnRemove(%this) {
+}
+//----------------------------------------------------------------------
+function Aquarium::OnUpdate(%this, %dt) {
+}
+//----------------------------------------------------------------------
+function Aquarium::DrawSpriteSheet(%this) {
+    %s = %this.Spritesheet;
+    %cnt = %s.getDynamicFieldCount();
+    %screenSize = getScreenSize();
+    %screenSize.y /= 2;
+    %x = 0; %y = 0;
+    %size = 26;
+    %mousePos = GetMousePosition();
+    %this.cursorTexure = "";
+    // BeginBlendMode();
+    for (%i = 0; %i < %cnt ; %i++) {
+        %f = %s.getDynamicField(%i);
+        %name = getField(%f,0);
+        %srcRect = getField(%f,1);
+        %y += %size;
+        if ( %y+%size > %screenSize.y) {
+            %y = 0;
+            %x += %size;
+        }
+        %dstRect = %x SPC %y SPC %size SPC %size;
+        %s.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+        if (PointInRect(%mousePos, %dstRect)) {
+            // echo("inRect:" SPC %name);
+            if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
+                %this.selectedTexture = %name;
+            }
+            %this.cursorTexure = %name;
+        }
+
+        // DrawText(%x , %y, %name,0.8);
+    }
+    if (%this.cursorTexure !$="")  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure, 1.8, "128 255 0", true, BLACK);
+    DrawText(0, %screenSize.y, "Press F5 to toggle Spritesheet", 1.2, WHITE, true);
+    // EndBlendMode();
+}
+//----------------------------------------------------------------------
+function Aquarium::Render(%this) {
+   %screenSize = getScreenSize();
+    %mousePos = GetMousePosition();
+   if (%this.showSheet) %this.DrawSpriteSheet();
+   if (%this.selectedTexture !$= "") {
+        %srcRect = Spritesheet.getFieldValue(%this.selectedTexture);
+        %dstRect = (%screenSize.x - 128) SPC 0 SPC 128 SPC 128;
+        if (PointInRect(%mousePos, %dstRect)) {
+            %dstRect.x -= 128;
+        }
+        Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+
+        if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+            %this.painting = true;
+            %wheel = SDL_GetMouseWheelY();
+            if (%wheel != 0) {
+                %this.paintSize += 8 * %wheel;
+                if (%this.paintSize < 8 )  %this.paintSize = 8; // min 8 ?
+                if (%this.paintSize > 256 )  %this.paintSize = 256; //max 256 ?
+            }
+            %dstRect = (%mousePos.x - %this.paintSize / 2) SPC (%mousePos.y - %this.paintSize / 2) SPC %this.paintSize SPC %this.paintSize;
+            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+        }
+
+
+
+        DrawRectRec(%dstRect, BLACK, false);
+        if (SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
+            %this.selectedTexture = "";
+        }
+   }
+}
+//----------------------------------------------------------------------
+function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+    if (%isDown) {
+        if (%scancode == SDL_SCANCODE_F5) %this.showSheet = !%this.showSheet;
+    }
+}
+function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
