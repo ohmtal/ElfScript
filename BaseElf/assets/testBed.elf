@@ -1,0 +1,38 @@
+// -----------------------------------------------------------------------------
+// TestBed ... console power :D
+// NOTE: eval is not the best method to play with script but a
+// usage would be: add("DrawCircle(200,200,10,\"255 0 0\");");
+// but it would be easier to write:
+// function onRender() { DrawCircle(200,200,10,"255 0 0");}
+// -----------------------------------------------------------------------------
+function onInit() {
+    new SimGroup(RenderCommands);
+}
+function onShutDown() {
+    RenderCommands.delete();
+}
+function onRender() {
+    foreach(%cmdObj in RenderCommands) {
+        eval(%cmdObj.cmd);
+    }
+}
+
+function clear() {
+    RenderCommands.deleteObjects();
+}
+
+function list() {
+    foreach(%cmdObj in RenderCommands) {
+        echo(%cmdObj.cmd);
+    }
+
+}
+
+function add(%command) {
+    if (eval(%command @ "return 1;")) {
+        RenderCommands.add (
+            new SimObject() { cmd = %command; }
+        );
+    }
+}
+
