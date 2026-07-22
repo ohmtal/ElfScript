@@ -48,11 +48,30 @@ echo(Tom.playerName);  // since i renamed it with .name= Foo is gone and Tom is 
 $fooObj.dumpFields(); //list all fields of the object
 $fooObj.dump(); //list all fields and methods of the object 
 ```
-Since ElfScript is based on TorqueScript you can also read this [Documentation](https://docs.torque3d.org/for-programmers/scripting/torquescript)
+Since ElfScript is based on TorqueScript you can also read this [Documentation](http://wiki.torque3d.org/wiki:_scripter-start)
 
 
----
-# Example / TestBed Application using OhmFlux:
+## Folder: ElfScript
+
+The current codebase i use with the latest changes and fixes. 
+Like the stuff in the TorqueScript folder but more cleanup unused Files and
+Functions. 
+
+- [ElfScript](./ElfScript/)
+
+## Folder: BaseElf
+
+Located in Folder [BaseElf](./BaseElf): A minimal Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as base for SDL3/ImGui/ResourceManager and ElfScript. It's also an enhanced example how to embed ElfScript.
+
+## Folder: TorqueScript
+
+My first working Version. I will not change this anymore. I work on the code in the ElfScript folder.
+
+## Folder: experimental 
+
+Unfinished non functional attempt to make it much smaller. 
+
+## Example / TestBed Application using OhmFlux:
 
 - ~~added math (using also Ohmflux functions)~~
 - added Platform functions (not complete)
@@ -60,7 +79,7 @@ Since ElfScript is based on TorqueScript you can also read this [Documentation](
 
 [Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
 
-# Raylib Bindings (raylib-elfscript):
+## Raylib Bindings (raylib-elfscript):
 
 - Using the raylib commands but in three Main-Callbacks:
     - function MainInit() { return true;}
@@ -69,19 +88,10 @@ Since ElfScript is based on TorqueScript you can also read this [Documentation](
 
 [raylib-elfscript](https://github.com/ohmtal/raylib-elfscript)
 
----
-
-# ElfScript
-
-The current codebase i use with the latest changes and fixes. 
-Like the stuff in the TorqueScript folder but more cleanup unused Files and
-Functions. 
-
-- [ElfScript](./ElfScript/)
 
 
+## Script related links
 
-## related links
 - [Torque3D](https://github.com/TorqueGameEngines/Torque3D)
 - [KorkScript embeded TorqueScript](https://github.com/jamesu/korkscript/)
 - [OGE3D enhanced Torque3D 3.x](https://github.com/ohmtal/OGE3D)

@@ -1,0 +1,57 @@
+// -----------------------------------------------------------------------------
+// Basic Script example with Settings
+// call it with: ./BaseElf --script assets/basic.elf
+// -----------------------------------------------------------------------------
+/*
+ * OnLoad is called BEFORE window is open
+ */
+function onLoad() {
+    //NOTE: only used onLoad - they do not automatically change anything after load
+    $Settings.ScreenSize        = "800 450"; // as Point2I [string]
+    $Settings.WindowMaximized   = false;
+    $Settings.FullScreen        = false;
+    $Settings.EnableVSync       = true;
+    $Settings.Company           = "The baseElf Company";
+    $Settings.Caption           = "baseElf basic window";
+    $Settings.Version           = "Version 0.260713";
+    $Settings.IconFilename      = "texture/icon_32.png";
+    $Settings.clearColor        = SLATEGRAY;
+
+    $Settings.sync(); //must be called
+}
+// -----------------------------------------------------------------------------
+/*
+ * OnInit is called after window is open
+ * Here you may init your baseClass
+ */
+function onInit() {}
+// -----------------------------------------------------------------------------
+/*
+ * onShutDown
+ * Last chance to cleanup
+ */
+function onShutDown() {}
+// -----------------------------------------------------------------------------
+/*
+ *  OnUpdate
+ *  Called about every 16.66 ms. %dt is in Secounds so it's usually 0.01667
+ */
+function onUpdate(%dt) {}
+// -----------------------------------------------------------------------------
+/*
+ * OnRender ... inside main Draw loop
+ * Most important call ;)
+ */
+function onRender() {
+    DrawText(10, 10 , "Hello World", 2.0, WHITE, true, BLACK);
+    DrawText(10, 30 , "Press [GraveAccent] to open console.", 2.0, "255 128 0", true, GRAY);
+}
+// -----------------------------------------------------------------------------
+/*
+ * Callbacks from KeyBoard/Mouse
+ */
+function onSDLMouseWheelEvent(%wheelX, %wheelY) {}
+function onSDLMouseButtonEvent(%button, %isDown, %x, %y) {}
+function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
+        if (%scancode == SDL_SCANCODE_ESCAPE) quit();
+}

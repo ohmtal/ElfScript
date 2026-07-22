@@ -155,7 +155,7 @@ void RegisterImGuiWindowConstants() {
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonRight);
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMiddle);
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMask_);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonDefault_);
+    // REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonDefault_);
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoReopen);
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverExistingPopup);
     REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverItems);

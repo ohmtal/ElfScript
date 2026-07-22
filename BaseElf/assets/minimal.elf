@@ -1,0 +1,7 @@
+// -----------------------------------------------------------------------------
+// Minimal Script example with some Settings
+// call it with: ./BaseElf --script assets/minimal.elf
+// -----------------------------------------------------------------------------
+function onRender() {
+    DrawText(80, 200 , "Congrats! You created your first window!", 2.0, GREEN);
+}
