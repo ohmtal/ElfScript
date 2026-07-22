@@ -1,6 +1,9 @@
 // AtlasFont must be a TextureObject
 // assuming the AtlasFont's grid is 10x10
 
+// to export it i used my Bitmap Font Tool:
+//  https://github.com/ohmtal/OhmFlux/tree/main/Tools/BitmapFont/qt
+
 function AtlasFont::onAdd(%this) {
     %this.StartChar = 32;
     %this.EndChar   =  127;

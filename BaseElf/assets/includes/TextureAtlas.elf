@@ -1,0 +1,80 @@
+include("./ScriptXML.elf"); //getXMLAttribute
+
+// Texture Atlas .. parse content and create a SimSet with the Textures:
+// content looks like:
+// <TextureAtlas imagePath="spritesheet-double.png">
+// <SubTexture name="background_rock_a" x="640" y="256" width="128" height="128"/>
+// <SubTexture name="background_rock_b" x="1280" y="512" width="128" height="128"/>
+// <SubTexture name="background_seaweed_a" x="1280" y="384" width="128" height="128"/>
+// </TextureAtlas>
+
+//NOTE this is designed for BaseElf
+/*
+ include("includes/TextureAtlas.elf");
+ $t = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
+ echo($t.background_rock_a);
+ // NOTE for more enhanced use: DrawRotatedSrcDstRect
+ // color white with forcing blend mode: in real rendering better use BeginBlendMode/EndBlendMode
+ function onRender() { $t.DrawSrcDstRect($t.fish_blue, "0 0 64 64", "255 255 255 254"); }
+ ....
+ result is a TextureObject with loaded Texture or SimSet if filenme not set
+ object have fields with "name" and rect like background_rock_a="640 512 128 128";
+ //
+*/
+function loadTextureAtlas(%filePath, %filename) {
+    %file = new FileObject();
+    if (!%file.openForRead(%filePath @ "/" @ %filename)) {
+        error("Failed to open Atlas XML File");
+        %file.delete();
+        return false;
+    }
+
+    while (!%file.isEOF()) {
+        %line = %file.readLine();
+        // echo("line:" SPC %line);
+
+        if (strstr(%line, "<TextureAtlas") != -1) {
+            %attrib =  getXMLAttribute(%line, "imagePath");
+            if (%attrib !$= "") {
+                %result = new TextureObject() {
+                    class = "TextureAtlas";
+                    internalName = %attrib;
+                    fileName = %filePath @ "/" @ %attrib;
+                };
+            }
+            continue;
+        }
+
+        if (strstr(%line, "<SubTexture") == -1)
+            continue;
+
+        if (!isObject(%result)) {
+            // we do a dummy to load later!
+            error("Filename not detected .. add dummy SimObject!");
+            %result = new SimObject();
+        }
+
+        %name   = getXMLAttribute(%line, "name");
+        %x      = getXMLAttribute(%line, "x");
+        %y      = getXMLAttribute(%line, "y");
+        %width  = getXMLAttribute(%line, "width");
+        %height = getXMLAttribute(%line, "height");
+
+        if (%name $= "")
+            continue;
+        %result.addTypeField(%name, "TypeRectI", %x SPC %y SPC %width SPC %height);
+    }
+
+    %file.close();
+    %file.delete();
+
+    return %result;
+
+}
+
+//---------------------------------------------------------------------------------------------
+
+
+
+
+

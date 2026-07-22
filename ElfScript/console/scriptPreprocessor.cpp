@@ -45,6 +45,12 @@ void setScriptConstant(std::string key, S32 value) {
     gScriptConstants[key] = str.end();
 }
 //----------------------------------------------------------------------
+void setScriptConstant(std::string key, U64 value) {
+    StringBuilder str;
+    str.format("%d", value);
+    gScriptConstants[key] = str.end();
+}
+//----------------------------------------------------------------------
 void setScriptConstant(std::string key, std::string value) {
     gScriptConstants[key] = value;
 }

@@ -43,8 +43,8 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 
 function Main::loop(%this) {
 
-
-    $ScreenSize = GetWindowSize();
+    // we scale the screen (setScreenSize) so we have to use out ScreenSize not windowSize
+    $ScreenSize = getScreenSize(); // GetWindowSize();
 
     if (isObject(%this.module)){
         %this.module.render();
@@ -90,13 +90,16 @@ function onLoad() {
  * OnInit is called after window is open
  */
 function onInit() {
-    //FIXME$isWebBuild = getOS() $= "Emscripten";
+    // scale the screen (window size independed - good for 2D! - but bad for ImGui )
+    // setScreenSize($Settings.ScreenSize.x, $Settings.ScreenSize.y); // scale when windowsize is changed
+
     $Main = new ScriptObject() {
         class = "Main";
         TypeS32 moduleIndex = 0;
         TypeS32 module = 0;
     };
     $Main.init();
+
 
 }
 // -----------------------------------------------------------------------------

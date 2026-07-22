@@ -9,7 +9,7 @@ include("includes/AtlasFont.elf");
 #define LOGO_SIZE 32
 //----------------------------------------------------------------------
 function createBaseDemo() {
-    %obj = new ScriptObject() {
+    %obj = new ScriptGroup() {
         class = "BaseDemo";
     };
 
@@ -18,8 +18,8 @@ function createBaseDemo() {
 //----------------------------------------------------------------------
 function BaseDemo::onAdd(%this) {
     ClearBackground( SEABLUE ); //set background color
-    new TextureObject(IconTexture) { fileName = "texture/icon_32.png"; };
-    new TextureObject(GrayTexture) { fileName = "texture/icon_32_gray.png"; };
+    %this.add ( new TextureObject(IconTexture) { fileName = "texture/icon_32.png"; } );
+    %this.add ( new TextureObject(GrayTexture) { fileName = "texture/icon_32_gray.png"; });
 
     new SimSet(LogoList);
 
@@ -27,18 +27,28 @@ function BaseDemo::onAdd(%this) {
     $showBla =1;
 
 
-    $f = new TextureObject(FontTexture) {
+    %f = new TextureObject(FontTerminatorTwo) {
         class = "AtlasFont";
-        fileName = "texture/source_code_32x60.png";
+        // fileName = "texture/fonts/kenney_mini_24x40.png";
+        // fileName = "texture/fonts/kenney_blocks_36x48.png";
+        // fileName = "texture/fonts/source_code_32x60.png";
+        fileName = "texture/fonts/terminatortwo_45x48.png";
     };
+    %this.add(%f);
+    %f = new TextureObject(FontKenneyBlocks) {
+        class = "AtlasFont";
+        fileName = "texture/fonts/kenney_blocks_36x48.png";
+    };
+    %this.add(%f);
 
     return true;
 }
 //----------------------------------------------------------------------
 function BaseDemo::OnRemove(%this) {
-    IconTexture.delete();
-    GrayTexture.delete();
-    FontTexture.delete();
+    // cleanup done by ScriptGroup: ($this)
+    // IconTexture.delete();
+    // GrayTexture.delete();
+    // FontTexture.delete();
 
     LogoList.deleteObjects();
     LogoList.delete();
@@ -96,7 +106,9 @@ function BaseDemo::Render(%this) {
         %y+= 20;DrawText(%x,%y,"[ ] add source editor with example", 1.5, DARKGRAY, true, SLATEGRAY);
 
         %y+=20;
-        FontTexture.drawText(%x, %y, "Hello AtlasFont using TextureObject's getAtlasRect","255 200 100 100");
+        FontTerminatorTwo.drawText(%x, %y, "Hello AtlasFont using TextureObject's getAtlasRect","255 200 100 100");
+        %y+=30;
+        FontKenneyBlocks.drawText(%x, %y, "using different fonts... exported with OhmFlux BitmapFont Tool","0 200 255 254");
 
         // if (isObject(IconTexture)){
         //     IconTexture.DrawRotatedSrcDstRect( "0 0 32 32",250 SPC %y SPC "32 32", 45, "0 0");

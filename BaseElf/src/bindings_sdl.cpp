@@ -765,6 +765,36 @@ DefineEngineFunction(GetMousePosition, Point2I, (),, "") {
 DefineEngineFunction(setWindowSize, bool, (S32 x, S32 y), , "") {
    return  SDL_SetWindowSize(app.getWindow(), x, y);
 }
+
+DefineEngineFunction(setScreenSize, bool, (S32 logicalWidth, S32 logicalHeight, S32 mode),((S32)SDL_LOGICAL_PRESENTATION_STRETCH) ,
+                     "Set SDL_SetRenderLogicalPresentation which does scale the screen.\n"
+                     "Warning: ImGui windows (like console) looks a bit strange than!") {
+   return SDL_SetRenderLogicalPresentation(app.getRenderer(), logicalWidth, logicalHeight
+            ,(SDL_RendererLogicalPresentation) mode);
+}
+DefineEngineFunction(unSetScreenSize, bool, (), ,
+        "Unset SDL_SetRenderLogicalPresentation to use window size\n"
+        "Same as setScreenSize(0,0,0);") {
+    return SDL_SetRenderLogicalPresentation(app.getRenderer(), 0, 0, SDL_LOGICAL_PRESENTATION_DISABLED);
+}
+
+DefineEngineFunction(GetScreenSize, Point2I, (), , "Get the current scaled screen size (SDL_GetRenderLogicalPresentation)") {
+   Point2I screenSize = {0,0};
+    SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
+
+    if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
+        // Con::printf("SDL_GetRenderLogicalPresentation: %dx%d, mode=%d\n", screenSize.x, screenSize.y, (int)mode);
+    } else {
+        Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
+    }
+    // fallback
+    if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
+
+    return screenSize;
+}
+
+
+
 DefineEngineFunction(getWindowSize, Point2I, (), , "") {
     int x, y;
     SDL_GetWindowSize(app.getWindow(), &x, &y);
@@ -850,6 +880,14 @@ ConsoleFunctionGroupEnd(BaseFlux);
 // added at bottom
 void InitBindings_SDL() {
 
+    Con::setScriptConstant("SDL_WINDOW_FULLSCREEN", SDL_WINDOW_FULLSCREEN);
+    Con::setScriptConstant("SDL_WINDOW_MAXIMIZED", SDL_WINDOW_MAXIMIZED);
+    Con::setScriptConstant("SDL_WINDOW_RESIZABLE", SDL_WINDOW_RESIZABLE);
+    Con::setScriptConstant("SDL_WINDOW_HIGH_PIXEL_DENSITY", SDL_WINDOW_HIGH_PIXEL_DENSITY);
+
+
+
+    Con::registerEnumS32<SDL_RendererLogicalPresentation>("", false);
     Con::registerEnumS32<SDL_ScaleMode>("", false);
     Con::registerEnumS32<SDL_FlipMode>("", false);
     registerColors();
