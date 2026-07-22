@@ -42,8 +42,8 @@ See also:
 
 You can use every Text Editor you want. If you want syntax highlighting:
     
-    - Easy: In you Editor set the type to c#, javascript or c++
-    - VSCode/VSCodium: [Plugin](https://github.com/ohmtal/VSCode_TorqueScript)
+- Easy: In you Editor set the type to c#, javascript or c++
+- VSCode/VSCodium: [Plugin](https://github.com/ohmtal/VSCode_TorqueScript)
     
 In assets/script_stub.elf you find the current class, functions and constants definitions. Some editors (like vim) allow autocomplete when the file is loaded in background. 
 
@@ -51,3 +51,4 @@ In assets/script_stub.elf you find the current class, functions and constants de
 
 - [Raylib-ElfScript bindings](https://github.com/ohmtal/raylib-elfscript)
 - [ElfFlux Raylib-ElfScript + Objects](https://github.com/ohmtal/ElfFlux)
+- [Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
