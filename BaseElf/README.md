@@ -82,15 +82,15 @@ I want to add a nicer grow shrink so i overwrite grow again
 
     function grow() { $rad = $rad + $value; if ($rad > 50 || $rad < 1 ) $value *= -1; }
     
-now $value is control it and max rad is 50. Value is empty so nothing happen. You need to set it. Also $rad can be too big so we adjust it also:
+now $value is control the effect and max rad is 50. Value is empty at the moment so nothing happen. You need to set it. Also $rad can be too big so we adjust it also:
 
     $value = 0.1; $rad = 10;
 
-finally i want to make change the color of the circle so we need to overwrite render again:
+finally i want to change the color of the circle so we need to overwrite render again:
 
      function onRender() { DrawCircle(500,300,$rad,"255 0 128");}
      
-Color is set by a RGB Value "255 255 0" => full red, no green half blue - should be pink now. Btw. cursor up in console get the last command back. 
+Color is set by a RGB integer (0..255) value "255 255 0" => full red, no green half blue - should be pink now. Btw. cursor up in console get the last command back. 
 
 Happy Scripting. 
     
