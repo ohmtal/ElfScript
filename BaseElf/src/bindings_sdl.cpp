@@ -688,16 +688,27 @@ DefineEngineFunction(DrawText, void, ( F32 x, F32 y,String text,
     BaseFlux::DrawDebugText(app.getRenderer(),x,y,text.c_str(), scale, color, doShadow, shadowColor);
 }
 
-
-
-DefineEngineFunction(DrawLine, void, (F32 x1, F32 y1,F32 x2, F32 y2, Color color)
-        ,(WHITE),"Draw a Line") {
-    BaseFlux::DrawLine(app.getRenderer(), Point2F(x1,y1),Point2F(x2,y2), color);
+DefineEngineFunction(MeasureText, Point2F, ( String text, F32 scale)
+,(1.0),"Calculate Text Width and Heigth and return Point2F")
+{
+    F32 size = (F32)SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * scale;
+    return Point2F( (F32) text.length() * size, size);
 }
 
-DefineEngineFunction(DrawLineRec, void, (RectF points, Color color)
-,(WHITE),"Draw a Line using rect w=x2 h=y2 as parameter") {
-    BaseFlux::DrawLine(app.getRenderer(), Point2F(points.x,points.y),Point2F(points.w,points.h), color);
+DefineEngineFunction(DrawLine, void, (F32 x1, F32 y1,F32 x2, F32 y2, Color color, F32 thickness)
+        ,(WHITE, 1.f),"Draw a Line") {
+    if (thickness != 1.f)
+        BaseFlux::DrawLineThick(app.getRenderer(), x1,y1,x2,y2, thickness, color);
+    else
+        BaseFlux::DrawLine(app.getRenderer(), Point2F(x1,y1),Point2F(x2,y2), color);
+}
+
+DefineEngineFunction(DrawLineRec, void, (RectF points, Color color, F32 thickness)
+    ,(WHITE, 1.f),"Draw a Line using rect w=x2 h=y2 as parameter") {
+    if (thickness != 1.f)
+        BaseFlux::DrawLineThick(app.getRenderer(), Point2F(points.x,points.y),Point2F(points.w,points.h), thickness, color);
+    else
+        BaseFlux::DrawLine(app.getRenderer(), Point2F(points.x,points.y),Point2F(points.w,points.h), color);
 }
 
 DefineEngineFunction(DrawRect, void, (F32 x, F32 y,F32 w, F32 h, Color color, bool fill)

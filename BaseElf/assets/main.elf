@@ -179,7 +179,7 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
             $Main.loadModule();
         }
 
-        if (%scancode == SDL_SCANCODE_ESCAPE) quit();
+        // if (%scancode == SDL_SCANCODE_ESCAPE) quit();
     }
 
         if (isObject($Main.module)) $Main.module.onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat);

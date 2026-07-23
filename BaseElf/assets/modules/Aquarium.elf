@@ -5,6 +5,7 @@ exec("includes/TextureAtlas.elf");
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
+#define MESSAGE_TIME 2.0
 
 function createAquarium() {
     %obj = new ScriptGroup() {
@@ -29,6 +30,9 @@ function Aquarium::onAdd(%this) {
     %this.selectedSceneObject = 0;
 
     %this.hideSpriteSheet = false;
+    %this.showMenu = false;
+    %this.messageCounter = 0;
+    %this.Message = "";
 
     return true;
 }
@@ -82,16 +86,69 @@ function compareLayers(%objA, %objB)
     return (%objA.layer > %objB.layer) ? -1 : 1;
 }
 //----------------------------------------------------------------------
+function Aquarium::DrawButtonBorder(%this, %rect, %down,%thickness){
+
+    %x = %rect.x;
+    %y = %rect.y;
+    %w = %rect.width;
+    %h = %rect.height;
+
+    if (%down) {
+        %col1 =DARKGRAY;
+        %col2 =LIGHTGRAY;
+    } else {
+        %col2 =DARKGRAY;
+        %col1 =LIGHTGRAY;
+
+    }
+
+    // Top edge
+    DrawLine( %x, %y, %x + %w, %y, %col1, %thickness);
+    // Bottom edge
+    DrawLine( %x, %y + %h, %x + %w, %y + %h,  %col2, %thickness);
+    // Left edge
+    DrawLine( %x, %y, %x, %y + %h, %col1, %thickness);
+    // Right edge
+    DrawLine( %x + %w, %y, %x + %w, %y + %h, %col2,%thickness);
+
+}
+//----------------------------------------------------------------------
+function Aquarium::MenuEntry(%this, %rect, %caption){
+    %result = false;
+    %textColor = WHITE;
+    if (PointInRect(GetMousePosition(), %rect)) {
+        BeginBlendMode();
+        DrawRectRec(%rect , "100 100 100 100", TRUE );
+        EndBlendMode();
+        %down = false;
+        %textColor = ORANGE;
+        if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
+            %textColor = YELLOW;
+            %down = true;
+        }
+        if (SDL_IsMouseButtonReleased(SDL_BUTTON_LEFT)) {
+            %result = true;
+        }
+        %this.DrawButtonBorder(%rect, %down, 1.0);
+    }
+    DrawText(%rect.x + 5, %rect.y + 5, %caption, 2.5, %textColor, true);
+    return %result;
+}
+
+//----------------------------------------------------------------------
 function Aquarium::Render(%this) {
 
+    %screenSize = getScreenSize();
     %mousePos = GetMousePosition();
     %haveSelected = %this.selectedTexture !$= "";
+
+    %haveOverlay =  %this.Message !$="" || %this.showMenu;
 
 
     foreach(%obj in SceneObjects) {
         Spritesheet.DrawSrcDstRect(%obj.srcRect,%obj.dstRect, "255 255 255 254");
         if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
-        if (!%haveSelected && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+        if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
             if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
         }
 
@@ -104,11 +161,10 @@ function Aquarium::Render(%this) {
         }
     }
 
-    %screenSize = getScreenSize();
     if (!%haveSelected) {
-       if (!%this.hideSpriteSheet) %this.DrawSpriteSheet();
+       if (!%this.hideSpriteSheet && !%haveOverlay) %this.DrawSpriteSheet();
        if (SDL_IsKeyPressed(SDL_SCANCODE_SPACE)) %this.hideSpriteSheet = !%this.hideSpriteSheet;
-    } else {
+    } else if (!%haveOverlay){
         %srcRect = Spritesheet.getFieldValue(%this.selectedTexture);
         %dstRect = (%screenSize.x - PREVIEW_SIZE) SPC 0 SPC PREVIEW_SIZE SPC PREVIEW_SIZE;
         if (SHOW_PREVIEW) {
@@ -137,13 +193,13 @@ function Aquarium::Render(%this) {
         }
 
 
-
+        %halvPaintSize =  %this.paintSize / 2;
         if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT)) {
             // Snap to grid
             %gridSize = SCALE_SNAP; // %this.paintSize;
 
-            %snapX = mFloor(%mousePos.x / %gridSize) * %gridSize;
-            %snapY = mFloor(%mousePos.y / %gridSize) * %gridSize;
+            %snapX = mFloor((%mousePos.x - %halvPaintSize) / %gridSize) * %gridSize;
+            %snapY = mFloor((%mousePos.y - %halvPaintSize) / %gridSize) * %gridSize;
 
             %maxX = getWord(%screenSize, 0) - %this.paintSize;
             %maxY = getWord(%screenSize, 1) - %this.paintSize;
@@ -154,12 +210,12 @@ function Aquarium::Render(%this) {
             %dstRect = %snapX SPC %snapY SPC %this.paintSize SPC %this.paintSize;
 
         } else {
-            %dstRect = (%mousePos.x - %this.paintSize / 2) SPC (%mousePos.y - %this.paintSize / 2) SPC %this.paintSize SPC %this.paintSize;
+            %dstRect = (%mousePos.x - %halvPaintSize) SPC (%mousePos.y - %halvPaintSize) SPC %this.paintSize SPC %this.paintSize;
         }
         Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
         DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize SPC "/" SPC %this.placementLayer , 1.0);
 
-        if (SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+        if (!%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
 
             // FIXME: flip and rotate
 
@@ -178,11 +234,87 @@ function Aquarium::Render(%this) {
         }
         DrawText(5, 5, "shift = snap to grid, wheel = size, ctrl+wheel = layer, right click = select", 1.2, WHITE, true);
     }
+
+    if (%haveOverlay) {
+        BeginBlendMode();
+        DrawRectRec("0 0" SPC %screenSize, "20 20 20 200"  );
+        EndBlendMode();
+    }
+
+    if (%this.showMenu) {
+        %menuWidth = 300;
+        %menuHeight = 300;
+        %x =  %screenSize.x / 2 - %menuWidth / 2;
+        %y = %screenSize.y / 2 - %menuHeight / 2;
+        %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+        BeginBlendMode();
+        DrawRectRec(%menuRect, "20 20 20 200"  );
+        EndBlendMode();
+
+
+        DrawRectRec(%menuRect, "200 200 200", false );
+
+        %x += 25;
+        %y += 15;DrawText(%x, %y, "Menu", 2.5, GRAY);
+        %y += 25; DrawLine(%x, %y, %x+250, %y, GRAY );
+        // Button Save
+        %y += 15;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+        if (%this.MenuEntry(%rect, "Save Scene")) {
+            %this.showMenu = false;
+            %this.Message = "FIXME SAVE SCENE";
+        }
+        // Button Export
+        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+        if (%this.MenuEntry(%rect, "Load Scene")){
+            %this.showMenu = false;
+            %this.Message = "FIXME LOAD SCENE";
+        }
+
+        // Button Export
+        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+        if (%this.MenuEntry(%rect, "Export Image")){
+            %this.showMenu = false;
+            %this.Message = "FIXME EXPORT IMAGE";
+        }
+
+        // Button Resume
+        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+        if (%this.MenuEntry(%rect, "Resume")) %this.showMenu = false;
+
+        // Button QUIT
+        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+        if (%this.MenuEntry(%rect, "Quit")) schedule(250,0, quit);
+
+    }
+    if (%this.Message !$= "") {
+        %menuWidth = %screenSize.x;
+        %linecount = getRecordCount(%this.Message) ;
+        %menuHeight = %linecount * 30 + 30;
+        %x =  %screenSize.x / 2 - %menuWidth / 2;
+        %y = %screenSize.y / 2 - %menuHeight / 2;
+        %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+        BeginBlendMode();
+        DrawRectRec(%menuRect, "20 20 20 200"  );
+        EndBlendMode();
+        DrawRectRec(%menuRect, "200 200 200", false );
+        %x += 25;
+        %y += 15;
+        for (%i = 0; %i < %linecount; %i++) {
+            DrawText(%x, %y, getRecord(%this.Message, %i), 2.0, ORANGE);
+            %y += 30;
+        }
+        %this.messageCounter += GetFrameTime();
+        if (%this.messageCounter > MESSAGE_TIME) {
+            %this.messageCounter = 0;
+            %this.Message = "";
+        }
+    }
+
 }
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
     if (%isDown) {
-        // if (%scancode == SDL_SCANCODE_F5) %this.showSheet = !%this.showSheet;
+        if (%scancode == SDL_SCANCODE_ESCAPE) %this.showMenu = !%this.showMenu;
     }
 }
 function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
