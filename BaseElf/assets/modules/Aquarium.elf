@@ -1,5 +1,11 @@
 exec("includes/TextureAtlas.elf");
 
+#define MAX_LAYER 20
+#define MAX_SCALE 120
+#define SCALE_SNAP 8
+#define PREVIEW_SIZE 96
+#define SHOW_PREVIEW 0
+
 function createAquarium() {
     %obj = new ScriptGroup() {
         class = "Aquarium";
@@ -17,7 +23,12 @@ function Aquarium::onAdd(%this) {
 
     %this.showSheet = true;
     %this.paintSize = 32;
-    %this.painting = false;
+    // %this.painting = false;
+    %this.add( new SimGroup(SceneObjects));
+    %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
+    %this.selectedSceneObject = 0;
+
+    %this.hideSpriteSheet = false;
 
     return true;
 }
@@ -60,43 +71,113 @@ function Aquarium::DrawSpriteSheet(%this) {
         // DrawText(%x , %y, %name,0.8);
     }
     if (%this.cursorTexure !$="")  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure, 1.8, "128 255 0", true, BLACK);
-    DrawText(0, %screenSize.y, "Press left shift to enter paint mode", 1.2, WHITE, true);
+    // DrawText(0, %screenSize.y, "Press left shift to enter paint mode", 1.2, WHITE, true);
     // EndBlendMode();
 }
 //----------------------------------------------------------------------
+// sort by layers higher == move to back (render first)
+function compareLayers(%objA, %objB)
+{
+    if (%objA.layer == %objB.layer) return 0;
+    return (%objA.layer > %objB.layer) ? -1 : 1;
+}
+//----------------------------------------------------------------------
 function Aquarium::Render(%this) {
-   %screenSize = getScreenSize();
+
     %mousePos = GetMousePosition();
-   if (!%this.painting ) %this.DrawSpriteSheet();
-   if (%this.selectedTexture !$= "") {
+    %haveSelected = %this.selectedTexture !$= "";
+
+
+    foreach(%obj in SceneObjects) {
+        Spritesheet.DrawSrcDstRect(%obj.srcRect,%obj.dstRect, "255 255 255 254");
+        if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
+        if (!%haveSelected && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+            if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
+        }
+
+        if (%this.selectedSceneObject == %obj) {
+            DrawRectRec(%obj.dstRect, ORANGE, false);
+            if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
+                %this.selectedSceneObject = 0;
+                %obj.schedule(10, "delete");
+            }
+        }
+    }
+
+    %screenSize = getScreenSize();
+    if (!%haveSelected) {
+       if (!%this.hideSpriteSheet) %this.DrawSpriteSheet();
+       if (SDL_IsKeyPressed(SDL_SCANCODE_SPACE)) %this.hideSpriteSheet = !%this.hideSpriteSheet;
+    } else {
         %srcRect = Spritesheet.getFieldValue(%this.selectedTexture);
-        %dstRect = (%screenSize.x - 128) SPC 0 SPC 128 SPC 128;
-        if (PointInRect(%mousePos, %dstRect)) {
-            %dstRect.x -= 128;
+        %dstRect = (%screenSize.x - PREVIEW_SIZE) SPC 0 SPC PREVIEW_SIZE SPC PREVIEW_SIZE;
+        if (SHOW_PREVIEW) {
+            if (PointInRect(%mousePos, %dstRect)) {
+                %dstRect.x -= PREVIEW_SIZE * 2;
+            }
+            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+            DrawRectRec(%dstRect, BLACK, false);
+        }
+
+
+        %wheel = SDL_GetMouseWheelY();
+        if (%wheel != 0) {
+
+            if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) {
+                %this.placementLayer += %wheel;
+                if (%this.placementLayer < 0) %this.placementLayer = 0;
+                if (%this.placementLayer > MAX_LAYER) %this.placementLayer = MAX_LAYER;
+
+            } else {
+                %this.paintSize += SCALE_SNAP * %wheel;
+                if (%this.paintSize < SCALE_SNAP )  %this.paintSize = SCALE_SNAP;
+                if (%this.paintSize > MAX_SCALE )  %this.paintSize = MAX_SCALE;
+            }
+
+        }
+
+
+
+        if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+            // Snap to grid
+            %gridSize = SCALE_SNAP; // %this.paintSize;
+
+            %snapX = mFloor(%mousePos.x / %gridSize) * %gridSize;
+            %snapY = mFloor(%mousePos.y / %gridSize) * %gridSize;
+
+            %maxX = getWord(%screenSize, 0) - %this.paintSize;
+            %maxY = getWord(%screenSize, 1) - %this.paintSize;
+
+            %snapX = mClamp(%snapX, 0, %maxX);
+            %snapY = mClamp(%snapY, 0, %maxY);
+
+            %dstRect = %snapX SPC %snapY SPC %this.paintSize SPC %this.paintSize;
+
+        } else {
+            %dstRect = (%mousePos.x - %this.paintSize / 2) SPC (%mousePos.y - %this.paintSize / 2) SPC %this.paintSize SPC %this.paintSize;
         }
         Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
-        if (SDL_IsKeyPressed(SDL_SCANCODE_LSHIFT)) %this.painting = !%this.painting;
-        if (%this.painting ) {
+        DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize SPC "/" SPC %this.placementLayer , 1.0);
 
-            %wheel = SDL_GetMouseWheelY();
-            if (%wheel != 0) {
-                %this.paintSize += 8 * %wheel;
-                if (%this.paintSize < 8 )  %this.paintSize = 8; // min 8 ?
-                if (%this.paintSize > 256 )  %this.paintSize = 256; //max 256 ?
-            }
-            %dstRect = (%mousePos.x - %this.paintSize / 2) SPC (%mousePos.y - %this.paintSize / 2) SPC %this.paintSize SPC %this.paintSize;
-            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
-            DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize , 1.0);
+        if (SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+
+            // FIXME: flip and rotate
+
+            SceneObjects.add(
+                new SimObject() {
+                    TypeRectF srcRect = %srcRect;
+                    TypeRectF dstRect = %dstRect;
+                    TypeF32   layer = %this.placementLayer; //higher = rendered first
+                });
+            SceneObjects.sort("compareLayers");
         }
 
-
-
-        DrawRectRec(%dstRect, BLACK, false);
-        if (SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
+        if ( SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
             %this.selectedTexture = "";
-            %this.painting = false;
+            // %this.painting = false;
         }
-   }
+        DrawText(5, 5, "shift = snap to grid, wheel = size, ctrl+wheel = layer, right click = select", 1.2, WHITE, true);
+    }
 }
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
