@@ -317,5 +317,9 @@ function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isR
         if (%scancode == SDL_SCANCODE_ESCAPE) %this.showMenu = !%this.showMenu;
     }
 }
-function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
+    if (%isDown) {
+        if (%button == SDL_BUTTON_MIDDLE) %this.showMenu = !%this.showMenu;
+    }
+}
 function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

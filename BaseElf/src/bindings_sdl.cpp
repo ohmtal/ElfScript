@@ -626,30 +626,30 @@ DefineEngineFunction(EndScale, void , (),,"") {
     SDL_SetRenderScale(app.getRenderer(), 1.f, 1.f);
 }
 // -----------------------------------------------------------------------------
-DefineEngineFunction(PointInRect, bool , (Point2I p, RectI rect),
+DefineEngineFunction(PointInRectI, bool , (Point2I p, RectI rect),
                      ,"Check a point is in rect") {
     return (bool)SDL_PointInRect(&p, &rect);
 }
-DefineEngineFunction(PointInRectF, bool , (Point2F p, RectF rect),
+DefineEngineFunction(PointInRect, bool , (Point2F p, RectF rect),
                      ,"Check a point is in rect") {
     return (bool)SDL_PointInRectFloat(&p, &rect);
 }
-DefineEngineFunction(HasRectIntersection, bool , (RectI rectA, RectI rectB),
+DefineEngineFunction(HasRectIntersectionI, bool , (RectI rectA, RectI rectB),
                      ,"Check rect intersection") {
     return (bool)SDL_HasRectIntersection(&rectA, &rectB);
 }
 
-DefineEngineFunction(HasRectIntersectionF, bool , (RectF rectA, RectF rectB),
+DefineEngineFunction(HasRectIntersection, bool , (RectF rectA, RectF rectB),
                      ,"Check rect intersection") {
     return (bool)SDL_HasRectIntersectionFloat(&rectA, &rectB);
 }
-DefineEngineFunction(GetRectIntersectionF, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(GetRectIntersection, RectF , (RectF rectA, RectF rectB),
                      ,"get rect intersection (overlap)") {
     RectF result = {0.f,0.f,0.f};
     SDL_GetRectIntersectionFloat(&rectA, &rectB, &result);
     return result;
 }
-DefineEngineFunction(GetRectUnionF, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(GetRectUnion, RectF , (RectF rectA, RectF rectB),
                      ,"get rect unio both rects combined to one big.") {
     RectF result = {0.f,0.f,0.f};
     SDL_GetRectUnionFloat(&rectA, &rectB, &result);
@@ -657,7 +657,7 @@ DefineEngineFunction(GetRectUnionF, RectF , (RectF rectA, RectF rectB),
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRectEnclosingPointsFloat(const SDL_FPoint *points, int count, const SDL_FRect *clip, SDL_FRect *result);
 
-DefineEngineFunction(HasRectLineIntersectionF, bool , (RectF rect, F32 x1,F32 y1, F32 x2, F32 y2),
+DefineEngineFunction(HasRectLineIntersection, bool , (RectF rect, F32 x1,F32 y1, F32 x2, F32 y2),
                      ,"check if a rect and a line intersects") {
 
     return SDL_GetRectAndLineIntersectionFloat(&rect, &x1, &y1, &x2, &y2);
