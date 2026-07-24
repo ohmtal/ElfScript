@@ -1,4 +1,4 @@
-exec("includes/TextureAtlas.elf");
+exec("include/TextureAtlas.elf");
 
 #define MAX_LAYER 20
 #define MAX_SCALE 120
@@ -6,6 +6,9 @@ exec("includes/TextureAtlas.elf");
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
 #define MESSAGE_TIME 2.0
+#define BACKGROUND_COLOR "176 233 252"
+#define SCENE_FILE "pref:/aquarium.elfscene"
+#define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
 
 function createAquarium() {
     %obj = new ScriptGroup() {
@@ -16,7 +19,7 @@ function createAquarium() {
 }
 //----------------------------------------------------------------------
 function Aquarium::onAdd(%this) {
-    ClearBackground("176 233 252"); //only set once
+    SetClearBackground(BACKGROUND_COLOR); //only set once
 
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
     %this.Spritesheet.name = "SpriteSheet";
@@ -33,6 +36,12 @@ function Aquarium::onAdd(%this) {
     %this.showMenu = false;
     %this.messageCounter = 0;
     %this.Message = "";
+
+    %target = CreateRenderTarget(getScreenSize());
+    %target.name = "RenderTarget";
+    %this.add( %target );
+
+    %this.dirty = true;
 
     return true;
 }
@@ -136,6 +145,11 @@ function Aquarium::MenuEntry(%this, %rect, %caption){
 }
 
 //----------------------------------------------------------------------
+function Aquarium::removeSceneObject(%this,%obj) {
+    %obj.delete();
+    %this.dirty = true;
+}
+//----------------------------------------------------------------------
 function Aquarium::Render(%this) {
 
     %screenSize = getScreenSize();
@@ -144,22 +158,31 @@ function Aquarium::Render(%this) {
 
     %haveOverlay =  %this.Message !$="" || %this.showMenu;
 
+    if (%this.dirty) {
+        if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
+        ClearBackground(BACKGROUND_COLOR);
 
-    foreach(%obj in SceneObjects) {
-        Spritesheet.DrawSrcDstRect(%obj.srcRect,%obj.dstRect, "255 255 255 254");
-        if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
-        if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
-            if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
-        }
+        foreach(%obj in SceneObjects) {
+            Spritesheet.DrawSrcDstRect(%obj.srcRect,%obj.dstRect, "255 255 255 254");
+            if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
+            if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+                if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
+            }
 
-        if (%this.selectedSceneObject == %obj) {
-            DrawRectRec(%obj.dstRect, ORANGE, false);
-            if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
-                %this.selectedSceneObject = 0;
-                %obj.schedule(10, "delete");
+            if (%this.selectedSceneObject == %obj) {
+                DrawRectRec(%obj.dstRect, ORANGE, false);
+                if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
+                    %this.selectedSceneObject = 0;
+                    %this.schedule(100, removeSceneObject, %obj);
+                }
             }
         }
+        SetRenderTarget(0); //NOTE TEST
     }
+
+    RenderTarget.DrawRect("0 0" SPC %screenSize);
+
+
 
     if (!%haveSelected) {
        if (!%this.hideSpriteSheet && !%haveOverlay) %this.DrawSpriteSheet();
@@ -226,6 +249,7 @@ function Aquarium::Render(%this) {
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                 });
             SceneObjects.sort("compareLayers");
+            %this.dirty = true;
         }
 
         if ( SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
@@ -261,20 +285,45 @@ function Aquarium::Render(%this) {
         %y += 15;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
         if (%this.MenuEntry(%rect, "Save Scene")) {
             %this.showMenu = false;
-            %this.Message = "FIXME SAVE SCENE";
+            %path = getFullPath(SCENE_FILE);
+            if (SceneObjects.save(%path)) %this.Message = "Scene saved to:\n" SPC %path;
+            else %this.Message = "[error] Failed to save Scene to:\n" SPC %path;
+            %this.dirty = true;
         }
-        // Button Export
+        // Button Load
         %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
         if (%this.MenuEntry(%rect, "Load Scene")){
             %this.showMenu = false;
-            %this.Message = "FIXME LOAD SCENE";
+            %path = getFullPath(SCENE_FILE);
+            %savScene = SceneObjects.getId();
+            %savScene.name = "savScene";
+
+            if (exec(%path)) {
+
+                %this.Message = "Scene loaded from:\n" @ %path;
+                warn("will delete previous scene in 100ms id:" SPC %savScene);
+                // add new one to this:
+                %this.add(SceneObjects);
+                // delete prev:
+                %savScene.schedule(100, delete);
+            } else {
+                %this.Message = "[error] Failed to load Scene from:\n" @ %path;
+                %savScene.name = SceneObjects; //restore saved scene
+                warn("Saved Scene restored:" SPC SceneObjects.getId() SPC "==" SPC %savScene);
+            }
+            %this.dirty = true;
         }
 
         // Button Export
         %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
         if (%this.MenuEntry(%rect, "Export Image")){
             %this.showMenu = false;
-            %this.Message = "FIXME EXPORT IMAGE";
+
+            %path = getFullPath(EXPORT_PNG_FILE);
+            if (RenderTarget.saveImage(%path))
+                %this.Message = "Image exported to:\n" @ %path;
+            else
+                %this.Message = "[error]Failed to export Image to:\n" @ %path;
         }
 
         // Button Resume
@@ -300,8 +349,13 @@ function Aquarium::Render(%this) {
         %x += 25;
         %y += 15;
         for (%i = 0; %i < %linecount; %i++) {
-            DrawText(%x, %y, getRecord(%this.Message, %i), 2.0, ORANGE);
+            %line = getRecord(%this.Message, %i);
+            if (startsWith(%line, "[error]"))
+                DrawText(%x, %y, %line, 1.4, RED);
+            else
+                DrawText(%x, %y, %line, 1.4, ORANGE);
             %y += 30;
+            if ( %this.messageCounter == 0.0) echo("MESSAGE:" SPC %line);
         }
         %this.messageCounter += GetFrameTime();
         if (%this.messageCounter > MESSAGE_TIME) {

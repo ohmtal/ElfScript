@@ -107,6 +107,8 @@ public:
    S64 getMicroseconds() const;
    S64 getInternalRepresentation() const;
 
+   S64 getUnixTimeStamp() const;
+
    Platform::LocalTime toLocalTime();
 
 private:
@@ -244,6 +246,12 @@ inline S64 Time::getInternalRepresentation() const
    return _time;
 }
 
+inline S64 Time::getUnixTimeStamp() const
+{
+   S64 unixTime = (_time - TORQUE_CONSTANT_S64(6213568320000000)) / 100000;
+   return unixTime;
+}
+
 //-----------------------------------------------------------------------------
 // time i/o time functions
 
@@ -262,12 +270,18 @@ template<class S> inline bool write(S &stream, const Time &theTime)
 }
 
 //-----------------------------------------------------------------------------
-
-inline Time UnixTimeToTime(U32 t)
+// ElfScript
+inline Time UnixTimeToTime(S64 t)
 {
-   // Converts "unix" time, seconds since 00:00:00 UTC, January 1, 1970
-   return Time(((S64)(t)) * 100000 + TORQUE_CONSTANT_S64(6213568320000000));
+   return Time((t * 100000) + TORQUE_CONSTANT_S64(6213568320000000));
 }
+//-----------------------------------------------------------------------------
+// previous:
+// inline Time UnixTimeToTime(U32 t)
+// {
+//    // Converts "unix" time, seconds since 00:00:00 UTC, January 1, 1970
+//    return Time(((S64)(t)) * 100000 + TORQUE_CONSTANT_S64(6213568320000000));
+// }
 
 inline Time Win32FileTimeToTime(U32 low,U32 high)
 {

@@ -37,6 +37,10 @@ IMPLEMENT_PRIMITIVE( String,        string,,    "Null-terminated UTF-16 Unicode 
 IMPLEMENT_PRIMITIVE( const UTF8*,   cstring,,   "Null-terminated UTF-8 Unicode string.");
 IMPLEMENT_PRIMITIVE( void*,         ptr,,       "Opaque pointer." );
 
+// ElfScript
+IMPLEMENT_PRIMITIVE( S64,           int64_t,,    "64bit signed interger" );
+IMPLEMENT_PRIMITIVE( U64,           uint64_t,,    "64bit unsigned interger" );
+
 // Define pointer types for vectors.
 IMPLEMENT_PRIMITIVE( bool*,                 ptr_bool,,    "Pointer to a bool." );
 IMPLEMENT_PRIMITIVE( U8*,                   ptr_ubyte,,   "Pointer to an unsigned byte." );

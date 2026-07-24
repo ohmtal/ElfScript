@@ -131,8 +131,10 @@ int main(int argc, char* argv[]) {
     initConsole();
     argParser(argc, argv);
     // engineGlue::init(MyLogger, (BaseFlux::Tools::getBasePath()+"/assets").c_str());
-    if (gDirectory.isEmpty()) gDirectory = (BaseFlux::Tools::getBasePath()+"/assets").c_str();
-    engineGlue::init(MyLogger, gDirectory);
+    if (gDirectory.isEmpty()) gDirectory = BaseFlux::Tools::getBasePath().c_str();
+    if (!gDirectory.endsWith("/")) gDirectory += "/";
+    app.mBasePath = gDirectory;
+    engineGlue::init(MyLogger, (gDirectory + "assets"));
     InitBindings_SDL();
     InitBindings_ImGui();
     ElfSDL3::InitKeyCodes();

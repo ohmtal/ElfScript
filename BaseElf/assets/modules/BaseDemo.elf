@@ -1,4 +1,4 @@
-include("includes/AtlasFont.elf");
+include("include/AtlasFont.elf");
 
 #define BORDER 60
 #define LOGO_SPAWN_RATE 50
@@ -17,7 +17,7 @@ function createBaseDemo() {
 }
 //----------------------------------------------------------------------
 function BaseDemo::onAdd(%this) {
-    ClearBackground( SEABLUE ); //set background color
+    SetClearBackground( SEABLUE ); //set background color
     %this.add ( new TextureObject(IconTexture) { fileName = "texture/icon_32.png"; } );
     %this.add ( new TextureObject(GrayTexture) { fileName = "texture/icon_32_gray.png"; });
 

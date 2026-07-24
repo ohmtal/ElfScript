@@ -25,7 +25,7 @@ function Collision::spawnPlayer(%this, %position) {
 }
 //----------------------------------------------------------------------
 function Collision::onAdd(%this) {
-    ClearBackground(SLATEGRAY); //only set once
+    SetClearBackground(SLATEGRAY); //only set once
 
     %this.cleanup = new SimSet();
 

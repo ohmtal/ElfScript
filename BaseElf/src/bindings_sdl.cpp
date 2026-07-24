@@ -174,24 +174,107 @@ class TextureObject : public SimObject
 {
     typedef SimObject Parent;
     StringTableEntry mFileName=nullptr;
-    SDL_Texture* mTexture;
+    SDL_Texture* mTexture = nullptr;
+    bool mIsTargetTexture = false;
+    bool mOwnsTexture = false; // we need to take care or removing!
+
+    void unload() {
+        if (mOwnsTexture && mTexture) {
+            SDL_DestroyTexture(mTexture);
+            mTexture = nullptr;
+        }
+    }
+
+
 public:
     DECLARE_CONOBJECT(TextureObject);
     TextureObject() {
          mFileName = StringTable->EmptyString();
     }
     bool onAdd() override {
-        mTexture = app.getTexture(mFileName);
-        if (!mTexture) return false;
+        mTexture = nullptr;
+        if (mFileName && dStrlen(mFileName) > 0) {
+            mTexture = app.getTexture(mFileName);
+        }
+        if (!mTexture) {
+            //1 pixel white SDL_Texture as fallback
+            mTexture = SDL_CreateTexture(
+                app.getRenderer(),
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_STATIC,
+                1, 1
+            );
+            if (mTexture) {
+                uint32_t whitePixel = 0xFFFFFFFF;
+                SDL_UpdateTexture(mTexture, NULL, &whitePixel, sizeof(uint32_t));
+            } else {
+                return false;
+            }
+        }
         return Parent::onAdd();
     }
-    // void onRemove() override;
+    void onRemove() override {
+        unload();
+        Parent::onRemove();
+    }
 
+    bool load(String fileName) {
+        if (fileName.isEmpty()) return false;
+        mFileName = StringTable->insert(fileName);
+        SDL_Texture* tex =  app.getTexture(mFileName);
+        if (!tex) return false;
+        unload();
+        mTexture = tex;
+        return true;
+    }
     SDL_Texture* get() { return mTexture; };
+    bool set(SDL_Texture* texture, bool isTargetTexture) {
+        if (!texture) return false;
+        unload();
+        mTexture = texture;
+        mIsTargetTexture = isTargetTexture;
+        mOwnsTexture = true;
+        return true;
+    }
     static void initPersistFields() {
         Parent::initPersistFields();
         addField("fileName", TypeString, Offset(mFileName,TextureObject));
     }
+    // ----------------------------------------------------
+    bool SaveImage( const char* fileName, bool asPNG = true) {
+        if ( !mTexture || !fileName) return false;
+
+        SDL_PropertiesID props = SDL_GetTextureProperties(mTexture);
+        S32 width = (int)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
+        S32 height = (int)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
+        SDL_PixelFormat format = (SDL_PixelFormat)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER, SDL_PIXELFORMAT_UNKNOWN);
+
+        if (width == 0 || height == 0 || format == SDL_PIXELFORMAT_UNKNOWN) {
+            return false;
+        }
+
+        SDL_Texture* oldTarget = SDL_GetRenderTarget(app.getRenderer());
+
+        if (!SDL_SetRenderTarget(app.getRenderer(), mTexture)) {
+            return false;
+        }
+        SDL_Surface* surface = SDL_RenderReadPixels(app.getRenderer(), NULL);
+        SDL_SetRenderTarget(app.getRenderer(), oldTarget);
+        if (!surface) {
+            SDL_Log("Failed to read pixels from texture: %s", SDL_GetError());
+            return false;
+        }
+
+        bool success = false;
+
+        if (asPNG) success = SDL_SavePNG(surface, fileName);
+        else success = SDL_SaveBMP(surface, fileName);
+
+        SDL_DestroySurface(surface);
+
+        return success;
+    }
+
 
 
     RectF getAtlasRect(S32 rowCount, S32 colCount, S32 index) {
@@ -285,6 +368,10 @@ public:
 };
 IMPLEMENT_CONOBJECT(TextureObject);
 
+DefineEngineMethod(TextureObject, load, bool, (const char* fileName),,"Load a Texture") {
+    return object->load(fileName);
+}
+
 DefineEngineMethod(TextureObject, getSize,Point2I, (),
                    ,"get the width and height of the loaded texture" ) {
     SDL_Texture* tex = object->get();
@@ -332,6 +419,12 @@ DefineEngineMethod(TextureObject, DrawRotatedCentered,bool, (F32 x, F32 y, F32 a
     ,"Draw a centered rotated (optional flipped) texture at the position"
     "@flip: see also SDL_FLIP_ constants" ) {
     return object->DrawRotatedCentered(x,y,angle, (SDL_FlipMode)flip, color);
+}
+
+
+DefineEngineMethod(TextureObject, SaveImage,bool, (const char* fileName, bool asPNG),(true)
+,"Save the current texture image as png or bmp." ) {
+    return object->SaveImage(fileName, asPNG);
 }
 
 
@@ -595,10 +688,22 @@ DefineEngineMethod(SoundObject, play,bool, (),
 // =============================================================================
 ConsoleFunctionGroupBegin( SDL, "SDL/BaseFlux functions");
 // =============================================================================
+DefineEngineFunction(SetClearBackground, void , (Color color),
+                     ,"set Settings.clearColor if alpha  == 0 it's disabled") {
+    app.getSettings().clearColor = color;
+}
 
 DefineEngineFunction(ClearBackground, void , (Color color),
-                     ,"Set the default background color - one call is enough") {
-   app.getSettings().clearColor = color;
+                     ,"clear the background the color - see also SetClearBackground") {
+   // app.getSettings().clearColor = color;
+
+    SDL_SetRenderDrawColor(app.getRenderer()
+    , color.r
+    , color.g
+    , color.b
+    , color.a
+    );
+    SDL_RenderClear(app.getRenderer());
 
 }
 
@@ -734,6 +839,40 @@ DefineEngineFunction(DrawDonut, void, (F32 x, F32 y,F32 innerRadius,F32 outerRad
 }
 
 
+// =============================================================================
+// RenderTarget and Save functions
+// =============================================================================
+DefineEngineFunction(CreateRenderTarget, S32  /*textureObjectId*/, (Point2I size),,
+                     "Create a Render Target Texture and return the TextureObject") {
+    SDL_Texture *target_texture = SDL_CreateTexture(
+        app.getRenderer(),
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        size.x, size.y
+    );
+    if (!target_texture) {
+        Con::errorf("Failed to create Target Texture!");
+        return 0;
+    }
+    TextureObject* result = new TextureObject();
+    result->registerObject(); // before set because this calles add
+    if (!result->set(target_texture, true)) {
+        result->deleteObject();
+        return 0;
+    }
+    return result->getId();
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SetRenderTarget, bool  , (SimObjectId texObjectID),,
+                     "Set a Render Target if textureObjectId is 0 it is reseted") {
+
+    if (texObjectID == 0) {
+        return SDL_SetRenderTarget(app.getRenderer(), nullptr);
+    }
+    TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
+    if (!texObject) return false;
+    return SDL_SetRenderTarget(app.getRenderer(),texObject->get());
+}
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(SDL);
 
@@ -816,10 +955,53 @@ DefineEngineFunction(setVSync, void, (bool value), , "bool value") {
     SDL_SetRenderVSync(app.getRenderer(), (int)value);
 }
 
-DefineEngineFunction(getFullPath, String,(),, "get the current directory") {
+DefineEngineFunction(getScriptPath, String,(),, "get the current path from the script engine") {
     return Torque::FS::GetCwd().getFullPath();
 }
 
+DefineEngineFunction(getAppPath, String,(),, "Get the directory where the application was run from.") {
+    return BaseFlux::Tools::getBasePath().c_str();
+}
+
+String getFullPath(String pathIdent = "base:/") {
+    if (pathIdent.isEmpty()) pathIdent = "base:/";
+    if (pathIdent.equal("script:/")) return Torque::FS::GetCwd().getFullPath();
+    std::string tmp = pathIdent.c_str();
+    app.setFullPath(tmp);
+    return tmp.c_str();
+}
+
+DefineEngineFunction(dumpPathes, void,(),, "print all known pathes on console output") {
+    // "base:/ || assets:/ || sound:/ || texture:/ || pref:/ || script:/"
+
+    Con::printf(" --- APP pathes: ---");
+    Con::printf("base:/    = %s", getFullPath("base:/").c_str());
+    Con::printf("assets:/  = %s", getFullPath("assets:/").c_str());
+    Con::printf("sound:/   = %s", getFullPath("sound:/").c_str());
+    Con::printf("texture:/ = %s", getFullPath("texture:/").c_str());
+    Con::printf("pref:/    = %s", getFullPath("pref:/").c_str());
+    Con::printf("script:/  = %s", getFullPath("script:/").c_str());
+
+    Con::printf(" --- OS pathes: ---");
+    Con::printf("home:/      = %s", getFullPath("home:/").c_str());
+    Con::printf("desktop:/   = %s", getFullPath("desktop:/").c_str());
+    Con::printf("documents:/ = %s", getFullPath("documents:/").c_str());
+    Con::printf("download:/  = %s", getFullPath("download:/").c_str());
+    Con::printf("music:/     = %s", getFullPath("music:/").c_str());
+    Con::printf("pictures:/  = %s", getFullPath("pictures:/").c_str());
+    Con::printf("videos:/    = %s", getFullPath("videos:/").c_str());
+
+}
+
+DefineEngineFunction(getFullPath, String,(String pathIdent),("base:/"),
+        "get the  path defined in settings.\n"
+        "@param pathIdent:\n"
+        "base:/ || assets:/ || sound:/ || texture:/ || pref:/ || script:/ \n"
+        "|| home:/ || desktop:/ || documents:/ || download:/ || music:/ \n"
+        "|| pictures || videos"
+){
+    return getFullPath(pathIdent);
+}
 // ----------------- include = exec with nocalls ----------------------
 
 DefineEngineFunction( include,bool, (String fileName, bool noCalls),(true), "include(fileName)" "exec a file without calls " ){

@@ -193,6 +193,129 @@ DefineEngineFunction( strasc, int, ( const char* chr ),,
 }
 
 //-----------------------------------------------------------------------------
+// ElfScript HeavyMetal formatString
+ConsoleFunction(formatString, const char*, 2, 32,
+                "(string format, ...)\n"
+                "like strFormat but with up to 31 parameters!"
+){
+      const char* fmt = argv[1];
+      S32 currentArgIndex = 2; // first arg at 2
+
+      StringBuilder builder;
+
+      while (*fmt)
+      {
+            if (*fmt == '%' && *(fmt + 1) != '\0')
+            {
+                  const char* specStart = fmt;
+                  fmt++;
+
+                  if (*fmt == '%')
+                  {
+                        builder.append('%');
+                        fmt++;
+                        continue;
+                  }
+
+                  if (currentArgIndex >= argc)
+                  {
+                        Con::errorf("formatString: invalid argument count !!");
+                        break;
+                  }
+
+                  const char* argValue = argv[currentArgIndex];
+                  currentArgIndex++;
+                  while (*fmt != '\0' && !dIsalpha(*fmt))
+                  {
+                        fmt++;
+                  }
+
+                  while (*fmt == 'l' || *fmt == 'h' || *fmt == 'z')
+                  {
+                        fmt++;
+                  }
+
+                  if (*fmt == '\0')
+                  {
+                        Con::errorf("formatString: invalid format specifier!!");
+                        break;
+                  }
+
+                  U32 specLen = (fmt - specStart) + 1;
+                  char specBuffer[32];
+                  if (specLen >= 32) specLen = 31;
+                  dStrncpy(specBuffer, specStart, specLen);
+                  specBuffer[specLen] = '\0';
+
+                  char tokenBuffer[512];
+
+                  switch (*fmt)
+                  {
+                        case 's': // String
+                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, argValue);
+                              break;
+
+                        case 'c':
+                        case 'C':
+                        case 'd':
+                        case 'i':
+                        case 'o':
+                        case 'u':
+                        case 'x':
+                        case 'X':
+                        {
+                              // long
+                              if (dStrchr(specBuffer, 'l') != NULL)
+                              {
+                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long long)strtoull(argValue, NULL, 10));
+                                    else
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long long)strtoll(argValue, NULL, 10));
+                              }
+                              else //  32-Bit Integer
+                              {
+                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoui(argValue));
+                                    else
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoi(argValue));
+                              }
+                              break;
+                        }
+
+                        case 'e':
+                        case 'E':
+                        case 'f':
+                        case 'g':
+                        case 'G':
+                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtof(argValue));
+                              break;
+
+                        default:
+                              Con::errorf("formatString: unknown type: '%c'!", *fmt);
+                              tokenBuffer[0] = '\0';
+                              break;
+                  }
+
+                  builder.append(tokenBuffer);
+            }
+            else
+            {
+                  builder.append(*fmt);
+            }
+
+            fmt++;
+      }
+
+      // Ergebnis in den Torque-Return-Buffer schieben
+      U32 finalLen = builder.length();
+      char* returnBuffer = Con::getReturnBuffer(finalLen + 1);
+      dMemcpy(returnBuffer, builder.data(), finalLen);
+      returnBuffer[finalLen] = '\0';
+
+      return returnBuffer;
+}
+
+//-----------------------------------------------------------------------------
 
 DefineEngineFunction( strformat, const char*, ( const char* format, const char* value ),,
    "Format the given value as a string using printf-style formatting.\n"
@@ -2812,9 +2935,52 @@ DefineEngineFunction( getStringHash, S32, (const char* _inString, bool _sensitiv
 }
 
 //-----------------------------------------------------------------------------
+// ElfScript
+DefineEngineFunction(getUnixTimestamp, S64, (), ,
+                     "Gets the unixtime as 64bit unsigned integer.")
+{
+      Torque::Time curTime = Torque::Time::getCurrentTime();
+      return curTime.getUnixTimeStamp();
+}
+DefineEngineFunction(getDateTime, String, (S32 mode),(0) ,
+                     "Gets ISO DateTime string.\n"
+                     "@return mode: default => YYYY-MM-DD H:M:S\n"
+                     "@return mode: 1 => YYYY-MM-DD\n"
+                     "@return mode: 2 => H:M:S\n"
+                     "@return mode: 3 => YYYYMMDDHMS\n"
+                     )
+{
+      Torque::Time::DateTime curTime;
+      Torque::Time::getCurrentDateTime(curTime);
+
+      StringBuilder builder;
+      if (mode == 3) {
+            builder.format("%04d%02d%02d%02d%02d%02d"
+            ,(curTime.year + 1900)
+            ,(curTime.month + 1)
+            ,(curTime.day)
+            , curTime.hour,curTime.minute, curTime.second
+            );
+            return builder.end();
+      }
+
+      if (mode != 2) {
+            builder.format("%04d-%02d-%02d"
+                        ,(curTime.year + 1900)
+                        ,(curTime.month + 1)
+                        ,(curTime.day)
+            );
+            if (mode == 1) return builder.end();
+            builder.append(" "); // add a blank to separate date time
+      }
+
+      builder.format("%02d:%02d:%02d",curTime.hour,curTime.minute, curTime.second  );
+
+      return builder.end();
+}
 
 DefineEngineFunction(getTimestamp, const char*, (), ,
-   "Gets datetime string.\n\n"
+   "Gets datetime string.\n"
    "@return YYYY-mm-DD_hh-MM-ss formatted date time string.")
 {
    Torque::Time::DateTime curTime;

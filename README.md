@@ -9,6 +9,7 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
 - 🤘 Added **ImGui** bindings to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/ImGui). Demo: [BaseElf](./BaseElf)
 - 🤘 Added **SDL3** Input (keyboard/mouse) handling and binding with events and polling to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/SDL3). Demo: [BaseElf](./BaseElf)
+- 😍 **ElfScript:** Added some handy console functions but this is my favorite: formatString(string format, ...) where you are able to add up to 31 parameter to really format a string :)
 - **ElfScript:** Added Con::ConsoleDocForStub default false to make the classes/function dumps better human readable but kept the code when it's exported for an parser.
 - Made it standalone
 - Added optional GarabageCollectionSet

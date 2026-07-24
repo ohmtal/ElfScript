@@ -205,6 +205,21 @@ inline S64 dAtol(const char* str)
    return strtol(str, NULL, 10);
 }
 
+// ElfScript
+inline S64 dAtoll(const char* str)
+{
+   return strtoll(str, NULL, 10);
+}
+
+// ElfScript
+inline U64 dAtoull(const char* str)
+{
+   return strtoull(str, NULL, 10);
+}
+
+
+
+
 inline char dToupper(const char c)
 {
    return toupper( c );

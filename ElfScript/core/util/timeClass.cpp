@@ -84,7 +84,9 @@ void Time::getCurrentDateTime(DateTime &dateTime)
 
 Time Time::getCurrentTime()
 {
-   return Torque::UnixTimeToTime( time( NULL ) );
+   // return Torque::UnixTimeToTime( time( NULL ) );
+   // ElfScript:
+   return Torque::UnixTimeToTime( (S64)time( NULL ) );
 }
 
 bool Time::set(S32 year, S32 month, S32 day, S32 hour, S32 minute, S32 second, S32 microsecond)

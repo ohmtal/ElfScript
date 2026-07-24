@@ -1,3 +1,5 @@
+include ("include/Inspector.elf");
+
 // Drawing test: >>>
 #define RadarGreen "0.0 1.0 0.0 1.0"
 #define RadarBg "0.1 0.1 0.1 0.8"
@@ -17,7 +19,7 @@ function createImGuiDemo() {
 }
 //----------------------------------------------------------------------
 function ImGuiDemo::onAdd(%this) {
-    ClearBackground(SLATEGRAY); //only set once
+    SetClearBackground(SLATEGRAY); //only set once
 
     new ScriptObject(ImStorage) {
         TypeBool    myBool = false;
@@ -29,6 +31,9 @@ function ImGuiDemo::onAdd(%this) {
     };
 
      new SoundObject(Sound1) { fileName = "sound/sound1.wav"; };
+
+     %this.add ( singleton SimObject(FieldInspector));
+     FieldInspector.inspect(ImStorage.getId());
 
     return true;
 }
@@ -52,6 +57,8 @@ function onFruitContextClick(%index, %itemName) {
 }
 //----------------------------------------------------------------------
 function ImGuiDemo::Render(%this) {
+
+    FieldInspector.render();
 
     // Single key stroke check
     if (ImIsKeyPressed(ImGuiKey_F5)) {
