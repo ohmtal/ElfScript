@@ -28,6 +28,9 @@ BaseFlux::Main app;
 ImConsole gConsole;
 SDL_Point gMousePos = {0,0};
 
+bool gDoUpdateCall; // = Con::isFunction("OnUpdate");
+bool gDoRenderCall; // = Con::isFunction("OnRender");
+
 bool gShowConsole = false;
 
 String gDirectory = "";
@@ -127,6 +130,15 @@ int argParser(int argc, char* argv[]) {
     return 0;
 }
 // ----------------------------------------------------------------------------
+void checkLoopFunc() {
+    gDoUpdateCall = Con::isFunction("OnUpdate");
+    gDoRenderCall = Con::isFunction("OnRender");
+}
+DefineEngineFunction(checkLoopFunc, void, (),,"recheck we want to enable onRender and onUpdate") {
+    checkLoopFunc();
+    Con::printf("checkLoopFunc: Update enable:%d, Render enable:%d", gDoUpdateCall, gDoRenderCall);
+}
+// ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     initConsole();
     argParser(argc, argv);
@@ -141,8 +153,7 @@ int main(int argc, char* argv[]) {
 
     Con::executeFile(gScriptFile);
 
-    bool doUpdateCall = Con::isFunction("OnUpdate");
-    bool doRenderCall = Con::isFunction("OnRender");
+    checkLoopFunc();
 
     app.getSettings() = {
         .ScreenSize = { 800, 450},
@@ -168,7 +179,7 @@ int main(int argc, char* argv[]) {
     };
     app.OnRender = [&](SDL_Renderer* renderer) {
 
-       if (doRenderCall) Con::executef("OnRender");
+       if (gDoRenderCall) Con::executef("OnRender");
 
 
         if (ImGui::IsKeyPressed(ImGuiKey_GraveAccent)) gShowConsole = !gShowConsole;
@@ -177,7 +188,7 @@ int main(int argc, char* argv[]) {
 
     // -------------------------------------------------------------------------
     app.OnUpdate = [&](const float dt) {
-        if (doUpdateCall)Con::executef("OnUpdate", dt);
+        if (gDoUpdateCall)Con::executef("OnUpdate", dt);
         engineGlue::process((SimTime)(dt * 1000.f));
     };
     // -------------------------------------------------------------------------

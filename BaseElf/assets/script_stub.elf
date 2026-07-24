@@ -476,6 +476,11 @@ class  TextureObject : public SimObject {
     * @return bool
     */
       function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -1800,11 +1805,19 @@ function Message::onRemove(%this)
 //                  F U N C T I O N S 
 //------------------------------------------------------------------
 namespace Global {
+   /** --- void checkLoopFunc ---
+    * recheck we want to enable onRender and onUpdate
+    */
+      function checkLoopFunc();
    /** --- Group: SDL ---
     * SDL/BaseFlux functions
     */
+   /** --- void SetClearBackground ---
+    * set Settings.clearColor if alpha  == 0 it's disabled
+    */
+      function SetClearBackground( Color color );
    /** --- void ClearBackground ---
-    * Set the default background color - one call is enough
+    * clear the background the color - see also SetClearBackground
     */
       function ClearBackground( Color color );
    /** --- void SetColor ---
@@ -1975,11 +1988,29 @@ namespace Global {
     * bool value
     */
       function setVSync( bool value );
-   /** --- String getFullPath ---
-    * get the current directory
+   /** --- String getScriptPath ---
+    * get the current path from the script engine
     * @return String
     */
-      function getFullPath();
+      function getScriptPath();
+   /** --- String getAppPath ---
+    * Get the directory where the application was run from.
+    * @return String
+    */
+      function getAppPath();
+   /** --- void dumpPathes ---
+    * print all known pathes on console output
+    */
+      function dumpPathes();
+   /** --- String getFullPath ---
+    * get the  path defined in settings.
+    * @param pathIdent:
+    * base:/ || assets:/ || sound:/ || texture:/ || pref:/ || script:/ 
+    * || home:/ || desktop:/ || documents:/ || download:/ || music:/ 
+    * || pictures || videos
+    * @return String
+    */
+      function getFullPath( String pathIdent="base:/" );
    /** --- bool include ---
     * include(fileName)exec a file without calls 
     * @return bool
@@ -2041,6 +2072,11 @@ namespace Global {
     * @return int
     */
       function strasc( string chr );
+   /** --- string formatString ---
+    * like strFormat but with up to 31 parameters!
+    * @return string
+    */
+      function formatString(string format, ...);
    /** --- const char* strformat ---
     * Format the given value as a string using printf-style formatting.
     * @param format A printf-style format string.
@@ -3294,6 +3330,20 @@ namespace Global {
     * @return S32
     */
       function getStringHash( string _inString="", bool _sensitive=true );
+   /** --- S64 getUnixTimestamp ---
+    * Gets the unixtime as 64bit unsigned integer.
+    * @return S64
+    */
+      function getUnixTimestamp();
+   /** --- String getDateTime ---
+    * Gets ISO DateTime string.
+    * @return mode: default => YYYY-MM-DD H:M:S
+    * @return mode: 1 => YYYY-MM-DD
+    * @return mode: 2 => H:M:S
+    * @return mode: 3 => YYYYMMDDHMS
+    * @return String
+    */
+      function getDateTime( int mode=0 );
    /** --- const char* getTimestamp ---
     * Gets datetime string.
     * @return YYYY-mm-DD_hh-MM-ss formatted date time string.

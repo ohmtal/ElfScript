@@ -177,10 +177,11 @@ function Aquarium::Render(%this) {
                 }
             }
         }
-        SetRenderTarget(0); //NOTE TEST
+        SetRenderTarget(0);
+        // FIXME bad in edit mode need to separate render from edit: %this.dirty = false;
     }
 
-    RenderTarget.DrawRect("0 0" SPC %screenSize);
+    RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
 
 
 
