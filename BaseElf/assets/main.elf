@@ -9,6 +9,8 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     if (%setNewModuleIndex !$= "" ) {
         %this.moduleIndex = %setNewModuleIndex;
     }
+     %this.hideBottomMessage = false;
+
     %cnt = getWordCount($MODULES);
     if (%this.moduleIndex >= %cnt)  %this.moduleIndex = 0;
     if (%this.moduleIndex < 0 ) %this.moduleIndex = %cnt - 1;
@@ -32,6 +34,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     eval(%cmd);
     %created = isObject(%this.module);
     echo("loadModule success:" SPC %created SPC "id:" SPC %this.module.getId());
+
     if (!%created || !%this.module.isMethod("render")) {
         error("Module failed!! obj:" SPC %this.module SPC "method render exists:" SPC %this.module.isMethod("render"));
         if (%created) %this.module.delete();
@@ -44,15 +47,19 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 function Main::loop(%this) {
 
     // we scale the screen (setScreenSize) so we have to use out ScreenSize not windowSize
+
     $ScreenSize = getScreenSize(); // GetWindowSize();
+
 
     if (isObject(%this.module)){
         %this.module.render();
-        DrawText(5, $ScreenSize.y - 20,"Loaded module:" SPC %this.moduleName ,  1.5, BLUE, true, BLACK);
+        if (!%this.hideBottomMessage ) DrawText(5, $ScreenSize.y - 20,"Loaded module:" SPC %this.moduleName ,  1.5, BLUE, true, BLACK);
     } else {
         ClearBackground("20 100 100");
         DrawText(5, $ScreenSize.y - 20,"Failed to load module:" SPC %this.moduleName,  1.5, RED);
     }
+    if ( %this.hideBottomMessage ) return;
+
     DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS(), 1.5,  "200 200 180", true, SLATEGRAY);
 
     DrawText($ScreenSize.x - 500, $ScreenSize.y - 10
@@ -97,6 +104,7 @@ function onInit() {
         class = "Main";
         TypeS32 moduleIndex = 0;
         TypeS32 module = 0;
+        TypeBool hideBottomMessage = false;
     };
     $Main.init();
 

@@ -66,8 +66,16 @@ function FieldInspector::_addFieldDef(%this, %fieldname) {
 // set new to object which should be inspected
 // here we generate the gui for the objects fields
 // this should be cached in a file
-function FieldInspector::Inspect(%this, %object) {
-    if (!isObject( %object )) return false;
+function FieldInspector::Inspect(%this, %object, %force) {
+
+    if (!%force && %this.object == %object) return true;
+
+    if (!isObject( %object )) {
+        %this.object = 0;
+        return false;
+    }
+
+
     %this.object = %object;
     if (isObject(%this.gui)) %this.gui.delete();
     %this.gui = new SimGroup();
@@ -114,21 +122,26 @@ function FieldInspector::Inspect(%this, %object) {
 // -----------------------------------------------------------------------------
 function FieldInspector::_reload(%this) {
      if (!isObject( %this.object )) return ;
-      %this.Inspect(%this.object);
+      %this.Inspect(%this.object, true);
 }
 // -----------------------------------------------------------------------------
 // Render the gui
-function FieldInspector::Render(%this) {
+function FieldInspector::Render(%this, %force) {
     if (!isObject( %this.object ) || !isObject(%this.gui)) return;
-    if (!ImBegin("FieldInspector: " SPC %this.object.getName() SPC %this.object.getId())) {
+    ///*SPC %this.object.getName() SPC %this.object.getId())*/
+    if (!ImBegin("FieldInspector" )) {
         ImEnd();
         return;
     }
 
     // FIXME $I_Header => if (ImTreeNode(%element.caption))  ... $I_CloseHeader => ImTreePop...
-    if (ImButton("Reload")) %this._reload();
+    if (ImButton("Reload")) {
+        %this._reload();
+    }
+    ImSameLine(); ImText("Id:" SPC  %this.object.getId());
 
     %skip = false;
+    %dirty = false;
     foreach (%element in %this.gui) {
         ImSetNextItemWidth(140.0);
         switch (%element.type) {
@@ -145,22 +158,28 @@ function FieldInspector::Render(%this) {
                 %skip = false;
 
             case $I_TypeString:
-                if (!%skip) ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname);
+                if (!%skip)
+                    if (ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname)) %dirty = true;
 
             case $I_TypeBool:
-                if (!%skip) ImCheckbox(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname);
+                if (!%skip)
+                    if (ImCheckbox(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname)) %dirty = true;
 
             case $I_TypeFloat:
-                if (!%skip) ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname);
+                if (!%skip)
+                    if (ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname)) %dirty = true;
 
             case $I_TypeInt:
-                if (!%skip) ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname);
+                if (!%skip)
+                    if (ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname)) %dirty = true;
 
 
             default:
                 if (!%skip) ImTextColored(cl_Red, %element.fieldname SPC %element.fieldtype);
         } //switch
     }
+
+    if (%dirty) %this.object.onInspectPostApply();
 
     if (ImButton("Add dynamic Field")) {
         ImOpenPopup("FieldInspectorAddDynamicPopup");

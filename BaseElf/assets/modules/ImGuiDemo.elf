@@ -11,7 +11,7 @@ include ("include/Inspector.elf");
 //----------------------------------------------------------------------
 
 function createImGuiDemo() {
-    %obj = new ScriptObject() {
+    %obj = new ScriptGroup() {
         class = "ImGuiDemo";
     };
 
@@ -30,17 +30,17 @@ function ImGuiDemo::onAdd(%this) {
         TypeString  ComboValues = "Apfel" TAB "Birne" TAB "Erdbeere" TAB "Kiwi";
     };
 
-     new SoundObject(Sound1) { fileName = "sound/sound1.wav"; };
+    %this.add(ImStorage);
+    new SoundObject(Sound1) { fileName = "sound/sound1.wav"; };
+    %this.add(Sound1);
 
-     %this.add ( singleton SimObject(FieldInspector));
-     FieldInspector.inspect(ImStorage.getId());
+    %this.add ( new SimObject(FieldInspector));
+    FieldInspector.inspect(ImStorage.getId());
 
     return true;
 }
 //----------------------------------------------------------------------
 function ImGuiDemo::OnRemove(%this) {
-    ImStorage.delete();
-    Sound1.delete();
 }
 //----------------------------------------------------------------------
 function ImGuiDemo::OnUpdate(%this, %dt) {

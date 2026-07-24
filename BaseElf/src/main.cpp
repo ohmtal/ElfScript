@@ -193,12 +193,22 @@ int main(int argc, char* argv[]) {
     };
     // -------------------------------------------------------------------------
     app.OnEvent = [&](const SDL_Event& event) {
-        if (app.getImGuiIO() && app.getImGuiIO()->WantTextInput) {
+        if (app.getImGuiIO())  {
+            if (app.getImGuiIO()->WantTextInput) {
             if (event.type == SDL_EVENT_KEY_DOWN ||
                 event.type == SDL_EVENT_KEY_UP ||
                 event.type == SDL_EVENT_TEXT_INPUT) {
-                return;
+                    return;
                 }
+            }
+            if (app.getImGuiIO()-> WantCaptureMouse) {
+                if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+                    event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
+                ) {
+                    return;
+                }
+
+            }
         }
 
         ElfSDL3::onEvent(event);

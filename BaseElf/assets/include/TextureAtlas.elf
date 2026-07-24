@@ -21,7 +21,10 @@ include("./ScriptXML.elf"); //getXMLAttribute
  object have fields with "name" and rect like background_rock_a="640 512 128 128";
  //
 */
-function loadTextureAtlas(%filePath, %filename) {
+function loadTextureAtlas(%filePath, %filename, %bleedingOffset) {
+
+    if (%bleedingOffset $= "") %bleedingOffset = 0.0;
+
     %file = new FileObject();
     if (!%file.openForRead(%filePath @ "/" @ %filename)) {
         error("Failed to open Atlas XML File");
@@ -55,14 +58,15 @@ function loadTextureAtlas(%filePath, %filename) {
         }
 
         %name   = getXMLAttribute(%line, "name");
-        %x      = getXMLAttribute(%line, "x");
-        %y      = getXMLAttribute(%line, "y");
-        %width  = getXMLAttribute(%line, "width");
-        %height = getXMLAttribute(%line, "height");
+        // i  add 0.01 in pos and remove 0.02 them in size to prevent Bleeding
+        %x      = getXMLAttribute(%line, "x") + %bleedingOffset;
+        %y      = getXMLAttribute(%line, "y") + %bleedingOffset;
+        %width  = getXMLAttribute(%line, "width") - %bleedingOffset * 2;
+        %height = getXMLAttribute(%line, "height") - %bleedingOffset * 2;
 
         if (%name $= "")
             continue;
-        %result.addTypeField(%name, "TypeRectI", %x SPC %y SPC %width SPC %height);
+        %result.addTypeField(%name, "TypeRectF", %x SPC %y SPC %width SPC %height);
     }
 
     %file.close();

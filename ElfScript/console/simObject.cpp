@@ -951,17 +951,23 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
       }
 
 
-      // if (fld->type == TypeU32) {
-      //       U32* target = (U32*)(((const char*)this) + fld->offset);
-      //       *target = (U32)value;
-      //       return true;
-      // }
-      //
-      // if (fld->type == TypeS64) {
-      //       S64* target = (S64*)(((const char*)this) + fld->offset);
-      //       *target = (S64)value;
-      //       return true;
-      // }
+      if (fld->type == TypeU32) {
+            U32* target = (U32*)(((const char*)this) + fld->offset);
+            *target = (U32)value;
+            return true;
+      }
+
+      if (fld->type == TypeS64) {
+            S64* target = (S64*)(((const char*)this) + fld->offset);
+            *target = (S64)value;
+            return true;
+      }
+
+      if (fld->type == TypeU64) {
+            U64* target = (U64*)(((const char*)this) + fld->offset);
+            *target = (U64)value;
+            return true;
+      }
       return false;
 }
 

@@ -1,4 +1,7 @@
-exec("include/TextureAtlas.elf");
+exec ("include/TextureAtlas.elf");
+exec ("include/Inspector.elf");
+
+
 
 #define MAX_LAYER 20
 #define MAX_SCALE 120
@@ -11,14 +14,15 @@ exec("include/TextureAtlas.elf");
 #define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
 
 function createAquarium() {
-    %obj = new ScriptGroup() {
-        class = "Aquarium";
+    %obj = new ScriptGroup(Aquarium) {
+        // class = "Aquarium";
     };
 
     return %obj;
 }
 //----------------------------------------------------------------------
 function Aquarium::onAdd(%this) {
+
     SetClearBackground(BACKGROUND_COLOR); //only set once
 
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
@@ -27,6 +31,11 @@ function Aquarium::onAdd(%this) {
 
     %this.showSheet = true;
     %this.paintSize = 32;
+    //FIXME unused >>>>
+    %this.paintRotate = 0;
+    %this.paintCenterPoint = "16 16";
+    %this.paintFlip = 0;
+    // <<<<
     // %this.painting = false;
     %this.add( new SimGroup(SceneObjects));
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
@@ -43,6 +52,11 @@ function Aquarium::onAdd(%this) {
 
     %this.dirty = true;
 
+    %this.add ( new SimObject(FieldInspector));
+    %this.showInspector = false;
+
+    $Main.hideBottomMessage = true;
+
     return true;
 }
 //----------------------------------------------------------------------
@@ -51,6 +65,7 @@ function Aquarium::OnRemove(%this) {
 //----------------------------------------------------------------------
 function Aquarium::OnUpdate(%this, %dt) {
 }
+//----------------------------------------------------------------------
 //----------------------------------------------------------------------
 function Aquarium::DrawSpriteSheet(%this) {
     %s = %this.Spritesheet;
@@ -77,6 +92,7 @@ function Aquarium::DrawSpriteSheet(%this) {
             // echo("inRect:" SPC %name);
             if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
                 %this.selectedTexture = %name;
+                %this.selectedSceneObject = 0;
             }
             %this.cursorTexure = %name;
         }
@@ -150,7 +166,57 @@ function Aquarium::removeSceneObject(%this,%obj) {
     %this.dirty = true;
 }
 //----------------------------------------------------------------------
+function Aquarium::load(%this) {
+    %path = getFullPath(SCENE_FILE);
+
+
+    %savScene = SceneObjects.getId();
+    %savScene.name = "savScene";
+
+    if (exec(%path)) {
+
+        %this.Message = "Scene loaded from:\n" @ %path;
+        warn("will delete previous scene in 100ms id:" SPC %savScene);
+        // add new one to this:
+        %this.add(SceneObjects);
+
+        //update objects to current version
+        foreach(%obj in SceneObjects) {
+            %obj.class = "SceneObject";
+
+            if (%obj.color $= "") {
+                %obj.color = "255 255 255 254";
+                // setup bleeding hack here ...
+                %obj.srcRect.x += 0.5;
+                %obj.srcRect.y += 0.5;
+                %obj.srcRect.width -= 1;
+                %obj.srcRect.height -= 1;
+            }
+
+            if (%obj.angle $= "") %obj.angle = 0;
+
+            if (%obj.centerPoint $= "")
+                %obj.centerPoint = %obj.dstRect.width / 2 SPC %obj.dstRect.height / 2;
+
+            if (%obj.flip $= "") %obj.flip = 0;
+        }
+
+
+        // delete prev:
+        %savScene.schedule(100, delete);
+    } else {
+        %this.Message = "[error] Failed to load Scene from:\n" @ %path;
+        %savScene.name = SceneObjects; //restore saved scene
+        warn("Saved Scene restored:" SPC SceneObjects.getId() SPC "==" SPC %savScene);
+    }
+    %this.dirty = true;
+
+
+}
+//----------------------------------------------------------------------
 function Aquarium::Render(%this) {
+
+    if (%this.showInspector && %this.selectedSceneObject != 0) FieldInspector.render();
 
     %screenSize = getScreenSize();
     %mousePos = GetMousePosition();
@@ -158,30 +224,101 @@ function Aquarium::Render(%this) {
 
     %haveOverlay =  %this.Message !$="" || %this.showMenu;
 
-    if (%this.dirty) {
+    if (%this.dirty /*|| %this.selectedSceneObject != 0*/) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
         ClearBackground(BACKGROUND_COLOR);
 
         foreach(%obj in SceneObjects) {
-            Spritesheet.DrawSrcDstRect(%obj.srcRect,%obj.dstRect, "255 255 255 254");
-            if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
-            if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
-                if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
-            }
-
-            if (%this.selectedSceneObject == %obj) {
-                DrawRectRec(%obj.dstRect, ORANGE, false);
-                if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
-                    %this.selectedSceneObject = 0;
-                    %this.schedule(100, removeSceneObject, %obj);
-                }
-            }
+            Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
+                                              %obj.dstRect,
+                                              %obj.angle,
+                                              %obj.centerPoint,
+                                              %obj.flip,
+                                               %obj.color
+                                              );
+            // if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
+            // if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+            //     if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
+            // }
+            //
+            // if (%this.selectedSceneObject == %obj) {
+            //     DrawRectRec(%obj.dstRect, ORANGE, false);
+            //     if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
+            //         %this.selectedSceneObject = 0;
+            //         %this.schedule(100, removeSceneObject, %obj);
+            //     }
+            // }
         }
         SetRenderTarget(0);
-        // FIXME bad in edit mode need to separate render from edit: %this.dirty = false;
+        %this.dirty = false;
     }
 
-    RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
+     if (!%this.dirty) {
+        RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
+        %mouseDown = SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT);
+        %deletePressed = SDL_IsKeyPressed(SDL_SCANCODE_DELETE);
+        %lctrlPressed = SDL_IsKeyDown(SDL_SCANCODE_LCTRL);
+        %lshiftPressed = SDL_IsKeyDown(SDL_SCANCODE_LSHIFT);
+        if (%mouseDown)  {
+            %this.selectedSceneObject = 0;
+            FieldInspector.inspect(0);
+        }
+        if (%mouseDown || %deletePressed || %lctrlPressed || %lshiftPressed || %this.selectedSceneObject != 0) {
+
+            if (%this.selectedSceneObject != 0) {
+
+                DrawText(10,%screenSize.y - 30, "DEL delete, 1-4 flip, wheel rotate, F10 Inspector", 2, BLUE, true);
+
+                %wheel = SDL_GetMouseWheelY();
+                if ( %wheel != 0 ) {
+                    %this.selectedSceneObject.angle += SDL_GetMouseWheelY();
+
+                    %this.dirty = true;
+                }
+                if (SDL_IsKeyPressed(SDL_SCANCODE_1))  {
+                    %this.selectedSceneObject.flip = 0;
+                    %this.dirty = true;
+                }
+                if (SDL_IsKeyPressed(SDL_SCANCODE_2))  {
+                    %this.selectedSceneObject.flip = 1;
+                    %this.dirty = true;
+                }
+                if (SDL_IsKeyPressed(SDL_SCANCODE_3))  {
+                    %this.selectedSceneObject.flip = 2;
+                    %this.dirty = true;
+                }
+                if (SDL_IsKeyPressed(SDL_SCANCODE_4))  {
+                    %this.selectedSceneObject.flip = 3;
+                    %this.dirty = true;
+                }
+            }
+
+            foreach(%obj in SceneObjects) {
+                if (%lctrlPressed) {
+                    DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
+                }
+
+
+                if (!%haveSelected && !%haveOverlay && %mouseDown) {
+                    if (PointInRect(%mousePos, %obj.dstRect)) {
+                        %this.selectedSceneObject = %obj;
+                        FieldInspector.inspect(%obj.getId());
+                    }
+
+                }
+
+                if (%this.selectedSceneObject == %obj) {
+                    DrawRectRec(%obj.dstRect, ORANGE, false);
+                    if (%deletePressed) {
+                        %this.selectedSceneObject = 0;
+                        FieldInspector.inspect(0);
+                        %this.schedule(100, removeSceneObject, %obj);
+                    }
+                }
+            } //foreach
+        }
+    }
+
 
 
 
@@ -202,13 +339,13 @@ function Aquarium::Render(%this) {
 
         %wheel = SDL_GetMouseWheelY();
         if (%wheel != 0) {
-
+//FIXME paintRotate + paintCenterPoint + paintFlip
             if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) {
                 %this.placementLayer += %wheel;
                 if (%this.placementLayer < 0) %this.placementLayer = 0;
                 if (%this.placementLayer > MAX_LAYER) %this.placementLayer = MAX_LAYER;
 
-            } else {
+            } else  {
                 %this.paintSize += SCALE_SNAP * %wheel;
                 if (%this.paintSize < SCALE_SNAP )  %this.paintSize = SCALE_SNAP;
                 if (%this.paintSize > MAX_SCALE )  %this.paintSize = MAX_SCALE;
@@ -245,8 +382,13 @@ function Aquarium::Render(%this) {
 
             SceneObjects.add(
                 new SimObject() {
+                    class = "SceneObject";
                     TypeRectF srcRect = %srcRect;
                     TypeRectF dstRect = %dstRect;
+                    TypeF32 angle = 0;
+                    TypeF32 centerPoint = %dstRect.width / 2 SPC %dstRect.height / 2;
+                    TypeColor color="255 255 255 254";
+                    TypeS32 flip = 0;
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                 });
             SceneObjects.sort("compareLayers");
@@ -295,24 +437,8 @@ function Aquarium::Render(%this) {
         %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
         if (%this.MenuEntry(%rect, "Load Scene")){
             %this.showMenu = false;
-            %path = getFullPath(SCENE_FILE);
-            %savScene = SceneObjects.getId();
-            %savScene.name = "savScene";
+            %this.load();
 
-            if (exec(%path)) {
-
-                %this.Message = "Scene loaded from:\n" @ %path;
-                warn("will delete previous scene in 100ms id:" SPC %savScene);
-                // add new one to this:
-                %this.add(SceneObjects);
-                // delete prev:
-                %savScene.schedule(100, delete);
-            } else {
-                %this.Message = "[error] Failed to load Scene from:\n" @ %path;
-                %savScene.name = SceneObjects; //restore saved scene
-                warn("Saved Scene restored:" SPC SceneObjects.getId() SPC "==" SPC %savScene);
-            }
-            %this.dirty = true;
         }
 
         // Button Export
@@ -366,10 +492,17 @@ function Aquarium::Render(%this) {
     }
 
 }
+
+function SceneObject::onInspectPostApply(%this) {
+    echo("onInspectPostApply" SPC %this);
+    Aquarium.dirty = true;
+    SceneObjects.sort("compareLayers");
+}
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
     if (%isDown) {
         if (%scancode == SDL_SCANCODE_ESCAPE) %this.showMenu = !%this.showMenu;
+        if (%scancode == SDL_SCANCODE_F10) %this.showInspector = !%this.showInspector;
     }
 }
 function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {

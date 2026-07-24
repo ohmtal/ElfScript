@@ -253,6 +253,14 @@ static void setFieldComponent(SimObject* object, StringTableEntry field, const c
       StringTable->insert("w")
    };
 
+   //XXTH added
+   static const StringTableEntry wh[] =
+   {
+         StringTable->insert("width"),
+         StringTable->insert("height")
+   };
+
+
    static const StringTableEntry rgba[] =
    {
       StringTable->insert("r"),
@@ -269,10 +277,10 @@ static void setFieldComponent(SimObject* object, StringTableEntry field, const c
    else if (subField == xyzw[1] || subField == rgba[1])
       dStrcpy(val, StringUnit::setUnit(prevVal, 1, strValue, " \t\n"), 128);
 
-   else if (subField == xyzw[2] || subField == rgba[2])
+   else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
       dStrcpy(val, StringUnit::setUnit(prevVal, 2, strValue, " \t\n"), 128);
 
-   else if (subField == xyzw[3] || subField == rgba[3])
+   else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
       dStrcpy(val, StringUnit::setUnit(prevVal, 3, strValue, " \t\n"), 128);
 
    if (val[0] != 0)
