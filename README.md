@@ -19,8 +19,9 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 - Fixed some memory leaks :)
 - Added auto enum binding as constants
 - Added new Log functions
-- Fixed Emscripten and Android Build  (Android untested)
-- Replaced Math with Light Version since the Types like Vector are removed
+- Fixed Emscripten and Android Build  (Android problem: file loading does not work in apk - i added overwrite exec - example in OhmFlux/ElfTest)
+- Replaced Math with Light Version (based on Torque2D) since the Types like Point3F are removed
+- Since i also removed nearly all platform code - network is not implemented, because i need to add threading/mutex again in order to get it working. 
 
 ```
 // Hello World example:

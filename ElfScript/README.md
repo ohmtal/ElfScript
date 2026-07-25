@@ -6,13 +6,15 @@ This is the enhanced Version of TorqueScript.
 - field type fast path
 - stability fixes
 - memleak fixes.
+- and more ....
 
 I already worked on ElfScript bindings for: 
 
+- Basic Demo for Testing Script only: [demo](./demo)
+- ImGui and SDL3 bindings demo with BaseFlux: [BaseElf](../BaseElf)
 - OhmFlux (ElfTest) [OhmFlux](https://github.com/ohmtal/OhmFlux)
 - raylib-elfScript [raylib-elfScript](https://github.com/ohmtal/raylib-elfscript)
 - ElfFlux raylib-elfScript with Objects [ElfFlux](https://github.com/ohmtal/ElfFlux)
-- ImGui with BaseFlux [BaseFlux](https://github.com/ohmtal/BaseFlux)
 
 ## how to use 
 
