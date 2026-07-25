@@ -610,8 +610,10 @@ DefineEngineFunction(ImInputText, bool, (const char* text, const char* valueVarN
     (0),
     "return true if changed add a varname as reference. Can be a global variable or a Object field.\n"
 ) {
+
     char buf[1024]{};
-    dStrcpy(buf, Con::getVariable(valueVarName, ""), 1024);
+    const char* value = Con::getVariable(valueVarName, "");
+    dStrcpy(buf, value, 1024);
     bool result = ImGui::InputText(text, buf,1024, flags);
     if (result) {
         Con::setVariable(valueVarName, buf);

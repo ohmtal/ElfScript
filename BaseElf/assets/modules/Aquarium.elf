@@ -5,6 +5,22 @@
 // Prototype for 2D Editor using a Aquarium
 // Graphics: 	Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
 //-----------------------------------------------------------------------------
+// FIXME getVariableObjectField on name or internalname failes
+//      ==> *SimObject::getDataField ==>             return (*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) );
+// not sure why because getFieldValue works...
+// NOTE: if it's NOT empty it works ... very strange ... guess it's a BUG
+// 16468.setFieldValue("name","bab"); works also if it's emtpy
+// NOTE 2: dumpFields also does NOT list name and fieldname!!!! ==> mInternalName         = NULL; <<< THIS!! but do not change it !!!
+/*
+ TODO:
+ getDataField fail because it's NULL ... FieldInspector should changed ... for that static fields !!!
+
+ const char * *val = obj->getDataField(StringTable->insert(token), 0);
+ if(!val)
+     return("");
+*/
+
+
 // Control Scheme:
 // FIXME implement
 // - Scale          : Mouse Wheel alone. Quick and natural for resizing.
