@@ -13,6 +13,8 @@ This is a nice place to learn ElfScript (aka TorqueScipt ).
     ./BaseElf
     
 Where -j4 means compile with 4 cores. 
+
+Building on MS-Windows is similar to: [OhmFlux Build on Windows](https://github.com/ohmtal/OhmFlux/blob/main/README_BUILD_WINDOWS.md) but you don't need OpenGL. (Note i did not test it so far - rarely boot my pc where MS-Windows lives  - using it makes me sad. ;) )
     
 ### Examples:
 
