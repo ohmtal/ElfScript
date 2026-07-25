@@ -203,7 +203,8 @@ int main(int argc, char* argv[]) {
             }
             if (app.getImGuiIO()-> WantCaptureMouse) {
                 if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-                    event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
+                    event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+                    event.type == SDL_EVENT_MOUSE_WHEEL
                 ) {
                     return;
                 }

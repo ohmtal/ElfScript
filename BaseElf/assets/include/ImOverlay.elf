@@ -1,0 +1,63 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+//
+// ImGui Overlay: Designed for selections (at mouse position for example)
+//
+// Create:
+//      new SimObject(ImOverLay) OR: new SimObject() { class = ImOverLay; }
+//
+// Callback onRender is called inside the ::Render overlay window "##TransparentOverlay";
+//      ImOverlay.onRender = "SelectCustom"; // function ImOverlay::SelectCustom(%this,%displaySize);
+//-----------------------------------------------------------------------------
+function ImOverlay::onAdd(%this) {
+  %this.WindowFlags = ImGuiWindowFlags_NoTitleBar |
+          ImGuiWindowFlags_NoResize |
+          ImGuiWindowFlags_NoMove |
+          ImGuiWindowFlags_NoScrollbar |
+          ImGuiWindowFlags_NoSavedSettings |
+          ImGuiWindowFlags_NoInputs;
+
+  // TestCallBack like functional
+
+}
+
+
+function ImOverlay::render(%this, /* ImVec2 */ %displaySize) {
+    if (!%this.visible) return;
+    if (%displaySize $= "") return; //error!
+    ImSetNextWindowPos("0 0");
+    ImSetNextWindowSize(%displaySize);
+
+    ImPushStyleColor(ImGuiCol_WindowBg, cl_Shadow );
+    ImPushStyleVar(ImGuiStyleVar_WindowRounding, 0.0);
+    ImPushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0);
+    ImPushStyleVarVec(ImGuiStyleVar_WindowPadding, "0 0");
+
+
+
+    ImBegin("##TransparentOverlay", "", %this.WindowFlags);
+      if (%this.isMethod("onRender")) {
+          %this.call("onRender", %displaySize);
+      } else {
+         //test call:
+        %this.call("MissingOnRender", %displaySize);
+      }
+
+    ImEnd();
+
+    ImPopStyleVar(3);
+    ImPopStyleColor();
+
+}
+
+function ImOverLay::MissingOnRender(%this, %displaySize) {
+  ImPushFontSize(24.0);
+  %text = "Hello Overlay - you missed to set onRender !! ";
+  %size = ImCalcTextSize(%text);
+  ImSetCursorScreenPosXY(%displaySize.x / 2 - %size.x / 2, %displaySize.y / 2 - %size.y / 2);
+  ImText(%text);
+  ImPopFontSize();
+  if (ImIsKeyPressed(ImGuiKey_Escape)) %this.visible = false;
+}

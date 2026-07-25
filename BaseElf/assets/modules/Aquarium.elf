@@ -1,10 +1,30 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Prototype for 2D Editor using a Aquarium
+// Graphics: 	Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
+//-----------------------------------------------------------------------------
+// Control Scheme:
+// FIXME implement
+// - Scale          : Mouse Wheel alone. Quick and natural for resizing.
+// - Rotate         : Shift + Mouse Wheel.
+// - Layer (0..20)  : Ctrl + Mouse Wheel.
+// - Flip (0..3)    : Middle Mouse Click Cycle.
+//
+// GUI:
+// - Atlas Map      : SPACE
+// - Main Menu      : ESCAPE
+// - Inspector      : F10
+//
+//-----------------------------------------------------------------------------
 exec ("include/TextureAtlas.elf");
 exec ("include/Inspector.elf");
 
 
 
 #define MAX_LAYER 20
-#define MAX_SCALE 120
+#define MAX_SCALE 256
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
@@ -25,7 +45,7 @@ function Aquarium::onAdd(%this) {
 
     SetClearBackground(BACKGROUND_COLOR); //only set once
 
-    %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml");
+    %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
     %this.Spritesheet.name = "SpriteSheet";
     %this.add(%this.Spritesheet);
 
@@ -40,6 +60,7 @@ function Aquarium::onAdd(%this) {
     %this.add( new SimGroup(SceneObjects));
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
     %this.selectedSceneObject = 0;
+    %this.add( new SimSet(SelectList));
 
     %this.hideSpriteSheet = false;
     %this.showMenu = false;
@@ -87,7 +108,7 @@ function Aquarium::DrawSpriteSheet(%this) {
             %x += %size;
         }
         %dstRect = %x SPC %y SPC %size SPC %size;
-        %s.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+        %s.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
         if (PointInRect(%mousePos, %dstRect)) {
             // echo("inRect:" SPC %name);
             if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
@@ -185,7 +206,7 @@ function Aquarium::load(%this) {
             %obj.class = "SceneObject";
 
             if (%obj.color $= "") {
-                %obj.color = "255 255 255 254";
+                %obj.color = WHITEBLEND;
                 // setup bleeding hack here ...
                 %obj.srcRect.x += 0.5;
                 %obj.srcRect.y += 0.5;
@@ -262,6 +283,7 @@ function Aquarium::Render(%this) {
         if (%mouseDown)  {
             %this.selectedSceneObject = 0;
             FieldInspector.inspect(0);
+            SelectList.clear();
         }
         if (%mouseDown || %deletePressed || %lctrlPressed || %lshiftPressed || %this.selectedSceneObject != 0) {
 
@@ -303,6 +325,7 @@ function Aquarium::Render(%this) {
                     if (PointInRect(%mousePos, %obj.dstRect)) {
                         %this.selectedSceneObject = %obj;
                         FieldInspector.inspect(%obj.getId());
+                        SelectList.add(%obj);
                     }
 
                 }
@@ -319,6 +342,10 @@ function Aquarium::Render(%this) {
         }
     }
 
+    if (SelectList.getCount() > 0 && %mouseDown) {
+        warn("Multiple Objects found at mouse position:");
+        SelectList.listObjects();
+    }
 
 
 
@@ -332,7 +359,7 @@ function Aquarium::Render(%this) {
             if (PointInRect(%mousePos, %dstRect)) {
                 %dstRect.x -= PREVIEW_SIZE * 2;
             }
-            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
             DrawRectRec(%dstRect, BLACK, false);
         }
 
@@ -373,7 +400,7 @@ function Aquarium::Render(%this) {
         } else {
             %dstRect = (%mousePos.x - %halvPaintSize) SPC (%mousePos.y - %halvPaintSize) SPC %this.paintSize SPC %this.paintSize;
         }
-        Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, "255 255 255 254");
+        Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
         DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize SPC "/" SPC %this.placementLayer , 1.0);
 
         if (!%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
@@ -387,7 +414,7 @@ function Aquarium::Render(%this) {
                     TypeRectF dstRect = %dstRect;
                     TypeF32 angle = 0;
                     TypeF32 centerPoint = %dstRect.width / 2 SPC %dstRect.height / 2;
-                    TypeColor color="255 255 255 254";
+                    TypeColor color=WHITEBLEND;
                     TypeS32 flip = 0;
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                 });

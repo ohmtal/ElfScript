@@ -603,4 +603,36 @@ struct _SCOPE
    EngineExportScope& operator()() const { return T::__engineExportScope(); }
 };
 
+
+// =============================================================================
+// NOTE: ElfScript Engine Type Traits
+// for non  POD (Plain Old Data) C-style structures
+// This fix (example):
+//    Problem in Semantic analysis
+//    Location: bindings_imgui.cpp :986
+//    'fnImGetMousePos' has C-linkage specified, but returns user-defined
+//    type 'EngineTypeTraits<ImVec2>::ReturnValueType' (aka 'ImVec2') which
+//    is incompatible with C [-Wreturn-type-c-linkage]
+// =============================================================================
+#define IMPLEMENT_ENGINE_TYPE_TRAITS(Type) \
+template<> \
+struct EngineTypeTraits< Type > : public _EngineStructTypeTraits< Type > { \
+      typedef Type* ReturnValueType; \
+      static Type* ReturnValue(Type* val) { return val; } \
+      static Type* ReturnValue(Type val)  { return new Type(val); } \
+}; \
+template<> \
+inline const EngineTypeInfo* const _EngineStructTypeTraits< Type >::TYPEINFO = EngineTypeInfo::getTypeInfoByName(#Type);
+
+// #define IMPLEMENT_ENGINE_TYPE_TRAITS(Type) \
+// template<> \
+// struct EngineTypeTraits< Type > : public _EngineStructTypeTraits< Type > { \
+//       typedef Type* ReturnValueType; \
+//       static Type* ReturnValue(Type* val) { return val; } \
+//       static Type* ReturnValue(Type val)  { return new Type(val); } \
+// }; \
+// template<> \
+// const EngineTypeInfo* const _EngineStructTypeTraits< Type >::TYPEINFO = EngineTypeInfo::getTypeInfoByName(#Type);
+
+
 #endif // !_ENGINETYPES_H_

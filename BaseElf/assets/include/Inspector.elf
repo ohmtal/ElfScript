@@ -1,9 +1,21 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
 //
 // ImGui Object Inspector
+// Version 0.260725
 //
-// -----------------------------------------------------------------------------
-//----------------------------------------------------------------------
-// TEST for script based ImGui Field Inspector
+// create:
+//      new SimObject(FieldInspector);
+//
+// select/disselect a object:
+//      FieldInspector.inspect( %objId ); // %objId == 0 < disselect
+//
+// render in the render loop:
+//      FieldInspector.render();
+//-----------------------------------------------------------------------------
+// for script based ImGui Field Inspector
 function ListObjectFields(%object) {
     // %object.dumpFields();
 

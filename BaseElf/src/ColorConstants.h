@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 // ColorConstants
 //-----------------------------------------------------------------------------
+#pragma once
 
 // Some Basic Colors borrowed from raylib >>>>
 #define LIGHTGRAY  (Color){ 200, 200, 200, 255 }   // Light Gray
@@ -35,6 +36,10 @@
 #define MAGENTA    (Color){ 255, 0, 255, 255 }     // Magenta
 #define RAYWHITE   (Color){ 245, 245, 245, 255 }   // My own White (raylib logo)
 
-#define SLATEGRAY (Color){45, 45, 45, 255}
-#define SEABLUE   (Color){20, 20, 50, 255}
 // <<< raylib ends
+#define WHITEBLEND (Color){ 255, 255, 255, 254 }   // WHITE with 254 alpha
+#define SLATEGRAY  (Color){ 45, 45, 45, 255 }      // My favorite dark gray
+#define SEABLUE    (Color){ 20, 20, 50, 255 }      // Dark Sea blue
+#define NEONPINK   (Color){255, 0, 128, 255}       // ...
+#define ACIDGREEN  (Color){128, 255, 0, 255}       // ...
+

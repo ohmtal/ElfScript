@@ -65,8 +65,12 @@ void registerColors() {
         {"BLANK", BLANK},
         {"MAGENTA", MAGENTA},
         {"RAYWHITE", RAYWHITE},
+
+        {"WHITEBLEND", WHITEBLEND},
         {"SLATEGRAY", SLATEGRAY},
-        {"SEABLUE", SEABLUE}
+        {"SEABLUE", SEABLUE},
+        {"NEONPINK", NEONPINK},
+        {"ACIDGREEN", ACIDGREEN}
     };
 
 
@@ -872,6 +876,10 @@ DefineEngineFunction(SetRenderTarget, bool  , (SimObjectId texObjectID),,
     TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
     if (!texObject) return false;
     return SDL_SetRenderTarget(app.getRenderer(),texObject->get());
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(GetRendererName, String, (), ,"Get the current renderer name") {
+    return SDL_GetRendererName(app.getRenderer());
 }
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(SDL);

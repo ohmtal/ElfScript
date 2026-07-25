@@ -434,53 +434,13 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  TextureObject : public SimObject {
+class  SoundObject : public SimObject {
   public:
-   /** --- bool load ---
-    * Load a Texture
+   /** --- bool play ---
+    * play the sound
     * @return bool
     */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
+      function play();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -488,6 +448,34 @@ class  TextureObject : public SimObject {
    /*!
     */
    string fileName;
+   /*!
+    */
+   float gain;
+   /*!
+    */
+   bool loop;
+};
+/*!
+@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
+ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
+a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
+@tsexample
+new ScriptObject(Game)
+{
+   class = "DeathMatchGame";
+   superClass = GameCore;
+   genre = "Action FPS"; // Note the new, non-Torque variable
+};
+@endtsexample
+@see SimObject
+@ingroup Console
+ */
+class  ScriptObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
 };
 /*!
 @brief A collection of SimObjects.
@@ -704,28 +692,6 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
-/*!
-@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
-ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
-a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
-@tsexample
-new ScriptObject(Game)
-{
-   class = "DeathMatchGame";
-   superClass = GameCore;
-   genre = "Action FPS"; // Note the new, non-Torque variable
-};
-@endtsexample
-@see SimObject
-@ingroup Console
- */
-class  ScriptObject : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
 class  SettingsObject : public SimObject {
   public:
    /** --- void sync ---
@@ -784,6 +750,61 @@ class  SettingsObject : public SimObject {
    /*!
     */
    Color clearColor;
+};
+class  TextureObject : public SimObject {
+  public:
+   /** --- bool load ---
+    * Load a Texture
+    * @return bool
+    */
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
 };
 class  GameObject : public SimObject {
   public:
@@ -890,27 +911,6 @@ class  GameObject : public SimObject {
    
     */
    int flip;
-};
-class  SoundObject : public SimObject {
-  public:
-   /** --- bool play ---
-    * play the sound
-    * @return bool
-    */
-      function play();
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
-   /*!
-    */
-   float gain;
-   /*!
-    */
-   bool loop;
 };
 /*!
 @brief Data structure for storing indexed sequences of key/value pairs.
@@ -1922,6 +1922,11 @@ namespace Global {
     * @return bool
     */
       function SetRenderTarget( SimObjectId texObjectID );
+   /** --- String GetRendererName ---
+    * Get the current renderer name
+    * @return String
+    */
+      function GetRendererName();
    /** --- Group: BaseFlux ---
     * BaseFlux Functions: getFPS, ...
     */
@@ -4133,11 +4138,6 @@ namespace Global {
     * @param text The string message to draw.
     */
       function ImDrawText( float pos_x, float pos_y, ImVec4 color, string text );
-   /** --- ImVec2 ImGetCursorScreenPos ---
-    * Returns the current screen coordinate position of the cursor as a native ImVec2.
-    * @return ImVec2
-    */
-      function ImGetCursorScreenPos();
    /** --- bool ImBeginTable ---
     * Begins a ImGui table framework.
     * Only call ImEndTable() if this returns true.
@@ -4269,6 +4269,70 @@ namespace Global {
     * Pops a text wrap position from the stack.
     */
       function ImPopTextWrapPos();
+   /** --- void ImPushFontSize ---
+    * Push a dynamic pixel size for the current font context.
+    *  - replacement for SetWindowFontScale, dont forget to call ImPopFontSize
+    */
+      function ImPushFontSize( float sizeInPixels );
+   /** --- void ImPopFontSize ---
+    * Pop the current dynamic font size context.
+    */
+      function ImPopFontSize();
+   /** --- ImVec2 ImCalcTextSize ---
+    * Calculate the bounding size of a text string in pixels based on the current font and scale configuration.
+    * @return ImVec2
+    */
+      function ImCalcTextSize( string text, bool hideTextAfterDoubleHash=false, float wrapWidth=-1.0f );
+   /** --- ImVec2 ImGetCursorScreenPos ---
+    * Get absolute cursor position in screen coordinates.
+    * @return ImVec2
+    */
+      function ImGetCursorScreenPos();
+   /** --- void ImSetCursorScreenPos ---
+    * Set absolute cursor position in screen coordinates.
+    */
+      function ImSetCursorScreenPos( ImVec2 pos );
+   /** --- void ImSetCursorScreenPosXY ---
+    * Set absolute cursor position in screen coordinates.
+    */
+      function ImSetCursorScreenPosXY( float x, float y );
+   /** --- ImVec2 ImGetContentRegionAvail ---
+    * Get available space from the current layout position.
+    * @return ImVec2
+    */
+      function ImGetContentRegionAvail();
+   /** --- ImVec2 ImGetCursorStartPos ---
+    * Get initial cursor placement in window-local coordinates.
+    * @return ImVec2
+    */
+      function ImGetCursorStartPos();
+   /** --- ImVec2 ImGetCursorPos ---
+    * Get window-local cursor position.
+    * @return ImVec2
+    */
+      function ImGetCursorPos();
+   /** --- void ImSetCursorPos ---
+    * Set window-local cursor position.
+    */
+      function ImSetCursorPos( ImVec2 local_pos );
+   /** --- F32 ImGetCursorPosX ---
+    * Get window-local cursor X position.
+    * @return F32
+    */
+      function ImGetCursorPosX();
+   /** --- void ImSetCursorPosX ---
+    * Set window-local cursor X position.
+    */
+      function ImSetCursorPosX( float local_x );
+   /** --- F32 ImGetCursorPosY ---
+    * Get window-local cursor Y position.
+    * @return F32
+    */
+      function ImGetCursorPosY();
+   /** --- void ImSetCursorPosY ---
+    * Set window-local cursor Y position.
+    */
+      function ImSetCursorPosY( float local_y );
    /** --- bool SDL_IsKeyPressed ---
     * return if the key with value scancode is pressed.
     * @return bool
@@ -4345,6 +4409,14 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
+  DummySize = "200 200"
+  TextWhite = "1.0 1.0 1.0 1.0"
+  RadarBg = "0.1 0.1 0.1 0.8"
+  PLAYER_SIZE = "16 16"
+  SCENE_FILE = "pref:/aquarium.elfscene"
+  BACKGROUND_COLOR = "176 233 252"
+  MESSAGE_TIME = 2.0
+  SCALE_SNAP = 8
   TEX_SIZE = 16
   BOUNCY = 6.66
   SDL_BUTTON_X1 = 4
@@ -4380,10 +4452,11 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
+  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
-  SDL_SCANCODE_LSHIFT = 225
-  ImGuiKey_R = 563
-  ImGuiInputTextFlags_CallbackHistory = 524288
+  SDL_SCANCODE_KP_MEMSUBTRACT = 212
+  SDL_SCANCODE_KP_MEMADD = 211
+  SDL_SCANCODE_KP_MEMCLEAR = 210
   ImGuiKey_M = 558
   ImGuiKey_RightArrow = 514
   SDL_SCANCODE_KP_SPACE = 205
@@ -4392,6 +4465,7 @@ namespace Global {
   ImGuiTreeNodeFlags_OpenOnDoubleClick = 64
   ImGuiKey_F = 551
   SDL_SCANCODE_INSERT = 73
+  ACIDGREEN = "128 255 0 255"
   ImGuiMod_Ctrl = 4096
   ImGuiTableColumnFlags_WidthFixed = 16
   ImGuiKey_D = 549
@@ -4410,6 +4484,9 @@ namespace Global {
   ImGuiInputTextFlags_EscapeClearsAll = 128
   SDL_SCANCODE_F9 = 66
   ImGuiTableFlags_Borders = 1920
+  ImGuiInputTextFlags_CallbackHistory = 524288
+  SDL_SCANCODE_LSHIFT = 225
+  ImGuiKey_R = 563
   ImGuiInputTextFlags_CallbackResize = 4194304
   SDL_SCANCODE_NONUSHASH = 50
   ImGuiInputTextFlags_ReadOnly = 512
@@ -4466,8 +4543,6 @@ namespace Global {
   ImGuiCol_TabDimmed = 38
   ImGuiCol_TabSelectedOverline = 37
   SDL_WINDOW_FULLSCREEN = 1
-  ImGuiCol_Tab = 35
-  SDL_SCANCODE_KP_5 = 93
   ImGuiTableFlags_ScrollY = 33554432
   ImGuiInputTextFlags_EnterReturnsTrue = 64
   ImGuiCol_SeparatorHovered = 28
@@ -4478,19 +4553,27 @@ namespace Global {
   ImGuiCol_HeaderActive = 26
   ImGuiCol_BorderShadow = 6
   SDL_SCANCODE_F17 = 108
+  ImGuiStyleVar_SelectableTextAlign = 36
+  ImGuiCol_ButtonHovered = 22
+  SDL_SCANCODE_A = 4
+  ImGuiStyleVar_ScrollbarRounding = 19
   ImGuiWindowFlags_NoBackground = 128
   SDL_SCANCODE_5 = 34
-  ImGuiKey_P = 561
   ImGuiInputTextFlags_Password = 1024
   ImGuiTableFlags_BordersOuterV = 1024
+  ImGuiKey_L = 557
+  ImGuiStyleVar_ButtonTextAlign = 35
+  SDL_SCANCODE_G = 10
+  ImGuiStyleVar_TableAngledHeadersTextAlign = 32
+  ImGuiPopupFlags_NoReopen = 32
+  ImGuiWindowFlags_NoNav = 196608
+  ImGuiCol_Header = 24
+  ImGuiWindowFlags_NoMove = 4
   ImGuiTreeNodeFlags_Selected = 1
   SDL_LOGICAL_PRESENTATION_LETTERBOX = 2
   ImGuiWindowFlags_AlwaysAutoResize = 64
   DARKPURPLE = "112 31 126 255"
   SDL_SCANCODE_E = 8
-  ImGuiCol_ButtonHovered = 22
-  ImGuiStyleVar_SelectableTextAlign = 36
-  SDL_SCANCODE_A = 4
   SDL_KMOD_CAPS = 8192
   ImGuiWindowFlags_NoResize = 2
   SDL_SCANCODE_3 = 32
@@ -4500,9 +4583,6 @@ namespace Global {
   ImGuiKey_T = 565
   ImGuiWindowFlags_MenuBar = 1024
   ImGuiTreeNodeFlags_OpenOnArrow = 128
-  ImGuiPopupFlags_NoReopen = 32
-  ImGuiWindowFlags_NoNav = 196608
-  ImGuiStyleVar_TableAngledHeadersTextAlign = 32
   MAGENTA = "255 0 255 255"
   BROWN = "127 106 79 255"
   BLACK = "0 0 0 255"
@@ -4510,6 +4590,12 @@ namespace Global {
   ImGuiWindowFlags_HorizontalScrollbar = 2048
   ImGuiWindowFlags_None = 0
   ImGuiInputTextFlags_CallbackCharFilter = 2097152
+  ImGuiKey_B = 547
+  ImGuiCol_ButtonActive = 23
+  WHITEBLEND = "255 255 255 254"
+  SDL_SCALEMODE_NEAREST = 0
+  SDL_SCANCODE_MEDIA_NEXT_TRACK = 267
+  SDL_SCANCODE_INTERNATIONAL4 = 138
   SDL_SCANCODE_BACKSPACE = 42
   ImGuiStyleVar_FramePadding = 11
   ImGuiCol_TableRowBg = 50
@@ -4531,9 +4617,7 @@ namespace Global {
   MAROON = "190 33 55 255"
   ImGuiTreeNodeFlags_AllowOverlap = 4
   ImGuiCol_WindowBg = 2
-  SDL_SCALEMODE_NEAREST = 0
-  SDL_SCANCODE_MEDIA_NEXT_TRACK = 267
-  SDL_SCANCODE_INTERNATIONAL4 = 138
+  TargetRed = "1.0 0.0 0.0 1.0"
   ImGuiTableColumnFlags_WidthStretch = 8
   PURPLE = "200 122 255 255"
   ImGuiKey_Backspace = 523
@@ -4555,6 +4639,7 @@ namespace Global {
   ImGuiWindowFlags_NoTitleBar = 1
   cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
   SDL_SCANCODE_CRSEL = 163
+  RadarGreen = "0.0 1.0 0.0 1.0"
   ImGuiCond_None = 0
   SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
   SDL_SCANCODE_END = 77
@@ -4570,7 +4655,6 @@ namespace Global {
   ImGuiCol_SeparatorActive = 29
   SDL_SCANCODE_2 = 31
   ImGuiPopupFlags_MouseButtonMiddle = 12
-  ImGuiStyleVar_DisabledAlpha = 1
   ImGuiCol_Border = 5
   ImGuiTreeNodeFlags_Framed = 2
   cl_Black = "0.000000 0.000000 0.000000 1.000000"
@@ -4578,12 +4662,6 @@ namespace Global {
   cl_Kelp = "0.130000 0.290000 0.130000 1.000000"
   FLT_MAX = 3.40282e+38
   SDL_SCANCODE_KP_PLUS = 87
-  ImGuiKey_L = 557
-  ImGuiStyleVar_ButtonTextAlign = 35
-  SDL_SCANCODE_G = 10
-  ImGuiWindowFlags_NoMove = 4
-  ImGuiCol_Header = 24
-  ImGuiWindowFlags_NoSavedSettings = 256
   SLATEGRAY = "45 45 45 255"
   ImGuiInputTextFlags_NoHorizontalScroll = 32768
   ImGuiKey_8 = 544
@@ -4592,24 +4670,26 @@ namespace Global {
   DARKGREEN = "0 117 44 255"
   ImGuiKey_H = 553
   ImGuiCond_Once = 2
+  ImGuiCol_Tab = 35
+  SDL_SCANCODE_KP_5 = 93
   SDL_SCANCODE_AC_PROPERTIES = 279
   ImGuiMod_Shift = 8192
   SDL_SCANCODE_AC_SAVE = 277
   ImGuiTreeNodeFlags_CollapsingHeader = 26
   SDL_SCANCODE_KP_ENTER = 88
+  ImGuiStyleVar_DisabledAlpha = 1
+  NEONPINK = "255 0 128 255"
+  ImGuiCol_TableBorderLight = 49
+  BEIGE = "211 176 131 255"
+  ImGuiTableFlags_RowBg = 64
   RED = "230 41 55 255"
   ImGuiTableFlags_None = 0
   ImGuiKey_G = 552
   ImGuiCol_ResizeGripActive = 32
   ImGuiWindowFlags_NoInputs = 197120
-  ImGuiCol_TableBorderLight = 49
-  BEIGE = "211 176 131 255"
-  ImGuiTableFlags_RowBg = 64
   DARKGRAY = "80 80 80 255"
   ImGuiCol_TabHovered = 34
   SDL_SCANCODE_HOME = 74
-  ImGuiKey_E = 550
-  ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiWindowFlags_NoBringToFrontOnFocus = 8192
   LIGHTGRAY = "200 200 200 255"
   GRAY = "130 130 130 255"
@@ -4621,6 +4701,7 @@ namespace Global {
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
   ImGuiKey_A = 546
+  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
@@ -4635,7 +4716,11 @@ namespace Global {
   ImGuiCol_PlotHistogram = 45
   cl_Slate = "0.180000 0.240000 0.310000 1.000000"
   ImGuiKey_Delete = 522
+  ImGuiWindowFlags_NoSavedSettings = 256
+  ImGuiKey_E = 550
+  ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiCol_PlotLines = 43
+  MAX_SCALE = 256
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiPopupFlags_MouseButtonRight = 8
   ImGuiCol_TitleBg = 10
@@ -4705,10 +4790,12 @@ namespace Global {
   ImGuiCol_DragDropTarget = 55
   SDL_SCANCODE_KP_HASH = 204
   ImGuiCol_MenuBarBg = 13
+  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
+  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
@@ -4726,9 +4813,7 @@ namespace Global {
   ImGuiCol_Button = 21
   WHITE = "255 255 255 255"
   SDL_SCANCODE_SLASH = 56
-  ImGuiStyleVar_ScrollbarRounding = 19
-  ImGuiKey_B = 547
-  ImGuiCol_ButtonActive = 23
+  ImGuiKey_P = 561
   SDL_SCANCODE_KP_MEMDIVIDE = 214
   ImGuiKey_S = 564
   SDL_SCANCODE_KP_A = 188
@@ -4829,7 +4914,6 @@ namespace Global {
   SDL_SCANCODE_1 = 30
   SDL_SCANCODE_6 = 35
   SDL_SCANCODE_8 = 37
-  SDL_SCANCODE_KP_MEMCLEAR = 210
   ImGuiWindowFlags_NoScrollbar = 8
   SDL_SCANCODE_ESCAPE = 41
   SDL_SCANCODE_LANG7 = 150
@@ -4920,7 +5004,6 @@ namespace Global {
   SDL_SCANCODE_ALTERASE = 153
   SDL_SCANCODE_LANG1 = 144
   SDL_SCANCODE_LANG4 = 147
-  SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_V = 25
   SDL_SCANCODE_LANG6 = 149
   cl_Emerald = "0.160000 0.710000 0.440000 1.000000"
@@ -4955,6 +5038,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
-  SDL_SCANCODE_KP_MEMADD = 211
---- End of Dump (611 items) ---
+--- End of Dump (629 items) ---
 */

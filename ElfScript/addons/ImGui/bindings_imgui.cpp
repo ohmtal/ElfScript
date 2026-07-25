@@ -55,6 +55,13 @@ ConsoleSetType( TypeImVec2 )
     else
         Con::printf("ImVec2 must be set as { x, y } or \"x y\"");
 }
+// template<>
+// class EngineTypeTraits<ImVec2> : public ConcreteTypeArgs<ImVec2>
+// {
+// public:
+//     // Forces the underlying C-linkage function to return a plain C-string pointer
+//     typedef const char* ReturnValueType;
+// };
 //-----------------------------------------------------------------------------
 // TypeImVec4
 //-----------------------------------------------------------------------------
@@ -938,6 +945,80 @@ DefineEngineFunction(ImIsMouseDown, bool, (S32 mouseButton), (0),
                      "Returns true if the mouse button is currently held down globally.\n") {
     return ImGui::IsMouseDown(mouseButton);
 }
+// =============================================================================
+// Mouse Status (Global & Positional)
+// =============================================================================
+
+DefineEngineFunction(ImIsMouseReleased, bool, (S32 mouseButton), (0),
+                     "Returns true if the mouse button went from down to up in this frame globally.\n") {
+    return ImGui::IsMouseReleased(mouseButton);
+}
+
+DefineEngineFunction(ImIsMouseDoubleClicked, bool, (S32 mouseButton), (0),
+                     "Returns true if the mouse button was double-clicked globally.\n") {
+    return ImGui::IsMouseDoubleClicked(mouseButton);
+}
+
+DefineEngineFunction(ImIsMouseReleasedWithDelay, bool, (S32 mouseButton, F32 delay), (0, -1.0f),
+                     "Returns true for a delayed mouse release event.\n") {
+    // If delay is negative or left default, automatically match ImGui's double-click window timing
+    if (delay < 0.0f) {
+        delay = ImGui::GetIO().MouseDoubleClickTime;
+    }
+    return ImGui::IsMouseReleasedWithDelay(mouseButton, delay);
+}
+
+DefineEngineFunction(ImGetMouseClickedCount, S32, (S32 mouseButton), (0),
+                     "Returns the number of successive mouse clicks recorded at the moment a click happens.\n") {
+    return ImGui::GetMouseClickedCount(mouseButton);
+}
+
+DefineEngineFunction(ImIsMouseHoveringRect, bool, (ImVec2 r_min, ImVec2 r_max, bool clip), (true),
+                     "Checks if the mouse is hovering a specific global bounding box.\n") {
+    return ImGui::IsMouseHoveringRect(r_min, r_max, clip);
+}
+
+DefineEngineFunction(ImIsMousePosValid, bool, (String mousePosStr), (""),
+                     "Returns true if the specified position (or current frame coordinate) is valid.\n") {
+    if (mousePosStr.isEmpty()) {
+        return ImGui::IsMousePosValid(nullptr);
+    }
+
+    // Parse vector manually if a specific coordinate string was provided to script
+    ImVec2 pos(0.0f, 0.0f);
+    dSscanf(mousePosStr.c_str(), "%f %f", &pos.x, &pos.y);
+    return ImGui::IsMousePosValid(&pos);
+}
+
+DefineEngineFunction(ImGetMousePos, ImVec2, (), ,
+                     "Returns the global screen coordinates of the mouse cursor.\n") {
+    return ImGui::GetMousePos();
+}
+
+DefineEngineFunction(ImGetMousePosOnOpeningCurrentPopup, ImVec2, (), ,
+                     "Returns the mouse coordinates captured exactly at the moment the current popup opened.\n") {
+    return ImGui::GetMousePosOnOpeningCurrentPopup();
+}
+
+DefineEngineFunction(ImIsMouseDragging, bool, (S32 mouseButton, F32 lockThreshold), (0, -1.0f),
+                     "Returns true if the mouse is actively dragging past a specified motion threshold.\n") {
+    return ImGui::IsMouseDragging(mouseButton, lockThreshold);
+}
+
+DefineEngineFunction(ImGetMouseDragDelta, ImVec2, (S32 mouseButton, F32 lockThreshold), (0, -1.0f),
+                     "Returns the total pixel distance shifted since dragging began.\n") {
+    return ImGui::GetMouseDragDelta(mouseButton, lockThreshold);
+}
+
+DefineEngineFunction(ImResetMouseDragDelta, void, (S32 mouseButton), (0),
+                     "Resets the mathematical baseline origin for the current drag session to the current cursor spot.\n") {
+    ImGui::ResetMouseDragDelta(mouseButton);
+}
+
+DefineEngineFunction(ImSetNextFrameWantCaptureMouse, void, (bool wantCaptureMouse), ,
+                     "Force-overrides the application-wide io.WantCaptureMouse layout flag for the next viewport pass.\n") {
+    ImGui::SetNextFrameWantCaptureMouse(wantCaptureMouse);
+}
 
 // =============================================================================
 // Keyboard & Shortcuts
@@ -1060,15 +1141,6 @@ DefineEngineFunction(ImDrawText, void, (F32 pos_x, F32 pos_y, ImVec4 color, cons
     drawList->AddText(ImVec2(pos_x, pos_y), packedColor, text);
 }
 
-// =============================================================================
-// Helper ImGetCursorScreenPos
-// =============================================================================
-DefineEngineFunction(ImGetCursorScreenPos, ImVec2, (), ,
-        "Returns the current screen coordinate position of the cursor as a native ImVec2.\n")
-{
-    ImVec2 pos = ImGui::GetCursorScreenPos();
-    return ImVec2(pos.x, pos.y);
-}
 
 // =============================================================================
 //  ImGui Tables
@@ -1238,6 +1310,106 @@ DefineEngineFunction(ImPopTextWrapPos, void, (), ,
         "Pops a text wrap position from the stack.\n") {
     ImGui::PopTextWrapPos();
 }
+
+// -----------------------------------------------------------------------------
+DefineEngineFunction(ImPushFontSize, void, (F32 sizeInPixels),
+    , "Push a dynamic pixel size for the current font context.\n"
+      " - replacement for SetWindowFontScale, dont forget to call ImPopFontSize")
+{
+    ImGui::PushFont(nullptr, sizeInPixels);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(ImPopFontSize, void, (), , "Pop the current dynamic font size context.")
+{
+    ImGui::PopFont();
+}
+// -----------------------------------------------------------------------------
+// Text Utilities
+// IMGUI_API ImVec2        CalcTextSize(const char* text, const char* text_end = NULL, bool hide_text_after_double_hash = false, float wrap_width = -1.0f);
+// -----------------------------------------------------------------------------
+DefineEngineFunction(ImCalcTextSize, ImVec2, (const char* text, bool hideTextAfterDoubleHash, F32 wrapWidth), (false, -1.0f),
+                     "Calculate the bounding size of a text string in pixels based on the current font and scale configuration.")
+{
+    if (!text || text[0] == '\0') {
+        return ImVec2(0.0f, 0.0f);
+    }
+
+    return ImGui::CalcTextSize(text, nullptr, hideTextAfterDoubleHash, wrapWidth);
+}
+
+
+// ============================================================================
+// Cursor
+// ============================================================================
+// IMGUI_API ImVec2        GetCursorScreenPos();                                           // cursor position, absolute coordinates. THIS IS YOUR BEST FRIEND (prefer using this rather than GetCursorPos(), also more useful to work with ImDrawList API).
+DefineEngineFunction(ImGetCursorScreenPos, ImVec2, (), , "Get absolute cursor position in screen coordinates.")
+{
+    return ImGui::GetCursorScreenPos();
+}
+
+// -----------------------------------------------------------------------------
+// IMGUI_API void          SetCursorScreenPos(const ImVec2& pos);                          // cursor position, absolute coordinates. THIS IS YOUR BEST FRIEND.
+DefineEngineFunction(ImSetCursorScreenPos, void, (ImVec2 pos), , "Set absolute cursor position in screen coordinates.")
+{
+    ImGui::SetCursorScreenPos(pos);
+}
+DefineEngineFunction(ImSetCursorScreenPosXY, void, (F32 x, F32 y), , "Set absolute cursor position in screen coordinates.")
+{
+    ImGui::SetCursorScreenPos({x,y});
+}
+// -----------------------------------------------------------------------------
+// IMGUI_API ImVec2        GetContentRegionAvail();                                        // available space from current position. THIS IS YOUR BEST FRIEND.
+DefineEngineFunction(ImGetContentRegionAvail, ImVec2, (), , "Get available space from the current layout position.")
+{
+    return ImGui::GetContentRegionAvail();
+}
+
+// -----------------------------------------------------------------------------
+// IMGUI_API ImVec2        GetCursorStartPos();                                            // [window-local] initial cursor position, in window-local coordinates. Call GetCursorScreenPos() after Begin() to get the absolute coordinates version.
+DefineEngineFunction(ImGetCursorStartPos, ImVec2, (), , "Get initial cursor placement in window-local coordinates.")
+{
+    return ImGui::GetCursorStartPos();
+}
+// -----------------------------------------------------------------------------
+// IMGUI_API ImVec2        GetCursorPos();                                                 // [window-local] cursor position in window-local coordinates. This is not your best friend.
+DefineEngineFunction(ImGetCursorPos, ImVec2, (), , "Get window-local cursor position.")
+{
+    return ImGui::GetCursorPos();
+}
+// -----------------------------------------------------------------------------
+// IMGUI_API void          SetCursorPos(const ImVec2& local_pos);                          // [window-local] "
+DefineEngineFunction(ImSetCursorPos, void, (ImVec2 local_pos), , "Set window-local cursor position.")
+{
+    ImGui::SetCursorPos(local_pos);
+}
+// -----------------------------------------------------------------------------
+// IMGUI_API float         GetCursorPosX();                                                // [window-local] "
+DefineEngineFunction(ImGetCursorPosX, F32, (), , "Get window-local cursor X position.")
+{
+    return ImGui::GetCursorPosX();
+}
+
+// -----------------------------------------------------------------------------
+// IMGUI_API void          SetCursorPosX(float local_x);                                   // [window-local] "
+DefineEngineFunction(ImSetCursorPosX, void, (F32 local_x), , "Set window-local cursor X position.")
+{
+    ImGui::SetCursorPosX(local_x);
+}
+
+// -----------------------------------------------------------------------------
+// IMGUI_API float         GetCursorPosY();                                                // [window-local] "
+DefineEngineFunction(ImGetCursorPosY, F32, (), , "Get window-local cursor Y position.")
+{
+    return ImGui::GetCursorPosY();
+}
+
+// -----------------------------------------------------------------------------
+// IMGUI_API void          SetCursorPosY(float local_y);                                   // [window-local] "
+DefineEngineFunction(ImSetCursorPosY, void, (F32 local_y), , "Set window-local cursor Y position.")
+{
+    ImGui::SetCursorPosY(local_y);
+}
+
 
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(ImGui);
