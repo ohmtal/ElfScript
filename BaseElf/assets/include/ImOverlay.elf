@@ -19,8 +19,7 @@ function ImOverlay::onAdd(%this) {
           ImGuiWindowFlags_NoSavedSettings |
           ImGuiWindowFlags_NoInputs;
 
-  // TestCallBack like functional
-
+  %this.onRenderFallBack = "MissingOnRender";
 }
 
 
@@ -38,11 +37,11 @@ function ImOverlay::render(%this, /* ImVec2 */ %displaySize) {
 
 
     ImBegin("##TransparentOverlay", "", %this.WindowFlags);
-      if (%this.isMethod("onRender")) {
-          %this.call("onRender", %displaySize);
+      if (%this.isMethod(%this.onRender)) {
+          %this.call(%this.onRender, %displaySize);
       } else {
-         //test call:
-        %this.call("MissingOnRender", %displaySize);
+         //testing call:
+        %this.call(%this.onRenderFallBack, %displaySize);
       }
 
     ImEnd();

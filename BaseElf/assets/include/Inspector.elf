@@ -53,6 +53,7 @@ $I_TypeString = 3;
 $I_TypeInt    = 4;
 $I_TypeFloat  = 5;
 $I_CloseHeader = 6;
+$I_TypeColorU8 = 7;
 // -----------------------------------------------------------------------------4
 function FieldInspector::_addFieldDef(%this, %fieldname) {
     %object = %this.object;
@@ -64,13 +65,17 @@ function FieldInspector::_addFieldDef(%this, %fieldname) {
         fieldtype = %object.getFieldType(%fieldname);
         internalName = %fieldname;
     };
+
+    echo(%element.fieldtype SPC %element.fieldname);
     switch$ (%element.fieldtype) {
         case "TypeS32": %element.type = $I_TypeInt;
         case "TypeF32": %element.type = $I_TypeFloat;
         case "TypeBool": %element.type = $I_TypeBool;
+        case "TypeColor": %element.type = $I_TypeColorU8;
         default: %element.type = $I_TypeString;
     }
     %this.gui.add(%element);
+
 
     return true;
 }
@@ -184,6 +189,11 @@ function FieldInspector::Render(%this, %force) {
             case $I_TypeInt:
                 if (!%skip)
                     if (ImInputText(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname)) %dirty = true;
+
+            case $I_TypeColorU8:
+
+                if (!%skip)
+                    if (ImColorEdit(%element.fieldname, %this.object.getId() @ "." @ %element.fieldname,true)) %dirty = true;
 
 
             default:

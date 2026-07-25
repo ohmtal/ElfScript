@@ -16,6 +16,7 @@
 #include "console/consoleExtras.h"
 #include "bindings_imgui.h"
 #include "core/strings/stringUnit.h"
+#include "math/mMathFn.h"
 
 #include <string>
 #include <format>
@@ -55,13 +56,6 @@ ConsoleSetType( TypeImVec2 )
     else
         Con::printf("ImVec2 must be set as { x, y } or \"x y\"");
 }
-// template<>
-// class EngineTypeTraits<ImVec2> : public ConcreteTypeArgs<ImVec2>
-// {
-// public:
-//     // Forces the underlying C-linkage function to return a plain C-string pointer
-//     typedef const char* ReturnValueType;
-// };
 //-----------------------------------------------------------------------------
 // TypeImVec4
 //-----------------------------------------------------------------------------
@@ -625,6 +619,41 @@ DefineEngineFunction(ImInputText, bool, (const char* text, const char* valueVarN
     return result;
 }
 
+// IMGUI_API bool          ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flags = 0);
+DefineEngineFunction(ImColorEdit, bool, (const char* label, const char* valueVarName, bool using_rgba_u8), (false),
+                     "Color Edit, when set bool using_rgba_u8 we convert it from 1.f to 255.") {
+
+    const char* currentStr = Con::getVariable(valueVarName);
+    float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+    if (currentStr && currentStr[0] != '\0') {
+        int scanned = dSscanf(currentStr, "%f %f %f %f", &color[0], &color[1], &color[2], &color[3]);
+        if (using_rgba_u8) {
+            for (int i = 0; i < scanned; ++i) {
+                color[i] /= 255.0f;
+            }
+        }
+    }
+    bool result = ImGui::ColorEdit4(label, color, 0);
+
+    if (result) {
+        char buffer[256];
+        if (using_rgba_u8) {
+            int r = (int)ElfMath::mRound(color[0] * 255.0f);
+            int g = (int)ElfMath::mRound(color[1] * 255.0f);
+            int b = (int)ElfMath::mRound(color[2] * 255.0f);
+            int a = (int)ElfMath::mRound(color[3] * 255.0f);
+            dSprintf(buffer, sizeof(buffer), "%d %d %d %d", r, g, b, a);
+        } else {
+            dSprintf(buffer, sizeof(buffer), "%f %f %f %f", color[0], color[1], color[2], color[3]);
+        }
+
+        Con::setVariable(valueVarName, buffer);
+    }
+
+    return result;
+}
+
 // -----------------------------------------------------------------------------
 // =============================================================================
 //  ImGui Boxes
@@ -673,30 +702,6 @@ DefineEngineFunction(ImCombo, bool, (
     return valueChanged;
 }
 
-//  version with \0 separated
-// DefineEngineFunction(ImCombo, bool, (
-//     const char* label
-//     , const char* currentItemIndexVarName
-//     , const char* ItemsTabSeparated
-//     ,  S32 popup_max_height_in_items),
-//     (-1),
-//         "return true if changed add a varname as reference. Can be a global variable or a Object field.\n"
-//         "@var currentItemIndexVarName is the name of variable where the current item index lives\n"
-//         "@var ItemsTabSeparated tab separated list of items \n"
-// ) {
-//     char buf[1024]{};
-//     if (!ConvertTabSeparatedToNullSeparated(ItemsTabSeparated, buf, sizeof(buf))) {
-//         Con::errorf("ImCombo Invalid ItemsTabSeparated list!!");
-//         return false;
-//     }
-//     S32 index = Con::getIntVariable(currentItemIndexVarName, 0);
-//
-//     bool result = ImGui::Combo(label, &index, buf, popup_max_height_in_items);
-//     if (result) {
-//         Con::setIntVariable(currentItemIndexVarName, index);
-//     }
-//     return result;
-// }
 
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImListBox, bool, (
