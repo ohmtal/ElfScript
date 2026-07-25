@@ -4,7 +4,7 @@ A minimal Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as b
 
 This is a nice place to learn ElfScript (aka TorqueScipt ). 
 
-![ScreenShot](./Screenshot_2026-07-22_01-36-32.png)
+![ScreenShots](./ScreenShotsCombined.png)
 
 ### Build this:
 
