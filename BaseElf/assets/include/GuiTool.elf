@@ -1,0 +1,231 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Custom made GuiTool - auto created as singelton on exec
+//-----------------------------------------------------------------------------
+function GuiTool::onAdd(%this) {
+    echo("* Init GuiTool");
+    %this.TextColor = WHITE;
+    %this.TextColorOver = ORANGE;
+    %this.TextColorPressed = YELLOW;
+
+    %this._IsOverlay = false;
+    %this.screenSize = GetScreenSize();
+    %this.OverlayColor = "20 20 20 200";
+
+    %this.Message = "";
+    %this.MessageTime = 2.0; //seconds
+    %this._messageCounter = 0.0;
+
+    %this.CurrentMenu  = 0; // GuiToolMenu Object
+
+
+}
+//-----------------------------------------------------------------------------
+// GuiToolMenu
+//-----------------------------------------------------------------------------
+function GuiToolMenu::onAdd(%this) {
+
+
+    if (%this.MenuCaption $= "") %this.MenuCaption = "Menu";
+    if (%this.MenuFontScale $= "") %this.MenuFontScale = 2.5;
+    // %this.MenuEntries = ""; //TAB separated list
+
+    // // Example function MyClass::OnAquariumMenu(%this, %menuId, %menuCaption)
+    if (%this.OnMenuObject $="") %this.OnMenuObject  = 0;
+    // %this.OnMenuObject = 0; // add the Menuobject where the callback is called
+    // %this.OnMenuMethod = ""; // method to call when a entry is pressed
+
+    if (%this.MenuTextureAtlas $= "") %this.MenuTextureAtlas = 0;
+    if (%this.MenuTextureAtlasSize $= "") %this.MenuTextureAtlasSize = "32 32";
+    // %this.MenuTextureRects = ""; Tab separated
+}
+
+function GuiToolMenu::Render(%this, %screenSize) {
+    // this calculation should be cached!!
+    %entries = %this.MenuEntries;
+    %cnt = getFieldCount( %entries );
+    if ( %cnt == 0 ) {
+        error("MenuEntires are empty!");
+        %this.ShowMenu = false;
+    }
+
+    %useImages = isObject(%this.MenuTextureAtlas) && %cnt == getFieldCount(%this.MenuTextureRects);
+
+    // FIXME constant borders config
+    %borderWidth = 80;
+    %borderHeight = 20;
+    %addButtonWidth = 10;
+    %buttonGap = 10;
+
+
+    %s = MeasureText(%this.MenuCaption, %this.MenuFontScale);
+    %menuWidth = %s.x;
+
+    for (%i = 0; %i < %cnt ; %i++ ) {
+        %caption = getField(%entries, %i);
+        %s = MeasureText(%caption, %this.MenuFontScale);
+        if (%s.x > %menuWidth) %menuWidth = %s.x;
+    }
+    %itemWidth = %menuWidth + %addButtonWidth;
+    %menuWidth += %borderWidth; //add border
+    %itemHeight =  %s.y + 10;
+
+    if (%useImages) {
+        %itemWidth += %this.MenuTextureAtlasSize.x;
+        if (%itemHeight < %this.MenuTextureAtlasSize.y)
+            %itemHeight = %this.MenuTextureAtlasSize.y;
+    }
+
+    %menuHeight = (%cnt + 1) * (%itemHeight + %buttonGap ) + 10 ;
+    // calculation done lets draw
+    %x = %screenSize.x / 2 - %menuWidth / 2;
+    %y = %screenSize.y / 2 - %menuHeight / 2;
+
+    %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+    // echo("%menuRect " SPC %menuRect );
+    BeginBlendMode();
+    DrawRectRec(%menuRect, "20 20 20 200"  );
+    EndBlendMode();
+    DrawRectRec(%menuRect, "200 200 200", false );
+
+    %x += %borderWidth / 2.0;
+    %y += 15;DrawText(%x, %y, %this.MenuCaption, %this.MenuFontScale, GRAY);
+    %y += 25; DrawLine(%x, %y, %x + %itemWidth , %y, GRAY );
+    %y += %buttonGap;
+    %rect = %x - 5 SPC  %y - 5 SPC %itemWidth SPC %itemHeight;
+    for (%i = 0; %i < %cnt ; %i++) {
+        %caption = getField(%entries, %i);
+        if (%useImages) {
+
+            %srcRect = getField(%this.MenuTextureRects, %i);
+            %dstRect = %rect.x SPC %rect.y SPC %this.MenuTextureAtlasSize;
+            %rect.x += %this.MenuTextureAtlasSize.x;
+            %this.MenuTextureAtlas.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
+        }
+        if (GuiTool.MenuEntry(%rect, %caption, %this.MenuFontScale)){
+            if (isObject(%this.OnMenuObject)) {
+                if ( %this.OnMenuObject.isMethod(%this.OnMenuMethod))
+                    %this.OnMenuObject.call( %this.OnMenuMethod, %i , %caption);
+                else
+                    error("GuiToolMenu: Missing Method of Object:" SPC %this.OnMenuObject SPC %this.OnMenuMethod);
+
+            } else {
+                error("GuiToolMenu: Missing OnMenuMethod!");
+            }
+        }
+        %y += %itemHeight + %buttonGap ;
+        %rect = %x - 5 SPC  %y - 5 SPC %itemWidth SPC %itemHeight;
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+function GuiTool::haveOverlay(%this) {
+    return %this._IsOverlay;
+}
+//-----------------------------------------------------------------------------
+function GuiTool::Render(%this, %screenSize) {
+   if (%screenSize !$="") %this.screenSize = %screenSize;
+
+   %menuActive = isObject( %this.CurrentMenu);
+   %this._IsOverlay = %this.Message !$= "" || %menuActive ;
+
+   if (%this._IsOverlay) {
+       BeginBlendMode();
+       DrawRectRec("0 0" SPC %screenSize, "20 20 20 200");
+       EndBlendMode();
+   }
+
+   // ---- Menu ----
+   if (%menuActive) {
+        %this.CurrentMenu.render(%screenSize);
+   }
+
+
+   // ---- Message -----
+   if (%this.Message !$= "") {
+       %menuWidth = %screenSize.x;
+       %linecount = getRecordCount(%this.Message) ;
+       %menuHeight = %linecount * 30 + 30;
+       %x =  %screenSize.x / 2 - %menuWidth / 2;
+       %y = %screenSize.y / 2 - %menuHeight / 2;
+       %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+       BeginBlendMode();
+       DrawRectRec(%menuRect, "20 20 20 200"  );
+       EndBlendMode();
+       DrawRectRec(%menuRect, "200 200 200", false );
+       %x += 25;
+       %y += 15;
+       for (%i = 0; %i < %linecount; %i++) {
+           %line = getRecord(%this.Message, %i);
+           if (startsWith(%line, "[error]"))
+               DrawText(%x, %y, %line, 1.4, RED);
+           else
+               DrawText(%x, %y, %line, 1.4, ORANGE);
+           %y += 30;
+           if ( %this._messageCounter == 0.0) echo("MESSAGE:" SPC %line);
+       }
+       %this._messageCounter += GetFrameTime();
+       if (%this._messageCounter > %this.MessageTime) {
+           %this._messageCounter = 0;
+           %this.Message = "";
+       }
+   }
+
+}
+//-----------------------------------------------------------------------------
+function GuiTool::DrawButtonBorder(%this, %rect, %down,%thickness){
+
+    %x = %rect.x;
+    %y = %rect.y;
+    %w = %rect.width;
+    %h = %rect.height;
+
+    if (%down) {
+        %col1 =DARKGRAY;
+        %col2 =LIGHTGRAY;
+    } else {
+        %col2 =DARKGRAY;
+        %col1 =LIGHTGRAY;
+
+    }
+
+    // Top edge
+    DrawLine( %x, %y, %x + %w, %y, %col1, %thickness);
+    // Bottom edge
+    DrawLine( %x, %y + %h, %x + %w, %y + %h,  %col2, %thickness);
+    // Left edge
+    DrawLine( %x, %y, %x, %y + %h, %col1, %thickness);
+    // Right edge
+    DrawLine( %x + %w, %y, %x + %w, %y + %h, %col2,%thickness);
+
+}
+//----------------------------------------------------------------------
+function GuiTool::MenuEntry(%this, %rect, %caption, %fontScale){
+    %result = false;
+    %textColor = %this.TextColor;
+    if (PointInRect(GetMousePosition(), %rect)) {
+        BeginBlendMode();
+        DrawRectRec(%rect , "100 100 100 100", TRUE );
+        EndBlendMode();
+        %down = false;
+        %textColor = %this.TextColorOver;
+        if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
+            %textColor = %this.TextColorPressed ;
+            %down = true;
+        }
+        if (SDL_IsMouseButtonReleased(SDL_BUTTON_LEFT)) {
+            %result = true;
+        }
+        %this.DrawButtonBorder(%rect, %down, 1.0);
+    }
+    DrawText(%rect.x + 5, %rect.y + 5, %caption, %fontScale, %textColor, true);
+    return %result;
+}
+
+//-----------------------------------------------------------------------------
+// Create the Object on Load !
+if (!isObject(GuiTool)) singleton ScriptGroup(GuiTool);
+//-----------------------------------------------------------------------------

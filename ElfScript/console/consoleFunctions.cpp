@@ -1,25 +1,12 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-
+// ElfScript:
+// NOTE: Important: changed getField to separate by TAB only !!
+//-----------------------------------------------------------------------------
 #include "platform/platform.h"
 #include "console/console.h"
 #include "console/consoleInternal.h"
@@ -1534,11 +1521,15 @@ DefineEngineFunction( weekdayNumToStr, String, ( S32 num, bool abbreviate ), (fa
 }
 
 //-----------------------------------------------------------------------------
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ElfScript
+// NOTE: Important changed to separate by TAB only !! use getRecord if you want to split by \n!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 DefineEngineFunction( getField, const char*, ( const char* text, S32 index ),,
-   "Extract the field at the given @a index in the newline and/or tab separated list in @a text.\n"
-   "Fields in @a text must be separated by newlines and/or tabs.\n"
-   "@param text A list of fields separated by newlines and/or tabs.\n"
+   "Extract the field at the given @a index in the  tab separated list in @a text.\n"
+   "Fields in @a text must be separated by tabs.\n"
+   "@param text A list of fields separated by tabs.\n"
    "@param index The zero-based index of the field to extract.\n"
    "@return The field at the given index or \"\" if the index is out of range.\n\n"
    "@tsexample\n"
@@ -1550,15 +1541,18 @@ DefineEngineFunction( getField, const char*, ( const char* text, S32 index ),,
    "@see getRecord\n"
    "@ingroup FieldManip" )
 {
-   return Con::getReturnBuffer( StringUnit::getUnit( text, index, "\t\n" ) );
+   return Con::getReturnBuffer( StringUnit::getUnit( text, index, "\t" ) );
 }
 
 //-----------------------------------------------------------------------------
-
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ElfScript
+// NOTE: Important changed to separate by TAB only !! use getRecord if you want to split by \n!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 DefineEngineFunction( getFields, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
    "Extract a range of fields from the given @a startIndex onwards thru @a endIndex.\n"
-   "Fields in @a text must be separated by newlines and/or tabs.\n"
-   "@param text A list of fields separated by newlines and/or tabs.\n"
+   "Fields in @a text must be separated by tabs.\n"
+   "@param text A list of fields separated by tabs.\n"
    "@param startIndex The zero-based index of the first field to extract from @a text.\n"
    "@param endIndex The zero-based index of the last field to extract from @a text.  If this is -1, all fields beginning "
       "with @a startIndex are extracted from @a text.\n"
@@ -1576,15 +1570,18 @@ DefineEngineFunction( getFields, const char*, ( const char* text, S32 startIndex
    if( endIndex < 0 )
       endIndex = 1000000;
 
-   return Con::getReturnBuffer( StringUnit::getUnits( text, startIndex, endIndex, "\t\n" ) );
+   return Con::getReturnBuffer( StringUnit::getUnits( text, startIndex, endIndex, "\t" ) );
 }
 
 //-----------------------------------------------------------------------------
-
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ElfScript
+// NOTE: Important changed to separate by TAB only !! use getRecord if you want to split by \n!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 DefineEngineFunction( setField, const char*, ( const char* text, S32 index, const char* replacement ),,
    "Replace the field in @a text at the given @a index with @a replacement.\n"
-   "Fields in @a text must be separated by newlines and/or tabs.\n"
-   "@param text A list of fields separated by newlines and/or tabs.\n"
+   "Fields in @a text must be separated by  tabs.\n"
+   "@param text A list of fields separated by  tabs.\n"
    "@param index The zero-based index of the field to replace.\n"
    "@param replacement The string with which to replace the field.\n"
    "@return A new string with the field at the given @a index replaced by @a replacement or the original "
@@ -1597,15 +1594,18 @@ DefineEngineFunction( setField, const char*, ( const char* text, S32 index, cons
    "@see setRecord\n"
    "@ingroup FieldManip" )
 {
-   return Con::getReturnBuffer( StringUnit::setUnit( text, index, replacement, "\t\n" ) );
+   return Con::getReturnBuffer( StringUnit::setUnit( text, index, replacement, "\t" ) );
 }
 
 //-----------------------------------------------------------------------------
-
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ElfScript
+// NOTE: Important changed to separate by TAB only !! use getRecord if you want to split by \n!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 DefineEngineFunction( removeField, const char*, ( const char* text, S32 index ),,
    "Remove the field in @a text at the given @a index.\n"
-   "Fields in @a text must be separated by newlines and/or tabs.\n"
-   "@param text A list of fields separated by newlines and/or tabs.\n"
+   "Fields in @a text must be separated by tabs.\n"
+   "@param text A list of fields separated by tabs.\n"
    "@param index The zero-based index of the field in @a text.\n"
    "@return A new string with the field at the given index removed or the original string if @a index is "
       "out of range.\n\n"
@@ -1616,15 +1616,18 @@ DefineEngineFunction( removeField, const char*, ( const char* text, S32 index ),
    "@see removeRecord\n"
    "@ingroup FieldManip" )
 {
-   return Con::getReturnBuffer( StringUnit::removeUnit( text, index, "\t\n" ) );
+   return Con::getReturnBuffer( StringUnit::removeUnit( text, index, "\t" ) );
 }
 
 //-----------------------------------------------------------------------------
-
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ElfScript
+// NOTE: Important changed to separate by TAB only !! use getRecord if you want to split by \n!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 DefineEngineFunction( getFieldCount, S32, ( const char* text ),,
-   "Return the number of newline and/or tab separated fields in @a text.\n"
-   "@param text A list of fields separated by newlines and/or tabs.\n"
-   "@return The number of newline and/or tab sepearated elements in @a text.\n\n"
+   "Return the number of  tab separated fields in @a text.\n"
+   "@param text A list of fields separated by  tabs.\n"
+   "@return The number of  tab sepearated elements in @a text.\n\n"
    "@tsexample\n"
       "getFieldCount( \"a b\" TAB \"c d\" TAB \"e f\" ) // Returns 3\n"
    "@endtsexample\n\n"
@@ -1632,7 +1635,7 @@ DefineEngineFunction( getFieldCount, S32, ( const char* text ),,
    "@see getRecordCount\n"
    "@ingroup FieldManip" )
 {
-   return StringUnit::getUnitCount( text, "\t\n" );
+   return StringUnit::getUnitCount( text, "\t" );
 }
 
 //-----------------------------------------------------------------------------

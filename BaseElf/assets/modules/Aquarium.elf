@@ -5,22 +5,6 @@
 // Prototype for 2D Editor using a Aquarium
 // Graphics: 	Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
 //-----------------------------------------------------------------------------
-// FIXME getVariableObjectField on name or internalname failes
-//      ==> *SimObject::getDataField ==>             return (*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) );
-// not sure why because getFieldValue works...
-// NOTE: if it's NOT empty it works ... very strange ... guess it's a BUG
-// 16468.setFieldValue("name","bab"); works also if it's emtpy
-// NOTE 2: dumpFields also does NOT list name and fieldname!!!! ==> mInternalName         = NULL; <<< THIS!! but do not change it !!!
-/*
- TODO:
- getDataField fail because it's NULL ... FieldInspector should changed ... for that static fields !!!
-
- const char * *val = obj->getDataField(StringTable->insert(token), 0);
- if(!val)
-     return("");
-*/
-
-
 // Control Scheme:
 // FIXME implement
 // - Scale          : Mouse Wheel alone. Quick and natural for resizing.
@@ -36,15 +20,13 @@
 //-----------------------------------------------------------------------------
 exec ("include/TextureAtlas.elf");
 exec ("include/Inspector.elf");
-
-
+exec ("include/GuiTool.elf");
 
 #define MAX_LAYER 20
 #define MAX_SCALE 256
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
-#define MESSAGE_TIME 2.0
 #define BACKGROUND_COLOR "176 233 252"
 #define SCENE_FILE "pref:/aquarium.elfscene"
 #define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
@@ -69,7 +51,7 @@ function Aquarium::onAdd(%this) {
     %this.paintSize = 32;
     //FIXME unused >>>>
     %this.paintRotate = 0;
-    %this.paintCenterPoint = "16 16";
+    %this.paintCenterPoint = "32 32";
     %this.paintFlip = 0;
     // <<<<
     // %this.painting = false;
@@ -79,9 +61,7 @@ function Aquarium::onAdd(%this) {
     %this.add( new SimSet(SelectList));
 
     %this.hideSpriteSheet = false;
-    %this.showMenu = false;
-    %this.messageCounter = 0;
-    %this.Message = "";
+
 
     %target = CreateRenderTarget(getScreenSize());
     %target.name = "RenderTarget";
@@ -94,10 +74,37 @@ function Aquarium::onAdd(%this) {
 
     $Main.hideBottomMessage = true;
 
+    // Menu
+    %this.MainMenu = new SimObject() {
+        class = "GuiToolMenu";
+        MenuCaption = "Menu";
+        MenuFontScale = 2.5;
+        MenuEntries = "Save Scene" TAB "Load Scene" TAB "Export Image" TAB  "Resume" TAB "Quit";
+        OnMenuObject = %this;
+        OnMenuMethod = "onMainMenu";
+    };
+
+    %this.SelectObjectMenu = new SimObject() {
+        class = "GuiToolMenu";
+        MenuCaption = "Multiple Objects:";
+        MenuFontScale = 1.5;
+        OnMenuObject = %this;
+        OnMenuMethod = "onSelectObject";
+        MenuTextureAtlas = %this.SpriteSheet;
+        MenuTextureAtlasSize = "16 16";
+        MenuEntries = "";
+        MenuTextureRects = "";
+    };
+
+    GuiTool.CurrentMenu = 0; //reset
+
+
+
     return true;
 }
 //----------------------------------------------------------------------
 function Aquarium::OnRemove(%this) {
+    GuiTool.CurrentMenu = 0; //reset
 }
 //----------------------------------------------------------------------
 function Aquarium::OnUpdate(%this, %dt) {
@@ -147,55 +154,6 @@ function compareLayers(%objA, %objB)
     if (%objA.layer == %objB.layer) return 0;
     return (%objA.layer > %objB.layer) ? -1 : 1;
 }
-//----------------------------------------------------------------------
-function Aquarium::DrawButtonBorder(%this, %rect, %down,%thickness){
-
-    %x = %rect.x;
-    %y = %rect.y;
-    %w = %rect.width;
-    %h = %rect.height;
-
-    if (%down) {
-        %col1 =DARKGRAY;
-        %col2 =LIGHTGRAY;
-    } else {
-        %col2 =DARKGRAY;
-        %col1 =LIGHTGRAY;
-
-    }
-
-    // Top edge
-    DrawLine( %x, %y, %x + %w, %y, %col1, %thickness);
-    // Bottom edge
-    DrawLine( %x, %y + %h, %x + %w, %y + %h,  %col2, %thickness);
-    // Left edge
-    DrawLine( %x, %y, %x, %y + %h, %col1, %thickness);
-    // Right edge
-    DrawLine( %x + %w, %y, %x + %w, %y + %h, %col2,%thickness);
-
-}
-//----------------------------------------------------------------------
-function Aquarium::MenuEntry(%this, %rect, %caption){
-    %result = false;
-    %textColor = WHITE;
-    if (PointInRect(GetMousePosition(), %rect)) {
-        BeginBlendMode();
-        DrawRectRec(%rect , "100 100 100 100", TRUE );
-        EndBlendMode();
-        %down = false;
-        %textColor = ORANGE;
-        if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
-            %textColor = YELLOW;
-            %down = true;
-        }
-        if (SDL_IsMouseButtonReleased(SDL_BUTTON_LEFT)) {
-            %result = true;
-        }
-        %this.DrawButtonBorder(%rect, %down, 1.0);
-    }
-    DrawText(%rect.x + 5, %rect.y + 5, %caption, 2.5, %textColor, true);
-    return %result;
-}
 
 //----------------------------------------------------------------------
 function Aquarium::removeSceneObject(%this,%obj) {
@@ -212,7 +170,7 @@ function Aquarium::load(%this) {
 
     if (exec(%path)) {
 
-        %this.Message = "Scene loaded from:\n" @ %path;
+        GuiTool.Message = "Scene loaded from:\n" @ %path;
         warn("will delete previous scene in 100ms id:" SPC %savScene);
         // add new one to this:
         %this.add(SceneObjects);
@@ -242,7 +200,7 @@ function Aquarium::load(%this) {
         // delete prev:
         %savScene.schedule(100, delete);
     } else {
-        %this.Message = "[error] Failed to load Scene from:\n" @ %path;
+        GuiTool.Message = "[error] Failed to load Scene from:\n" @ %path;
         %savScene.name = SceneObjects; //restore saved scene
         warn("Saved Scene restored:" SPC SceneObjects.getId() SPC "==" SPC %savScene);
     }
@@ -250,6 +208,51 @@ function Aquarium::load(%this) {
 
 
 }
+
+//----------------------------------------------------------------------
+function Aquarium::onSelectObject(%this, %menuId, %menuCaption) {
+
+    // echo("LIST:"); SelectList.listObjects();
+
+    %obj = SelectList.getObject(%menuId);
+    %this.selectedSceneObject = %obj;
+    SelectList.clear();
+    GuiTool.CurrentMenu = 0;
+
+    // warn("SELECT " SPC %menuId SPC  %menuCaption SPC "=>" SPC %obj);
+}
+//----------------------------------------------------------------------
+function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
+    switch$ (%menuCaption) {
+
+        case "Save Scene":
+            GuiTool.CurrentMenu = 0;
+            %path = getFullPath(SCENE_FILE);
+            if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
+            else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
+            %this.dirty = true;
+
+        case "Load Scene":
+            GuiTool.CurrentMenu = 0;
+            %this.load();
+
+        case "Export Image":
+            GuiTool.CurrentMenu = 0;
+
+            %path = getFullPath(EXPORT_PNG_FILE);
+            if (RenderTarget.saveImage(%path))
+                GuiTool.Message = "Image exported to:\n" @ %path;
+        else
+            GuiTool.Message = "[error]Failed to export Image to:\n" @ %path;
+
+        case "Resume":
+            GuiTool.CurrentMenu = 0;
+
+        case "Quit": schedule(250,0, quit);
+
+    } //switch
+}
+
 //----------------------------------------------------------------------
 function Aquarium::Render(%this) {
 
@@ -259,7 +262,7 @@ function Aquarium::Render(%this) {
     %mousePos = GetMousePosition();
     %haveSelected = %this.selectedTexture !$= "";
 
-    %haveOverlay =  %this.Message !$="" || %this.showMenu;
+    %haveOverlay =  GuiTool.haveOverlay();
 
     if (%this.dirty /*|| %this.selectedSceneObject != 0*/) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
@@ -290,13 +293,13 @@ function Aquarium::Render(%this) {
         %this.dirty = false;
     }
 
-     if (!%this.dirty) {
+     if (!%this.dirty && !%haveOverlay) {
         RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
         %mouseDown = SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT);
         %deletePressed = SDL_IsKeyPressed(SDL_SCANCODE_DELETE);
         %lctrlPressed = SDL_IsKeyDown(SDL_SCANCODE_LCTRL);
         %lshiftPressed = SDL_IsKeyDown(SDL_SCANCODE_LSHIFT);
-        if (%mouseDown)  {
+        if (%mouseDown   )  {
             %this.selectedSceneObject = 0;
             FieldInspector.inspect(0);
             SelectList.clear();
@@ -358,9 +361,19 @@ function Aquarium::Render(%this) {
         }
     }
 
-    if (SelectList.getCount() > 0 && %mouseDown) {
+    if (SelectList.getCount() > 1 && %mouseDown) {
         warn("Multiple Objects found at mouse position:");
-        SelectList.listObjects();
+
+        %this.SelectObjectMenu.MenuEntries = "";
+        %this.SelectObjectMenu.MenuTextureRects = "";
+
+        foreach( %obj in SelectList ) {
+            %this.SelectObjectMenu.MenuEntries = trim( %this.SelectObjectMenu.MenuEntries TAB %obj.getId());
+            %this.SelectObjectMenu.MenuTextureRects = trim( %this.SelectObjectMenu.MenuTextureRects TAB %obj.srcRect );
+        }
+        GuiTool.CurrentMenu =  %this.SelectObjectMenu;
+
+
     }
 
 
@@ -445,94 +458,62 @@ function Aquarium::Render(%this) {
         DrawText(5, 5, "shift = snap to grid, wheel = size, ctrl+wheel = layer, right click = select", 1.2, WHITE, true);
     }
 
-    if (%haveOverlay) {
-        BeginBlendMode();
-        DrawRectRec("0 0" SPC %screenSize, "20 20 20 200"  );
-        EndBlendMode();
-    }
 
-    if (%this.showMenu) {
-        %menuWidth = 300;
-        %menuHeight = 300;
-        %x =  %screenSize.x / 2 - %menuWidth / 2;
-        %y = %screenSize.y / 2 - %menuHeight / 2;
-        %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
-        BeginBlendMode();
-        DrawRectRec(%menuRect, "20 20 20 200"  );
-        EndBlendMode();
+    GuiTool.Render(%screenSize);
 
 
-        DrawRectRec(%menuRect, "200 200 200", false );
-
-        %x += 25;
-        %y += 15;DrawText(%x, %y, "Menu", 2.5, GRAY);
-        %y += 25; DrawLine(%x, %y, %x+250, %y, GRAY );
-        // Button Save
-        %y += 15;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-        if (%this.MenuEntry(%rect, "Save Scene")) {
-            %this.showMenu = false;
-            %path = getFullPath(SCENE_FILE);
-            if (SceneObjects.save(%path)) %this.Message = "Scene saved to:\n" SPC %path;
-            else %this.Message = "[error] Failed to save Scene to:\n" SPC %path;
-            %this.dirty = true;
-        }
-        // Button Load
-        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-        if (%this.MenuEntry(%rect, "Load Scene")){
-            %this.showMenu = false;
-            %this.load();
-
-        }
-
-        // Button Export
-        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-        if (%this.MenuEntry(%rect, "Export Image")){
-            %this.showMenu = false;
-
-            %path = getFullPath(EXPORT_PNG_FILE);
-            if (RenderTarget.saveImage(%path))
-                %this.Message = "Image exported to:\n" @ %path;
-            else
-                %this.Message = "[error]Failed to export Image to:\n" @ %path;
-        }
-
-        // Button Resume
-        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-        if (%this.MenuEntry(%rect, "Resume")) %this.showMenu = false;
-
-        // Button QUIT
-        %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-        if (%this.MenuEntry(%rect, "Quit")) schedule(250,0, quit);
-
-    }
-    if (%this.Message !$= "") {
-        %menuWidth = %screenSize.x;
-        %linecount = getRecordCount(%this.Message) ;
-        %menuHeight = %linecount * 30 + 30;
-        %x =  %screenSize.x / 2 - %menuWidth / 2;
-        %y = %screenSize.y / 2 - %menuHeight / 2;
-        %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
-        BeginBlendMode();
-        DrawRectRec(%menuRect, "20 20 20 200"  );
-        EndBlendMode();
-        DrawRectRec(%menuRect, "200 200 200", false );
-        %x += 25;
-        %y += 15;
-        for (%i = 0; %i < %linecount; %i++) {
-            %line = getRecord(%this.Message, %i);
-            if (startsWith(%line, "[error]"))
-                DrawText(%x, %y, %line, 1.4, RED);
-            else
-                DrawText(%x, %y, %line, 1.4, ORANGE);
-            %y += 30;
-            if ( %this.messageCounter == 0.0) echo("MESSAGE:" SPC %line);
-        }
-        %this.messageCounter += GetFrameTime();
-        if (%this.messageCounter > MESSAGE_TIME) {
-            %this.messageCounter = 0;
-            %this.Message = "";
-        }
-    }
+    // if (%this.showMenu) {
+    //     %menuWidth = 300;
+    //     %menuHeight = 300;
+    //     %x =  %screenSize.x / 2 - %menuWidth / 2;
+    //     %y = %screenSize.y / 2 - %menuHeight / 2;
+    //     %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+    //     BeginBlendMode();
+    //     DrawRectRec(%menuRect, "20 20 20 200"  );
+    //     EndBlendMode();
+    //     DrawRectRec(%menuRect, "200 200 200", false );
+    //
+    //     %x += 25;
+    //     %y += 15;DrawText(%x, %y, "Menu", 2.5, GRAY);
+    //     %y += 25; DrawLine(%x, %y, %x+250, %y, GRAY );
+    //     // Button Save
+    //     %y += 15;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+    //     if (GuiTool.MenuEntry(%rect, "Save Scene")) {
+    //         %this.showMenu = false;
+    //         %path = getFullPath(SCENE_FILE);
+    //         if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
+    //         else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
+    //         %this.dirty = true;
+    //     }
+    //     // Button Load
+    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+    //     if (GuiTool.MenuEntry(%rect, "Load Scene")){
+    //         %this.showMenu = false;
+    //         %this.load();
+    //
+    //     }
+    //
+    //     // Button Export
+    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+    //     if (GuiTool.MenuEntry(%rect, "Export Image")){
+    //         %this.showMenu = false;
+    //
+    //         %path = getFullPath(EXPORT_PNG_FILE);
+    //         if (RenderTarget.saveImage(%path))
+    //             GuiTool.Message = "Image exported to:\n" @ %path;
+    //         else
+    //             GuiTool.Message = "[error]Failed to export Image to:\n" @ %path;
+    //     }
+    //
+    //     // Button Resume
+    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+    //     if (GuiTool.MenuEntry(%rect, "Resume")) %this.showMenu = false;
+    //
+    //     // Button QUIT
+    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
+    //     if (GuiTool.MenuEntry(%rect, "Quit")) schedule(250,0, quit);
+    //
+    // }
 
 }
 
@@ -544,13 +525,15 @@ function SceneObject::onInspectPostApply(%this) {
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
     if (%isDown) {
-        if (%scancode == SDL_SCANCODE_ESCAPE) %this.showMenu = !%this.showMenu;
+        if (%scancode == SDL_SCANCODE_ESCAPE) {
+            if (GuiTool.CurrentMenu == 0) GuiTool.CurrentMenu =%this.MainMenu;
+            else GuiTool.CurrentMenu = 0;
+        }
         if (%scancode == SDL_SCANCODE_F10) %this.showInspector = !%this.showInspector;
     }
 }
 function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (%isDown) {
-        if (%button == SDL_BUTTON_MIDDLE) %this.showMenu = !%this.showMenu;
     }
 }
 function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

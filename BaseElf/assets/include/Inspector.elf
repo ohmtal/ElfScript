@@ -15,6 +15,21 @@
 // render in the render loop:
 //      FieldInspector.render();
 //-----------------------------------------------------------------------------
+// FIXME getVariableObjectField on name or internalname failes
+//      ==> *SimObject::getDataField ==>             return (*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) );
+// not sure why because getFieldValue works...
+// NOTE: if it's NOT empty it works ... very strange ... guess it's a BUG
+// 16468.setFieldValue("name","bab"); works also if it's emtpy
+// NOTE 2: dumpFields also does NOT list name and fieldname!!!! ==> mInternalName         = NULL; <<< THIS!! but do not change it !!!
+/*
+ TODO:
+ getDataField fail because it's NULL ... FieldInspector should changed ... for that static fields !!!
+
+ const char * *val = obj->getDataField(StringTable->insert(token), 0);
+ if(!val)
+     return("");
+ */
+//-----------------------------------------------------------------------------
 // for script based ImGui Field Inspector
 function ListObjectFields(%object) {
     // %object.dumpFields();
