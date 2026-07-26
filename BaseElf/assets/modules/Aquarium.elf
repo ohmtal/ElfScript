@@ -31,7 +31,7 @@ exec ("include/Inspector.elf");
 exec ("include/GuiTool.elf");
 
 #define MAX_LAYER 20
-#define MAX_SCALE 256
+#define MAX_SCALE 1024
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
@@ -163,6 +163,7 @@ function Aquarium::DrawSpriteSheet(%this) {
                     TypeS32   flip = %this.paintFlip;
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                     TypeString textureName = %name;
+                    TypeBool ignoreOnMultiSelect = false;
                 };
                 SceneObjects.add( %this.mouseObject);
             }
@@ -202,23 +203,7 @@ function Aquarium::load(%this) {
 
         //update objects to current version
         foreach(%obj in SceneObjects) {
-            %obj.class = "SceneObject";
-
-            if (%obj.color $= "") {
-                %obj.color = WHITEBLEND;
-                // setup bleeding hack here ...
-                %obj.srcRect.x += 0.5;
-                %obj.srcRect.y += 0.5;
-                %obj.srcRect.width -= 1;
-                %obj.srcRect.height -= 1;
-            }
-
-            if (%obj.angle $= "") %obj.angle = 0;
-
-            if (%obj.centerPoint $= "")
-                %obj.centerPoint = %obj.dstRect.width / 2 SPC %obj.dstRect.height / 2;
-
-            if (%obj.flip $= "") %obj.flip = 0;
+            // when a version is changed ... for future use
         }
 
 
@@ -257,7 +242,8 @@ function Aquarium::save(%this) {
 }
 //----------------------------------------------------------------------
 function Aquarium::onConfirmMenu(%this, %menuId, %menuCaption) {
-    if (%this.action $= "Save Scene" && %menuId == 0) {
+
+    if (%this.ConfirmMenu.action $= "Save Scene" && %menuId == 0) {
         %this.save();
     }
     GuiTool.CurrentMenu = 0;
@@ -376,15 +362,27 @@ function Aquarium::Render(%this) {
     if (SelectList.getCount() > 1 && %mouseDown) {
         warn("Multiple Objects found at mouse position:");
 
-        %this.SelectObjectMenu.MenuEntries = "";
-        %this.SelectObjectMenu.MenuTextureRects = "";
-
         foreach( %obj in SelectList ) {
-            %this.SelectObjectMenu.MenuEntries = trim( %this.SelectObjectMenu.MenuEntries TAB %obj.getId());
-            %this.SelectObjectMenu.MenuTextureRects = trim( %this.SelectObjectMenu.MenuTextureRects TAB %obj.srcRect );
+            if (%obj.ignoreOnMultiSelect) {
+                SelectList.remove(%obj);
+                echo(%obj.getid SPC "ignored");
+            }
         }
-        %this.SelectObjectMenu.position = GetMousePosition();
-        GuiTool.CurrentMenu =  %this.SelectObjectMenu;
+
+        if (SelectList.getCount() == 1) {
+            %this.selectedSceneObject = SelectList.getObject(0);
+        } else {
+            %this.SelectObjectMenu.MenuEntries = "";
+            %this.SelectObjectMenu.MenuTextureRects = "";
+
+            foreach( %obj in SelectList ) {
+                %this.SelectObjectMenu.MenuEntries = trim( %this.SelectObjectMenu.MenuEntries TAB %obj.getId());
+                %this.SelectObjectMenu.MenuTextureRects = trim( %this.SelectObjectMenu.MenuTextureRects TAB %obj.srcRect );
+            }
+            %this.SelectObjectMenu.position = GetMousePosition();
+            GuiTool.CurrentMenu =  %this.SelectObjectMenu;
+        }
+
     }
 
 
@@ -436,17 +434,6 @@ function Aquarium::Render(%this) {
         //  P L A C E M E N T
         if (!%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
             SceneObjects.add( %this.mouseObject.clone());
-            // SceneObjects.add(
-            //     new SimObject() {
-            //         class = "SceneObject";
-            //         TypeRectF srcRect = %srcRect;
-            //         TypeRectF dstRect = %dstRect;
-            //         TypeF32 angle = 0;
-            //         TypeF32 centerPoint = %dstRect.width / 2 SPC %dstRect.height / 2;
-            //         TypeColor color=WHITEBLEND;
-            //         TypeS32 flip = 0;
-            //         TypeF32   layer = %this.placementLayer; //higher = rendered first
-            //     });
             SceneObjects.sort("compareLayers");
             %this.dirty = true;
         }
@@ -463,7 +450,7 @@ function Aquarium::Render(%this) {
 }
 
 function SceneObject::onInspectPostApply(%this) {
-    echo("onInspectPostApply" SPC %this);
+    // echo("onInspectPostApply" SPC %this);
     Aquarium.dirty = true;
     SceneObjects.sort("compareLayers");
 }
@@ -556,14 +543,15 @@ function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
     if (%wheelY != 0 && %haveObject) {
         // Wheel + SHIFT = LAYER
         if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT) || SDL_IsKeyDown(SDL_SCANCODE_RSHIFT) ) {
-            %this.placementLayer += %wheelY;
-            if (%this.placementLayer < 0) %this.placementLayer = 0;
-            if (%this.placementLayer > MAX_LAYER) %this.placementLayer = MAX_LAYER;
-            %obj.layer = %this.placementLayer;
 
             if (%obj == %this.selectedSceneObject) {
+                %obj.layer = mClamp(%obj.layer + %wheelY, 0, MAX_LAYER) ;
                 %this.dirty = true;
                 SceneObjects.sort("compareLayers");
+            } else {
+                //must be mouseObject
+                %this.placementLayer = mClamp( %this.placementLayer  + %wheelY, 0,MAX_LAYER) ;
+                %obj.layer = %this.placementLayer;
             }
         }
         // Wheel + ctrl = Rotate
@@ -583,9 +571,7 @@ function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
         // not ctrl and to shift we resize
         else {
             // should i keep the paintSize == new selected SceneObject size
-            %this.paintSize += SCALE_SNAP * %wheelY;
-            if (%this.paintSize < SCALE_SNAP )  %this.paintSize = SCALE_SNAP;
-            if (%this.paintSize > MAX_SCALE )  %this.paintSize = MAX_SCALE;
+            %this.paintSize = mClamp( %this.paintSize + SCALE_SNAP * %wheelY,SCALE_SNAP, MAX_SCALE) ;
 
             %this.paintCenterPoint = %this.paintSize / 2 SPC %this.paintSize / 2;
             %obj.centerPoint = %this.paintCenterPoint;

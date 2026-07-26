@@ -40,22 +40,22 @@ function ListObjectFields(%object) {
     // - echo(getClassHierarchy(SpriteObject)); << Space separated
 
     %cnt = %object.getFieldCount();
-    echo ("----- FIELDS" SPC %cnt SPC "-------------");
+    // echo ("----- FIELDS" SPC %cnt SPC "-------------");
     for (%i = 0 ; %i < %cnt; %i++) {
         %fieldName = %object.getField(%i);
         %fieldType = %object.getFieldType(%fieldName);
         %fieldDoc = %object.getFieldDoc(%fieldName);
         %fieldValue = %object.getFieldValue(%fieldName);
-        echo(%fieldname SPC ":" SPC %fieldType SPC "=" SPC %fieldValue) ; // SPC "(" SPC %fieldDoc SPC  ")");
+        // echo(%fieldname SPC ":" SPC %fieldType SPC "=" SPC %fieldValue) ; // SPC "(" SPC %fieldDoc SPC  ")");
     }
     %cnt = %object.getDynamicFieldCount();
-    echo ("----- DYNAMIC FIELDS" SPC %cnt SPC "-------------");
+    // echo ("----- DYNAMIC FIELDS" SPC %cnt SPC "-------------");
     for (%i = 0 ; %i < %cnt; %i++) {
         %fldData = %object.getDynamicField(%i); //tab separates name^value
         %fieldName = getField(%fldData,0);
         %fieldType = %object.getFieldType(%fieldName);
         %fieldValue = getField(%fldData,1);
-        echo(%fieldname SPC ":" SPC %fieldType SPC "=" SPC %fieldValue) ; // SPC "(" SPC %fieldDoc SPC  ")");
+        // echo(%fieldname SPC ":" SPC %fieldType SPC "=" SPC %fieldValue) ; // SPC "(" SPC %fieldDoc SPC  ")");
     }
 
 }
@@ -81,7 +81,7 @@ function FieldInspector::_addFieldDef(%this, %fieldname) {
         internalName = %fieldname;
     };
 
-    echo(%element.fieldtype SPC %element.fieldname);
+    // echo(%element.fieldtype SPC %element.fieldname);
     switch$ (%element.fieldtype) {
         case "TypeS32": %element.type = $I_TypeInt;
         case "TypeF32": %element.type = $I_TypeFloat;
@@ -117,7 +117,7 @@ function FieldInspector::Inspect(%this, %object, %force) {
    for (%index = getWordCount(%classes) - 1; %index >=0; %index--) {
        %class = getWord(%classes,%index);
        %cnt = getFieldCountNS(%class);
-       echo("class:" SPC %class SPC "I=" SPC %index SPC "field count:" SPC %cnt);
+       // echo("class:" SPC %class SPC "I=" SPC %index SPC "field count:" SPC %cnt);
        if (%cnt == 0) continue; //skip empty
        %this.gui.add(
           new SimObject() {

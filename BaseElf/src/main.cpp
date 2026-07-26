@@ -13,6 +13,7 @@
 #include "console/script.h"
 #include "core/strings/stringUnit.h"
 #include "addons/SDL3/SDL3_input.h"
+#include "addons/SDL3/SDL3_Filesystem.h"
 
 // ----  BaseFlux
 #include <SDL3/SDL.h>
@@ -150,6 +151,7 @@ int main(int argc, char* argv[]) {
     InitBindings_SDL();
     InitBindings_ImGui();
     ElfSDL3::InitKeyCodes();
+    ElfSDL3::RegisterFileSystemConstants();
 
     Con::executeFile(gScriptFile);
 

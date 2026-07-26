@@ -4466,21 +4466,28 @@ namespace Global {
     * @return F32
     */
       function SDL_GetMouseY();
+   /** --- bool SDL_FileExists ---
+    * return true if the file exits
+    * @return bool
+    */
+      function SDL_FileExists( string path );
+   /** --- bool SDL_GetPathInfo ---
+    * resultObjectId is the object which gets it dynamic fields filled with informationreturn true if the file exits
+    * @return bool
+    */
+      function SDL_GetPathInfo( string path, int resultObjectId );
 };
 //------------------------------------------------------------------
 //                  C O N S T A N T S 
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  DummySize = "200 200"
-  TextWhite = "1.0 1.0 1.0 1.0"
-  RadarBg = "0.1 0.1 0.1 0.8"
-  PLAYER_SIZE = "16 16"
-  SCENE_FILE = "pref:/aquarium.elfscene"
-  BACKGROUND_COLOR = "176 233 252"
-  SCALE_SNAP = 8
   TEX_SIZE = 16
   BOUNCY = 6.66
+  SDL_PATHTYPE_OTHER = 3
+  SDL_PATHTYPE_DIRECTORY = 2
+  SDL_PATHTYPE_FILE = 1
+  SDL_PATHTYPE_NONE = 0
   SDL_BUTTON_X1 = 4
   SDL_BUTTON_MIDDLE = 2
   SDL_BUTTON_LEFT = 1
@@ -4514,7 +4521,6 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
-  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
@@ -4679,7 +4685,6 @@ namespace Global {
   MAROON = "190 33 55 255"
   ImGuiTreeNodeFlags_AllowOverlap = 4
   ImGuiCol_WindowBg = 2
-  TargetRed = "1.0 0.0 0.0 1.0"
   ImGuiTableColumnFlags_WidthStretch = 8
   PURPLE = "200 122 255 255"
   ImGuiKey_Backspace = 523
@@ -4701,7 +4706,6 @@ namespace Global {
   ImGuiWindowFlags_NoTitleBar = 1
   cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
   SDL_SCANCODE_CRSEL = 163
-  RadarGreen = "0.0 1.0 0.0 1.0"
   ImGuiCond_None = 0
   SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
   SDL_SCANCODE_END = 77
@@ -4763,7 +4767,6 @@ namespace Global {
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
   ImGuiKey_A = 546
-  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
@@ -4782,7 +4785,6 @@ namespace Global {
   ImGuiKey_E = 550
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiCol_PlotLines = 43
-  MAX_SCALE = 256
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiPopupFlags_MouseButtonRight = 8
   ImGuiCol_TitleBg = 10
@@ -4852,12 +4854,10 @@ namespace Global {
   ImGuiCol_DragDropTarget = 55
   SDL_SCANCODE_KP_HASH = 204
   ImGuiCol_MenuBarBg = 13
-  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
-  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
@@ -5100,5 +5100,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (628 items) ---
+--- End of Dump (618 items) ---
 */
