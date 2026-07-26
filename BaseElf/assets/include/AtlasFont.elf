@@ -63,3 +63,82 @@ function AtlasFont::DrawText(%this, %x, %y, %text, %color) {
         }
     }
 }
+
+// ------------------------ animatated text ---------------------------------
+
+// Animtypes: "wave", "shake", "rainbow", "pulse"
+// GetGameTime() can be used for time but you can also change the speed by multiply it
+
+function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %animType) {
+    %len = strlen(%text);
+    if (%len == 0) return;
+
+    %cw = %this.CharWidth;
+    %ch = %this.CharHeight;
+    %cols = %this.rowCount;
+    %rows = %this.colCount;
+    %start = %this.StartChar;
+    %end = %this.EndChar;
+
+    for (%i = 0; %i < %len; %i++) {
+        %c = getSubStr(%text, %i, 1);
+        %asc = strasc(%c);
+
+        if (%asc >= %start && %asc <= %end) {
+            %index = %asc - %start;
+            %srcRect = %this.getAtlasRect(%cols, %rows, %index);
+
+            %curX = %x + %i * %cw;
+            %curY = %y;
+            %curColor = %baseColor;
+
+            if (%animType $= "wave") {
+                %offsetY = mSin(%time * 5.0 + %i * 0.5) * 10.0;
+                %curY += %offsetY;
+            }
+            else if (%animType $= "shake") {
+                %curX += getRandom(-2, 2);
+                %curY += getRandom(-2, 2);
+            }
+            else if (%animType $= "rainbow") {
+                %hue = mFmod((%time * 50.0) + (%i * 20.0), 360.0);
+                %curColor = %this.HSVtoRGB_U8(%hue, 1.0, 1.0);
+            }
+            else if (%animType $= "pulse") {
+                %scale = 1.0 + mSin(%time * 4.0) * 0.15;
+                %scaledW = %cw * %scale;
+                %scaledH = %ch * %scale;
+                %curX -= (%scaledW - %cw) / 2;
+                %curY -= (%scaledH - %ch) / 2;
+
+                %dstRect = %curX SPC %curY SPC %scaledW SPC %scaledH;
+                %this.DrawSrcDstRect(%srcRect, %dstRect, %curColor);
+                continue;
+            }
+
+            %dstRect = %curX SPC %curY SPC %cw SPC %ch;
+            %this.DrawSrcDstRect(%srcRect, %dstRect, %curColor);
+        }
+    }
+}
+
+// FIXME move to bindings_sdl.cpp
+function AtlasFont::HSVtoRGB_U8(%this, %h, %s, %v) {
+    %c = %v * %s;
+    %x = %c * (1.0 - mAbs(mFmod(%h / 60.0, 2.0) - 1.0));
+    %m = %v - %c;
+
+    if (%h < 60)       { %r = %c; %g = %x; %b = 0; }
+    else if (%h < 120) { %r = %x; %g = %c; %b = 0; }
+    else if (%h < 180) { %r = 0;  %g = %c; %b = %x; }
+    else if (%h < 240) { %r = 0;  %g = %x; %b = %c; }
+    else if (%h < 300) { %r = %x; %g = 0;  %b = %c; }
+    else               { %r = %c; %g = 0;  %b = %x; }
+
+    // Skalierung auf SDL_Color / U8 Wertebereich (0..255) mit kaufmaennischer Rundung
+    %rU8 = mRound((%r + %m) * 255);
+    %gU8 = mRound((%g + %m) * 255);
+    %bU8 = mRound((%b + %m) * 255);
+
+    return %rU8 SPC %gU8 SPC %bU8 SPC "254"; //254 enabled blend
+}
