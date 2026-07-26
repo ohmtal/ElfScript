@@ -68,20 +68,27 @@ function GuiToolMenu::Render(%this, %screenSize) {
         %s = MeasureText(%caption, %this.MenuFontScale);
         if (%s.x > %menuWidth) %menuWidth = %s.x;
     }
-    %itemWidth = %menuWidth + %addButtonWidth;
-    %menuWidth += %borderWidth; //add border
-    %itemHeight =  %s.y + 10;
 
+    %itemHeight =  %s.y + 10;
     if (%useImages) {
-        %itemWidth += %this.MenuTextureAtlasSize.x;
+        %menuWidth += %this.MenuTextureAtlasSize.x;
         if (%itemHeight < %this.MenuTextureAtlasSize.y)
             %itemHeight = %this.MenuTextureAtlasSize.y;
     }
+    %itemWidth = %menuWidth + %addButtonWidth;
+    %menuWidth += %borderWidth; //add border
 
     %menuHeight = (%cnt + 1) * (%itemHeight + %buttonGap ) + 10 ;
     // calculation done lets draw
-    %x = %screenSize.x / 2 - %menuWidth / 2;
-    %y = %screenSize.y / 2 - %menuHeight / 2;
+    if (%this.position $="") {
+        %x = %screenSize.x / 2 - %menuWidth / 2;
+        %y = %screenSize.y / 2 - %menuHeight / 2;
+    } else {
+        %x = %this.position.x;
+        %y = %this.position.y;
+        if (%x + %menuWidth  > %screenSize.x) %x -= %menuWidth;
+        if (%y + %menuHeight > %screenSize.y) %y -= %menuHeight;
+    }
 
     %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
     // echo("%menuRect " SPC %menuRect );
@@ -100,8 +107,8 @@ function GuiToolMenu::Render(%this, %screenSize) {
         if (%useImages) {
 
             %srcRect = getField(%this.MenuTextureRects, %i);
-            %dstRect = %rect.x SPC %rect.y SPC %this.MenuTextureAtlasSize;
-            %rect.x += %this.MenuTextureAtlasSize.x;
+            %dstRect = %rect.x - %this.MenuTextureAtlasSize.x SPC %rect.y SPC %this.MenuTextureAtlasSize;
+            // %rect.x += %this.MenuTextureAtlasSize.x;
             %this.MenuTextureAtlas.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
         }
         if (GuiTool.MenuEntry(%rect, %caption, %this.MenuFontScale)){
@@ -127,52 +134,66 @@ function GuiTool::haveOverlay(%this) {
 }
 //-----------------------------------------------------------------------------
 function GuiTool::Render(%this, %screenSize) {
-   if (%screenSize !$="") %this.screenSize = %screenSize;
+    if (%screenSize !$="") %this.screenSize = %screenSize;
 
-   %menuActive = isObject( %this.CurrentMenu);
-   %this._IsOverlay = %this.Message !$= "" || %menuActive ;
+    %menuActive = isObject( %this.CurrentMenu);
+    %this._IsOverlay = %this.Message !$= "" || %menuActive ;
 
-   if (%this._IsOverlay) {
-       BeginBlendMode();
-       DrawRectRec("0 0" SPC %screenSize, "20 20 20 200");
-       EndBlendMode();
-   }
+    if (%this._IsOverlay) {
+        BeginBlendMode();
+        DrawRectRec("0 0" SPC %screenSize, "20 20 20 200");
+        EndBlendMode();
+    }
 
-   // ---- Menu ----
-   if (%menuActive) {
+    // ---- Menu ----
+
+    if (%menuActive) {
         %this.CurrentMenu.render(%screenSize);
-   }
+
+        %this.escapeTimer += GetFrameTime();
+        if (%this.escapeTimer > 0.5 && SDL_IsKeyPressed(SDL_SCANCODE_ESCAPE)) {
+            %this.CurrentMenu = 0;
+        }
+    } else {
+        %this.escapeTimer = 0;
+    }
 
 
-   // ---- Message -----
-   if (%this.Message !$= "") {
-       %menuWidth = %screenSize.x;
-       %linecount = getRecordCount(%this.Message) ;
-       %menuHeight = %linecount * 30 + 30;
-       %x =  %screenSize.x / 2 - %menuWidth / 2;
-       %y = %screenSize.y / 2 - %menuHeight / 2;
-       %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
-       BeginBlendMode();
-       DrawRectRec(%menuRect, "20 20 20 200"  );
-       EndBlendMode();
-       DrawRectRec(%menuRect, "200 200 200", false );
-       %x += 25;
-       %y += 15;
-       for (%i = 0; %i < %linecount; %i++) {
-           %line = getRecord(%this.Message, %i);
-           if (startsWith(%line, "[error]"))
-               DrawText(%x, %y, %line, 1.4, RED);
-           else
-               DrawText(%x, %y, %line, 1.4, ORANGE);
-           %y += 30;
-           if ( %this._messageCounter == 0.0) echo("MESSAGE:" SPC %line);
-       }
-       %this._messageCounter += GetFrameTime();
-       if (%this._messageCounter > %this.MessageTime) {
-           %this._messageCounter = 0;
-           %this.Message = "";
-       }
-   }
+    // ---- Message -----
+    if (%this.Message !$= "") {
+        %menuWidth = %screenSize.x;
+        %linecount = getRecordCount(%this.Message) ;
+        %menuHeight = %linecount * 30 + 30;
+        %x =  %screenSize.x / 2 - %menuWidth / 2;
+        %y = %screenSize.y / 2 - %menuHeight / 2;
+        %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
+        BeginBlendMode();
+        DrawRectRec(%menuRect, "20 20 20 200"  );
+        EndBlendMode();
+        DrawRectRec(%menuRect, "200 200 200", false );
+        %x += 25;
+        %y += 15;
+        for (%i = 0; %i < %linecount; %i++) {
+            %line = getRecord(%this.Message, %i);
+            if (startsWith(%line, "[error]"))
+                DrawText(%x, %y, %line, 1.4, RED);
+            else
+                DrawText(%x, %y, %line, 1.4, ORANGE);
+            %y += 30;
+            if ( %this._messageCounter == 0.0) echo("MESSAGE:" SPC %line);
+        }
+
+        if (%this.MessageTime > 0.0) {
+            %this._messageCounter += GetFrameTime();
+            if (%this._messageCounter > %this.MessageTime) {
+                %this._messageCounter = 0;
+                %this.Message = "";
+            }
+        }
+        if (SDL_IsKeyPressed(SDL_SCANCODE_ESCAPE)) {
+            %this.Message = "";
+        }
+    }
 
 }
 //-----------------------------------------------------------------------------

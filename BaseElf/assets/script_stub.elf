@@ -434,13 +434,53 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  SoundObject : public SimObject {
+class  TextureObject : public SimObject {
   public:
-   /** --- bool play ---
-    * play the sound
+   /** --- bool load ---
+    * Load a Texture
     * @return bool
     */
-      function play();
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -448,34 +488,6 @@ class  SoundObject : public SimObject {
    /*!
     */
    string fileName;
-   /*!
-    */
-   float gain;
-   /*!
-    */
-   bool loop;
-};
-/*!
-@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
-ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
-a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
-@tsexample
-new ScriptObject(Game)
-{
-   class = "DeathMatchGame";
-   superClass = GameCore;
-   genre = "Action FPS"; // Note the new, non-Torque variable
-};
-@endtsexample
-@see SimObject
-@ingroup Console
- */
-class  ScriptObject : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
 };
 /*!
 @brief A collection of SimObjects.
@@ -692,6 +704,28 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+/*!
+@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
+ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
+a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
+@tsexample
+new ScriptObject(Game)
+{
+   class = "DeathMatchGame";
+   superClass = GameCore;
+   genre = "Action FPS"; // Note the new, non-Torque variable
+};
+@endtsexample
+@see SimObject
+@ingroup Console
+ */
+class  ScriptObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
 class  SettingsObject : public SimObject {
   public:
    /** --- void sync ---
@@ -750,61 +784,6 @@ class  SettingsObject : public SimObject {
    /*!
     */
    Color clearColor;
-};
-class  TextureObject : public SimObject {
-  public:
-   /** --- bool load ---
-    * Load a Texture
-    * @return bool
-    */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
 };
 class  GameObject : public SimObject {
   public:
@@ -911,6 +890,27 @@ class  GameObject : public SimObject {
    
     */
    int flip;
+};
+class  SoundObject : public SimObject {
+  public:
+   /** --- bool play ---
+    * play the sound
+    * @return bool
+    */
+      function play();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
+   /*!
+    */
+   float gain;
+   /*!
+    */
+   bool loop;
 };
 /*!
 @brief Data structure for storing indexed sequences of key/value pairs.
@@ -2668,9 +2668,9 @@ namespace Global {
     */
       function weekdayNumToStr( int num, bool abbreviate=false );
    /** --- const char* getField ---
-    * Extract the field at the given @a index in the newline and/or tab separated list in @a text.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Extract the field at the given @a index in the  tab separated list in @a text.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param index The zero-based index of the field to extract.
     * @return The field at the given index or "" if the index is out of range.
     * @tsexample
@@ -2686,8 +2686,8 @@ namespace Global {
       function getField( string text, int index );
    /** --- const char* getFields ---
     * Extract a range of fields from the given @a startIndex onwards thru @a endIndex.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param startIndex The zero-based index of the first field to extract from @a text.
     * @param endIndex The zero-based index of the last field to extract from @a text.  If this is -1, all fields beginning with @a startIndex are extracted from @a text.
     * @return A string containing the specified range of fields from @a text or "" if @a startIndex is out of range or greater than @a endIndex.
@@ -2704,8 +2704,8 @@ namespace Global {
       function getFields( string text, int startIndex, int endIndex=-1 );
    /** --- const char* setField ---
     * Replace the field in @a text at the given @a index with @a replacement.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by  tabs.
+    * @param text A list of fields separated by  tabs.
     * @param index The zero-based index of the field to replace.
     * @param replacement The string with which to replace the field.
     * @return A new string with the field at the given @a index replaced by @a replacement or the original string if @a index is out of range.
@@ -2721,8 +2721,8 @@ namespace Global {
       function setField( string text, int index, string replacement );
    /** --- const char* removeField ---
     * Remove the field in @a text at the given @a index.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param index The zero-based index of the field in @a text.
     * @return A new string with the field at the given index removed or the original string if @a index is out of range.
     * @tsexample
@@ -2735,9 +2735,9 @@ namespace Global {
     */
       function removeField( string text, int index );
    /** --- S32 getFieldCount ---
-    * Return the number of newline and/or tab separated fields in @a text.
-    * @param text A list of fields separated by newlines and/or tabs.
-    * @return The number of newline and/or tab sepearated elements in @a text.
+    * Return the number of  tab separated fields in @a text.
+    * @param text A list of fields separated by  tabs.
+    * @return The number of  tab sepearated elements in @a text.
     * @tsexample
     * getFieldCount( "a b" TAB "c d" TAB "e f" ) // Returns 3
     * @endtsexample
@@ -3952,6 +3952,11 @@ namespace Global {
     * @return bool
     */
       function ImInputText( string text, string valueVarName, int flags=0 );
+   /** --- bool ImColorEdit ---
+    * Color Edit, when set bool using_rgba_u8 we convert it from 1.f to 255.
+    * @return bool
+    */
+      function ImColorEdit( string label, string valueVarName, bool using_rgba_u8=false );
    /** --- bool ImCombo ---
     * return true if changed add a varname as reference. Can be a global variable or a Object field.
     * @var currentItemIndexVarName is the name of variable where the current item index lives
@@ -4082,6 +4087,64 @@ namespace Global {
     * @return bool
     */
       function ImIsMouseDown( int mouseButton=0 );
+   /** --- bool ImIsMouseReleased ---
+    * Returns true if the mouse button went from down to up in this frame globally.
+    * @return bool
+    */
+      function ImIsMouseReleased( int mouseButton=0 );
+   /** --- bool ImIsMouseDoubleClicked ---
+    * Returns true if the mouse button was double-clicked globally.
+    * @return bool
+    */
+      function ImIsMouseDoubleClicked( int mouseButton=0 );
+   /** --- bool ImIsMouseReleasedWithDelay ---
+    * Returns true for a delayed mouse release event.
+    * @return bool
+    */
+      function ImIsMouseReleasedWithDelay( int mouseButton=0, float delay=-1.0f );
+   /** --- S32 ImGetMouseClickedCount ---
+    * Returns the number of successive mouse clicks recorded at the moment a click happens.
+    * @return S32
+    */
+      function ImGetMouseClickedCount( int mouseButton=0 );
+   /** --- bool ImIsMouseHoveringRect ---
+    * Checks if the mouse is hovering a specific global bounding box.
+    * @return bool
+    */
+      function ImIsMouseHoveringRect( ImVec2 r_min, ImVec2 r_max, bool clip=true );
+   /** --- bool ImIsMousePosValid ---
+    * Returns true if the specified position (or current frame coordinate) is valid.
+    * @return bool
+    */
+      function ImIsMousePosValid( String mousePosStr="" );
+   /** --- ImVec2 ImGetMousePos ---
+    * Returns the global screen coordinates of the mouse cursor.
+    * @return ImVec2
+    */
+      function ImGetMousePos();
+   /** --- ImVec2 ImGetMousePosOnOpeningCurrentPopup ---
+    * Returns the mouse coordinates captured exactly at the moment the current popup opened.
+    * @return ImVec2
+    */
+      function ImGetMousePosOnOpeningCurrentPopup();
+   /** --- bool ImIsMouseDragging ---
+    * Returns true if the mouse is actively dragging past a specified motion threshold.
+    * @return bool
+    */
+      function ImIsMouseDragging( int mouseButton=0, float lockThreshold=-1.0f );
+   /** --- ImVec2 ImGetMouseDragDelta ---
+    * Returns the total pixel distance shifted since dragging began.
+    * @return ImVec2
+    */
+      function ImGetMouseDragDelta( int mouseButton=0, float lockThreshold=-1.0f );
+   /** --- void ImResetMouseDragDelta ---
+    * Resets the mathematical baseline origin for the current drag session to the current cursor spot.
+    */
+      function ImResetMouseDragDelta( int mouseButton=0 );
+   /** --- void ImSetNextFrameWantCaptureMouse ---
+    * Force-overrides the application-wide io.WantCaptureMouse layout flag for the next viewport pass.
+    */
+      function ImSetNextFrameWantCaptureMouse( bool wantCaptureMouse );
    /** --- bool ImIsKeyDown ---
     * Returns true if the specific ImGuiKey is currently held down.
     * @param imguiKey The native ImGuiKey enum integer value.
@@ -4415,7 +4478,6 @@ namespace Global {
   PLAYER_SIZE = "16 16"
   SCENE_FILE = "pref:/aquarium.elfscene"
   BACKGROUND_COLOR = "176 233 252"
-  MESSAGE_TIME = 2.0
   SCALE_SNAP = 8
   TEX_SIZE = 16
   BOUNCY = 6.66
@@ -5038,5 +5100,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (629 items) ---
+--- End of Dump (628 items) ---
 */

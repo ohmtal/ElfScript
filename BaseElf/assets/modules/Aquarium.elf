@@ -3,17 +3,25 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // Prototype for 2D Editor using a Aquarium
-// Graphics: 	Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
+// Graphics: Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
 //-----------------------------------------------------------------------------
+// FIXME implement: 1.) Add Mouse Object!! which is cloned or placed
 // Control Scheme:
-// FIXME implement
-// - Scale          : Mouse Wheel alone. Quick and natural for resizing.
-// - Rotate         : Shift + Mouse Wheel.
-// - Layer (0..20)  : Ctrl + Mouse Wheel.
+//
+// - Scale          : Mouse Wheel
+// - Rotate         : CTRL + Mouse Wheel.
+// - Layer (0..20)  : Shift + Mouse Wheel.
 // - Flip (0..3)    : Middle Mouse Click Cycle.
 //
+// - deselect       : right mouse button
+// - placement      : left mouse button (in placement mode)
+// - select object  : left mouse button (in select mode)
+// - attach selected to mouse: SPACE
+//
 // GUI:
-// - Atlas Map      : SPACE
+// - Snap To Grid  : F1
+// - reset placement parameters : F2
+// - Atlas Map      : TAB
 // - Main Menu      : ESCAPE
 // - Inspector      : F10
 //
@@ -48,13 +56,13 @@ function Aquarium::onAdd(%this) {
     %this.add(%this.Spritesheet);
 
     %this.showSheet = true;
-    %this.paintSize = 32;
-    //FIXME unused >>>>
-    %this.paintRotate = 0;
-    %this.paintCenterPoint = "32 32";
+    %this.snapToGrid = true;
+
+    %this.paintSize = 48;
+    %this.paintAngle = 0;
+    %this.paintCenterPoint = "24 24";
     %this.paintFlip = 0;
-    // <<<<
-    // %this.painting = false;
+
     %this.add( new SimGroup(SceneObjects));
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
     %this.selectedSceneObject = 0;
@@ -84,14 +92,23 @@ function Aquarium::onAdd(%this) {
         OnMenuMethod = "onMainMenu";
     };
 
+    %this.ConfirmMenu = new SimObject() {
+        class = "GuiToolMenu";
+        MenuCaption = "Confirm";
+        MenuFontScale = 3.0;
+        MenuEntries = "YES" TAB "NO";
+        OnMenuObject = %this;
+        OnMenuMethod = "onConfirmMenu";
+    };
+
     %this.SelectObjectMenu = new SimObject() {
         class = "GuiToolMenu";
-        MenuCaption = "Multiple Objects:";
-        MenuFontScale = 1.5;
+        MenuCaption = "select";
+        MenuFontScale = 1.2;
         OnMenuObject = %this;
         OnMenuMethod = "onSelectObject";
         MenuTextureAtlas = %this.SpriteSheet;
-        MenuTextureAtlasSize = "16 16";
+        MenuTextureAtlasSize = "24 24";
         MenuEntries = "";
         MenuTextureRects = "";
     };
@@ -133,19 +150,27 @@ function Aquarium::DrawSpriteSheet(%this) {
         %dstRect = %x SPC %y SPC %size SPC %size;
         %s.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
         if (PointInRect(%mousePos, %dstRect)) {
-            // echo("inRect:" SPC %name);
+
             if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
-                %this.selectedTexture = %name;
                 %this.selectedSceneObject = 0;
+                %this.mouseObject = new SimObject() {
+                    class = "SceneObject";
+                    TypeRectF srcRect = %srcRect;
+                    // TypeRectF dstRect = %dstRect;
+                    TypeF32   angle = %this.paintAngle;
+                    TypeF32   centerPoint = %this.paintCenterPoint;
+                    TypeColor color=WHITEBLEND;
+                    TypeS32   flip = %this.paintFlip;
+                    TypeF32   layer = %this.placementLayer; //higher = rendered first
+                    TypeString textureName = %name;
+                };
+                SceneObjects.add( %this.mouseObject);
             }
             %this.cursorTexure = %name;
         }
 
-        // DrawText(%x , %y, %name,0.8);
     }
-    if (%this.cursorTexure !$="")  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure, 1.8, "128 255 0", true, BLACK);
-    // DrawText(0, %screenSize.y, "Press left shift to enter paint mode", 1.2, WHITE, true);
-    // EndBlendMode();
+    if (!isObject(%this.mouseObject))  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure , 1.8, "128 255 0", true, BLACK);
 }
 //----------------------------------------------------------------------
 // sort by layers higher == move to back (render first)
@@ -214,23 +239,43 @@ function Aquarium::onSelectObject(%this, %menuId, %menuCaption) {
 
     // echo("LIST:"); SelectList.listObjects();
 
-    %obj = SelectList.getObject(%menuId);
+    %obj = SelectList.getObject(%menuId).getId();
     %this.selectedSceneObject = %obj;
+    FieldInspector.inspect(%obj);
     SelectList.clear();
     GuiTool.CurrentMenu = 0;
 
     // warn("SELECT " SPC %menuId SPC  %menuCaption SPC "=>" SPC %obj);
 }
 //----------------------------------------------------------------------
+function Aquarium::save(%this) {
+
+    %path = getFullPath(SCENE_FILE);
+    if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
+    else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
+    %this.dirty = true;
+}
+//----------------------------------------------------------------------
+function Aquarium::onConfirmMenu(%this, %menuId, %menuCaption) {
+    if (%this.action $= "Save Scene" && %menuId == 0) {
+        %this.save();
+    }
+    GuiTool.CurrentMenu = 0;
+}
+
+//----------------------------------------------------------------------
 function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
     switch$ (%menuCaption) {
 
         case "Save Scene":
-            GuiTool.CurrentMenu = 0;
-            %path = getFullPath(SCENE_FILE);
-            if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
-            else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
-            %this.dirty = true;
+            if (SceneObjects.getCount() == 0) {
+                GuiTool.Message = "Skip save empty scene!";
+                return;
+            }
+            %this.ConfirmMenu.MenuCaption = "Confirm Save Scene";
+            %this.ConfirmMenu.action = "Save Scene";
+            GuiTool.CurrentMenu = %this.ConfirmMenu;
+
 
         case "Load Scene":
             GuiTool.CurrentMenu = 0;
@@ -260,11 +305,11 @@ function Aquarium::Render(%this) {
 
     %screenSize = getScreenSize();
     %mousePos = GetMousePosition();
-    %haveSelected = %this.selectedTexture !$= "";
+    %haveMouseObject = isObject(%this.mouseObject);
 
     %haveOverlay =  GuiTool.haveOverlay();
 
-    if (%this.dirty /*|| %this.selectedSceneObject != 0*/) {
+    if (%this.dirty ) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
         ClearBackground(BACKGROUND_COLOR);
 
@@ -276,25 +321,17 @@ function Aquarium::Render(%this) {
                                               %obj.flip,
                                                %obj.color
                                               );
-            // if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
-            // if (!%haveSelected && !%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
-            //     if (PointInRect(%mousePos, %obj.dstRect)) %this.selectedSceneObject = %obj;
-            // }
-            //
-            // if (%this.selectedSceneObject == %obj) {
-            //     DrawRectRec(%obj.dstRect, ORANGE, false);
-            //     if (SDL_IsKeyPressed(SDL_SCANCODE_DELETE)) {
-            //         %this.selectedSceneObject = 0;
-            //         %this.schedule(100, removeSceneObject, %obj);
-            //     }
-            // }
+
         }
         SetRenderTarget(0);
         %this.dirty = false;
     }
 
+    RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
      if (!%this.dirty && !%haveOverlay) {
-        RenderTarget.DrawRect("0 0" SPC RenderTarget.getSize());
+
+        //FIXME cleanup source code :
+
         %mouseDown = SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT);
         %deletePressed = SDL_IsKeyPressed(SDL_SCANCODE_DELETE);
         %lctrlPressed = SDL_IsKeyDown(SDL_SCANCODE_LCTRL);
@@ -306,61 +343,36 @@ function Aquarium::Render(%this) {
         }
         if (%mouseDown || %deletePressed || %lctrlPressed || %lshiftPressed || %this.selectedSceneObject != 0) {
 
-            if (%this.selectedSceneObject != 0) {
-
-                DrawText(10,%screenSize.y - 30, "DEL delete, 1-4 flip, wheel rotate, F10 Inspector", 2, BLUE, true);
-
-                %wheel = SDL_GetMouseWheelY();
-                if ( %wheel != 0 ) {
-                    %this.selectedSceneObject.angle += SDL_GetMouseWheelY();
-
-                    %this.dirty = true;
-                }
-                if (SDL_IsKeyPressed(SDL_SCANCODE_1))  {
-                    %this.selectedSceneObject.flip = 0;
-                    %this.dirty = true;
-                }
-                if (SDL_IsKeyPressed(SDL_SCANCODE_2))  {
-                    %this.selectedSceneObject.flip = 1;
-                    %this.dirty = true;
-                }
-                if (SDL_IsKeyPressed(SDL_SCANCODE_3))  {
-                    %this.selectedSceneObject.flip = 2;
-                    %this.dirty = true;
-                }
-                if (SDL_IsKeyPressed(SDL_SCANCODE_4))  {
-                    %this.selectedSceneObject.flip = 3;
-                    %this.dirty = true;
-                }
-            }
+            // FIXME HELPLINE
+            DrawText(10,%screenSize.y - 30, "DEL delete,  F10 Inspector", 2, BLUE, true);
 
             foreach(%obj in SceneObjects) {
-                if (%lctrlPressed) {
+
+                // SHOW THE LAYERS OF ALL OBJECTS
+                if (%lshiftPressed) {
                     DrawText(%obj.dstRect.x + 1 ,%obj.dstRect.y + 1, %obj.Layer , 1.0, YELLOW, true);
                 }
 
 
-                if (!%haveSelected && !%haveOverlay && %mouseDown) {
+                // SELECT OBJECT
+                if (!%haveMouseObject && !%haveOverlay && %mouseDown) {
                     if (PointInRect(%mousePos, %obj.dstRect)) {
                         %this.selectedSceneObject = %obj;
                         FieldInspector.inspect(%obj.getId());
                         SelectList.add(%obj);
                     }
-
                 }
 
+
+                // draw SELECTION RECT
                 if (%this.selectedSceneObject == %obj) {
                     DrawRectRec(%obj.dstRect, ORANGE, false);
-                    if (%deletePressed) {
-                        %this.selectedSceneObject = 0;
-                        FieldInspector.inspect(0);
-                        %this.schedule(100, removeSceneObject, %obj);
-                    }
                 }
             } //foreach
         }
     }
 
+    // check Multiple selections and show menu
     if (SelectList.getCount() > 1 && %mouseDown) {
         warn("Multiple Objects found at mouse position:");
 
@@ -371,49 +383,30 @@ function Aquarium::Render(%this) {
             %this.SelectObjectMenu.MenuEntries = trim( %this.SelectObjectMenu.MenuEntries TAB %obj.getId());
             %this.SelectObjectMenu.MenuTextureRects = trim( %this.SelectObjectMenu.MenuTextureRects TAB %obj.srcRect );
         }
+        %this.SelectObjectMenu.position = GetMousePosition();
         GuiTool.CurrentMenu =  %this.SelectObjectMenu;
-
-
     }
 
 
 
-    if (!%haveSelected) {
-       if (!%this.hideSpriteSheet && !%haveOverlay) %this.DrawSpriteSheet();
-       if (SDL_IsKeyPressed(SDL_SCANCODE_SPACE)) %this.hideSpriteSheet = !%this.hideSpriteSheet;
-    } else if (!%haveOverlay){
-        %srcRect = Spritesheet.getFieldValue(%this.selectedTexture);
-        %dstRect = (%screenSize.x - PREVIEW_SIZE) SPC 0 SPC PREVIEW_SIZE SPC PREVIEW_SIZE;
-        if (SHOW_PREVIEW) {
-            if (PointInRect(%mousePos, %dstRect)) {
-                %dstRect.x -= PREVIEW_SIZE * 2;
-            }
-            Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
-            DrawRectRec(%dstRect, BLACK, false);
-        }
+    if (!%haveMouseObject) {
+        if (!%haveOverlay) {
+            if ( %this.hideSpriteSheet ) {
 
+                DrawText(0,0,"[TAB]",1.5, "200 200 0 150", true);
 
-        %wheel = SDL_GetMouseWheelY();
-        if (%wheel != 0) {
-//FIXME paintRotate + paintCenterPoint + paintFlip
-            if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL)) {
-                %this.placementLayer += %wheel;
-                if (%this.placementLayer < 0) %this.placementLayer = 0;
-                if (%this.placementLayer > MAX_LAYER) %this.placementLayer = MAX_LAYER;
-
-            } else  {
-                %this.paintSize += SCALE_SNAP * %wheel;
-                if (%this.paintSize < SCALE_SNAP )  %this.paintSize = SCALE_SNAP;
-                if (%this.paintSize > MAX_SCALE )  %this.paintSize = MAX_SCALE;
+            } else {
+                %this.DrawSpriteSheet();
             }
 
         }
 
+    } else /*if (!%haveOverlay )*/ {
 
         %halvPaintSize =  %this.paintSize / 2;
-        if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+        if (%this.snapToGrid) {
             // Snap to grid
-            %gridSize = SCALE_SNAP; // %this.paintSize;
+            %gridSize = SCALE_SNAP;
 
             %snapX = mFloor((%mousePos.x - %halvPaintSize) / %gridSize) * %gridSize;
             %snapY = mFloor((%mousePos.y - %halvPaintSize) / %gridSize) * %gridSize;
@@ -424,96 +417,48 @@ function Aquarium::Render(%this) {
             %snapX = mClamp(%snapX, 0, %maxX);
             %snapY = mClamp(%snapY, 0, %maxY);
 
-            %dstRect = %snapX SPC %snapY SPC %this.paintSize SPC %this.paintSize;
+            %this.mouseObject.dstRect = %snapX SPC %snapY SPC %this.paintSize SPC %this.paintSize;
 
         } else {
-            %dstRect = (%mousePos.x - %halvPaintSize) SPC (%mousePos.y - %halvPaintSize) SPC %this.paintSize SPC %this.paintSize;
+            %this.mouseObject.dstRect = (%mousePos.x - %halvPaintSize) SPC (%mousePos.y - %halvPaintSize) SPC %this.paintSize SPC %this.paintSize;
         }
-        Spritesheet.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
+
+        Spritesheet.DrawRotatedSrcDstRect(%this.mouseObject.srcRect,
+                                          %this.mouseObject.dstRect,
+                                          %this.mouseObject.angle,
+                                          %this.mouseObject.centerPoint,
+                                          %this.mouseObject.flip,
+                                          %this.mouseObject.color
+        );
+        %dstRect = %this.mouseObject.dstRect;
         DrawText(%dstRect.x + 1 , %dstRect.y + 1, %this.paintSize SPC "/" SPC %this.placementLayer , 1.0);
 
+        //  P L A C E M E N T
         if (!%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
-
-            // FIXME: flip and rotate
-
-            SceneObjects.add(
-                new SimObject() {
-                    class = "SceneObject";
-                    TypeRectF srcRect = %srcRect;
-                    TypeRectF dstRect = %dstRect;
-                    TypeF32 angle = 0;
-                    TypeF32 centerPoint = %dstRect.width / 2 SPC %dstRect.height / 2;
-                    TypeColor color=WHITEBLEND;
-                    TypeS32 flip = 0;
-                    TypeF32   layer = %this.placementLayer; //higher = rendered first
-                });
+            SceneObjects.add( %this.mouseObject.clone());
+            // SceneObjects.add(
+            //     new SimObject() {
+            //         class = "SceneObject";
+            //         TypeRectF srcRect = %srcRect;
+            //         TypeRectF dstRect = %dstRect;
+            //         TypeF32 angle = 0;
+            //         TypeF32 centerPoint = %dstRect.width / 2 SPC %dstRect.height / 2;
+            //         TypeColor color=WHITEBLEND;
+            //         TypeS32 flip = 0;
+            //         TypeF32   layer = %this.placementLayer; //higher = rendered first
+            //     });
             SceneObjects.sort("compareLayers");
             %this.dirty = true;
         }
 
-        if ( SDL_IsMouseButtonPressed(SDL_BUTTON_RIGHT)) {
-            %this.selectedTexture = "";
-            // %this.painting = false;
-        }
-        DrawText(5, 5, "shift = snap to grid, wheel = size, ctrl+wheel = layer, right click = select", 1.2, WHITE, true);
+
+        DrawText(5, 5, "snap to grid (F1):" SPC (%this.snapToGrid ? "ON" : "OFF"), 2.0, BLUE, true);
     }
 
 
     GuiTool.Render(%screenSize);
 
 
-    // if (%this.showMenu) {
-    //     %menuWidth = 300;
-    //     %menuHeight = 300;
-    //     %x =  %screenSize.x / 2 - %menuWidth / 2;
-    //     %y = %screenSize.y / 2 - %menuHeight / 2;
-    //     %menuRect = %x SPC %y  SPC %menuWidth SPC %menuHeight;
-    //     BeginBlendMode();
-    //     DrawRectRec(%menuRect, "20 20 20 200"  );
-    //     EndBlendMode();
-    //     DrawRectRec(%menuRect, "200 200 200", false );
-    //
-    //     %x += 25;
-    //     %y += 15;DrawText(%x, %y, "Menu", 2.5, GRAY);
-    //     %y += 25; DrawLine(%x, %y, %x+250, %y, GRAY );
-    //     // Button Save
-    //     %y += 15;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-    //     if (GuiTool.MenuEntry(%rect, "Save Scene")) {
-    //         %this.showMenu = false;
-    //         %path = getFullPath(SCENE_FILE);
-    //         if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
-    //         else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
-    //         %this.dirty = true;
-    //     }
-    //     // Button Load
-    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-    //     if (GuiTool.MenuEntry(%rect, "Load Scene")){
-    //         %this.showMenu = false;
-    //         %this.load();
-    //
-    //     }
-    //
-    //     // Button Export
-    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-    //     if (GuiTool.MenuEntry(%rect, "Export Image")){
-    //         %this.showMenu = false;
-    //
-    //         %path = getFullPath(EXPORT_PNG_FILE);
-    //         if (RenderTarget.saveImage(%path))
-    //             GuiTool.Message = "Image exported to:\n" @ %path;
-    //         else
-    //             GuiTool.Message = "[error]Failed to export Image to:\n" @ %path;
-    //     }
-    //
-    //     // Button Resume
-    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-    //     if (GuiTool.MenuEntry(%rect, "Resume")) %this.showMenu = false;
-    //
-    //     // Button QUIT
-    //     %y += 40;%rect = %x - 5 SPC  %y - 5 SPC 250 SPC 30;
-    //     if (GuiTool.MenuEntry(%rect, "Quit")) schedule(250,0, quit);
-    //
-    // }
 
 }
 
@@ -524,16 +469,133 @@ function SceneObject::onInspectPostApply(%this) {
 }
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+
+    if ( GuiTool.haveOverlay() ) return;
+
     if (%isDown) {
         if (%scancode == SDL_SCANCODE_ESCAPE) {
             if (GuiTool.CurrentMenu == 0) GuiTool.CurrentMenu =%this.MainMenu;
             else GuiTool.CurrentMenu = 0;
         }
+        if (%scancode == SDL_SCANCODE_F1) %this.snapToGrid = !%this.snapToGrid;
+        if (%scancode == SDL_SCANCODE_F2) {
+            %this.paintSize = 48;
+            %this.paintAngle = 0;
+            %this.paintCenterPoint = "24 24";
+            %this.paintFlip = 0;
+            if (isObject(%this.mouseObject)) {
+                %this.mouseObject.angle = %this.paintAngle;
+                %this.mouseObject.centerPoint = %this.paintCenterPoint;
+                %this.mouseObject.flip = %this.paintFlip;
+            }
+
+        }
         if (%scancode == SDL_SCANCODE_F10) %this.showInspector = !%this.showInspector;
+        if (%scancode == SDL_SCANCODE_TAB) %this.hideSpriteSheet = !%this.hideSpriteSheet;
+
+        if (%scancode == SDL_SCANCODE_SPACE) {
+            if (isObject(%this.selectedSceneObject)) {
+                %obj = %this.selectedSceneObject;
+                %this.selectedSceneObject = 0;
+                SceneObjects.remove(%obj);
+                %this.dirty = true;
+
+                %this.paintSize = %obj.dstRect.width;
+                %this.mouseObject = %obj;
+
+            }
+        }
+
+        if (%scancode ==  SDL_SCANCODE_DELETE) {
+            if (isObject(%this.selectedSceneObject)) {
+                %this.selectedSceneObject.delete();
+                %this.selectedSceneObject = 0;
+                %this.dirty = true;
+            }
+        }
+
     }
 }
+//----------------------------------------------------------------------
 function Aquarium::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (%isDown) {
+        // change flip
+        if (%button == SDL_BUTTON_MIDDLE) {
+            %obj = isObject(%this.mouseObject) ? %this.mouseObject :  %this.selectedSceneObject;
+            %haveObject = isObject(%obj);
+            if (haveObject) {
+
+
+                if (%obj == %this.selectedSceneObject) {
+                    %obj.flip ++;
+                    %obj.flip = %obj.flip % 4;
+                    %this.dirty = true;
+                } else {
+                    %this.paintFlip++;
+                    %this.paintFlip = %this.paintFlip % 4;
+                    %obj.flip = %this.paintFlip;
+                }
+            }
+        } else if ( %button == SDL_BUTTON_RIGHT ) {
+            if (%this.mouseObject != 0) {
+                %this.mouseObject.delete();
+                %this.mouseObject = 0;
+            }
+            if (%this.selectedSceneObject != 0) {
+                %this.selectedSceneObject = 0;
+            }
+        }
     }
 }
-function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+//----------------------------------------------------------------------
+function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
+
+    %obj = isObject(%this.mouseObject) ? %this.mouseObject :  %this.selectedSceneObject;
+    %haveObject = isObject(%obj);
+
+    if (%wheelY != 0 && %haveObject) {
+        // Wheel + SHIFT = LAYER
+        if (SDL_IsKeyDown(SDL_SCANCODE_LSHIFT) || SDL_IsKeyDown(SDL_SCANCODE_RSHIFT) ) {
+            %this.placementLayer += %wheelY;
+            if (%this.placementLayer < 0) %this.placementLayer = 0;
+            if (%this.placementLayer > MAX_LAYER) %this.placementLayer = MAX_LAYER;
+            %obj.layer = %this.placementLayer;
+
+            if (%obj == %this.selectedSceneObject) {
+                %this.dirty = true;
+                SceneObjects.sort("compareLayers");
+            }
+        }
+        // Wheel + ctrl = Rotate
+        else if (SDL_IsKeyDown(SDL_SCANCODE_LCTRL) || SDL_IsKeyDown(SDL_SCANCODE_RCTRL) ) {
+            %a = %obj.angle + %wheelY;
+            // clamp
+            %a = ((%a % 360) + 360) % 360;
+
+            %obj.angle = %a;
+            if (%obj == %this.selectedSceneObject) {
+                %this.dirty = true;
+            } else {
+                %this.paintAngle += %obj.angle;
+
+            }
+        }
+        // not ctrl and to shift we resize
+        else {
+            // should i keep the paintSize == new selected SceneObject size
+            %this.paintSize += SCALE_SNAP * %wheelY;
+            if (%this.paintSize < SCALE_SNAP )  %this.paintSize = SCALE_SNAP;
+            if (%this.paintSize > MAX_SCALE )  %this.paintSize = MAX_SCALE;
+
+            %this.paintCenterPoint = %this.paintSize / 2 SPC %this.paintSize / 2;
+            %obj.centerPoint = %this.paintCenterPoint;
+
+            if (%obj == %this.selectedSceneObject) {
+                %obj.dstRect.width = %this.paintSize;
+                %obj.dstRect.height = %this.paintSize;
+
+                %this.dirty = true;
+            }
+        }
+    } // wheel + object
+}
