@@ -1,0 +1,78 @@
+//----------------------------------------------------------------------
+exec ("include/TextureAtlas.elf");
+//----------------------------------------------------------------------
+function createCameraTest() {
+    %obj = new ScriptGroup(CameraTest) {
+        // class = "CameraTest";
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function CameraTest::onAdd(%this) {
+    SetClearBackground(SLATEGRAY); //only set once
+
+    %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
+    %this.Spritesheet.name = "SpriteSheet";
+    %this.add(%this.Spritesheet);
+
+
+    %this.add( new SpriteBaseObject(MySprite));
+    MySprite.srcRect = SpriteSheet.fish_brown;
+    MySprite.dstRect = "100 100 128 128";
+
+    %this.add( new Camera2DObject(Camera));
+
+
+    return true;
+}
+//----------------------------------------------------------------------
+function CameraTest::OnRemove(%this) {
+}
+//----------------------------------------------------------------------
+function CameraTest::OnUpdate(%this, %dt) {
+    %speed = %dt * 100;
+    if (SDL_IsKeyDown(SDL_SCANCODE_LEFT))     Camera.x += %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_RIGHT))    Camera.x -= %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_UP))       Camera.y += %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_DOWN))     Camera.y -= %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_PAGEUP)) {
+        Camera.zoom -= %dt;
+        Camera.zoom = mClampF(Camera.zoom, 0.1, 5.0);
+    }
+    if (SDL_IsKeyDown( SDL_SCANCODE_PAGEDOWN)) {
+        Camera.zoom += %dt;
+        Camera.zoom = mClampF(Camera.zoom, 0.1, 5.0);
+    }
+    if (SDL_IsKeyPressed( SDL_SCANCODE_SPACE)) {
+        Camera.reset();
+    }
+
+}
+//----------------------------------------------------------------------
+function CameraTest::Render(%this) {
+
+    %obj = MySprite.getId();
+    //NOTE translate dstRect to screenRect and centerPoint to screenCenterPoint
+    %doRender = Camera.TranslateSpriteBaseObject(%obj);
+    if (%doRender) {
+        Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
+                                          %obj.screenRect, //NOTE this!
+                                          %obj.angle,
+                                          %obj.screenCenterPoint, //NOTE and this!
+                                          %obj.flip,
+                                          %obj.color
+        );
+    }
+
+
+
+    %y = 10;
+    DrawText(10,%y, "Mouse:" SPC GetMousePosition() SPC "/" SPC Camera.GetMousePosition(), 1.2, WHITE);
+    %y += 15; DrawText(10,%y, "CAM:" SPC Camera.x SPC Camera.y SPC Camera.zoom , 1.2, WHITE);
+    %y += 15; DrawText(10,%y, "ScreenRect:" SPC %obj.screenRect, 1.2, WHITE);
+}
+//----------------------------------------------------------------------
+function CameraTest::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {}
+function CameraTest::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function CameraTest::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

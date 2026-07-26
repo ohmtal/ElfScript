@@ -726,6 +726,77 @@ class  ScriptObject : public SimObject {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  SpriteBaseObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   RectF srcRect;
+   /*!
+    */
+   float srcX;
+   /*!
+    */
+   float srcY;
+   /*!
+    */
+   float srcWidth;
+   /*!
+    */
+   float srcHeight;
+   /*!
+    */
+   RectF dstRect;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float width;
+   /*!
+    */
+   float height;
+   /*!
+    */
+   float angle;
+   /*!
+    */
+   float centerPoint;
+   /*!
+    */
+   int flip;
+   /*!
+    */
+   Color color;
+   /*!
+    */
+   char r;
+   /*!
+    */
+   char g;
+   /*!
+    */
+   char b;
+   /*!
+    */
+   char a;
+   /*!
+   Translated rect when using camera translate
+   
+    */
+   RectF ScreenRect;
+   /*!
+   Translated point when using camera translate
+   
+    */
+   float ScreenCenterPoint;
+};
 class  SettingsObject : public SimObject {
   public:
    /** --- void sync ---
@@ -784,6 +855,62 @@ class  SettingsObject : public SimObject {
    /*!
     */
    Color clearColor;
+};
+class  Camera2DObject : public SimObject {
+  public:
+   /** --- void Begin ---
+    * Refresh the Center position. Must be called on init and when screensize is changed
+    * This is called on add. If you do not changes the screen size you do not need to call it at all.
+    */
+      function Begin();
+   /** --- void Reset ---
+    * Refresh the position and Reset the cam to center postion and zoom 1
+    */
+      function Reset();
+   /** --- Point2F GetMousePosition ---
+    * Get the Mouse position in world Coordinates
+    * @return Point2F
+    */
+      function GetMousePosition();
+   /** --- Point2F ScreenToWorld ---
+    * get the world position by a screen position
+    * @return Point2F
+    */
+      function ScreenToWorld( Point2F position );
+   /** --- bool GetInsideSceen ---
+    * Check is a rect is inside the screen (frustum culling)
+    * @return bool
+    */
+      function GetInsideSceen( RectF rect );
+   /** --- RectF TranslateWorldRect ---
+    * Translate a world rect to screen / render rect 
+    * @return RectF
+    */
+      function TranslateWorldRect( RectF rect );
+   /** --- Point2F TranslateCenterPoint ---
+    * Translate a world rect to screen / render rect 
+    * @return Point2F
+    */
+      function TranslateCenterPoint( Point2F point );
+   /** --- bool TranslateSpriteBaseObject ---
+    * Translate to screenRect and screenCenterPoint of a SpriteBaseObject
+    * return false if out of view.
+    * @return bool
+    */
+      function TranslateSpriteBaseObject( int spriteBaseObjectId );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float zoom;
 };
 class  GameObject : public SimObject {
   public:
@@ -4466,6 +4593,11 @@ namespace Global {
     * @return F32
     */
       function SDL_GetMouseY();
+   /** --- const char* SDL_GetError ---
+    * Get the last SDL Error.
+    * @return const char*
+    */
+      function SDL_GetError();
    /** --- bool SDL_FileExists ---
     * return true if the file exits
     * @return bool
@@ -4476,6 +4608,54 @@ namespace Global {
     * @return bool
     */
       function SDL_GetPathInfo( string path, int resultObjectId );
+   /** --- bool SDL_GlobDirectory ---
+    * resultObjectId is the object which gets it dynamic fields filled with information
+    * dynamic parameters are: query_path, query_pattern, query_ignorecase
+    * for the result: count, result_[i]
+    * return true if result was not empty.
+    * @return bool
+    */
+      function SDL_GlobDirectory( string path, int resultObjectId, string pattern="*", bool patternIgnoreCase=true );
+   /** --- bool SDL_CopyFile ---
+    * Copy a file.
+    * @return bool
+    */
+      function SDL_CopyFile( string oldpath, string newpath );
+   /** --- bool SDL_CreateDirectory ---
+    * Create a Directory.
+    * @return bool
+    */
+      function SDL_CreateDirectory( string path );
+   /** --- bool SDL_RenamePath ---
+    * rename a path/file.
+    * @return bool
+    */
+      function SDL_RenamePath( string oldpath, string newpath );
+   /** --- bool SDL_RemovePath ---
+    * rename a path/file.
+    * @return bool
+    */
+      function SDL_RemovePath( string path );
+   /** --- const char* SDL_GetUserFolder ---
+    * get the user folder. see also SDL_FOLDER_
+    * @return const char*
+    */
+      function SDL_GetUserFolder( int sdl_folder );
+   /** --- const char* SDL_GetBasePath ---
+    * Get the directory where the application was run from.
+    * @return const char*
+    */
+      function SDL_GetBasePath();
+   /** --- const char* SDL_GetCurrentDirectory ---
+    * Get what the system believes is the current working directory.
+    * @return const char*
+    */
+      function SDL_GetCurrentDirectory();
+   /** --- const char* SDL_GetPrefPath ---
+    * Get the user-and-app-specific path where files can be written.
+    * @return const char*
+    */
+      function SDL_GetPrefPath( string org, string app );
 };
 //------------------------------------------------------------------
 //                  C O N S T A N T S 
@@ -4484,6 +4664,13 @@ namespace Global {
 --- Script Constants Dump ---
   TEX_SIZE = 16
   BOUNCY = 6.66
+  SDL_FOLDER_VIDEOS = 10
+  SDL_FOLDER_SCREENSHOTS = 8
+  SDL_FOLDER_PUBLICSHARE = 6
+  SDL_FOLDER_PICTURES = 5
+  SDL_FOLDER_DOWNLOADS = 3
+  SDL_FOLDER_DESKTOP = 1
+  SDL_FOLDER_HOME = 0
   SDL_PATHTYPE_OTHER = 3
   SDL_PATHTYPE_DIRECTORY = 2
   SDL_PATHTYPE_FILE = 1
@@ -4639,6 +4826,7 @@ namespace Global {
   ImGuiWindowFlags_NoMove = 4
   ImGuiTreeNodeFlags_Selected = 1
   SDL_LOGICAL_PRESENTATION_LETTERBOX = 2
+  SDL_FOLDER_COUNT = 11
   ImGuiWindowFlags_AlwaysAutoResize = 64
   DARKPURPLE = "112 31 126 255"
   SDL_SCANCODE_E = 8
@@ -4851,6 +5039,7 @@ namespace Global {
   ImGuiWindowFlags_NoFocusOnAppearing = 4096
   ImGuiCol_TitleBgActive = 11
   GREEN = "0 228 48 255"
+  SDL_FOLDER_DOCUMENTS = 2
   ImGuiCol_DragDropTarget = 55
   SDL_SCANCODE_KP_HASH = 204
   ImGuiCol_MenuBarBg = 13
@@ -4883,6 +5072,7 @@ namespace Global {
   ImGuiKey_U = 566
   cl_Coral = "1.000000 0.500000 0.310000 1.000000"
   ImGuiKey_V = 567
+  SDL_FOLDER_TEMPLATES = 9
   ImGuiKey_W = 568
   ImGuiKey_Y = 570
   ImGuiTableFlags_BordersInnerV = 512
@@ -4924,6 +5114,7 @@ namespace Global {
   SDL_WINDOW_RESIZABLE = 32
   SDL_SCANCODE_KP_PERIOD = 99
   ImGuiKey_Enter = 525
+  SDL_FOLDER_MUSIC = 4
   ImGuiCol_HeaderHovered = 25
   SDL_SCANCODE_INTERNATIONAL3 = 137
   ImGuiMouseButton_Left = 0
@@ -5019,6 +5210,7 @@ namespace Global {
   SDL_SCANCODE_PAGEUP = 75
   SDL_SCANCODE_SELECT = 119
   SDL_SCANCODE_PAGEDOWN = 78
+  SDL_FOLDER_SAVEDGAMES = 7
   DARKBROWN = "76 63 47 255"
   SDL_SCANCODE_RETURN = 40
   SDL_SCANCODE_RIGHT = 79
@@ -5100,5 +5292,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (618 items) ---
+--- End of Dump (630 items) ---
 */

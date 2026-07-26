@@ -1,5 +1,5 @@
 function createBlank() {
-    %obj = new ScriptObject() {
+    %obj = new ScriptGroup() {
         class = "Blank";
     };
 

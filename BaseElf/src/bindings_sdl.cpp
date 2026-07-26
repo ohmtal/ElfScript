@@ -170,6 +170,248 @@ DefineEngineMethod(SettingsObject, sync, void, (),,"Settings must be synced to g
 
 SettingsObject* gSettingsObject;
 
+
+// ---------------------------- Helper -------------------------------------
+namespace ElfSDL3 {
+
+    SDL_Point GetScreenSize() {
+        SDL_Point screenSize = {0,0};
+        SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
+
+        if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
+        } else {
+            Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
+        }
+        // fallback
+        if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
+
+        return screenSize;
+    }
+
+}
+
+
+// =============================================================================
+// SpriteBaseObject
+// a different approch as GameObject. Store:
+//  - RecF src rectangle
+//  - RecF dest rectangle
+//  - F32 angle
+//  - Point2F centerPoint
+//  - S32 flip (mode)
+//  - Color color
+// =============================================================================
+class SpriteBaseObject :public SimObject
+{
+    typedef SimObject Parent;
+public:
+    DECLARE_CONOBJECT(SpriteBaseObject);
+    RectF mSrcRect = { 0.f, 0.f, 0.f, 0.f};
+    RectF mDstRect = { 0.f, 0.f, 0.f, 0.f};
+    F32   mAngle   = 0.f;
+    Point2F mCenterPoint = {0.f, 0.f};
+    S32 mFlip = 0; // (SDL_FlipMode)
+    Color mColor = WHITEBLEND;
+
+    // this is used for camera !!!!
+    RectF mScreenRect = { 0.f, 0.f, 0.f, 0.f};
+    Point2F mScreenCenterPoint = { 0.f, 0.f};
+
+    static void initPersistFields() {
+        Parent::initPersistFields();
+        addField("srcRect", TypeRectF, Offset(mSrcRect,SpriteBaseObject));
+        addField("srcX", TypeF32, Offset(mSrcRect.x,SpriteBaseObject));
+        addField("srcY", TypeF32, Offset(mSrcRect.y,SpriteBaseObject));
+        addField("srcWidth", TypeF32, Offset(mSrcRect.w,SpriteBaseObject));
+        addField("srcHeight", TypeF32, Offset(mSrcRect.h,SpriteBaseObject));
+
+        addField("dstRect", TypeRectF, Offset(mDstRect,SpriteBaseObject));
+        addField("x", TypeF32, Offset(mDstRect.x,SpriteBaseObject));
+        addField("y", TypeF32, Offset(mDstRect.y,SpriteBaseObject));
+        addField("width", TypeF32, Offset(mDstRect.w,SpriteBaseObject));
+        addField("height", TypeF32, Offset(mDstRect.h,SpriteBaseObject));
+
+        addField("angle", TypeF32, Offset(mAngle,SpriteBaseObject));
+        addField("centerPoint", TypeF32, Offset(mCenterPoint,SpriteBaseObject));
+        addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject));
+
+        addField("color", TypeColor, Offset(mColor,SpriteBaseObject));
+        addField("r", TypeS8, Offset(mColor.r,SpriteBaseObject));
+        addField("g", TypeS8, Offset(mColor.g,SpriteBaseObject));
+        addField("b", TypeS8, Offset(mColor.b,SpriteBaseObject));
+        addField("a", TypeS8, Offset(mColor.g,SpriteBaseObject));
+
+
+        addField("ScreenRect", TypeRectF, Offset(mScreenRect,SpriteBaseObject), "Translated rect when using camera translate");
+        addField("ScreenCenterPoint", TypeF32, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
+    }
+
+
+}; //CLASS
+IMPLEMENT_CONOBJECT(SpriteBaseObject);
+// =============================================================================
+//  Camera2DObject
+// This does not work automaticly it's used to translate a destination Rectangle
+// =============================================================================
+class Camera2DObject: public SimObject
+{
+    typedef SimObject Parent;
+
+    Point2F mCenter = {0.f, 0.f};
+
+public:
+    DECLARE_CONOBJECT(Camera2DObject);
+
+    F32 mX = 0.f;
+    F32 mY = 0.f;
+    F32 mZoom = 1.f;
+
+    bool onAdd() override {
+        Reset(); //<< begin + center
+        return Parent::onAdd();
+    }
+
+    static void initPersistFields() {
+        Parent::initPersistFields();
+        addField("x", TypeF32, Offset(mX,Camera2DObject));
+        addField("y", TypeF32, Offset(mY,Camera2DObject));
+        addField("zoom", TypeF32, Offset(mZoom,Camera2DObject));
+    }
+
+    void Reset() {
+        Begin();  //make sure we are up to date!
+        mX = mCenter.x;
+        mY = mCenter.y;
+        mZoom = 1.f;
+    }
+
+    // must be called before !!!
+    void Begin() {
+        Point2I sizeI = ElfSDL3::GetScreenSize();
+        mCenter.x = (F32)sizeI.x / 2.0f;
+        mCenter.y = (F32)sizeI.y / 2.0f;
+    }
+
+    // -------------------------------------------------------------------------
+    // Screen Coordinates -> World Coordinates
+    // (example usage: mouse point)
+    Point2F ScreenToWorld(const Point2F& screenPos) {
+        Point2F worldPos;
+        F32 safeZoom = (mZoom == 0.f) ? 0.0001f : mZoom;
+        worldPos.x = ((screenPos.x - mCenter.x) / safeZoom) + mX;
+        worldPos.y = ((screenPos.y - mCenter.y) / safeZoom) + mY;
+        return worldPos;
+    }
+    // -------------------------------------------------------------------------
+    // Fast Frustum Culling Check (Uses AABB intersection in World Space)
+    bool IsInView(const RectF& worldRect) {
+        F32 safeZoom = (mZoom == 0.f) ? 0.0001f : mZoom;
+        F32 halfViewW = mCenter.x / safeZoom;
+        F32 halfViewH = mCenter.y / safeZoom;
+
+        F32 camMinX = mX - halfViewW;
+        F32 camMaxX = mX + halfViewW;
+        F32 camMinY = mY - halfViewH;
+        F32 camMaxY = mY + halfViewH;
+
+        F32 objMinX = worldRect.x;
+        F32 objMaxX = worldRect.x + worldRect.w;
+        F32 objMinY = worldRect.y;
+        F32 objMaxY = worldRect.y + worldRect.h;
+
+        return (objMaxX >= camMinX && objMinX <= camMaxX &&
+        objMaxY >= camMinY && objMinY <= camMaxY);
+    }
+    // -------------------------------------------------------------------------
+    // Translate the WorldRect to Render Rect
+    void TranslateWorldRect(RectF& rect) {
+        rect.x = (rect.x - mX) * mZoom + mCenter.x;
+        rect.y = (rect.y - mY) * mZoom + mCenter.y;
+        rect.w *= mZoom;
+        rect.h *= mZoom;
+    }
+
+    // Translate the rotation center point when zoomed.
+    void TranslateCenterPoint(Point2F& centerPoint) {
+        centerPoint.x *= mZoom;
+        centerPoint.y *= mZoom;
+    }
+
+    // All in One call
+    bool Translate(RectF& rect, Point2F& centerPoint) {
+        if (!IsInView(rect)) return false;
+        TranslateWorldRect(rect);
+        TranslateCenterPoint(centerPoint);
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    // Translate a SpriteBaseObject
+    bool Translate(SpriteBaseObject* sprite) {
+        if (!sprite) return false;
+        sprite->mScreenCenterPoint = sprite->mCenterPoint;
+        sprite->mScreenRect = sprite->mDstRect;
+        return Translate(sprite->mScreenRect, sprite->mScreenCenterPoint);
+    }
+
+    // get the Translated mouse position !
+    Point2F GetMousePosition() {
+        return ScreenToWorld(Point2F((F32)gMousePos.x, (F32)gMousePos.y));
+    }
+
+};
+IMPLEMENT_CONOBJECT(Camera2DObject);
+
+// -----------------------------------------------------------------------------
+DefineEngineMethod(Camera2DObject, Begin, void, (),,
+        "Refresh the Center position. Must be called on init and when screensize is changed\n"
+        "This is called on add. If you do not changes the screen size you do not need to call it at all."
+) {
+    object->Begin();
+}
+
+DefineEngineMethod(Camera2DObject, Reset, void, (),,
+        "Refresh the position and Reset the cam to center postion and zoom 1") {
+    object->Reset();
+}
+// -----------------------------------------------------------------------------
+DefineEngineMethod(Camera2DObject, GetMousePosition, Point2F, (),,
+        "Get the Mouse position in world Coordinates") {
+    return object->GetMousePosition();
+}
+DefineEngineMethod(Camera2DObject, ScreenToWorld, Point2F, (Point2F position),,
+                   "get the world position by a screen position") {
+    return object->ScreenToWorld(position);
+}
+
+// -----------------------------------------------------------------------------
+DefineEngineMethod(Camera2DObject, GetInsideSceen, bool, (RectF rect),,
+                   "Check is a rect is inside the screen (frustum culling)") {
+    return object->IsInView(rect);
+}
+// -----------------------------------------------------------------------------
+// Camera Translate world 2 screen:
+// -----------------------------------------------------------------------------
+DefineEngineMethod(Camera2DObject, TranslateWorldRect, RectF, (RectF rect),,
+        "Translate a world rect to screen / render rect ") {
+    object->TranslateWorldRect(rect);
+    return rect;
+}
+DefineEngineMethod(Camera2DObject, TranslateCenterPoint, Point2F, (Point2F point),,
+        "Translate a world rect to screen / render rect ") {
+    object->TranslateCenterPoint(point);
+    return point;
+}
+
+DefineEngineMethod(Camera2DObject, TranslateSpriteBaseObject, bool, (S32 spriteBaseObjectId),,
+        "Translate to screenRect and screenCenterPoint of a SpriteBaseObject\n"
+        "return false if out of view.") {
+    SpriteBaseObject* spriteObj = dynamic_cast<SpriteBaseObject*>(Sim::findObject(spriteBaseObjectId)) ;
+    if (!spriteObj) {
+        Con::errorf("TranslateSpriteBaseObject: SpriteBaseObject not found:%d", spriteBaseObjectId);
+        return false;
+    }
+    return object->Translate(spriteObj);
+}
 // =============================================================================
 //  TextureObject
 // =============================================================================
@@ -937,18 +1179,19 @@ DefineEngineFunction(unSetScreenSize, bool, (), ,
 }
 
 DefineEngineFunction(GetScreenSize, Point2I, (), , "Get the current scaled screen size (SDL_GetRenderLogicalPresentation)") {
-   Point2I screenSize = {0,0};
-    SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
-
-    if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
-        // Con::printf("SDL_GetRenderLogicalPresentation: %dx%d, mode=%d\n", screenSize.x, screenSize.y, (int)mode);
-    } else {
-        Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
-    }
-    // fallback
-    if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
-
-    return screenSize;
+   // Point2I screenSize = {0,0};
+   //  SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
+   //
+   //  if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
+   //      // Con::printf("SDL_GetRenderLogicalPresentation: %dx%d, mode=%d\n", screenSize.x, screenSize.y, (int)mode);
+   //  } else {
+   //      Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
+   //  }
+   //  // fallback
+   //  if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
+   //
+   //  return screenSize;
+    return ElfSDL3::GetScreenSize();
 }
 
 
