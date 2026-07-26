@@ -434,61 +434,6 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  TextureObject : public SimObject {
-  public:
-   /** --- bool load ---
-    * Load a Texture
-    * @return bool
-    */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
-};
 /*!
 @brief A collection of SimObjects.
 It is often necessary to keep track of an arbitrary set of SimObjects. For instance, Torque's networking code needs to not only keep track of the set of objects which need to be ghosted, but also the set of objects which must <i>always</i> be ghosted. It does this by working with two sets. The first of these is the RootGroup (which is actually a SimGroup) and the second is the GhostAlwaysSet, which contains objects which must always be ghosted to the client.
@@ -704,6 +649,61 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  TextureObject : public SimObject {
+  public:
+   /** --- bool load ---
+    * Load a Texture
+    * @return bool
+    */
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
+};
 /*!
 @brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
 ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
@@ -726,8 +726,71 @@ class  ScriptObject : public SimObject {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  SettingsObject : public SimObject {
+  public:
+   /** --- void sync ---
+    * Settings must be synced to get active!
+    */
+      function sync();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   Point2I ScreenSize;
+   /*!
+    */
+   int FpsLimit;
+   /*!
+    */
+   bool WindowMaximized;
+   /*!
+    */
+   bool FullScreen;
+   /*!
+    */
+   bool EnableVSync;
+   /*!
+    */
+   string Company;
+   /*!
+    */
+   string Caption;
+   /*!
+    */
+   string Version;
+   /*!
+    */
+   string IconFilename;
+   /*!
+    */
+   string AssetPath;
+   /*!
+    */
+   string SoundPathAppend;
+   /*!
+    */
+   string TexturePathAppend;
+   /*!
+    */
+   bool EnableDockSpace;
+   /*!
+    */
+   string IniFileName;
+   /*!
+    */
+   int sdlWindowFlagsOverwrite;
+   /*!
+    */
+   Color clearColor;
+};
 class  SpriteBaseObject : public SimObject {
   public:
+   /** --- void CenterCenterPoint ---
+    * center the centerPoint inside the dstRect
+    */
+      function CenterCenterPoint();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -797,65 +860,6 @@ class  SpriteBaseObject : public SimObject {
     */
    float ScreenCenterPoint;
 };
-class  SettingsObject : public SimObject {
-  public:
-   /** --- void sync ---
-    * Settings must be synced to get active!
-    */
-      function sync();
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   Point2I ScreenSize;
-   /*!
-    */
-   int FpsLimit;
-   /*!
-    */
-   bool WindowMaximized;
-   /*!
-    */
-   bool FullScreen;
-   /*!
-    */
-   bool EnableVSync;
-   /*!
-    */
-   string Company;
-   /*!
-    */
-   string Caption;
-   /*!
-    */
-   string Version;
-   /*!
-    */
-   string IconFilename;
-   /*!
-    */
-   string AssetPath;
-   /*!
-    */
-   string SoundPathAppend;
-   /*!
-    */
-   string TexturePathAppend;
-   /*!
-    */
-   bool EnableDockSpace;
-   /*!
-    */
-   string IniFileName;
-   /*!
-    */
-   int sdlWindowFlagsOverwrite;
-   /*!
-    */
-   Color clearColor;
-};
 class  Camera2DObject : public SimObject {
   public:
    /** --- void Begin ---
@@ -912,111 +916,53 @@ class  Camera2DObject : public SimObject {
     */
    float zoom;
 };
-class  GameObject : public SimObject {
+class  SpriteObject : public SpriteBaseObject {
   public:
-   /** --- RectF getRectF ---
-    * get the current rect
-    * @return RectF
-    */
-      function getRectF();
    /** --- Point2F getCenter2F ---
     * get the center point
     * @return Point2F
     */
       function getCenter2F();
    /** --- void moveLinear ---
-    * Move Linear position/velocity
+    * Move Linear by velocity
     */
-      function moveLinear();
+      function moveLinear( float dt=-1.f );
    /** --- void moveGravity ---
-    * Move with gravity acceleration default: 0,-9.81,0
+    * Move with gravity acceleration default: 0,9.81
     */
-      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float gravityZ=0.f );
+      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float dt=-1.f );
    /** --- void moveOrbital ---
-    * Move in a gravitational field
+    * Orbital Movement around ankerPoint
     */
-      function moveOrbital( Point3F centerPoint, float centerMass );
-   /** --- void moveOrbital2D ---
-    * 2D Safe Orbital Movement
-    */
-      function moveOrbital2D( Point3F centerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f );
-   /** --- bool DrawTexture ---
-    * Draw2D
-    * @return bool
-    */
-      function DrawTexture( SimObjectId texObjectID, bool center=true );
+      function moveOrbital( Point2F ankerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f, float dt=-1.f );
    /** --- bool solveCollideLine ---
     * check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)
     * @return bool
     */
       function solveCollideLine( RectF linePoints, float bounceStrength=0.2f );
-   /** --- bool getCollideRectF ---
+   /** --- bool solveCollideRect ---
     * Check collide and move out
     * @return bool
     */
-      function getCollideRectF( SimObjectId gameObjectID, bool alsoNullVelo=false );
+      function solveCollideRect( RectF otherRect, bool stopMovement=false );
+   /** --- bool DrawTexture ---
+    * Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)
+    * @return bool
+    */
+      function DrawTexture( SimObjectId texObjectID, bool centerDraw=false, bool useScreenRect=false );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
     */
-   Point3F position;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float z;
-   /*!
-    */
-   Point3F velocity;
+   Point2F velocity;
    /*!
     */
    float veloX;
    /*!
     */
    float veloY;
-   /*!
-    */
-   float veloZ;
-   /*!
-    */
-   Point2F size;
-   /*!
-    */
-   float width;
-   /*!
-    */
-   float heigth;
-   /*!
-    */
-   Color color;
-   /*!
-    */
-   char r;
-   /*!
-    */
-   char g;
-   /*!
-    */
-   char b;
-   /*!
-    */
-   char a;
-   /*!
-   angle in degree
-   
-    */
-   float rotate;
-   /*!
-   is flipped (SDL_FlipMode)
-   
-    */
-   int flip;
 };
 class  SoundObject : public SimObject {
   public:
@@ -4662,6 +4608,12 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
+  SCENE_FILE = "pref:/aquarium.elfscene"
+  BACKGROUND_COLOR = "176 233 252"
+  SCALE_SNAP = 8
+  DummySize = "200 200"
+  TextWhite = "1.0 1.0 1.0 1.0"
+  RadarBg = "0.1 0.1 0.1 0.8"
   TEX_SIZE = 16
   BOUNCY = 6.66
   SDL_FOLDER_VIDEOS = 10
@@ -4708,6 +4660,7 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
+  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
@@ -4873,6 +4826,7 @@ namespace Global {
   MAROON = "190 33 55 255"
   ImGuiTreeNodeFlags_AllowOverlap = 4
   ImGuiCol_WindowBg = 2
+  TargetRed = "1.0 0.0 0.0 1.0"
   ImGuiTableColumnFlags_WidthStretch = 8
   PURPLE = "200 122 255 255"
   ImGuiKey_Backspace = 523
@@ -4894,6 +4848,7 @@ namespace Global {
   ImGuiWindowFlags_NoTitleBar = 1
   cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
   SDL_SCANCODE_CRSEL = 163
+  RadarGreen = "0.0 1.0 0.0 1.0"
   ImGuiCond_None = 0
   SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
   SDL_SCANCODE_END = 77
@@ -4955,6 +4910,7 @@ namespace Global {
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
   ImGuiKey_A = 546
+  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
@@ -4973,6 +4929,7 @@ namespace Global {
   ImGuiKey_E = 550
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiCol_PlotLines = 43
+  MAX_SCALE = 1024
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiPopupFlags_MouseButtonRight = 8
   ImGuiCol_TitleBg = 10
@@ -5019,7 +4976,7 @@ namespace Global {
   ImGuiPopupFlags_MouseButtonLeft = 4
   SDL_SCANCODE_L = 15
   ImGuiPopupFlags_MouseButtonMask_ = 12
-  MAG_MAX = 10000
+  MAG_MAX = 2000
   ImGuiKey_C = 548
   ImGuiCol_TitleBgCollapsed = 12
   ImGuiInputTextFlags_CtrlEnterForNewLine = 256
@@ -5043,10 +5000,12 @@ namespace Global {
   ImGuiCol_DragDropTarget = 55
   SDL_SCANCODE_KP_HASH = 204
   ImGuiCol_MenuBarBg = 13
+  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
+  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
@@ -5292,5 +5251,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (630 items) ---
+--- End of Dump (643 items) ---
 */

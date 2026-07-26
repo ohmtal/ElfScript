@@ -12,14 +12,17 @@ function Collision::spawnPlayer(%this, %position) {
     if (%position $= "") %position = "550 130";
     echo("Spawn player at:" SPC %position);
     if (isObject(%this.player)) %this.player.delete();
-    %this.player = new GameObject() {
+    %this.player = new SpriteObject() {
         x = %position.x;
         y = %position.y;
         veloX = $shift ? getRandom(-5, 5): 0;
         veloY = 10;
         color = getRandom(0,255) SPC getRandom(0,255) SPC getRandom(0,255) SPC getRandom(32,255);
-        size = PLAYER_SIZE;
+        width = PLAYER_SIZE;
+        height = PLAYER_SIZE;
     };
+
+    %this.player.dumpFields();
     %this.cleanup.add(%this.player);
     $p = %this.player; //debug global
 }
@@ -82,7 +85,6 @@ function Collision::Render(%this) {
     if (%playerSpawned) {
         %pos = %p.getCenter2F();
         DrawCircle(%pos.x,%pos.y,%p.width / 2, %collided ? RED : YELLOW);
-        // DrawRectRec(%p.getRectF(),  %collided ? RED : YELLOW);
     }
 }
 //----------------------------------------------------------------------

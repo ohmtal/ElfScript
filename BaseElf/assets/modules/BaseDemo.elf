@@ -4,7 +4,7 @@ include("include/AtlasFont.elf");
 #define LOGO_SPAWN_RATE 50
 #define LOGO_START_SPEED 100
 #define MAG_DIR_VALUE 15
-#define MAG_MAX 10000
+#define MAG_MAX 5000
 #define BOUNCY 6.66
 #define LOGO_SIZE 32
 //----------------------------------------------------------------------
@@ -148,7 +148,7 @@ function BaseDemo::Render(%this) {
         if ( $magnetism > MAG_MAX ) $magDirection = -MAG_DIR_VALUE;
         else if ( $magnetism < -MAG_MAX ) {
             $magDirection = MAG_DIR_VALUE;
-            %this.impulse();
+            // %this.impulse();
         }
 
         %damping = BOUNCY; //1
@@ -159,17 +159,20 @@ function BaseDemo::Render(%this) {
 
         // for (%i = 0; %i < %cnt; %i++) {
         //     %logo = LogoList.getObject(%i);
+
+        %mag = $magnetism / 200;
         foreach(%logo in LogoList) { //much faster than for/getObject
-            %logo.moveLinear();
-            %logo.moveGravity(0, 4 * $magDirection);
-            %logo.moveOrbital2D(%cp, $magnetism, 5, LOGO_START_SPEED);
+            %logo.moveLinear(%dt);
+            %logo.moveGravity(0, 4 * $magDirection, %dt);
+            %logo.moveOrbital(%cp, %mag , 5, LOGO_START_SPEED , %dt);
+
             if ($ticker % 2 == 0) {
                 if (%logo.x <= BORDER.0 ) { %logo.VeloX *= -%damping; %logo.x = BORDER.01;}
                 else if ( %logo.x >= %bx) { %logo.VeloX *= -%damping; %logo.x = %bx - 0.01;}
                 if (%logo.y <= BORDER.0)  { %logo.VeloY *= -%damping; %logo.y = BORDER.01;}
                 else if ( %logo.y >= %by) { %logo.VeloY *= -%damping; %logo.y = %by - 0.01; }
             }
-            %logo.drawTexture(GrayTexture.getId());
+            %logo.drawTexture(GrayTexture.getId(), true);
         }
 
         // -----------------
@@ -192,15 +195,19 @@ function BaseDemo::impulse(%this) {
 //----------------------------------------------------------------------
 function BaseDemo::addLogo(%this,%x,%y) {
 
-    %logo = new GameObject() {
+    %logo = new SpriteObject() {
         x = %x;
         y = %y;
         veloX = getRandom(-LOGO_START_SPEED,LOGO_START_SPEED);
         veloY = getRandom(-LOGO_START_SPEED,LOGO_START_SPEED);
         color = getRandom(0,255) SPC getRandom(0,255) SPC getRandom(0,255) SPC getRandom(32,255);
-        size = LOGO_SIZE SPC LOGO_SIZE;
+        width = LOGO_SIZE;
+        height = LOGO_SIZE;
     };
     LogoList.add(%logo);
+
+    //LogoList.getObject(0).dumpFields();
+
     // echo("added logo:" SPC %logo);
 }
 //----------------------------------------------------------------------

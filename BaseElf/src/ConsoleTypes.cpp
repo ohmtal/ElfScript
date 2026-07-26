@@ -303,7 +303,7 @@ ConsoleSetType( TypePoint2F )
 // Point3F
 //-----------------------------------------------------------------------------
 
-
+/*
 IMPLEMENT_STRUCT( Point3F,
                   Point3F, ,
                   "" )
@@ -337,3 +337,4 @@ ConsoleSetType( TypePoint3F )
     else
         Con::printf("Point3F must be set as { x, y, z } or \"x y z\"");
 }
+*/

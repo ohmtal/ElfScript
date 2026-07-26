@@ -246,9 +246,20 @@ public:
         addField("ScreenCenterPoint", TypeF32, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
     }
 
+    // center the centerpoint by dstRect
+    void CenterCenterPoint() {
+        mCenterPoint.x = mDstRect.w / 2.0;
+        mCenterPoint.y = mDstRect.h / 2.0;
+    }
+
 
 }; //CLASS
 IMPLEMENT_CONOBJECT(SpriteBaseObject);
+
+DefineEngineMethod(SpriteBaseObject, CenterCenterPoint,void, (),,"center the centerPoint inside the dstRect") {
+    object->CenterCenterPoint();
+}
+
 // =============================================================================
 //  Camera2DObject
 // This does not work automaticly it's used to translate a destination Rectangle
@@ -676,8 +687,182 @@ DefineEngineMethod(TextureObject, SaveImage,bool, (const char* fileName, bool as
 
 
 // =============================================================================
-//  GameObject
+//  SpriteObject
 // =============================================================================
+class SpriteObject :public SpriteBaseObject
+{
+    typedef SpriteBaseObject Parent;
+public:
+    DECLARE_CONOBJECT(SpriteObject);
+
+    Point2F mVelo = {0.f, 0.f };
+
+    static void initPersistFields() {
+        Parent::initPersistFields();
+        addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject));
+        addField("veloX", TypeF32, Offset(mVelo.x,SpriteObject));
+        addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject));
+    }
+
+    // -------------------------------------------------------------------------
+    RectF getRectF() {
+        return mDstRect;
+    }
+    Point2F getCenter2F() {
+        return { mDstRect.x + mDstRect.w / 2.0f , mDstRect.y + mDstRect.h / 2.0f };
+    }
+    // -------------------------------------------------------------------------
+    // Movement
+    // -------------------------------------------------------------------------
+    void moveLinear(F32 dt = -1.f) {
+        if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
+        mDstRect.x += mVelo.x * dt;
+        mDstRect.y += mVelo.y * dt;
+    }
+    // -------------------------------------------------------------------------
+    void moveGravity(F32 gravityX, F32 gravityY, F32 dt = -1.f) {
+        if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
+        mVelo.x += gravityX * dt;
+        mVelo.y += gravityY * dt;
+        moveLinear(dt);
+    }
+
+    // -------------------------------------------------------------------------
+    void moveOrbital(Point2F ankerPoint,F32 gravity, F32 softening, F32 maxSpeed, F32 dt = -1.f) {
+        if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
+
+        Point2F direction = ankerPoint - Point2F(mDstRect.x, mDstRect.y);
+
+        F32 distance = length(direction);
+
+        // F32 G = 9.81f;
+
+        if (distance > 0.0001f) {
+            normalize(direction);
+            F32 gravityPull = (gravity * 1000.f) / (distance * distance + softening);
+            mVelo.x += direction.x * gravityPull * dt;
+            mVelo.y += direction.y * gravityPull * dt;
+        }
+
+        // F32 drag = 0.995f;
+        // mVelo.x *= drag;
+        // mVelo.y *= drag;
+
+        F32 currentSpeed = ElfMath::mSqrt(mVelo.x * mVelo.x + mVelo.y * mVelo.y);
+        if (currentSpeed > maxSpeed && currentSpeed > 0.0f) {
+            mVelo.x = (mVelo.x / currentSpeed) * maxSpeed;
+            mVelo.y = (mVelo.y / currentSpeed) * maxSpeed;
+        }
+
+        moveLinear(dt);
+
+    }
+    // -------------------------------------------------------------------------
+    // Collistion solver
+    // -------------------------------------------------------------------------
+    bool solveCollideLine(F32 x1, F32 y1, F32 x2, F32 y2, F32 bounceStrength /*= 0.2f*/) {
+
+        BaseFlux::Collision::Info info;
+        if ( BaseFlux::Collision::getInfoRectLine(mDstRect, x1, y1, x2, y2 , info))
+        {
+            BaseFlux::Collision::solveOberlap(mDstRect, info);
+
+            if (bounceStrength > 0.f) {
+                float dotProduct = (mVelo.x * info.mNormal.x) + (mVelo.y * info.mNormal.y);
+                if (dotProduct < 0.0f) {
+                    float impulse = -(1.0f + bounceStrength) * dotProduct;
+                    mVelo.x += info.mNormal.x * impulse;
+                    mVelo.y += info.mNormal.y * impulse;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    // -------------------------------------------------------------------------
+    bool solveCollideRect(RectF otherRect, bool stopMovement) {
+        BaseFlux::Collision::Info info;
+        if (BaseFlux::Collision::getInfoRectF(mDstRect, otherRect, info)) {
+            BaseFlux::Collision::solveOberlap(mDstRect, info);
+            if (stopMovement) {
+                mVelo.x = 0.f;
+                mVelo.y = 0.f;
+            }
+            return true;
+        }
+        return false;
+    }
+    // -------------------------------------------------------------------------
+};
+IMPLEMENT_CONOBJECT(SpriteObject);
+
+DefineEngineMethod(SpriteObject, getCenter2F, Point2F, (), ,"get the center point") {
+    return object->getCenter2F();
+}
+// -------------------------------------------------------------------------
+// Movement
+// -------------------------------------------------------------------------
+DefineEngineMethod(SpriteObject, moveLinear, void, (F32 dt ),(-1.f) ,"Move Linear by velocity") {
+    object->moveLinear(dt);
+}
+DefineEngineMethod(SpriteObject, moveGravity,void, (F32 gravityX, F32 gravityY, F32 dt),
+                   (0.f, 9.81f, -1.f) ,"Move with gravity acceleration default: 0,9.81") {
+    object->moveGravity(gravityX, gravityY, dt);
+}
+DefineEngineMethod(SpriteObject, moveOrbital, void,
+                   (Point2F ankerPoint, F32 gravity, F32 softening, F32 maxSpeed, F32 dt),
+                   (10.f, 150.f, 350.f, -1.f) ,"Orbital Movement around ankerPoint") {
+    object->moveOrbital(ankerPoint, gravity, softening, maxSpeed, dt);
+}
+// -------------------------------------------------------------------------
+// Collistion solver
+// -------------------------------------------------------------------------
+DefineEngineMethod(SpriteObject, solveCollideLine,bool, (RectF linePoints, F32 bounceStrength)
+,(0.2f),"check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)")
+{
+    return object->solveCollideLine(linePoints.x, linePoints.y, linePoints.w, linePoints.h, bounceStrength);
+}
+DefineEngineMethod(SpriteObject, solveCollideRect,bool, (RectF otherRect, bool stopMovement)
+,(false),"Check collide and move out")
+{
+    return object->solveCollideRect(otherRect, stopMovement);
+}
+
+
+DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bool centerDraw, bool useScreenRect),(false, false),
+                   "Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)") {
+    TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
+    if (!texObject) return false;
+    RectF srcRect  = object->mSrcRect;
+    if (srcRect.w <= 0 || srcRect.h <= 0) {
+        srcRect.x = 0;
+        srcRect.y = 0;
+        srcRect.w = (F32)texObject->get()->w;
+        srcRect.h = (F32)texObject->get()->h;
+    }
+    RectF dstRect; // had pointer but need a copy for centerDraw
+    Point2F* centerPoint;
+    if (useScreenRect) { //See also Camera2DObject
+        dstRect = object->mScreenRect;
+        centerPoint = &object->mScreenCenterPoint;
+    } else {
+        dstRect = object->mDstRect;
+        centerPoint = &object->mCenterPoint;
+    }
+    if (centerDraw) {
+        dstRect.x -= dstRect.w / 2.f;
+        dstRect.y -= dstRect.h / 2.f;
+    }
+
+    return texObject->DrawRotatedSrcDstRect(
+        srcRect, dstRect,
+        object->mAngle, *centerPoint,
+        (SDL_FlipMode)object->mFlip, object->mColor
+    );
+
+}
+
+/* redesign! and only 2D!
 class GameObject :public SimObject
 {
     typedef SimObject Parent;
@@ -889,6 +1074,7 @@ DefineEngineMethod(GameObject, getCollideRectF,bool, (SimObjectId gameObjectID, 
     }
     return false;
 }
+*/
 
 // =============================================================================
 //  SoundObject
