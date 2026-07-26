@@ -21,7 +21,30 @@ void RegisterFileSystemConstants() {
     REGISTER_SDL_CONST(SDL_PATHTYPE_FILE);      /**< a normal file */
     REGISTER_SDL_CONST(SDL_PATHTYPE_DIRECTORY); /**< a directory */
     REGISTER_SDL_CONST(SDL_PATHTYPE_OTHER);      /**< something completely different like a device node (not a symlink, those are always followed) */
+    // ----------------
+    REGISTER_SDL_CONST(SDL_FOLDER_HOME);        /**< The folder which contains all of the current user's data); preferences); and documents. It usually contains most of the other folders. If a requested folder does not exist); the home folder can be considered a safe fallback to store a user's documents. */
+    REGISTER_SDL_CONST(SDL_FOLDER_DESKTOP);     /**< The folder of files that are displayed on the desktop. Note that the existence of a desktop folder does not guarantee that the system does show icons on its desktop; certain GNU/Linux distros with a graphical environment may not have desktop icons. */
+    REGISTER_SDL_CONST(SDL_FOLDER_DOCUMENTS);   /**< User document files); possibly application-specific. This is a good place to save a user's projects. */
+    REGISTER_SDL_CONST(SDL_FOLDER_DOWNLOADS);   /**< Standard folder for user files downloaded from the internet. */
+    REGISTER_SDL_CONST(SDL_FOLDER_MUSIC);       /**< Music files that can be played using a standard music player (mp3); ogg...). */
+    REGISTER_SDL_CONST(SDL_FOLDER_PICTURES);    /**< Image files that can be displayed using a standard viewer (png); jpg...). */
+    REGISTER_SDL_CONST(SDL_FOLDER_PUBLICSHARE); /**< Files that are meant to be shared with other users on the same computer. */
+    REGISTER_SDL_CONST(SDL_FOLDER_SAVEDGAMES);  /**< Save files for games. */
+    REGISTER_SDL_CONST(SDL_FOLDER_SCREENSHOTS); /**< Application screenshots. */
+    REGISTER_SDL_CONST(SDL_FOLDER_TEMPLATES);   /**< Template files to be used when the user requests the desktop environment to create a new file in a certain folder); such as "New Text File.txt".  Any file in the Templates folder can be used as a starting point for a new file. */
+    REGISTER_SDL_CONST(SDL_FOLDER_VIDEOS);      /**< Video files that can be played using a standard video player (mp4); webm...). */
+    REGISTER_SDL_CONST(SDL_FOLDER_COUNT);        /**< Total number of types in this enum); not a folder type by itself. */
+
+
 }
+// -----------------------------------------------------------------------------
+// defined here but can be a problem when it's defined somewhere else
+#ifndef SDL_FILESYSTEM_NO_GET_ERROR
+DefineEngineFunction(SDL_GetError,  const char* , () ,,
+                     "Get the last SDL Error."){
+    return SDL_GetError();
+}
+#endif
 // -----------------------------------------------------------------------------
 DefineEngineFunction(SDL_FileExists, bool, (const char* path),, "return true if the file exits"){
     return SDL_GetPathInfo(path, nullptr);
@@ -30,6 +53,7 @@ DefineEngineFunction(SDL_FileExists, bool, (const char* path),, "return true if 
 DefineEngineFunction(SDL_GetPathInfo, bool, (const char* path, S32 resultObjectId),,
                      "resultObjectId is the object which gets it dynamic fields filled with information"
                      "return true if the file exits"){
+    if (!path) return false;
     SimObject* obj = Sim::findObject(resultObjectId);
     if (!obj) {
         Con::errorf("SDL_GetPathInfo :: resultObjectId is invalid!");
@@ -46,6 +70,74 @@ DefineEngineFunction(SDL_GetPathInfo, bool, (const char* path, S32 resultObjectI
     obj->setDataField(StringTable->insert( "file_access_time" ), nullptr,  avar("%lld" ,info.access_time) );
 
     return true;
+}
+// -----------------------------------------------------------------------------
+// new SimObject(GlobResult); SDL_GlobDirectory(SDL_GetBasePath(),GlobResult.getId(),"*", true);GlobResult.dumpFields();
+DefineEngineFunction(SDL_GlobDirectory, bool,
+                     (const char* path,S32 resultObjectId, const char* pattern, bool patternIgnoreCase),
+                     ("*", true),
+                     "resultObjectId is the object which gets it dynamic fields filled with information\n"
+                     "dynamic parameters are: query_path, query_pattern, query_ignorecase\n"
+                     "for the result: count, result_[i]\n"
+                     "return true if result was not empty."){
+    if (!path ) return false;
+    SimObject* obj = Sim::findObject(resultObjectId);
+    if (!obj) {
+        Con::errorf("SDL_GlobDirectory :: resultObjectId is invalid!");
+        return false;
+    }
+    // extern SDL_DECLSPEC char ** SDLCALL SDL_GlobDirectory(const char *path, const char *pattern, SDL_GlobFlags flags, int *count);
+    int count = 0;
+    SDL_GlobFlags flags = patternIgnoreCase ?  SDL_GLOB_CASEINSENSITIVE : 0;
+
+    char **matches = SDL_GlobDirectory(path, pattern, flags, &count);
+
+    if (matches == nullptr) return false;
+
+    obj->setDataField(StringTable->insert( "query_path" ), nullptr,  path );
+    obj->setDataField(StringTable->insert( "query_pattern" ), nullptr,  pattern );
+    obj->setDataField(StringTable->insert( "query_ignorecase" ), nullptr,  avar("%d", patternIgnoreCase) );
+
+    obj->setDataField(StringTable->insert( "count" ), nullptr,  avar("%d", count) );
+    for (int i = 0; i < count; i++) {
+        obj->setDataField(StringTable->insert( avar("result_%d", i) ), nullptr,  matches[i] );
+    }
+    SDL_free(matches);
+
+    return true;
+
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_CopyFile, bool, (const char *oldpath, const char *newpath),,"Copy a file.") {
+    return SDL_CopyFile(oldpath, newpath);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_CreateDirectory, bool, (const char *path),,"Create a Directory.") {
+    return SDL_CreateDirectory(path);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_RenamePath, bool, (const char *oldpath, const char *newpath),,"rename a path/file.") {
+    return SDL_RenamePath(oldpath, newpath);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_RemovePath, bool, (const char *path),,"rename a path/file.") {
+    return SDL_RemovePath(path);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_GetUserFolder, const char* , (S32 sdl_folder),,"get the user folder. see also SDL_FOLDER_") {
+    return SDL_GetUserFolder((SDL_Folder)sdl_folder);
+}
+DefineEngineFunction(SDL_GetBasePath, const char* , () ,,
+                     "Get the directory where the application was run from.") {
+    return SDL_GetBasePath();
+}
+DefineEngineFunction(SDL_GetCurrentDirectory, const char* , () ,,
+                     "Get what the system believes is the current working directory.") {
+    return SDL_GetCurrentDirectory();
+}
+DefineEngineFunction(SDL_GetPrefPath,  const char* , (const char* org, const char* app) ,,
+                     "Get the user-and-app-specific path where files can be written."){
+    return SDL_GetPrefPath(org, app);
 }
 
 

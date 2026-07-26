@@ -371,6 +371,7 @@ function Aquarium::Render(%this) {
 
         if (SelectList.getCount() == 1) {
             %this.selectedSceneObject = SelectList.getObject(0);
+            Inspector.inspect(%this.selectedSceneObject);
         } else {
             %this.SelectObjectMenu.MenuEntries = "";
             %this.SelectObjectMenu.MenuTextureRects = "";

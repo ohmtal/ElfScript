@@ -2,20 +2,26 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// NOTE: Status incomplete !
-
 /*
+ *
+ * [X] = implemented and tested
+ * [_] = implemented untested
+ * [~] = not implemented and not planed to
+ *
+[X] SDL_GetError NOTE defined here !!! can be cause problems when it's also defined somewhere else
+        so i added ifndef SDL_FILESYSTEM_NO_GET_ERROR
 [X] SDL_GetPathInfo + SDL_FileExists
-[ ] SDL_CopyFile
-[ ] SDL_CreateDirectory
-[ ] SDL_EnumerateDirectory
-[ ] SDL_GetBasePath
-[ ] SDL_GetCurrentDirectory
-[ ] SDL_GetPrefPath
-[ ] SDL_GetUserFolder
-[ ] SDL_GlobDirectory
-[ ] SDL_RemovePath
-[ ] SDL_RenamePath
+[X] SDL_CopyFile
+[X] SDL_CreateDirectory
+[X] SDL_GetBasePath
+[X] SDL_GetCurrentDirectory
+[X] SDL_GetPrefPath
+[X] SDL_GetUserFolder
+[X] SDL_RemovePath
+[X] SDL_RenamePath
+[X] SDL_GlobDirectory
+----
+[~] SDL_EnumerateDirectory NOTE not implemented useing SDL_GlobDirectory should work fine
 */
 //-----------------------------------------------------------------------------
 #pragma once
