@@ -63,7 +63,7 @@ function Aquarium::onAdd(%this) {
     %this.paintCenterPoint = "24 24";
     %this.paintFlip = 0;
 
-    %this.add( new SimGroup(SceneObjects));
+    %this.add( new SpriteGroup(SceneObjects));
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
     %this.selectedSceneObject = 0;
     %this.add( new SimSet(SelectList));
@@ -153,7 +153,7 @@ function Aquarium::DrawSpriteSheet(%this) {
 
             if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
                 %this.selectedSceneObject = 0;
-                %this.mouseObject = new SimObject() {
+                %this.mouseObject = new SpriteObject() {
                     class = "SceneObject";
                     TypeRectF srcRect = %srcRect;
                     // TypeRectF dstRect = %dstRect;
@@ -299,16 +299,17 @@ function Aquarium::Render(%this) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
         ClearBackground(BACKGROUND_COLOR);
 
-        foreach(%obj in SceneObjects) {
-            Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
-                                              %obj.dstRect,
-                                              %obj.angle,
-                                              %obj.centerPoint,
-                                              %obj.flip,
-                                               %obj.color
-                                              );
-
-        }
+        SceneObjects.drawAtlasBatch(SpriteSheet.getId(), 0);
+        // foreach(%obj in SceneObjects) {
+        //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
+        //                                       %obj.dstRect,
+        //                                       %obj.angle,
+        //                                       %obj.centerPoint,
+        //                                       %obj.flip,
+        //                                        %obj.color
+        //                                       );
+        //
+        // }
         SetRenderTarget(0);
         %this.dirty = false;
     }
@@ -435,7 +436,8 @@ function Aquarium::Render(%this) {
         //  P L A C E M E N T
         if (!%haveOverlay && SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
             SceneObjects.add( %this.mouseObject.clone());
-            SceneObjects.sort("compareLayers");
+            // SceneObjects.sort("compareLayers");
+            SceneObjects.sortLayers();
             %this.dirty = true;
         }
 
@@ -453,7 +455,8 @@ function Aquarium::Render(%this) {
 function SceneObject::onInspectPostApply(%this) {
     // echo("onInspectPostApply" SPC %this);
     Aquarium.dirty = true;
-    SceneObjects.sort("compareLayers");
+    // SceneObjects.sort("compareLayers");
+    SceneObjects.sortLayers();
 }
 //----------------------------------------------------------------------
 function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
@@ -548,7 +551,8 @@ function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
             if (%obj == %this.selectedSceneObject) {
                 %obj.layer = mClamp(%obj.layer + %wheelY, 0, MAX_LAYER) ;
                 %this.dirty = true;
-                SceneObjects.sort("compareLayers");
+                // SceneObjects.sort("compareLayers");
+                SceneObjects.sortLayers();
             } else {
                 //must be mouseObject
                 %this.placementLayer = mClamp( %this.placementLayer  + %wheelY, 0,MAX_LAYER) ;

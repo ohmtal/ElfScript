@@ -165,7 +165,7 @@ class  SimObject {
     * @param value If true, the object will be hidden; if false, the object will be unhidden.
     */
       function setHidden( bool value=true );
-   /** --- ArrayObject* dumpMethods ---
+   /** --- ArrayObject* getMethods ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - Minimum number of arguments.
@@ -177,7 +177,7 @@ class  SimObject {
     * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
     * @return ArrayObject*
     */
-      function dumpMethods();
+      function getMethods();
    /** --- ArrayObject* getMethodSigs ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
@@ -364,6 +364,11 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dumpFields( bool staticFields=true, bool dynamicFields=true, bool detailed=false );
+   /** --- void dumpMethods ---
+    * Dump a description of all methods and callbacks defined on this object to the console.
+    * @param detailed Whether to print detailed information about members.
+    */
+      function dumpMethods( bool detailed=false );
    // --- Group: Ungrouped ---
    /*!
    Optional global name of this object.
@@ -433,6 +438,61 @@ class  SimObject {
    
     */
    pid persistentId;
+};
+class  TextureObject : public SimObject {
+  public:
+   /** --- bool load ---
+    * Load a Texture
+    * @return bool
+    */
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
 };
 /*!
 @brief A collection of SimObjects.
@@ -648,61 +708,6 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
-};
-class  TextureObject : public SimObject {
-  public:
-   /** --- bool load ---
-    * Load a Texture
-    * @return bool
-    */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
 };
 /*!
 @brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
@@ -963,6 +968,25 @@ class  SpriteObject : public SpriteBaseObject {
    /*!
     */
    float veloY;
+   /*!
+    */
+   uint layer;
+};
+class  SpriteGroup : public SimGroup {
+  public:
+   /** --- void sortLayers ---
+    * Sort SpriteObject's by layer
+    */
+      function sortLayers();
+   /** --- bool drawAtlasBatch ---
+    * Draw all sprites in the group with option camera object
+    * @return bool
+    */
+      function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
 };
 class  SoundObject : public SimObject {
   public:
@@ -971,6 +995,11 @@ class  SoundObject : public SimObject {
     * @return bool
     */
       function play();
+   /** --- bool stop ---
+    * stop the sound
+    * @return bool
+    */
+      function stop();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -1885,6 +1914,16 @@ namespace Global {
    /** --- Group: SDL ---
     * SDL/BaseFlux functions
     */
+   /** --- bool playSound ---
+    * lazy way to play a sound by filename 
+    * @return bool
+    */
+      function playSound( string fileName, float gain=0.9f, bool loop=false );
+   /** --- bool stopSound ---
+    * lazy way to stop a sound by filename 
+    * @return bool
+    */
+      function stopSound( string fileName );
    /** --- void SetClearBackground ---
     * set Settings.clearColor if alpha  == 0 it's disabled
     */
@@ -4608,12 +4647,6 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  SCENE_FILE = "pref:/aquarium.elfscene"
-  BACKGROUND_COLOR = "176 233 252"
-  SCALE_SNAP = 8
-  DummySize = "200 200"
-  TextWhite = "1.0 1.0 1.0 1.0"
-  RadarBg = "0.1 0.1 0.1 0.8"
   TEX_SIZE = 16
   BOUNCY = 6.66
   SDL_FOLDER_VIDEOS = 10
@@ -4660,7 +4693,6 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
-  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
@@ -4826,7 +4858,6 @@ namespace Global {
   MAROON = "190 33 55 255"
   ImGuiTreeNodeFlags_AllowOverlap = 4
   ImGuiCol_WindowBg = 2
-  TargetRed = "1.0 0.0 0.0 1.0"
   ImGuiTableColumnFlags_WidthStretch = 8
   PURPLE = "200 122 255 255"
   ImGuiKey_Backspace = 523
@@ -4848,7 +4879,6 @@ namespace Global {
   ImGuiWindowFlags_NoTitleBar = 1
   cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
   SDL_SCANCODE_CRSEL = 163
-  RadarGreen = "0.0 1.0 0.0 1.0"
   ImGuiCond_None = 0
   SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
   SDL_SCANCODE_END = 77
@@ -4910,7 +4940,6 @@ namespace Global {
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
   ImGuiKey_A = 546
-  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
@@ -4929,7 +4958,6 @@ namespace Global {
   ImGuiKey_E = 550
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiCol_PlotLines = 43
-  MAX_SCALE = 1024
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiPopupFlags_MouseButtonRight = 8
   ImGuiCol_TitleBg = 10
@@ -4976,7 +5004,7 @@ namespace Global {
   ImGuiPopupFlags_MouseButtonLeft = 4
   SDL_SCANCODE_L = 15
   ImGuiPopupFlags_MouseButtonMask_ = 12
-  MAG_MAX = 2000
+  MAG_MAX = 5000
   ImGuiKey_C = 548
   ImGuiCol_TitleBgCollapsed = 12
   ImGuiInputTextFlags_CtrlEnterForNewLine = 256
@@ -5000,12 +5028,10 @@ namespace Global {
   ImGuiCol_DragDropTarget = 55
   SDL_SCANCODE_KP_HASH = 204
   ImGuiCol_MenuBarBg = 13
-  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
-  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
@@ -5251,5 +5277,5 @@ namespace Global {
   SDL_SCANCODE_KP_AT = 206
   BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (643 items) ---
+--- End of Dump (630 items) ---
 */

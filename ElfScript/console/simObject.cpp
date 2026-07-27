@@ -2735,8 +2735,9 @@ DefineEngineMethod( SimObject, setHidden, void, ( bool value ), ( true ),
 }
 
 //-----------------------------------------------------------------------------
-
-DefineEngineMethod( SimObject, dumpMethods, ArrayObject*, (),,
+// ElfScript why is this called dump?
+// DefineEngineMethod( SimObject, dumpMethods, ArrayObject*, (),,
+DefineEngineMethod( SimObject, getMethods, ArrayObject*, (),,
    "List the methods defined on this object.\n\n"
    "Each description is a newline-separated vector with the following elements:\n"
    "- Minimum number of arguments.\n"
@@ -3724,3 +3725,55 @@ DefineEngineMethod( SimObject, dumpFields, void,
 
 }
 // -----------------------------------------------------------------------------
+// ElfScript THIS is dumpMethods
+DefineEngineMethod( SimObject, dumpMethods, void, ( bool detailed ), ( false ),
+                    "Dump a description of all methods and callbacks defined on this object to the console.\n"
+                    "@param detailed Whether to print detailed information about members." )
+{
+      Con::printf( "Class: %s", object->getClassName() );
+
+      Con::printf( "Methods:" );
+      Namespace *ns = object->getNamespace();
+      VectorPtr<Namespace::Entry *> vec(__FILE__, __LINE__);
+
+      if(ns)
+            ns->getEntryList(&vec);
+
+      bool sawCBs = false;
+
+      for(Vector<Namespace::Entry *>::iterator j = vec.begin(); j != vec.end(); j++)
+      {
+            Namespace::Entry *e = *j;
+
+            if(e->mType == Namespace::Entry::ScriptCallbackType)
+                  sawCBs = true;
+
+            if(e->mType < 0)
+                  continue;
+
+            DocString doc( e );
+            Con::printf( "  %s%s%s%s", doc.mReturnType, doc.mPadding, e->mFunctionName, doc.mPrototype.c_str() );
+
+            if( detailed && !doc.mDescription.isEmpty() )
+                  Con::printf( "    %s", doc.mDescription.c_str() );
+      }
+
+      if( sawCBs )
+      {
+            Con::printf( "Callbacks:" );
+
+            for(Vector<Namespace::Entry *>::iterator j = vec.begin(); j != vec.end(); j++)
+            {
+                  Namespace::Entry *e = *j;
+
+                  if(e->mType != Namespace::Entry::ScriptCallbackType)
+                        continue;
+
+                  DocString doc( e );
+                  Con::printf( "  %s%s%s%s", doc.mReturnType, doc.mPadding, e->cb.mCallbackName, doc.mPrototype.c_str() );
+
+                  if( detailed && !doc.mDescription.isEmpty() )
+                        Con::printf( "    %s", doc.mDescription.c_str() );
+            }
+      }
+}

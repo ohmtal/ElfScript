@@ -7,6 +7,7 @@
 #include <SDL3/SDL.h>
 #include "console/engineAPI.h"
 #include "console/consoleExtras.h"
+#include "console/simSet.h"
 #include "core/volume.h"
 #include "math/mMathFn.h"
 
@@ -696,12 +697,14 @@ public:
     DECLARE_CONOBJECT(SpriteObject);
 
     Point2F mVelo = {0.f, 0.f };
+    U32     mLayer = 0;
 
     static void initPersistFields() {
         Parent::initPersistFields();
         addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject));
         addField("veloX", TypeF32, Offset(mVelo.x,SpriteObject));
         addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject));
+        addField("layer", TypeU32, Offset(mLayer,SpriteObject));
     }
 
     // -------------------------------------------------------------------------
@@ -1075,9 +1078,105 @@ DefineEngineMethod(GameObject, getCollideRectF,bool, (SimObjectId gameObjectID, 
     return false;
 }
 */
+// =============================================================================
+//  SpriteGroup
+//  - A Group which only accepts SpriteObjects
+//  - NOTE: drawAtlasBatch accept only one Texture - it's desinged for AtlasTextures!
+// =============================================================================
+class SpriteGroup : public SimGroup
+{
+    typedef SimGroup Parent;
+public:
+    DECLARE_CONOBJECT(SpriteGroup);
+    void addObject( SimObject* obj ) override {
+        // NOTE: make sure we only add SpriteObject's
+        SpriteObject* sprite = dynamic_cast<SpriteObject*>(obj);
+        if (!sprite) return;
+        Parent::addObject(obj);
+    }
+    void sortLayers();
+
+    void drawAtlasBatch(TextureObject* texture, Camera2DObject* camera = nullptr) {
+        if (!texture) return;
+        lock();
+        for( SimSet::iterator iter = begin(); iter != end(); ++ iter ) {
+            SpriteObject* sprite = static_cast<SpriteObject*>(*iter);
+            if (camera) {
+                // Translate also make a frustum check :
+                if (camera->Translate(sprite)) {
+                    texture->DrawRotatedSrcDstRect(
+                        sprite->mSrcRect,
+                        sprite->mScreenRect,
+                        sprite->mAngle,
+                        sprite->mScreenCenterPoint,
+                        (SDL_FlipMode)sprite->mFlip,
+                        sprite->mColor
+                    );
+                }
+            } else {
+                texture->DrawRotatedSrcDstRect(
+                    sprite->mSrcRect,
+                    sprite->mDstRect,
+                    sprite->mAngle,
+                    sprite->mCenterPoint,
+                    (SDL_FlipMode)sprite->mFlip,
+                    sprite->mColor
+                );
+            }
+        }
+        unlock();
+    }
+
+private:
+    static S32 QSORT_CALLBACK compare_Layer( const void* a, const void* b );
+
+};
+IMPLEMENT_CONOBJECT(SpriteGroup);
+// -----------------------------------------------------------------------------
+// Layer
+S32 QSORT_CALLBACK SpriteGroup::compare_Layer( const void* a, const void* b )
+{
+    const SpriteObject * cp_a = *(const SpriteObject**)a;
+    const SpriteObject * cp_b = *(const SpriteObject**)b;
+
+    if (cp_a->mLayer == cp_b->mLayer) return 0;
+
+    if (cp_a->mLayer > cp_b->mLayer)
+        return -1;
+    else
+        return 1;
+
+}
+void SpriteGroup::sortLayers()
+{
+    lock();
+    dQsort( mObjectList.address(), size(), sizeof(SimObject *), SpriteGroup::compare_Layer );
+    unlock();
+}
+
+DefineEngineMethod(SpriteGroup, sortLayers, void, (),,"Sort SpriteObject's by layer") {
+    object->sortLayers();
+}
+// -----------------------------------------------------------------------------
+// DrawBatch and Camera
+// -----------------------------------------------------------------------------
+DefineEngineMethod(SpriteGroup, drawAtlasBatch, bool, (S32 texObjectID, S32 camera2DObjectId), (0),
+                     "Draw all sprites in the group with option camera object") {
+    TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
+    if (!texObject) return false;
+
+    Camera2DObject* camObject = nullptr;
+    if (camera2DObjectId > 0) {
+        camObject = dynamic_cast<Camera2DObject*>(Sim::findObject(camera2DObjectId));
+    }
+    object->drawAtlasBatch(texObject,camObject);
+    return true;
+}
+
 
 // =============================================================================
-//  SoundObject
+// SoundObject
+// Using BaseFlux sound - only WAV supported - nativ by SDL3
 // =============================================================================
 class SoundObject : public SimObject
 {
@@ -1107,19 +1206,33 @@ public:
     }
 
     bool play() {
+        if (!mWaveData) return false;
         return app.getAudioManager().play(mWaveData, mGain, mLoop);
+    }
+    bool stop() {
+        if (!mWaveData) return false;
+        return app.getAudioManager().stop(mWaveData);
     }
 };
 IMPLEMENT_CONOBJECT(SoundObject);
 
-DefineEngineMethod(SoundObject, play,bool, (),
-                   ,"play the sound" ) {
-    return object->play();
-}
+DefineEngineMethod(SoundObject, play,bool, (),,"play the sound" ) { return object->play(); }
+DefineEngineMethod(SoundObject, stop,bool, (),,"stop the sound" ) { return object->stop(); }
 
 // =============================================================================
 ConsoleFunctionGroupBegin( SDL, "SDL/BaseFlux functions");
 // =============================================================================
+// Lazy sound playing - slower but fast coded
+// bool playSound(std::string fileName, float gain = 1.0f, bool loop = false);
+DefineEngineFunction(playSound, bool , (const char* fileName, F32 gain, bool loop),(0.9f, false)
+                     ,"lazy way to play a sound by filename ") {
+    return app.playSound(fileName, gain, loop);
+}
+DefineEngineFunction(stopSound, bool , (const char* fileName),
+,"lazy way to stop a sound by filename ") {
+    return app.stopSound(fileName);
+}
+
 DefineEngineFunction(SetClearBackground, void , (Color color),
                      ,"set Settings.clearColor if alpha  == 0 it's disabled") {
     app.getSettings().clearColor = color;

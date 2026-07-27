@@ -1,5 +1,6 @@
 //----------------------------------------------------------------------
 exec ("include/TextureAtlas.elf");
+#define SCENE_FILE "pref:/aquarium.elfscene"
 //----------------------------------------------------------------------
 function createCameraTest() {
     %obj = new ScriptGroup(CameraTest) {
@@ -16,10 +17,35 @@ function CameraTest::onAdd(%this) {
     %this.Spritesheet.name = "SpriteSheet";
     %this.add(%this.Spritesheet);
 
+    // we load our saved aquarium if any.
+    %path = getFullPath(SCENE_FILE);
+    if (SDL_FileExists(%path)) exec(%path);
 
-    %this.add( new SpriteBaseObject(MySprite));
-    MySprite.srcRect = SpriteSheet.fish_brown;
-    MySprite.dstRect = "100 100 128 128";
+    // Fallback we did not load anything
+    if (!isObject(SceneObjects)) {
+        new SpriteGroup(SceneObjects);
+
+        SpriteGroup.add(
+            new SpriteBaseObject(MyFish) {
+                srcRect = SpriteSheet.fish_brown;
+                dstRect = "100 100 128 128";
+            }
+        );
+    } else {
+        // i want MyFish ;)
+        foreach(%obj in SceneObjects) {
+            if (%obj.textureName $= "fish_brown_outline") {
+                %obj.name = MyFish;
+                %obj.savColor = %obj.color;
+                %obj.savDstRect = %obj.dstRect;
+                %obj.savLayer = %obj.layer;
+                break;
+            }
+        }
+
+    }
+
+    %this.add(SceneObjects);
 
     %this.add( new Camera2DObject(Camera));
 
@@ -32,10 +58,10 @@ function CameraTest::OnRemove(%this) {
 //----------------------------------------------------------------------
 function CameraTest::OnUpdate(%this, %dt) {
     %speed = %dt * 100;
-    if (SDL_IsKeyDown(SDL_SCANCODE_LEFT))     Camera.x += %speed;
-    if (SDL_IsKeyDown( SDL_SCANCODE_RIGHT))    Camera.x -= %speed;
-    if (SDL_IsKeyDown( SDL_SCANCODE_UP))       Camera.y += %speed;
-    if (SDL_IsKeyDown( SDL_SCANCODE_DOWN))     Camera.y -= %speed;
+    if (SDL_IsKeyDown(SDL_SCANCODE_LEFT))     Camera.x -= %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_RIGHT))    Camera.x += %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_UP))       Camera.y -= %speed;
+    if (SDL_IsKeyDown( SDL_SCANCODE_DOWN))     Camera.y += %speed;
     if (SDL_IsKeyDown( SDL_SCANCODE_PAGEUP)) {
         Camera.zoom -= %dt;
         Camera.zoom = mClampF(Camera.zoom, 0.1, 5.0);
@@ -48,29 +74,56 @@ function CameraTest::OnUpdate(%this, %dt) {
         Camera.reset();
     }
 
+
+    // testing only the Camera.GetMousePosition => not the smartest way on every update:
+    if (isObject(MyFish) && PointInRect(Camera.GetMousePosition(), MyFish.dstRect) ) {
+        if (MyFish.layer > 0) {
+            playSound("sound/beep.wav");
+            MyFish.color = "128 255 0 254";
+            MyFish.x = MyFish.savDstRect.x - 10;
+            MyFish.y = MyFish.savDstRect.y - 10;
+            MyFish.width  = MyFish.savDstRect.width + 20;
+            MyFish.height = MyFish.savDstRect.height + 20;
+            MyFish.layer = 0;
+            SceneObjects.sortLayers();
+        }
+
+    } else {
+        if (MyFish.layer == 0) {
+            MyFish.color = MyFish.savColor;
+            MyFish.dstRect = MyFish.savDstRect;
+            MyFish.layer = MyFish.savLayer;
+            SceneObjects.sortLayers();
+        }
+    }
+
 }
 //----------------------------------------------------------------------
 function CameraTest::Render(%this) {
 
-    %obj = MySprite.getId();
+    SceneObjects.drawAtlasBatch(Spritesheet.getId(), Camera.getId());
+
+
+    // Example how to do it manually ... drawAtlasBatch does it all for me
+    // %obj = MySprite.getId();
     //NOTE translate dstRect to screenRect and centerPoint to screenCenterPoint
-    %doRender = Camera.TranslateSpriteBaseObject(%obj);
-    if (%doRender) {
-        Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
-                                          %obj.screenRect, //NOTE this!
-                                          %obj.angle,
-                                          %obj.screenCenterPoint, //NOTE and this!
-                                          %obj.flip,
-                                          %obj.color
-        );
-    }
+    // %doRender = Camera.TranslateSpriteBaseObject(%obj);
+    // if (%doRender) {
+    //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
+    //                                       %obj.screenRect, //NOTE this!
+    //                                       %obj.angle,
+    //                                       %obj.screenCenterPoint, //NOTE and this!
+    //                                       %obj.flip,
+    //                                       %obj.color
+    //     );
+    // }
 
 
 
     %y = 10;
     DrawText(10,%y, "Mouse:" SPC GetMousePosition() SPC "/" SPC Camera.GetMousePosition(), 1.2, WHITE);
     %y += 15; DrawText(10,%y, "CAM:" SPC Camera.x SPC Camera.y SPC Camera.zoom , 1.2, WHITE);
-    %y += 15; DrawText(10,%y, "ScreenRect:" SPC %obj.screenRect, 1.2, WHITE);
+    // %y += 15; DrawText(10,%y, "ScreenRect:" SPC %obj.screenRect, 1.2, WHITE);
 }
 //----------------------------------------------------------------------
 function CameraTest::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {}
