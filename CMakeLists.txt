@@ -18,6 +18,15 @@ if (BUILD_ELFSCRIPT)
 
     set(TARGET_NAME HelloElf)
     include("${CMAKE_CURRENT_LIST_DIR}/ElfScript/ElfScript.cmake")
+    
+#     set_target_properties(${PROJECT_NAME} PROPERTIES
+#         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+# 
+#         # -- for windows:
+#         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}"
+#         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}"
+#     )         
+    
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
     if(UNIX)
       list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/shellConsole/POSIXConsole.cpp)
@@ -27,12 +36,27 @@ if (BUILD_ELFSCRIPT)
       # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/core/dnet.cpp)
       # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/core/stream/bitStream.cpp)
       # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/platformNet.cpp)
+      
+           
+      
     add_executable(${TARGET_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/demoMain.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/testObj.cpp
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
+    
+    # Windows - winVolume :: need to set on all builds
+    if(MSVC)
+        target_compile_options(${TARGET_NAME} PRIVATE "/Zc:wchar_t-")
+        target_compile_definitions(${TARGET_NAME} PRIVATE
+            NOMINMAX
+            UNICODE
+            _UNICODE
+        )
+    endif()
+      
+    
     target_include_directories(${TARGET_NAME} PRIVATE "./ElfScript/" "./ElfScript/demo/")
 endif()
 # -----------------------------------------------------------------------------
@@ -41,6 +65,17 @@ if (BUILD_TORQUESCRIPT)
     set(TARGET_NAME HelloConsole)
     include("${CMAKE_CURRENT_LIST_DIR}/TorqueScript/TorqueScript.cmake")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+
+        # Windows - winVolume :: need to set on all builds
+        if(MSVC)
+            target_compile_options(${TARGET_NAME} PRIVATE "/Zc:wchar_t-")
+            target_compile_definitions(${TARGET_NAME} PRIVATE
+                NOMINMAX
+                UNICODE
+                _UNICODE
+            )
+        endif()
+    
     add_executable(${TARGET_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/TorqueScript/demo/main.cpp
         ${TORQUESCRIPT_SRC}
@@ -55,6 +90,16 @@ if (BUILD_EXPERIMENTAL)
     set(TARGET_NAME HelloExperimental)
     include("${CMAKE_CURRENT_LIST_DIR}/experimental/Experimental.cmake")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+        # Windows - winVolume :: need to set on all builds
+        if(MSVC)
+            target_compile_options(${TARGET_NAME} PRIVATE "/Zc:wchar_t-")
+            target_compile_definitions(${TARGET_NAME} PRIVATE
+                NOMINMAX
+                UNICODE
+                _UNICODE
+            )
+        endif()
+
     add_executable(${TARGET_NAME}
         experimental/main.cpp
         ${EXPERIMENTAL_SRC}
