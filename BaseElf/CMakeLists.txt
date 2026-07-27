@@ -84,6 +84,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+
+    # -- for windows: 
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -95,6 +99,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     BaseFlux
 )
 
+
+# Windows - winVolume :: need to set on all builds 
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE "/Zc:wchar_t-")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+        NOMINMAX 
+        UNICODE 
+        _UNICODE
+    )
+endif()
 
 # Web Configurations
 if (EMSCRIPTEN)

@@ -36,19 +36,19 @@ std::unordered_map<std::string, std::string> gScriptConstants;
 void setScriptConstant(std::string key, F64 value) {
     StringBuilder str;
     str.format("%g", value);
-    gScriptConstants[key] = str.end();
+    gScriptConstants[key] = str.end().c_str();
 }
 //----------------------------------------------------------------------
 void setScriptConstant(std::string key, S32 value) {
     StringBuilder str;
     str.format("%d", value);
-    gScriptConstants[key] = str.end();
+    gScriptConstants[key] = str.end().c_str();
 }
 //----------------------------------------------------------------------
 void setScriptConstant(std::string key, U64 value) {
     StringBuilder str;
     str.format("%d", value);
-    gScriptConstants[key] = str.end();
+    gScriptConstants[key] = str.end().c_str();
 }
 //----------------------------------------------------------------------
 void setScriptConstant(std::string key, std::string value) {

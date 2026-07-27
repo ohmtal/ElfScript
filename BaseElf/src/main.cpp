@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     // engineGlue::init(MyLogger, (BaseFlux::Tools::getBasePath()+"/assets").c_str());
     if (gDirectory.isEmpty()) gDirectory = BaseFlux::Tools::getBasePath().c_str();
     if (!gDirectory.endsWith("/")) gDirectory += "/";
-    app.mBasePath = gDirectory;
+    app.mBasePath = gDirectory.c_str();
     engineGlue::init(MyLogger, (gDirectory + "assets"));
     InitBindings_SDL();
     InitBindings_ImGui();

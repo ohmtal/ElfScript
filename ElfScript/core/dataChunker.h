@@ -21,6 +21,11 @@
 #include <algorithm>
 #include <stdint.h>
 
+//ElfScript windows build:
+#ifdef max
+#undef max
+#endif
+
 /// Implements a chunked data allocator.
 ///
 /// This memory allocator allocates data in chunks of bytes, 
