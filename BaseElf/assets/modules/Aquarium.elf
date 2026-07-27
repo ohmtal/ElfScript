@@ -111,6 +111,7 @@ function Aquarium::onAdd(%this) {
         MenuTextureAtlasSize = "24 24";
         MenuEntries = "";
         MenuTextureRects = "";
+        NoDarkenOverlay = true;
     };
 
     GuiTool.CurrentMenu = 0; //reset

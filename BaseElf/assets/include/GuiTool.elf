@@ -40,6 +40,8 @@ function GuiToolMenu::onAdd(%this) {
     if (%this.MenuTextureAtlas $= "") %this.MenuTextureAtlas = 0;
     if (%this.MenuTextureAtlasSize $= "") %this.MenuTextureAtlasSize = "32 32";
     // %this.MenuTextureRects = ""; Tab separated
+//
+    if (%this.NoDarkenOverlay $= "") %this.NoDarkenOverlay = false;
 }
 
 function GuiToolMenu::Render(%this, %screenSize) {
@@ -138,8 +140,10 @@ function GuiTool::Render(%this, %screenSize) {
 
     %menuActive = isObject( %this.CurrentMenu);
     %this._IsOverlay = %this.Message !$= "" || %menuActive ;
+    %drawOverlay = %this._IsOverlay;
+    if (%menuActive && %this.CurrentMenu.NoDarkenOverlay) %drawOverlay = false;
 
-    if (%this._IsOverlay) {
+    if (%drawOverlay) {
         BeginBlendMode();
         DrawRectRec("0 0" SPC %screenSize, "20 20 20 200");
         EndBlendMode();
