@@ -1,5 +1,6 @@
 //----------------------------------------------------------------------
 exec ("include/TextureAtlas.elf");
+include ("include/Inspector.elf");
 #define SCENE_FILE "pref:/aquarium.elfscene"
 //----------------------------------------------------------------------
 function createCameraTest() {
@@ -11,8 +12,8 @@ function createCameraTest() {
 }
 //----------------------------------------------------------------------
 function CameraTest::onAdd(%this) {
-    SetClearBackground("160 160 200"); //only set once
-
+    // SetClearBackground("160 160 200"); //only set once
+    SetClearBackground(BLACK);
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
     %this.Spritesheet.name = "SpriteSheet";
     %this.add(%this.Spritesheet);
@@ -48,6 +49,7 @@ function CameraTest::onAdd(%this) {
                 %obj.veloY = getRandom(-20, -50);
                 BubbleSet.add(%obj);
             }
+            // %obj.color = getScaledColor(%obj.color , 0.8); //make dark we have a light ..
         }
 
     }
@@ -57,6 +59,23 @@ function CameraTest::onAdd(%this) {
 
     %this.add( new Camera2DObject(Camera));
 
+    %this.add(new TextureObject(TexOmniLight) {
+       fileName = "assets:/texture/spotlight.png";
+       // fileName = "assets:/texture/omnilight.png";
+       blendMode = SDL_BLENDMODE_ADD;
+    });
+    %this.add(new SpriteObject( OmniLight ) {
+        dstRect = "-600 -600 2000 2000";
+        angle = -25;
+        // basecolor   = "120 0 255 120";
+        basecolor   = "10 10 60 120";
+        layer = 1;
+    });
+    OmniLight.color = getScaledColorSaturation(OmniLight.basecolor, getRandomF(0.4,0.6));
+    OmniLight.CenterCenterPoint();
+
+    %this.add ( new SimObject(FieldInspector));
+    FieldInspector.inspect(OmniLight.getId());
 
     return true;
 }
@@ -65,6 +84,8 @@ function CameraTest::OnRemove(%this) {
 }
 //----------------------------------------------------------------------
 function CameraTest::OnUpdate(%this, %dt) {
+
+    OmniLight.color = getScaledColorSaturation(OmniLight.basecolor, mSin(getGameTime())* 0.3  + 0.5);
 
     MyFish.moveLinear(%dt);
     if (MyFish.x > 1200) {
@@ -134,13 +155,18 @@ function CameraTest::OnUpdate(%this, %dt) {
 //----------------------------------------------------------------------
 function CameraTest::Render(%this) {
 
+
+    FieldInspector.render();
+
     SceneObjects.drawAtlasBatch(Spritesheet.getId(), Camera.getId());
 
 
     // Example how to do it manually ... drawAtlasBatch does it all for me
     // %obj = MySprite.getId();
     //NOTE translate dstRect to screenRect and centerPoint to screenCenterPoint
-    // %doRender = Camera.TranslateSpriteBaseObject(%obj);
+    %doRender = Camera.TranslateSpriteBaseObject(OmniLight.getId());
+    //
+    if (%doRender) OmniLight.DrawTexture(TexOmniLight.getId(), false, true);
     // if (%doRender) {
     //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
     //                                       %obj.screenRect, //NOTE this!

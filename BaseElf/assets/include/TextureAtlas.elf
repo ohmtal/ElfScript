@@ -58,15 +58,24 @@ function loadTextureAtlas(%filePath, %filename, %bleedingOffset) {
         }
 
         %name   = getXMLAttribute(%line, "name");
-        // i  add 0.01 in pos and remove 0.02 them in size to prevent Bleeding
-        %x      = getXMLAttribute(%line, "x") + %bleedingOffset;
-        %y      = getXMLAttribute(%line, "y") + %bleedingOffset;
-        %width  = getXMLAttribute(%line, "width") - %bleedingOffset * 2;
-        %height = getXMLAttribute(%line, "height") - %bleedingOffset * 2;
-
         if (%name $= "")
             continue;
-        %result.addTypeField(%name, "TypeRectF", %x SPC %y SPC %width SPC %height);
+
+        %result.add(
+            new AtlasEntryObject() {
+                internalName = %name;
+                x      = getXMLAttribute(%line, "x") + %bleedingOffset;
+                y      = getXMLAttribute(%line, "y") + %bleedingOffset;
+                width  = getXMLAttribute(%line, "width") - %bleedingOffset * 2;
+                height = getXMLAttribute(%line, "height") - %bleedingOffset * 2;
+            }
+        );
+        // i  add 0.01 in pos and remove 0.02 them in size to prevent Bleeding
+        // %x      = getXMLAttribute(%line, "x") + %bleedingOffset;
+        // %y      = getXMLAttribute(%line, "y") + %bleedingOffset;
+        // %width  = getXMLAttribute(%line, "width") - %bleedingOffset * 2;
+        // %height = getXMLAttribute(%line, "height") - %bleedingOffset * 2;
+        // %result.addTypeField(%name, "TypeRectF", %x SPC %y SPC %width SPC %height);
     }
 
     %file.close();

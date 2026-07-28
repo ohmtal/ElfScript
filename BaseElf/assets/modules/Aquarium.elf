@@ -134,25 +134,25 @@ function Aquarium::OnUpdate(%this, %dt) {
 //----------------------------------------------------------------------
 function Aquarium::DrawSpriteSheet(%this) {
     %s = %this.Spritesheet;
-    %cnt = %s.getDynamicFieldCount();
     %screenSize = getScreenSize();
-    %screenSize.y /= 2;
+    %screenSize.y /= 1.3;
     %x = 0; %y = 0;
-    %size = 32;
+    %maxX = 0; %maxY = 0;
+    %size = 28;
     %mousePos = GetMousePosition();
     %this.cursorTexure = "";
     // BeginBlendMode();
-    for (%i = 0; %i < %cnt ; %i++) {
-        %f = %s.getDynamicField(%i);
-        %name = getField(%f,0);
-        %srcRect = getField(%f,1);
-        %y += %size;
-        if ( %y+%size > %screenSize.y) {
-            %y = 0;
-            %x += %size;
-        }
+    if (%this.Spritesheet.backRect !$= "") {
+        BeginBlendMode();
+        DrawRectRec(%this.Spritesheet.backRect, "50 50 50 100");
+        EndBlendMode();
+    }
+
+    foreach(%atlasEntry in %s) {
+        %name = %atlasEntry.internalName;
+        %srcRect = %atlasEntry.rect;
         %dstRect = %x SPC %y SPC %size SPC %size;
-        %s.DrawSrcDstRect(%srcRect,%dstRect, WHITEBLEND);
+        %s.DrawSrcDstRect(%srcRect,%dstRect, WHITE);
         if (PointInRect(%mousePos, %dstRect)) {
 
             if (SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)) {
@@ -170,11 +170,20 @@ function Aquarium::DrawSpriteSheet(%this) {
                     TypeBool ignoreOnMultiSelect = false;
                 };
                 SceneObjects.add( %this.mouseObject);
+                SelectList.clear();
             }
             %this.cursorTexure = %name;
         }
-
+        %y += %size;
+        if ( %y+%size > %screenSize.y) {
+            %y = 0;
+            %x += %size;
+        }
+        if (%x > %maxX) %maxX = %x;
+        if (%y > %maxY) %maxY = %y;
     }
+    %this.Spritesheet.backRect = "0 0" SPC %maxX + %size SPC %maxY + %size;
+
     if (!isObject(%this.mouseObject))  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure , 1.8, "128 255 0", true, BLACK);
 }
 //----------------------------------------------------------------------
@@ -300,8 +309,10 @@ function Aquarium::Render(%this) {
     %screenSize = getScreenSize();
     %mousePos = GetMousePosition();
     %haveMouseObject = isObject(%this.mouseObject);
-
     %haveOverlay =  GuiTool.haveOverlay();
+
+
+
 
     if (%this.dirty ) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
@@ -366,6 +377,16 @@ function Aquarium::Render(%this) {
             } //foreach
         }
     }
+    if (!%haveMouseObject) {
+        if (!%haveOverlay) {
+            if ( %this.hideSpriteSheet ) {
+                DrawText(0,0,"[TAB]",1.5, "200 200 0 150", true);
+            } else {
+                %this.DrawSpriteSheet();
+            }
+        }
+    }
+
 
     // check Multiple selections and show menu
     if (SelectList.getCount() > 1 && %mouseDown) {
@@ -397,19 +418,7 @@ function Aquarium::Render(%this) {
 
 
 
-    if (!%haveMouseObject) {
-        if (!%haveOverlay) {
-            if ( %this.hideSpriteSheet ) {
-
-                DrawText(0,0,"[TAB]",1.5, "200 200 0 150", true);
-
-            } else {
-                %this.DrawSpriteSheet();
-            }
-
-        }
-
-    } else /*if (!%haveOverlay )*/ {
+    if (%haveMouseObject) {
 
         %halvPaintSize =  %this.paintSize / 2;
         if (%this.snapToGrid) {

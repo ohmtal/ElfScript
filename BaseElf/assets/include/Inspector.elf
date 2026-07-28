@@ -216,7 +216,7 @@ function FieldInspector::Render(%this, %force) {
         } //switch
     }
 
-    if (%dirty) %this.object.onInspectPostApply();
+    if (%dirty && %this.object.isMethod("onInspectPostApply")) %this.object.onInspectPostApply();
 
     if (ImButton("Add dynamic Field")) {
         ImOpenPopup("FieldInspectorAddDynamicPopup");

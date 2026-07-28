@@ -29,7 +29,8 @@
 
 namespace Con {
 
-    //----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
 // Global table that persists across multiple exec() calls
 std::unordered_map<std::string, std::string> gScriptConstants;
 //----------------------------------------------------------------------
@@ -45,9 +46,15 @@ void setScriptConstant(std::string key, S32 value) {
     gScriptConstants[key] = str.end().c_str();
 }
 //----------------------------------------------------------------------
+void setScriptConstant(std::string key, U32 value) {
+    StringBuilder str;
+    str.format("%u", value);
+    gScriptConstants[key] = str.end().c_str();
+}
+//----------------------------------------------------------------------
 void setScriptConstant(std::string key, U64 value) {
     StringBuilder str;
-    str.format("%d", value);
+    str.format("%llu", value);
     gScriptConstants[key] = str.end().c_str();
 }
 //----------------------------------------------------------------------

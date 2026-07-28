@@ -102,7 +102,7 @@ function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %a
             }
             else if (%animType $= "rainbow") {
                 %hue = mFmod((%time * 50.0) + (%i * 20.0), 360.0);
-                %curColor = %this.HSVtoRGB_U8(%hue, 1.0, 1.0);
+                %curColor = getColorFromHSV(%hue, 1.0, 1.0);
             }
             else if (%animType $= "pulse") {
                 %scale = 1.0 + mSin(%time * 4.0) * 0.15;
@@ -122,23 +122,23 @@ function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %a
     }
 }
 
-// FIXME move to bindings_sdl.cpp
-function AtlasFont::HSVtoRGB_U8(%this, %h, %s, %v) {
-    %c = %v * %s;
-    %x = %c * (1.0 - mAbs(mFmod(%h / 60.0, 2.0) - 1.0));
-    %m = %v - %c;
-
-    if (%h < 60)       { %r = %c; %g = %x; %b = 0; }
-    else if (%h < 120) { %r = %x; %g = %c; %b = 0; }
-    else if (%h < 180) { %r = 0;  %g = %c; %b = %x; }
-    else if (%h < 240) { %r = 0;  %g = %x; %b = %c; }
-    else if (%h < 300) { %r = %x; %g = 0;  %b = %c; }
-    else               { %r = %c; %g = 0;  %b = %x; }
-
-    // Skalierung auf SDL_Color / U8 Wertebereich (0..255) mit kaufmaennischer Rundung
-    %rU8 = mRound((%r + %m) * 255);
-    %gU8 = mRound((%g + %m) * 255);
-    %bU8 = mRound((%b + %m) * 255);
-
-    return %rU8 SPC %gU8 SPC %bU8 SPC "254"; //254 enabled blend
-}
+// //  moved to bindings_sdl.cpp
+// function AtlasFont::HSVtoRGB_U8(%this, %h, %s, %v) {
+//     %c = %v * %s;
+//     %x = %c * (1.0 - mAbs(mFmod(%h / 60.0, 2.0) - 1.0));
+//     %m = %v - %c;
+//
+//     if (%h < 60)       { %r = %c; %g = %x; %b = 0; }
+//     else if (%h < 120) { %r = %x; %g = %c; %b = 0; }
+//     else if (%h < 180) { %r = 0;  %g = %c; %b = %x; }
+//     else if (%h < 240) { %r = 0;  %g = %x; %b = %c; }
+//     else if (%h < 300) { %r = %x; %g = 0;  %b = %c; }
+//     else               { %r = %c; %g = 0;  %b = %x; }
+//
+//     // Skalierung auf SDL_Color / U8 Wertebereich (0..255) mit kaufmaennischer Rundung
+//     %rU8 = mRound((%r + %m) * 255);
+//     %gU8 = mRound((%g + %m) * 255);
+//     %bU8 = mRound((%b + %m) * 255);
+//
+//     return %rU8 SPC %gU8 SPC %bU8 SPC "254"; //254 enabled blend
+// }

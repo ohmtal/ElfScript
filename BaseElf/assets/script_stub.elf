@@ -460,27 +460,27 @@ class  TextureObject : public SimObject {
     * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
     * @return bool
     */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE );
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
    /** --- bool DrawRect ---
     * Draw a texture with source and destination rect
     * @return bool
     */
-      function DrawRect( RectF dstRect, Color color=WHITE );
+      function DrawRect( RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
    /** --- bool DrawSrcDstRect ---
     * Draw a the texture from srcRect to dstRect
     * @return bool
     */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE );
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
    /** --- bool DrawCentered ---
     * Draw the texture centered at the position
     * @return bool
     */
-      function DrawCentered( float x, float y, Color color=WHITE );
+      function DrawCentered( float x, float y, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
    /** --- bool DrawRotatedCentered ---
     * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
     * @return bool
     */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE );
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
    /** --- bool SaveImage ---
     * Save the current texture image as png or bmp.
     * @return bool
@@ -493,6 +493,9 @@ class  TextureObject : public SimObject {
    /*!
     */
    string fileName;
+   /*!
+    */
+   uint blendMode;
 };
 /*!
 @brief A collection of SimObjects.
@@ -835,7 +838,7 @@ class  SpriteBaseObject : public SimObject {
    float angle;
    /*!
     */
-   float centerPoint;
+   Point2F centerPoint;
    /*!
     */
    int flip;
@@ -863,7 +866,7 @@ class  SpriteBaseObject : public SimObject {
    Translated point when using camera translate
    
     */
-   float ScreenCenterPoint;
+   Point2F ScreenCenterPoint;
 };
 class  Camera2DObject : public SimObject {
   public:
@@ -960,17 +963,30 @@ class  SpriteObject : public SpriteBaseObject {
    // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
+   velocity as point see also veloX veloY
+   
     */
    Point2F velocity;
    /*!
+   X velocity
+   
     */
    float veloX;
    /*!
+   Y velocity
+   
     */
    float veloY;
    /*!
+   Layer of the Sprite. 
+   
     */
    uint layer;
+   /*!
+   SDL_BLENDMODE_
+   
+    */
+   uint blendMode;
 };
 class  SpriteGroup : public SimGroup {
   public:
@@ -4670,9 +4686,7 @@ namespace Global {
   SDL_KMOD_LGUI = 1024
   SDL_KMOD_RALT = 512
   SDL_KMOD_LALT = 256
-  SDL_KMOD_LCTRL = 64
   SDL_KMOD_LSHIFT = 1
-  SDL_SCANCODE_AC_BOOKMARKS = 286
   SDL_BUTTON_RIGHT = 3
   SDL_SCANCODE_AC_REFRESH = 285
   SDL_SCANCODE_AC_FORWARD = 283
@@ -4697,42 +4711,36 @@ namespace Global {
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
   SDL_SCANCODE_KP_MEMCLEAR = 210
-  ImGuiKey_M = 558
-  ImGuiKey_RightArrow = 514
+  SDL_SCANCODE_KP_MEMRECALL = 209
+  BORDER = 60
+  SDL_SCANCODE_KP_MEMSTORE = 208
   SDL_SCANCODE_KP_SPACE = 205
-  ImGuiKey_N = 559
-  ImGuiCol_PlotHistogramHovered = 46
-  ImGuiTreeNodeFlags_OpenOnDoubleClick = 64
-  ImGuiKey_F = 551
-  SDL_SCANCODE_INSERT = 73
-  ACIDGREEN = "128 255 0 255"
-  ImGuiMod_Ctrl = 4096
-  ImGuiTableColumnFlags_WidthFixed = 16
-  ImGuiKey_D = 549
-  ImGuiCol_TabSelected = 36
-  ImGuiKey_I = 554
+  SDL_SCANCODE_KP_COLON = 203
+  SDL_SCANCODE_KP_DBLVERTICALBAR = 202
+  SDL_SCANCODE_KP_VERTICALBAR = 201
+  SDL_SCANCODE_KP_DBLAMPERSAND = 200
+  SDL_SCANCODE_KP_AMPERSAND = 199
+  SDL_SCANCODE_KP_GREATER = 198
+  SDL_SCANCODE_KP_LESS = 197
+  SDL_SCANCODE_KP_POWER = 195
+  SDL_SCANCODE_KP_F = 193
+  SDL_SCANCODE_KP_E = 192
+  SDL_SCANCODE_KP_D = 191
+  SDL_SCANCODE_KP_C = 190
+  SDL_SCANCODE_KP_A = 188
   ImGuiTableColumnFlags_Disabled = 1
   DARKBLUE = "0 82 172 255"
-  ImGuiTableFlags_ScrollX = 16777216
   ImGuiTableFlags_NoSavedSettings = 16
   ImGuiWindowFlags_NoCollapse = 32
-  SDL_SCANCODE_KP_POWER = 195
+  ImGuiTableFlags_Resizable = 1
   ImGuiTreeNodeFlags_LabelSpanAllColumns = 32768
   ImGuiStyleVar_TabBarBorderSize = 29
-  ImGuiTableFlags_Resizable = 1
   ImGuiKey_Home = 519
   ImGuiInputTextFlags_EscapeClearsAll = 128
   SDL_SCANCODE_F9 = 66
-  ImGuiTableFlags_Borders = 1920
-  ImGuiInputTextFlags_CallbackHistory = 524288
-  SDL_SCANCODE_LSHIFT = 225
-  ImGuiKey_R = 563
-  ImGuiInputTextFlags_CallbackResize = 4194304
-  SDL_SCANCODE_NONUSHASH = 50
   ImGuiInputTextFlags_ReadOnly = 512
   SDL_SCANCODE_F3 = 60
   ImGuiInputTextFlags_AlwaysOverwrite = 2048
-  SDL_SCANCODE_KP_MEMRECALL = 209
   ImGuiInputTextFlags_CallbackCompletion = 262144
   ImGuiInputTextFlags_AutoSelectAll = 4096
   ImGuiInputTextFlags_CharsNoBlank = 16
@@ -4750,15 +4758,12 @@ namespace Global {
   ImGuiStyleVar_CellPadding = 17
   ImGuiInputTextFlags_CharsDecimal = 1
   ImGuiStyleVar_IndentSpacing = 16
-  ImGuiStyleVar_ItemSpacing = 14
   ImGuiStyleVar_FrameBorderSize = 13
   SDL_KMOD_NONE = 0
   ImGuiWindowFlags_UnsavedDocument = 262144
   ImGuiStyleVar_PopupRounding = 9
   ImGuiKey_UpArrow = 515
   ImGuiKey_F12 = 583
-  ImGuiTableColumnFlags_DefaultHide = 2
-  ImGuiStyleVar_SeparatorTextBorderSize = 37
   ImGuiStyleVar_WindowBorderSize = 4
   ImGuiStyleVar_Alpha = 0
   ImGuiTableColumnFlags_None = 0
@@ -4770,13 +4775,17 @@ namespace Global {
   SDL_FLIP_HORIZONTAL = 1
   cl_Pink = "1.000000 0.400000 0.700000 1.000000"
   ImGuiCol_NavWindowingHighlight = 59
+  SDL_FOLDER_DOCUMENTS = 2
+  SDL_SCANCODE_KP_HASH = 204
+  ImGuiCol_DragDropTarget = 55
   ImGuiWindowFlags_NoNavFocus = 131072
   SDL_SCANCODE_C = 6
-  ImGuiCol_TextLink = 52
   ImGuiCol_TableRowBgAlt = 51
   ImGuiCol_ScrollbarGrabActive = 17
   ImGuiStyleVar_TableAngledHeadersAngle = 31
   ImGuiPopupFlags_NoOpenOverExistingPopup = 128
+  ImGuiCol_PlotHistogramHovered = 46
+  ImGuiKey_N = 559
   ImGuiCol_TableHeaderBg = 47
   ImGuiCol_TabDimmedSelectedOverline = 40
   ImGuiCol_TabDimmedSelected = 39
@@ -4787,9 +4796,6 @@ namespace Global {
   ImGuiInputTextFlags_EnterReturnsTrue = 64
   ImGuiCol_SeparatorHovered = 28
   cl_LightGray = "0.750000 0.750000 0.750000 1.000000"
-  SDL_SCANCODE_KP_PLUSMINUS = 215
-  ImGuiStyleVar_TabRounding = 25
-  ImGuiCol_Separator = 27
   ImGuiCol_HeaderActive = 26
   ImGuiCol_BorderShadow = 6
   SDL_SCANCODE_F17 = 108
@@ -4797,76 +4803,35 @@ namespace Global {
   ImGuiCol_ButtonHovered = 22
   SDL_SCANCODE_A = 4
   ImGuiStyleVar_ScrollbarRounding = 19
-  ImGuiWindowFlags_NoBackground = 128
-  SDL_SCANCODE_5 = 34
-  ImGuiInputTextFlags_Password = 1024
-  ImGuiTableFlags_BordersOuterV = 1024
-  ImGuiKey_L = 557
-  ImGuiStyleVar_ButtonTextAlign = 35
-  SDL_SCANCODE_G = 10
-  ImGuiStyleVar_TableAngledHeadersTextAlign = 32
-  ImGuiPopupFlags_NoReopen = 32
-  ImGuiWindowFlags_NoNav = 196608
-  ImGuiCol_Header = 24
-  ImGuiWindowFlags_NoMove = 4
-  ImGuiTreeNodeFlags_Selected = 1
-  SDL_LOGICAL_PRESENTATION_LETTERBOX = 2
-  SDL_FOLDER_COUNT = 11
-  ImGuiWindowFlags_AlwaysAutoResize = 64
-  DARKPURPLE = "112 31 126 255"
-  SDL_SCANCODE_E = 8
-  SDL_KMOD_CAPS = 8192
-  ImGuiWindowFlags_NoResize = 2
-  SDL_SCANCODE_3 = 32
-  SDL_SCANCODE_RSHIFT = 229
-  SDL_WINDOW_MAXIMIZED = 128
-  ImGuiPopupFlags_AnyPopupId = 1024
-  ImGuiKey_T = 565
-  ImGuiWindowFlags_MenuBar = 1024
-  ImGuiTreeNodeFlags_OpenOnArrow = 128
-  MAGENTA = "255 0 255 255"
-  BROWN = "127 106 79 255"
-  BLACK = "0 0 0 255"
-  SDL_SCANCODE_F8 = 65
-  ImGuiWindowFlags_HorizontalScrollbar = 2048
-  ImGuiWindowFlags_None = 0
-  ImGuiInputTextFlags_CallbackCharFilter = 2097152
-  ImGuiKey_B = 547
-  ImGuiCol_ButtonActive = 23
-  WHITEBLEND = "255 255 255 254"
-  SDL_SCALEMODE_NEAREST = 0
-  SDL_SCANCODE_MEDIA_NEXT_TRACK = 267
-  SDL_SCANCODE_INTERNATIONAL4 = 138
-  SDL_SCANCODE_BACKSPACE = 42
-  ImGuiStyleVar_FramePadding = 11
-  ImGuiCol_TableRowBg = 50
-  SKYBLUE = "102 191 255 255"
-  SDL_SCANCODE_KP_DIVIDE = 84
-  SDL_SCANCODE_KP_MINUS = 86
-  ImGuiKey_Escape = 526
-  BLUE = "0 121 241 255"
-  MAG_DIR_VALUE = 15
-  SDL_SCALEMODE_PIXELART = 2
-  ImGuiTreeNodeFlags_DefaultOpen = 32
-  ImGuiKey_J = 555
-  LOGO_SIZE = 32
-  SDL_SCANCODE_KP_LEFTPAREN = 182
-  SDL_SCANCODE_D = 7
+  ImGuiCol_PlotLines = 43
+  ImGuiCol_SliderGrabActive = 20
+  SDL_SCANCODE_F10 = 67
+  ImGuiCol_CheckMark = 18
+  SDL_BLENDMODE_ADD = 2
+  SDL_SCANCODE_F21 = 112
+  ImGuiCol_TitleBgCollapsed = 12
+  ImGuiCol_FrameBgActive = 9
   ImGuiCol_ChildBg = 3
-  ImGuiMouseButton_Middle = 2
-  SDL_SCANCODE_KP_VERTICALBAR = 201
-  MAROON = "190 33 55 255"
-  ImGuiTreeNodeFlags_AllowOverlap = 4
   ImGuiCol_WindowBg = 2
-  ImGuiTableColumnFlags_WidthStretch = 8
-  PURPLE = "200 122 255 255"
-  ImGuiKey_Backspace = 523
+  ImGuiTreeNodeFlags_AllowOverlap = 4
+  ImGuiInputTextFlags_CtrlEnterForNewLine = 256
+  SDL_BUTTON_X2 = 5
+  SDL_SCANCODE_I = 12
+  cl_Purple = "0.500000 0.000000 0.500000 1.000000"
+  SDL_SCANCODE_R = 21
+  ImGuiTableFlags_Borders = 1920
+  ImGuiInputTextFlags_CallbackHistory = 524288
+  SDL_SCANCODE_LSHIFT = 225
+  ImGuiKey_R = 563
+  ImGuiInputTextFlags_CallbackResize = 4194304
+  SDL_SCANCODE_NONUSHASH = 50
+  SDL_BLENDFACTOR_DST_ALPHA = 9
+  ImGuiCol_PopupBg = 4
+  ImGuiCol_FrameBg = 7
   SDL_LOGICAL_PRESENTATION_INTEGER_SCALE = 4
   ImGuiTreeNodeFlags_Leaf = 256
   ImGuiCol_COUNT = 62
   ImGuiWindowFlags_NoMouseInputs = 512
-  ImGuiKey_0 = 536
-  ImGuiKey_PageUp = 517
   SDL_SCANCODE_KP_RIGHTBRACE = 185
   ImGuiCol_TextSelectedBg = 53
   SDL_SCANCODE_P = 19
@@ -4875,190 +4840,275 @@ namespace Global {
   ImGuiTreeNodeFlags_Bullet = 512
   cl_Blue = "0.000000 0.000000 1.000000 1.000000"
   SDL_SCANCODE_LANG2 = 145
+  MAGENTA = "255 0 255 255"
+  BROWN = "127 106 79 255"
+  SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
+  BLACK = "0 0 0 255"
+  SDL_SCANCODE_F8 = 65
+  ImGuiWindowFlags_HorizontalScrollbar = 2048
+  ImGuiKey_B = 547
+  ImGuiCol_ButtonActive = 23
+  WHITEBLEND = "255 255 255 254"
+  SDL_SCALEMODE_NEAREST = 0
+  SDL_SCANCODE_MEDIA_NEXT_TRACK = 267
+  SDL_SCANCODE_INTERNATIONAL4 = 138
+  SDL_SCANCODE_MEDIA_REWIND = 266
+  SDL_SCANCODE_F12 = 69
+  GREEN = "0 228 48 255"
+  SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR = 8
+  SDL_BLENDFACTOR_ZERO = 1
+  ImGuiStyleVar_FramePadding = 11
+  ImGuiCol_TableRowBg = 50
+  SKYBLUE = "102 191 255 255"
+  SDL_SCANCODE_KP_DIVIDE = 84
+  SDL_SCANCODE_KP_MINUS = 86
+  ImGuiKey_Escape = 526
+  BLUE = "0 121 241 255"
+  MAG_DIR_VALUE = 15
+  SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR = 4
+  SDL_SCALEMODE_PIXELART = 2
+  MAROON = "190 33 55 255"
+  ImGuiKey_Backspace = 523
+  ImGuiTreeNodeFlags_DefaultOpen = 32
   SDL_LOGICAL_PRESENTATION_DISABLED = 0
-  ImGuiWindowFlags_NoTitleBar = 1
-  cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
-  SDL_SCANCODE_CRSEL = 163
-  ImGuiCond_None = 0
-  SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
-  SDL_SCANCODE_END = 77
-  SDL_SCANCODE_F23 = 114
-  ImGuiPopupFlags_AnyPopupLevel = 2048
-  SDL_SCANCODE_LANG9 = 152
-  ImGuiCol_PopupBg = 4
-  ImGuiCol_FrameBg = 7
-  SDL_SCANCODE_KP_LEFTBRACE = 184
-  YELLOW = "253 249 0 255"
-  SDL_SCANCODE_Q = 20
-  ImGuiStyleVar_WindowRounding = 3
-  ImGuiCol_SeparatorActive = 29
-  SDL_SCANCODE_2 = 31
-  ImGuiPopupFlags_MouseButtonMiddle = 12
-  ImGuiCol_Border = 5
-  ImGuiTreeNodeFlags_Framed = 2
-  cl_Black = "0.000000 0.000000 0.000000 1.000000"
-  SDL_SCANCODE_UNKNOWN = 0
-  cl_Kelp = "0.130000 0.290000 0.130000 1.000000"
-  FLT_MAX = 3.40282e+38
-  SDL_SCANCODE_KP_PLUS = 87
-  SLATEGRAY = "45 45 45 255"
-  ImGuiInputTextFlags_NoHorizontalScroll = 32768
-  ImGuiKey_8 = 544
-  SDL_LOGICAL_PRESENTATION_STRETCH = 1
-  LIME = "0 158 47 255"
-  DARKGREEN = "0 117 44 255"
-  ImGuiKey_H = 553
-  ImGuiCond_Once = 2
-  ImGuiCol_Tab = 35
-  SDL_SCANCODE_KP_5 = 93
-  SDL_SCANCODE_AC_PROPERTIES = 279
-  ImGuiMod_Shift = 8192
-  SDL_SCANCODE_AC_SAVE = 277
-  ImGuiTreeNodeFlags_CollapsingHeader = 26
-  SDL_SCANCODE_KP_ENTER = 88
-  ImGuiStyleVar_DisabledAlpha = 1
-  NEONPINK = "255 0 128 255"
+  SDL_SCANCODE_KP_EXCLAM = 207
+  ImGuiInputTextFlags_AllowTabInput = 32
   ImGuiCol_TableBorderLight = 49
   BEIGE = "211 176 131 255"
   ImGuiTableFlags_RowBg = 64
+  SDL_SCANCODE_KP_XOR = 194
+  VIOLET = "135 60 190 255"
+  SDL_SCANCODE_CRSEL = 163
+  ImGuiCond_None = 0
+  SDL_WINDOW_HIGH_PIXEL_DENSITY = 8192
+  LIME = "0 158 47 255"
+  DARKGREEN = "0 117 44 255"
+  ImGuiWindowFlags_NoTitleBar = 1
+  cl_AcidGreen = "0.500000 1.000000 0.000000 1.000000"
+  SDL_SCANCODE_END = 77
+  ImGuiPopupFlags_AnyPopupLevel = 2048
+  SDL_SCANCODE_LANG9 = 152
+  SDL_SCANCODE_RSHIFT = 229
+  SDL_WINDOW_MAXIMIZED = 128
+  ImGuiPopupFlags_AnyPopupId = 1024
+  ImGuiKey_T = 565
+  SDL_SCANCODE_KP_LEFTBRACE = 184
+  SDL_SCANCODE_Q = 20
+  ImGuiCol_TextLink = 52
+  SDL_BLENDMODE_BLEND_PREMULTIPLIED = 16
+  SDL_SCANCODE_CAPSLOCK = 57
+  ImGuiTreeNodeFlags_DrawLinesToNodes = 1048576
+  NEONPINK = "255 0 128 255"
+  ImGuiStyleVar_DisabledAlpha = 1
+  ImGuiCol_Border = 5
+  SDL_SCANCODE_UNKNOWN = 0
+  cl_Kelp = "0.130000 0.290000 0.130000 1.000000"
+  SDL_LOGICAL_PRESENTATION_LETTERBOX = 2
+  ImGuiTreeNodeFlags_Selected = 1
+  SDL_FOLDER_COUNT = 11
+  ImGuiWindowFlags_AlwaysAutoResize = 64
+  DARKPURPLE = "112 31 126 255"
+  SDL_SCANCODE_E = 8
+  SDL_SCANCODE_AC_BOOKMARKS = 286
+  SDL_BLENDFACTOR_DST_COLOR = 7
+  ImGuiPopupFlags_MouseButtonLeft = 4
+  SDL_SCANCODE_L = 15
+  ImGuiTableFlags_ScrollX = 16777216
+  SDL_BLENDOPERATION_REV_SUBTRACT = 3
+  SDL_BLENDMODE_BLEND = 1
+  ImGuiWindowFlags_NoBackground = 128
+  SDL_SCANCODE_5 = 34
+  ImGuiKey_8 = 544
+  SDL_LOGICAL_PRESENTATION_STRETCH = 1
+  ImGuiTableFlags_BordersOuterV = 1024
+  ImGuiInputTextFlags_Password = 1024
+  SLATEGRAY = "45 45 45 255"
+  ImGuiInputTextFlags_NoHorizontalScroll = 32768
+  ImGuiKey_Delete = 522
+  ImGuiCol_Tab = 35
+  SDL_SCANCODE_KP_5 = 93
+  ACIDGREEN = "128 255 0 255"
+  ImGuiStyleVar_ScrollbarSize = 18
+  SDL_SCANCODE_VOLUMEDOWN = 129
+  SDL_FLIP_NONE = 0
+  SDL_SCANCODE_0 = 39
+  ImGuiStyleVar_SeparatorTextAlign = 38
+  SDL_SCANCODE_CURRENCYUNIT = 180
+  ImGuiKey_D = 549
+  ImGuiCol_TabSelected = 36
+  ImGuiTableColumnFlags_WidthFixed = 16
   RED = "230 41 55 255"
   ImGuiTableFlags_None = 0
-  ImGuiKey_G = 552
-  ImGuiCol_ResizeGripActive = 32
   ImGuiWindowFlags_NoInputs = 197120
+  SDL_BLENDOPERATION_SUBTRACT = 2
   DARKGRAY = "80 80 80 255"
   ImGuiCol_TabHovered = 34
   SDL_SCANCODE_HOME = 74
-  ImGuiWindowFlags_NoBringToFrontOnFocus = 8192
-  LIGHTGRAY = "200 200 200 255"
+  ImGuiKey_3 = 539
+  SDL_SCALEMODE_LINEAR = 1
   GRAY = "130 130 130 255"
   SDL_SCANCODE_KP_TAB = 186
+  ImGuiWindowFlags_NoFocusOnAppearing = 4096
+  ImGuiCol_TitleBgActive = 11
+  ImGuiTreeNodeFlags_SpanLabelWidth = 8192
+  ImGuiCol_Text = 0
+  SDL_FLIP_HORIZONTAL_AND_VERTICAL = 3
   PINK = "255 109 194 255"
   cl_Green = "0.000000 1.000000 0.000000 1.000000"
   ImGuiTreeNodeFlags_SpanAllColumns = 16384
   ImGuiStyleVar_WindowTitleAlign = 6
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
-  ImGuiKey_A = 546
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
+  ImGuiCol_ScrollbarGrabHovered = 16
+  ImGuiTableFlags_BordersInnerH = 128
+  SDL_SCANCODE_DELETE = 76
+  SDL_FLIP_VERTICAL = 2
+  SDL_SCANCODE_KP_PLUSMINUS = 215
+  ImGuiStyleVar_TabRounding = 25
+  ImGuiCol_Separator = 27
+  SDL_KMOD_LCTRL = 64
+  SDL_BLENDFACTOR_ONE = 2
   ImGuiWindowFlags_AlwaysVerticalScrollbar = 16384
-  ImGuiKey_O = 560
-  SDL_SCANCODE_INTERNATIONAL2 = 136
-  ImGuiInputTextFlags_AllowTabInput = 32
-  SDL_SCANCODE_KP_EXCLAM = 207
   SDL_SCANCODE_AC_EXIT = 276
   ImGuiStyleVar_ItemInnerSpacing = 15
+  SDL_BLENDOPERATION_MAXIMUM = 5
   ImGuiCol_TableBorderStrong = 48
   ImGuiCol_PlotHistogram = 45
   cl_Slate = "0.180000 0.240000 0.310000 1.000000"
-  ImGuiKey_Delete = 522
-  ImGuiWindowFlags_NoSavedSettings = 256
-  ImGuiKey_E = 550
-  ImGuiTreeNodeFlags_SpanFullWidth = 4096
-  ImGuiCol_PlotLines = 43
-  ImGuiTreeNodeFlags_FramePadding = 1024
-  ImGuiPopupFlags_MouseButtonRight = 8
+  SDL_BLENDMODE_INVALID = 2147483647
+  SDL_BLENDFACTOR_SRC_COLOR = 3
   ImGuiCol_TitleBg = 10
   ImGuiKey_Tab = 512
   SDL_SCANCODE_POWER = 102
-  ImGuiStyleVar_ScrollbarSize = 18
-  SDL_SCANCODE_VOLUMEDOWN = 129
-  ImGuiKey_K = 556
-  ImGuiStyleVar_PopupBorderSize = 10
-  SDL_FLIP_NONE = 0
-  SDL_SCANCODE_0 = 39
-  ImGuiStyleVar_SeparatorTextAlign = 38
-  SDL_SCANCODE_CURRENCYUNIT = 180
+  ImGuiPopupFlags_MouseButtonRight = 8
+  ImGuiCol_Button = 21
+  WHITE = "255 255 255 255"
+  SDL_SCANCODE_SLASH = 56
+  ImGuiCol_MenuBarBg = 13
+  SDL_BLENDFACTOR_SRC_ALPHA = 5
+  ImGuiStyleVar_ItemSpacing = 14
+  YELLOW = "253 249 0 255"
+  SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA = 6
+  ImGuiStyleVar_WindowRounding = 3
+  ImGuiCol_SeparatorActive = 29
+  SDL_SCANCODE_2 = 31
+  SDL_BLENDMODE_ADD_PREMULTIPLIED = 32
+  ImGuiPopupFlags_MouseButtonMiddle = 12
+  FLT_MAX = 3.40282e+38
+  SDL_SCANCODE_KP_PLUS = 87
+  ImGuiWindowFlags_NoBringToFrontOnFocus = 8192
+  LIGHTGRAY = "200 200 200 255"
+  SDL_SCANCODE_KP_BACKSPACE = 187
+  ImGuiInputTextFlags_CallbackEdit = 8388608
+  SDL_BLENDOPERATION_MINIMUM = 4
+  ImGuiWindowFlags_None = 0
+  ImGuiInputTextFlags_CallbackCharFilter = 2097152
+  SDL_KMOD_CAPS = 8192
+  ImGuiWindowFlags_NoResize = 2
+  SDL_SCANCODE_3 = 32
+  ImGuiStyleVar_ButtonTextAlign = 35
+  SDL_SCANCODE_G = 10
+  ImGuiStyleVar_TableAngledHeadersTextAlign = 32
+  ImGuiPopupFlags_NoReopen = 32
+  ImGuiWindowFlags_NoNav = 196608
+  SDL_BLENDOPERATION_ADD = 1
+  ImGuiCol_Header = 24
+  ImGuiWindowFlags_NoMove = 4
+  cl_Black = "0.000000 0.000000 0.000000 1.000000"
+  ImGuiTreeNodeFlags_Framed = 2
+  ImGuiWindowFlags_MenuBar = 1024
+  ImGuiTreeNodeFlags_OpenOnArrow = 128
+  ImGuiWindowFlags_NoSavedSettings = 256
+  ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiWindowFlags_NoDecoration = 43
   ImGuiTreeNodeFlags_None = 0
   SDL_SCANCODE_AGAIN = 121
-  ImGuiCol_ScrollbarGrabHovered = 16
   ImGuiTreeNodeFlags_NoTreePushOnOpen = 8
   ImGuiTreeNodeFlags_NoAutoOpenOnLog = 16
   ImGuiPopupFlags_NoOpenOverItems = 256
   SDL_SCANCODE_N = 17
   SDL_SCANCODE_F13 = 104
   SDL_SCANCODE_KP_COMMA = 133
-  SDL_SCANCODE_F10 = 67
-  ImGuiCol_CheckMark = 18
+  ImGuiTreeNodeFlags_OpenOnDoubleClick = 64
+  ImGuiStyleVar_PopupBorderSize = 10
+  ImGuiKey_K = 556
   ImGuiCol_SliderGrab = 19
   ImGuiTableFlags_Reorderable = 2
   ImGuiTreeNodeFlags_SpanAvailWidth = 2048
   ImGuiTreeNodeFlags_NavLeftJumpsToParent = 131072
+  SDL_SCANCODE_AC_SAVE = 277
+  ImGuiTreeNodeFlags_CollapsingHeader = 26
+  SDL_SCANCODE_AC_PROPERTIES = 279
+  ImGuiMod_Shift = 8192
+  SDL_SCANCODE_KP_ENTER = 88
   cl_Orange = "1.000000 0.500000 0.000000 1.000000"
-  SDL_SCANCODE_TAB = 43
-  SDL_SCANCODE_KP_EQUALSAS400 = 134
-  ImGuiInputTextFlags_CharsScientific = 4
-  SDL_SCANCODE_KP_DBLVERTICALBAR = 202
-  SDL_SCANCODE_CAPSLOCK = 57
-  ImGuiTreeNodeFlags_DrawLinesToNodes = 1048576
-  FLT_MIN = 1.17549e-38
-  ImGuiWindowFlags_NoScrollWithMouse = 16
-  RAYWHITE = "245 245 245 255"
-  SDL_SCANCODE_AC_STOP = 284
-  SDL_SCANCODE_AC_SEARCH = 280
-  cl_Aquamarine = "0.500000 1.000000 0.830000 1.000000"
-  ImGuiPopupFlags_None = 0
-  ImGuiPopupFlags_MouseButtonLeft = 4
-  SDL_SCANCODE_L = 15
-  ImGuiPopupFlags_MouseButtonMask_ = 12
-  MAG_MAX = 5000
-  ImGuiKey_C = 548
-  ImGuiCol_TitleBgCollapsed = 12
-  ImGuiInputTextFlags_CtrlEnterForNewLine = 256
-  SDL_BUTTON_X2 = 5
-  SDL_SCANCODE_I = 12
-  cl_Purple = "0.500000 0.000000 0.500000 1.000000"
-  SDL_SCANCODE_R = 21
-  ImGuiCol_FrameBgActive = 9
-  SDL_SCALEMODE_LINEAR = 1
-  ImGuiKey_3 = 539
-  ImGuiTreeNodeFlags_SpanLabelWidth = 8192
-  ImGuiCol_Text = 0
-  SDL_FLIP_HORIZONTAL_AND_VERTICAL = 3
-  ImGuiTableFlags_BordersInnerH = 128
-  SDL_FLIP_VERTICAL = 2
-  SDL_SCANCODE_DELETE = 76
-  ImGuiWindowFlags_NoFocusOnAppearing = 4096
-  ImGuiCol_TitleBgActive = 11
-  GREEN = "0 228 48 255"
-  SDL_FOLDER_DOCUMENTS = 2
-  ImGuiCol_DragDropTarget = 55
-  SDL_SCANCODE_KP_HASH = 204
-  ImGuiCol_MenuBarBg = 13
-  SDL_SCANCODE_MEDIA_REWIND = 266
-  SDL_SCANCODE_F12 = 69
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
-  ImGuiWindowFlags_AlwaysHorizontalScrollbar = 32768
   ImGuiCol_TextDisabled = 1
+  ImGuiWindowFlags_AlwaysHorizontalScrollbar = 32768
   SDL_SCANCODE_EXECUTE = 116
-  ImGuiInputTextFlags_CallbackEdit = 8388608
-  SDL_SCANCODE_KP_BACKSPACE = 187
+  SDL_SCANCODE_TAB = 43
+  SDL_SCANCODE_KP_EQUALSAS400 = 134
+  ImGuiInputTextFlags_CharsScientific = 4
+  ImGuiWindowFlags_NoScrollWithMouse = 16
+  RAYWHITE = "245 245 245 255"
+  SDL_SCANCODE_AC_STOP = 284
+  SDL_SCANCODE_AC_SEARCH = 280
+  cl_Aquamarine = "0.500000 1.000000 0.830000 1.000000"
+  FLT_MIN = 1.17549e-38
+  ImGuiPopupFlags_None = 0
+  ImGuiPopupFlags_MouseButtonMask_ = 12
+  ImGuiStyleVar_SeparatorTextBorderSize = 37
+  ImGuiTableColumnFlags_DefaultHide = 2
+  PURPLE = "200 122 255 255"
+  ImGuiTableColumnFlags_WidthStretch = 8
+  SDL_SCANCODE_BACKSPACE = 42
   ImGuiKey_Insert = 521
-  ImGuiMod_None = 0
   ImGuiCol_ScrollbarBg = 14
-  SDL_SCANCODE_F21 = 112
+  ImGuiMod_None = 0
+  ImGuiMod_Ctrl = 4096
+  SDL_SCANCODE_F23 = 114
   ImGuiMod_Super = 32768
-  ImGuiCol_SliderGrabActive = 20
-  ImGuiCol_Button = 21
-  WHITE = "255 255 255 255"
-  SDL_SCANCODE_SLASH = 56
+  ImGuiKey_A = 546
+  MAG_MAX = 5000
+  ImGuiKey_C = 548
+  ImGuiTreeNodeFlags_SpanFullWidth = 4096
+  ImGuiKey_E = 550
+  ImGuiKey_F = 551
+  SDL_SCANCODE_INSERT = 73
+  ImGuiCol_ResizeGripActive = 32
+  ImGuiKey_G = 552
+  ImGuiMouseButton_Middle = 2
+  ImGuiCond_Once = 2
+  ImGuiKey_H = 553
+  ImGuiKey_L = 557
+  ImGuiKey_I = 554
+  ImGuiKey_J = 555
+  ImGuiKey_PageUp = 517
+  ImGuiKey_0 = 536
+  LOGO_SIZE = 32
+  SDL_SCANCODE_KP_LEFTPAREN = 182
+  SDL_SCANCODE_D = 7
+  ImGuiKey_M = 558
+  ImGuiKey_RightArrow = 514
+  ImGuiKey_O = 560
+  SDL_SCANCODE_INTERNATIONAL2 = 136
   ImGuiKey_P = 561
   SDL_SCANCODE_KP_MEMDIVIDE = 214
   ImGuiKey_S = 564
-  SDL_SCANCODE_KP_A = 188
   SDL_SCANCODE_MEDIA_STOP = 269
   ImGuiKey_U = 566
   cl_Coral = "1.000000 0.500000 0.310000 1.000000"
   ImGuiKey_V = 567
   SDL_FOLDER_TEMPLATES = 9
   ImGuiKey_W = 568
+  SDL_BLENDMODE_MOD = 4
   ImGuiKey_Y = 570
   ImGuiTableFlags_BordersInnerV = 512
   ImGuiKey_Z = 571
@@ -5082,7 +5132,6 @@ namespace Global {
   SDL_SCANCODE_STOP = 120
   ImGuiKey_F4 = 575
   ImGuiKey_F5 = 576
-  SDL_SCANCODE_KP_E = 192
   ImGuiKey_F6 = 577
   ImGuiKey_F7 = 578
   ImGuiKey_F8 = 579
@@ -5095,6 +5144,7 @@ namespace Global {
   ImGuiKey_PageDown = 518
   SDL_SCANCODE_9 = 38
   SDL_SCANCODE_OPER = 161
+  SDL_BLENDMODE_MUL = 8
   ImGuiKey_End = 520
   SDL_WINDOW_RESIZABLE = 32
   SDL_SCANCODE_KP_PERIOD = 99
@@ -5102,6 +5152,7 @@ namespace Global {
   SDL_FOLDER_MUSIC = 4
   ImGuiCol_HeaderHovered = 25
   SDL_SCANCODE_INTERNATIONAL3 = 137
+  SDL_BLENDMODE_NONE = 0
   ImGuiMouseButton_Left = 0
   ImGuiMouseButton_Right = 1
   ImGuiInputTextFlags_CallbackAlways = 1048576
@@ -5117,6 +5168,8 @@ namespace Global {
   SDL_SCANCODE_KP_DECIMAL = 220
   SDL_SCANCODE_J = 13
   cl_DarkGray = "0.250000 0.250000 0.250000 1.000000"
+  SDL_SCANCODE_KP_B = 189
+  SDL_SCANCODE_KP_RIGHTPAREN = 183
   cl_Brown = "0.600000 0.300000 0.000000 1.000000"
   cl_Lime = "0.750000 1.000000 0.000000 1.000000"
   SDL_SCANCODE_B = 5
@@ -5161,7 +5214,10 @@ namespace Global {
   SDL_KMOD_RCTRL = 128
   SDL_SCANCODE_EQUALS = 46
   SDL_SCANCODE_CANCEL = 155
-  SDL_SCANCODE_KP_D = 191
+  SDL_KMOD_SCROLL = 32768
+  SDL_SCANCODE_AC_HOME = 281
+  SDL_SCANCODE_KP_AT = 206
+  SDL_SCANCODE_LEFTBRACKET = 47
   SDL_SCANCODE_RIGHTBRACKET = 48
   SDL_SCANCODE_LALT = 226
   SDL_SCANCODE_BACKSLASH = 49
@@ -5172,6 +5228,8 @@ namespace Global {
   SDL_SCANCODE_KP_MEMMULTIPLY = 213
   SEABLUE = "20 20 50 255"
   SDL_SCANCODE_INTERNATIONAL7 = 141
+  SDL_SCANCODE_KP_PERCENT = 196
+  SDL_SCANCODE_COMMA = 54
   SDL_SCALEMODE_INVALID = -1
   SDL_SCANCODE_PERIOD = 55
   SDL_SCANCODE_F1 = 58
@@ -5196,8 +5254,8 @@ namespace Global {
   SDL_SCANCODE_SELECT = 119
   SDL_SCANCODE_PAGEDOWN = 78
   SDL_FOLDER_SAVEDGAMES = 7
-  DARKBROWN = "76 63 47 255"
   SDL_SCANCODE_RETURN = 40
+  DARKBROWN = "76 63 47 255"
   SDL_SCANCODE_RIGHT = 79
   SDL_SCANCODE_LEFT = 80
   SDL_SCANCODE_DOWN = 81
@@ -5247,8 +5305,8 @@ namespace Global {
   SDL_SCANCODE_LANG6 = 149
   cl_Emerald = "0.160000 0.710000 0.440000 1.000000"
   SDL_SCANCODE_LANG8 = 151
-  ImGuiCol_NavHighlight = 58
   SDL_SCANCODE_S = 22
+  ImGuiCol_NavHighlight = 58
   SDL_SCANCODE_KP_3 = 91
   SDL_SCANCODE_CLEAR = 156
   SDL_SCANCODE_RETURN2 = 158
@@ -5258,24 +5316,5 @@ namespace Global {
   SDL_SCANCODE_KP_00 = 176
   ImGuiKey_Q = 562
   SDL_SCANCODE_THOUSANDSSEPARATOR = 178
-  SDL_SCANCODE_KP_RIGHTPAREN = 183
-  SDL_SCANCODE_KP_B = 189
-  SDL_SCANCODE_KP_C = 190
-  SDL_SCANCODE_KP_F = 193
-  VIOLET = "135 60 190 255"
-  SDL_SCANCODE_KP_XOR = 194
-  SDL_SCANCODE_COMMA = 54
-  SDL_SCANCODE_KP_PERCENT = 196
-  SDL_SCANCODE_KP_LESS = 197
-  SDL_SCANCODE_KP_GREATER = 198
-  SDL_SCANCODE_KP_AMPERSAND = 199
-  SDL_SCANCODE_KP_DBLAMPERSAND = 200
-  SDL_SCANCODE_KP_COLON = 203
-  SDL_KMOD_SCROLL = 32768
-  SDL_SCANCODE_AC_HOME = 281
-  SDL_SCANCODE_LEFTBRACKET = 47
-  SDL_SCANCODE_KP_AT = 206
-  BORDER = 60
-  SDL_SCANCODE_KP_MEMSTORE = 208
---- End of Dump (630 items) ---
+--- End of Dump (653 items) ---
 */

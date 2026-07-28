@@ -189,7 +189,9 @@ namespace ElfSDL3 {
         return screenSize;
     }
 
-}
+
+
+} // namespace
 
 
 // =============================================================================
@@ -261,6 +263,31 @@ DefineEngineMethod(SpriteBaseObject, CenterCenterPoint,void, (),,"center the cen
     object->CenterCenterPoint();
 }
 
+DefineEngineMethod(SpriteBaseObject, colorFromHSV, void, (S32 hue, F32 saturation, F32 value, U8 alpha)
+    , (255), "Set the color from hue(0..359), sat (0..1), value(0..1)") {
+        object->mColor = fromHSV(hue, saturation, value, alpha);
+}
+
+
+
+// -.-
+DefineEngineFunction(getColorFromHSV, Color , (S32 hue, F32 saturation, F32 value, U8 alpha)
+, (255), "get the color from hue(0..359), sat (0..1), value(0..1)") {
+    return fromHSV(hue, saturation, value, alpha);
+}
+
+DefineEngineFunction( getScaledColorSaturation, Color, (Color color, F32 scale), , "scale the color saturation ") {
+    setSaturationScale(color, scale);
+    return color;
+}
+DefineEngineFunction( getScaledColorValue, Color, (Color color, F32 scale), , "scale the color value ") {
+    setValueScale(color, scale);
+    return color;
+}
+DefineEngineFunction( getScaledColor, Color, (Color color, F32 scale), , "scale the color") {
+    setScale(color, scale);
+    return color;
+}
 // =============================================================================
 //  Camera2DObject
 // This does not work automaticly it's used to translate a destination Rectangle
@@ -426,15 +453,43 @@ DefineEngineMethod(Camera2DObject, TranslateSpriteBaseObject, bool, (S32 spriteB
 }
 // =============================================================================
 //  TextureObject
+//  As group to AtlasEntryObject's
 // =============================================================================
-// TODO: SDL_RenderTextureRotated
-class TextureObject : public SimObject
+class AtlasEntryObject : public SimObject {
+  typedef SimObject Parent;
+public:
+    DECLARE_CONOBJECT(AtlasEntryObject);
+    RectF mRect;
+
+    static void initPersistFields() {
+        Parent::initPersistFields();
+        addField("rect", TypeRectF, Offset(mRect,AtlasEntryObject));
+        addField("x", TypeF32, Offset(mRect.x,AtlasEntryObject));
+        addField("y", TypeF32, Offset(mRect.y,AtlasEntryObject));
+        addField("width", TypeF32, Offset(mRect.w,AtlasEntryObject));
+        addField("height", TypeF32, Offset(mRect.h,AtlasEntryObject));
+    }
+};
+IMPLEMENT_CONOBJECT(AtlasEntryObject);
+
+class TextureObject : public SimGroup
 {
-    typedef SimObject Parent;
+    typedef SimGroup Parent;
     StringTableEntry mFileName=nullptr;
     SDL_Texture* mTexture = nullptr;
     bool mIsTargetTexture = false;
     bool mOwnsTexture = false; // we need to take care or removing!
+
+    Color mCurrentColor = BLACK;
+    SDL_BlendMode mDefaultBlendMode = SDL_BLENDMODE_BLEND;
+    SDL_BlendMode mCurrentBlendMode = SDL_BLENDMODE_INVALID; //trigger inital setup
+
+    void addObject( SimObject* obj ) override {
+        // NOTE: make sure we only add AtlasEntryObject's
+        AtlasEntryObject* atlasEntry = dynamic_cast<AtlasEntryObject*>(obj);
+        if (!atlasEntry) return;
+        Parent::addObject(obj);
+    }
 
     void unload() {
         if (mOwnsTexture && mTexture) {
@@ -456,6 +511,9 @@ public:
         }
         if (!mTexture) {
             //1 pixel white SDL_Texture as fallback
+            if (!mFileName && dStrlen(mFileName) > 0) {
+                Con::warnf("TextureObject. Failed to load texture: %s", mFileName);
+            }
             mTexture = SDL_CreateTexture(
                 app.getRenderer(),
                 SDL_PIXELFORMAT_RGBA8888,
@@ -469,6 +527,7 @@ public:
                 return false;
             }
         }
+        setBlendModeAndColor(WHITE, mDefaultBlendMode); //initial color and blendmode
         return Parent::onAdd();
     }
     void onRemove() override {
@@ -497,6 +556,7 @@ public:
     static void initPersistFields() {
         Parent::initPersistFields();
         addField("fileName", TypeString, Offset(mFileName,TextureObject));
+        addField("blendMode", TypeU32, Offset(mDefaultBlendMode,TextureObject));
     }
     // ----------------------------------------------------
     bool SaveImage( const char* fileName, bool asPNG = true) {
@@ -554,6 +614,32 @@ public:
     }
 
 
+    void setBlendModeAndColor(Color color, SDL_BlendMode mode) {
+        if (color != mCurrentColor) {
+            mCurrentColor = color;
+            SDL_SetTextureColorMod(mTexture, color.r, color.g, color.b);
+            SDL_SetTextureAlphaMod(mTexture, color.a);
+        }
+
+        // reset to default
+        if (mode == SDL_BLENDMODE_INVALID) {
+            // check it is changed-
+            if (mCurrentBlendMode != mDefaultBlendMode) {
+                mCurrentBlendMode = mDefaultBlendMode;
+                SDL_SetTextureBlendMode(mTexture, mCurrentBlendMode);
+            }
+            // nothing else to do here - bail out
+            return;
+        }
+
+        // check new mode is current mode
+        if ( mode == mCurrentBlendMode ) {
+            return;
+        }
+        mCurrentBlendMode = mode;
+        SDL_SetTextureBlendMode(mTexture, mCurrentBlendMode);
+    }
+
 //     bool SDL_RenderTextureRotated(SDL_Renderer *renderer, SDL_Texture *texture,
 //                                   const SDL_FRect *srcrect, const SDL_FRect *dstrect,
 //                                   double angle, const SDL_FPoint *center,
@@ -562,17 +648,19 @@ public:
     bool DrawRotatedSrcDstRect(RectF srcRect, RectF dstRect,
             F32 angle, Point2F centerPoint,
             SDL_FlipMode flip = SDL_FLIP_NONE,
-            Color color=WHITE) {
+            Color color=WHITE, SDL_BlendMode blendMode = SDL_BLENDMODE_INVALID) {
         SDL_Texture* tex = mTexture;
         if (color.a < 1 || !tex) return false;
-        SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(tex, color.a);
-        SDL_SetTextureBlendMode(tex, (color.a < 255) ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+
+        setBlendModeAndColor(color, blendMode);
 
         return SDL_RenderTextureRotated(app.getRenderer(), tex, &srcRect, &dstRect,
                     angle, &centerPoint, flip);
     }
-    bool DrawRotatedCentered(F32 x, F32 y, F32 angle, SDL_FlipMode flip = SDL_FLIP_NONE, Color color=WHITE) {
+    // ----------
+    bool DrawRotatedCentered(F32 x, F32 y, F32 angle,
+            SDL_FlipMode flip = SDL_FLIP_NONE, Color color=WHITE,
+            SDL_BlendMode blendMode = SDL_BLENDMODE_INVALID) {
         SDL_Texture* tex = mTexture;
         if (color.a < 1 || !tex) return false;
 
@@ -581,34 +669,30 @@ public:
         RectF dstRect = {x - w * 0.5f,y - h * 0.5f, w, h};
         Point2F centerPoint = { w/2, h/2 };
 
-        SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(tex, color.a);
-        SDL_SetTextureBlendMode(tex, (color.a < 255) ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+        setBlendModeAndColor(color, blendMode);
 
         return SDL_RenderTextureRotated(app.getRenderer(), tex, nullptr, &dstRect,
                     angle, &centerPoint, flip);
     }
-
-    bool DrawSrcDstRect(RectF srcRect, RectF dstRect, Color color=WHITE) {
+    // ----------
+    bool DrawSrcDstRect(RectF srcRect, RectF dstRect, Color color=WHITE, SDL_BlendMode blendMode = SDL_BLENDMODE_INVALID) {
         SDL_Texture* tex = mTexture;
         if (color.a < 1 || !tex) return false;
-        SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(tex, color.a);
-        SDL_SetTextureBlendMode(tex, (color.a < 255) ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+        setBlendModeAndColor(color, blendMode);
 
         return SDL_RenderTexture(app.getRenderer(), tex, &srcRect, &dstRect);
     }
-    bool DrawRect( RectF dstRect, Color color=WHITE) {
+    // ----------
+    bool DrawRect( RectF dstRect, Color color=WHITE, SDL_BlendMode blendMode = SDL_BLENDMODE_INVALID) {
         SDL_Texture* tex = mTexture;
         if (color.a < 1 || !tex) return false;
-        SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(tex, color.a);
-        SDL_SetTextureBlendMode(tex, (color.a < 255) ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+        setBlendModeAndColor(color, blendMode);
 
         return SDL_RenderTexture(app.getRenderer(), tex, nullptr, &dstRect);
     }
 
-    bool DrawCentered( F32 x, F32 y, Color color=WHITE) {
+    // ----------
+    bool DrawCentered( F32 x, F32 y, Color color=WHITE, SDL_BlendMode blendMode = SDL_BLENDMODE_INVALID) {
         SDL_Texture* tex = mTexture;
         if (color.a < 1 || !tex) return false;
 
@@ -616,9 +700,7 @@ public:
         F32 h = (F32)tex->h;
         RectF dstRect = {x - w * 0.5f,y - h * 0.5f, w, h};
 
-        SDL_SetTextureColorMod(tex, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(tex, color.a);
-        SDL_SetTextureBlendMode(tex, (color.a < 255) ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+        setBlendModeAndColor(color, blendMode);
 
         return SDL_RenderTexture(app.getRenderer(), tex, nullptr, &dstRect);
     }
@@ -644,39 +726,40 @@ DefineEngineMethod(TextureObject, getAtlasRect,RectF, (S32 colCount, S32 rowCoun
 
 
 DefineEngineMethod(TextureObject, DrawRotatedSrcDstRect,bool,
-        (RectF srcRect, RectF dstRect,F32 angle, Point2F centerPoint, S32 sdl_flip,  Color color),
-        (0,WHITE)
+        (RectF srcRect, RectF dstRect,F32 angle, Point2F centerPoint, S32 sdl_flip,  Color color, U32 blendMode),
+        (0,WHITE, (U32)SDL_BLENDMODE_INVALID)
         ,"Draw a rotated and optional flipped texture with source and destination rect."
         "@flip: see also SDL_FLIP_ constants" ) {
-    return object->DrawRotatedSrcDstRect(srcRect, dstRect,angle, centerPoint, (SDL_FlipMode)sdl_flip, color);
+    return object->DrawRotatedSrcDstRect(srcRect, dstRect,angle, centerPoint, (SDL_FlipMode)sdl_flip, color, blendMode);
 }
 
-DefineEngineMethod(TextureObject, DrawRect,bool, (RectF dstRect, Color color), (WHITE)
+DefineEngineMethod(TextureObject, DrawRect,bool, (RectF dstRect, Color color, U32 blendMode), (WHITE, (U32)SDL_BLENDMODE_INVALID)
                    ,"Draw a texture with source and destination rect" ) {
-     return object->DrawRect( dstRect, color);
+     return object->DrawRect( dstRect, color, blendMode);
 }
 
 DefineEngineMethod(TextureObject, DrawSrcDstRect,bool,
-                   (RectF srcRect, RectF dstRect,  Color color),
-                   (WHITE)
+                   (RectF srcRect, RectF dstRect,  Color color, U32 blendMode),
+                   (WHITE,  (U32)SDL_BLENDMODE_INVALID)
                    ,"Draw a the texture from srcRect to dstRect") {
-    return object->DrawSrcDstRect(srcRect, dstRect, color);
+    return object->DrawSrcDstRect(srcRect, dstRect, color, blendMode);
 
 }
 
 
 
-DefineEngineMethod(TextureObject, DrawCentered,bool, (F32 x, F32 y, Color color), (WHITE)
+DefineEngineMethod(TextureObject, DrawCentered,bool, (F32 x, F32 y, Color color, U32 blendMode), (WHITE,(U32)SDL_BLENDMODE_INVALID)
                    ,"Draw the texture centered at the position" ) {
-    return object->DrawCentered(x,y,color);
+    return object->DrawCentered(x,y,color, blendMode);
 }
 
 
-DefineEngineMethod(TextureObject, DrawRotatedCentered,bool, (F32 x, F32 y, F32 angle , S32 flip, Color color)
-    , (0,WHITE)
+DefineEngineMethod(TextureObject, DrawRotatedCentered,bool,
+    (F32 x, F32 y, F32 angle , S32 flip, Color color, U32 blendMode)
+    , (0,WHITE, (U32)SDL_BLENDMODE_INVALID)
     ,"Draw a centered rotated (optional flipped) texture at the position"
     "@flip: see also SDL_FLIP_ constants" ) {
-    return object->DrawRotatedCentered(x,y,angle, (SDL_FlipMode)flip, color);
+    return object->DrawRotatedCentered(x,y,angle, (SDL_FlipMode)flip, color, blendMode);
 }
 
 
@@ -698,13 +781,15 @@ public:
 
     Point2F mVelo = {0.f, 0.f };
     U32     mLayer = 0;
+    SDL_BlendMode mBlendMode = SDL_BLENDMODE_INVALID;
 
     static void initPersistFields() {
         Parent::initPersistFields();
-        addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject));
-        addField("veloX", TypeF32, Offset(mVelo.x,SpriteObject));
-        addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject));
-        addField("layer", TypeU32, Offset(mLayer,SpriteObject));
+        addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject), "velocity as point see also veloX veloY");
+        addField("veloX", TypeF32, Offset(mVelo.x,SpriteObject), "X velocity");
+        addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject), "Y velocity");
+        addField("layer", TypeU32, Offset(mLayer,SpriteObject), "Layer of the Sprite. ");
+        addField("blendMode", TypeU32, Offset(mBlendMode,SpriteObject), "SDL_BLENDMODE_ overwrite the Texture blendmode\ndefault SDL_BLENDMODE_INVALID => not overwritten");
     }
 
     // -------------------------------------------------------------------------
@@ -833,7 +918,8 @@ DefineEngineMethod(SpriteObject, solveCollideRect,bool, (RectF otherRect, bool s
 
 
 DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bool centerDraw, bool useScreenRect),(false, false),
-                   "Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)") {
+                   "Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)\n"
+                   "When useScreenRect is enabled centerDraw is not allowed!!!") {
     TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
     if (!texObject) return false;
     RectF srcRect  = object->mSrcRect;
@@ -843,6 +929,12 @@ DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bo
         srcRect.w = (F32)texObject->get()->w;
         srcRect.h = (F32)texObject->get()->h;
     }
+
+    if (useScreenRect && centerDraw) {
+        centerDraw = false;
+        //show a error ?!
+    }
+
     RectF dstRect; // had pointer but need a copy for centerDraw
     Point2F* centerPoint;
     if (useScreenRect) { //See also Camera2DObject
@@ -861,6 +953,7 @@ DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bo
         srcRect, dstRect,
         object->mAngle, *centerPoint,
         (SDL_FlipMode)object->mFlip, object->mColor
+        ,object->mBlendMode
     );
 
 }
@@ -1110,7 +1203,8 @@ public:
                         sprite->mAngle,
                         sprite->mScreenCenterPoint,
                         (SDL_FlipMode)sprite->mFlip,
-                        sprite->mColor
+                        sprite->mColor,
+                        sprite->mBlendMode
                     );
                 }
             } else {
@@ -1120,7 +1214,8 @@ public:
                     sprite->mAngle,
                     sprite->mCenterPoint,
                     (SDL_FlipMode)sprite->mFlip,
-                    sprite->mColor
+                    sprite->mColor,
+                    sprite->mBlendMode
                 );
             }
         }
@@ -1261,8 +1356,8 @@ DefineEngineFunction(SetColor, void , (Color color),
     SDL_SetRenderDrawColor(app.getRenderer(), color.r, color.g, color.b, color.a);
 }
 // ----------------------------------------------------------------------------
-DefineEngineFunction(BeginBlendMode, void, (),,"") {
-    SDL_SetRenderDrawBlendMode(app.getRenderer(), SDL_BLENDMODE_BLEND );
+DefineEngineFunction(BeginBlendMode, void, (U32 blendmode),(SDL_BLENDMODE_BLEND)," see also SDL_BLENDMODE_*") {
+    SDL_SetRenderDrawBlendMode(app.getRenderer(), blendmode );
 
 }
 DefineEngineFunction(EndBlendMode, void,(),,"") {
@@ -1447,6 +1542,9 @@ DefineEngineFunction(getFrameTime, F32,(),, "get the current frame time in secon
     return (F32) BaseFlux::getFrameTime();
 }
 
+DefineEngineFunction(SDL_GetTicks, U64, (),, "Ticks from SDL") {
+    return SDL_GetTicks();
+}
 
 
 DefineEngineFunction(getRealTime, S32, (),, "get current time from script engine") {
@@ -1634,6 +1732,23 @@ void InitBindings_SDL() {
     Con::registerEnumS32<SDL_ScaleMode>("", false);
     Con::registerEnumS32<SDL_FlipMode>("", false);
     registerColors();
+
+    // Blend >>
+    // SDL_BlendMode
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_NONE);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_BLEND);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_BLEND_PREMULTIPLIED);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_ADD);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_ADD_PREMULTIPLIED);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_MOD);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_MUL);
+    Con::REGISTER_CONST_U32(SDL_BLENDMODE_INVALID);
+
+    Con::registerEnumS32<SDL_BlendOperation>("", false);
+    Con::registerEnumS32<SDL_BlendFactor>("", false);
+
+    // << Blend
+
 
     gSettingsObject = new SettingsObject();
     gSettingsObject->registerObject(); //make available on Console
