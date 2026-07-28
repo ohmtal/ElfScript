@@ -15,7 +15,7 @@ function GuiTool::onAdd(%this) {
     %this.OverlayColor = "20 20 20 200";
 
     %this.Message = "";
-    %this.MessageTime = 2.0; //seconds
+    %this.MessageTime = 1.5; //seconds
     %this._messageCounter = 0.0;
 
     %this.CurrentMenu  = 0; // GuiToolMenu Object
@@ -133,6 +133,12 @@ function GuiToolMenu::Render(%this, %screenSize) {
 //-----------------------------------------------------------------------------
 function GuiTool::haveOverlay(%this) {
     return %this._IsOverlay;
+}
+//-----------------------------------------------------------------------------
+function GuiTool::ShowMessage(%this, %message, %messageTime) {
+    if (%messageTime $= "") %messageTime = 1.5;
+    %this.messageTime = %messageTime;
+    %this.message = %message;
 }
 //-----------------------------------------------------------------------------
 function GuiTool::Render(%this, %screenSize) {

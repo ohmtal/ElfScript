@@ -6,24 +6,27 @@
 // Graphics: Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
 //-----------------------------------------------------------------------------
 // FIXME implement: 1.) Add Mouse Object!! which is cloned or placed
-// Control Scheme:
-//
-// - Scale          : Mouse Wheel
-// - Rotate         : CTRL + Mouse Wheel.
-// - Layer (0..20)  : Shift + Mouse Wheel.
-// - Flip (0..3)    : Middle Mouse Click Cycle.
-//
-// - deselect       : right mouse button
-// - placement      : left mouse button (in placement mode)
-// - select object  : left mouse button (in select mode)
-// - attach selected to mouse: SPACE
-//
-// GUI:
-// - Snap To Grid  : F1
-// - reset placement parameters : F2
-// - Atlas Map      : TAB
-// - Main Menu      : ESCAPE
-// - Inspector      : F10
+$ControlHelp=
+"Control Scheme:" NL
+"" NL
+"- Scale          : Mouse Wheel" NL
+"- Rotate         : CTRL + Mouse Wheel." NL
+"- Layer (0..20)  : Shift + Mouse Wheel." NL
+"- Flip (0..3)    : Middle Mouse Click Cycle." NL
+"" NL
+"- deselect       : right mouse button" NL
+"- placement      : left mouse button (in placement mode)" NL
+"- select object  : left mouse button (in select mode)" NL
+"- attach selected to mouse: SPACE" NL
+"" NL
+"GUI:" NL
+"- Snap To Grid  : F1" NL
+"- reset placement parameters : F2" NL
+"- Atlas Map      : TAB" NL
+"- Main Menu      : ESCAPE" NL
+"- Inspector      : F10"
+;
+
 //
 //-----------------------------------------------------------------------------
 exec ("include/TextureAtlas.elf");
@@ -87,7 +90,7 @@ function Aquarium::onAdd(%this) {
         class = "GuiToolMenu";
         MenuCaption = "Menu";
         MenuFontScale = 2.5;
-        MenuEntries = "Save Scene" TAB "Load Scene" TAB "Export Image" TAB  "Resume" TAB "Quit";
+        MenuEntries = "Save Scene" TAB "Load Scene" TAB "Export Image" TAB  "Resume" TAB "Control Help" TAB "Quit";
         OnMenuObject = %this;
         OnMenuMethod = "onMainMenu";
     };
@@ -197,7 +200,7 @@ function Aquarium::load(%this) {
 
     if (exec(%path)) {
 
-        GuiTool.Message = "Scene loaded from:\n" @ %path;
+        GuiTool.ShowMessage("Scene loaded from:\n" @ %path);
         warn("will delete previous scene in 100ms id:" SPC %savScene);
         // add new one to this:
         %this.add(SceneObjects);
@@ -211,7 +214,7 @@ function Aquarium::load(%this) {
         // delete prev:
         %savScene.schedule(100, delete);
     } else {
-        GuiTool.Message = "[error] Failed to load Scene from:\n" @ %path;
+        GuiTool.ShowMessage("[error] Failed to load Scene from:\n" @ %path);
         %savScene.name = SceneObjects; //restore saved scene
         warn("Saved Scene restored:" SPC SceneObjects.getId() SPC "==" SPC %savScene);
     }
@@ -237,8 +240,8 @@ function Aquarium::onSelectObject(%this, %menuId, %menuCaption) {
 function Aquarium::save(%this) {
 
     %path = getFullPath(SCENE_FILE);
-    if (SceneObjects.save(%path)) GuiTool.Message = "Scene saved to:\n" SPC %path;
-    else GuiTool.Message = "[error] Failed to save Scene to:\n" SPC %path;
+    if (SceneObjects.save(%path)) GuiTool.ShowMessage("Scene saved to:\n" SPC %path);
+    else GuiTool.ShowMessage("[error] Failed to save Scene to:\n" SPC %path);
     %this.dirty = true;
 }
 //----------------------------------------------------------------------
@@ -256,7 +259,7 @@ function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
 
         case "Save Scene":
             if (SceneObjects.getCount() == 0) {
-                GuiTool.Message = "Skip save empty scene!";
+                GuiTool.ShowMessage("Skip save empty scene!");
                 return;
             }
             %this.ConfirmMenu.MenuCaption = "Confirm Save Scene";
@@ -273,12 +276,14 @@ function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
 
             %path = getFullPath(EXPORT_PNG_FILE);
             if (RenderTarget.saveImage(%path))
-                GuiTool.Message = "Image exported to:\n" @ %path;
+                GuiTool.ShowMessage("Image exported to:\n" @ %path);
         else
-            GuiTool.Message = "[error]Failed to export Image to:\n" @ %path;
+            GuiTool.ShowMessage("[error]Failed to export Image to:\n" @ %path);
 
         case "Resume":
             GuiTool.CurrentMenu = 0;
+
+        case "Control Help": GuiTool.ShowMessage($ControlHelp, 0);
 
         case "Quit": schedule(250,0, quit);
 
@@ -576,17 +581,20 @@ function Aquarium::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
         }
         // not ctrl and to shift we resize
         else {
-            // should i keep the paintSize == new selected SceneObject size
-            %this.paintSize = mClamp( %this.paintSize + SCALE_SNAP * %wheelY,SCALE_SNAP, MAX_SCALE) ;
 
-            %this.paintCenterPoint = %this.paintSize / 2 SPC %this.paintSize / 2;
-            %obj.centerPoint = %this.paintCenterPoint;
 
             if (%obj == %this.selectedSceneObject) {
-                %obj.dstRect.width = %this.paintSize;
-                %obj.dstRect.height = %this.paintSize;
+                %obj.dstRect.width = mClamp( %obj.dstRect.width + SCALE_SNAP * %wheelY,SCALE_SNAP, MAX_SCALE) ;
+                %obj.dstRect.height = mClamp( %obj.dstRect.height + SCALE_SNAP * %wheelY,SCALE_SNAP, MAX_SCALE) ;
+
+                %this.paintCenterPoint = %obj.dstRect.width / 2 SPC  %obj.dstRect.height / 2;
+                %obj.centerPoint = %this.paintCenterPoint;
 
                 %this.dirty = true;
+            } else {
+                %this.paintSize = mClamp( %this.paintSize + SCALE_SNAP * %wheelY,SCALE_SNAP, MAX_SCALE) ;
+                %this.paintCenterPoint = %this.paintSize / 2 SPC %this.paintSize / 2;
+                %obj.centerPoint = %this.paintCenterPoint;
             }
         }
     } // wheel + object

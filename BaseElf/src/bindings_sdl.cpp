@@ -233,7 +233,7 @@ public:
         addField("height", TypeF32, Offset(mDstRect.h,SpriteBaseObject));
 
         addField("angle", TypeF32, Offset(mAngle,SpriteBaseObject));
-        addField("centerPoint", TypeF32, Offset(mCenterPoint,SpriteBaseObject));
+        addField("centerPoint", TypePoint2F, Offset(mCenterPoint,SpriteBaseObject));
         addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject));
 
         addField("color", TypeColor, Offset(mColor,SpriteBaseObject));
@@ -244,7 +244,7 @@ public:
 
 
         addField("ScreenRect", TypeRectF, Offset(mScreenRect,SpriteBaseObject), "Translated rect when using camera translate");
-        addField("ScreenCenterPoint", TypeF32, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
+        addField("ScreenCenterPoint", TypePoint2F, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
     }
 
     // center the centerpoint by dstRect
