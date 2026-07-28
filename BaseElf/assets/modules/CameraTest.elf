@@ -17,6 +17,9 @@ function CameraTest::onAdd(%this) {
     %this.Spritesheet.name = "SpriteSheet";
     %this.add(%this.Spritesheet);
 
+
+    %this.add( new SimSet(BubbleSet));
+
     // we load our saved aquarium if any.
     %path = getFullPath(SCENE_FILE);
     if (SDL_FileExists(%path)) exec(%path);
@@ -25,7 +28,7 @@ function CameraTest::onAdd(%this) {
     if (!isObject(SceneObjects)) {
         new SpriteGroup(SceneObjects);
 
-        SpriteGroup.add(
+        SceneObjects.add(
             new SpriteBaseObject(MyFish) {
                 srcRect = SpriteSheet.fish_brown;
                 dstRect = "100 100 128 128";
@@ -39,12 +42,17 @@ function CameraTest::onAdd(%this) {
                 %obj.savColor = %obj.color;
                 %obj.savDstRect = %obj.dstRect;
                 %obj.savLayer = %obj.layer;
-                break;
+                // break;
+            }
+            if (%obj.textureName $= "bubble_a") {
+                %obj.veloY = getRandom(-20, -50);
+                BubbleSet.add(%obj);
             }
         }
 
     }
 
+    MyFish.veloX = 100.0;
     %this.add(SceneObjects);
 
     %this.add( new Camera2DObject(Camera));
@@ -57,6 +65,31 @@ function CameraTest::OnRemove(%this) {
 }
 //----------------------------------------------------------------------
 function CameraTest::OnUpdate(%this, %dt) {
+
+    MyFish.moveLinear(%dt);
+    if (MyFish.x > 1200) {
+        MyFish.x = 1200;
+        MyFish.veloX = -100.0;
+        MyFish.flip = 1;
+    } else if (MyFish.x < -300) {
+        MyFish.x = -300;
+        MyFish.veloX = 100.0;
+        MyFish.flip = 0;
+    }
+
+    foreach(%bubble in BubbleSet) {
+        %bubble.moveLinear(%dt);
+        // %bubble.moveGravity(0,-200);
+        // %bubble.moveOrbital(MyFish.getCenter2F(), -50);
+        if (%bubble.y < -30) {
+            %bubble.y = 480;
+            %bubble.x = getRandom(20, 1100);
+            %bubble.veloY = getRandom(-20, -50);
+            %bubble.velox = 0.0;
+        }
+    }
+
+
     %speed = %dt * 100;
     if (SDL_IsKeyDown(SDL_SCANCODE_LEFT))     Camera.x -= %speed;
     if (SDL_IsKeyDown( SDL_SCANCODE_RIGHT))    Camera.x += %speed;
@@ -80,10 +113,10 @@ function CameraTest::OnUpdate(%this, %dt) {
         if (MyFish.layer > 0) {
             playSound("sound/beep.wav");
             MyFish.color = "128 255 0 254";
-            MyFish.x = MyFish.savDstRect.x - 10;
-            MyFish.y = MyFish.savDstRect.y - 10;
-            MyFish.width  = MyFish.savDstRect.width + 20;
-            MyFish.height = MyFish.savDstRect.height + 20;
+            // MyFish.x = MyFish.savDstRect.x - 10;
+            // MyFish.y = MyFish.savDstRect.y - 10;
+            // MyFish.width  = MyFish.savDstRect.width + 20;
+            // MyFish.height = MyFish.savDstRect.height + 20;
             MyFish.layer = 0;
             SceneObjects.sortLayers();
         }
@@ -91,7 +124,7 @@ function CameraTest::OnUpdate(%this, %dt) {
     } else {
         if (MyFish.layer == 0) {
             MyFish.color = MyFish.savColor;
-            MyFish.dstRect = MyFish.savDstRect;
+            // MyFish.dstRect = MyFish.savDstRect;
             MyFish.layer = MyFish.savLayer;
             SceneObjects.sortLayers();
         }
