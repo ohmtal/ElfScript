@@ -8,23 +8,23 @@
 // FIXME implement: 1.) Add Mouse Object!! which is cloned or placed
 $ControlHelp=
 "Control Scheme:" NL
+"---------------" NL
+"- Scale            : Mouse Wheel" NL
+"- Rotate           : CTRL + Mouse Wheel." NL
+"- Layer (0..20)    : Shift + Mouse Wheel." NL
+"- Flip (0..3)      : Middle Mouse Click Cycle." NL
 "" NL
-"- Scale          : Mouse Wheel" NL
-"- Rotate         : CTRL + Mouse Wheel." NL
-"- Layer (0..20)  : Shift + Mouse Wheel." NL
-"- Flip (0..3)    : Middle Mouse Click Cycle." NL
+"- deselect         : right mouse button" NL
+"- placement        : left mouse button (in placement mode)" NL
+"- select object    : left mouse button (in select mode)" NL
+"- attach selected"   NL
+"  Object to mouse  : SPACE" NL
 "" NL
-"- deselect       : right mouse button" NL
-"- placement      : left mouse button (in placement mode)" NL
-"- select object  : left mouse button (in select mode)" NL
-"- attach selected to mouse: SPACE" NL
-"" NL
-"GUI:" NL
-"- Snap To Grid  : F1" NL
-"- reset placement parameters : F2" NL
-"- Atlas Map      : TAB" NL
-"- Main Menu      : ESCAPE" NL
-"- Inspector      : F10"
+"- Snap To Grid     : F1" NL
+"- reset placement  : F2" NL
+"- Atlas Map        : TAB" NL
+"- Main Menu        : ESCAPE" NL
+"- Inspector        : F10"
 ;
 
 //
@@ -283,7 +283,9 @@ function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
         case "Resume":
             GuiTool.CurrentMenu = 0;
 
-        case "Control Help": GuiTool.ShowMessage($ControlHelp, 0);
+        case "Control Help":
+            GuiTool.CurrentMenu = 0;
+            GuiTool.ShowMessage($ControlHelp, 0, 1.8);
 
         case "Quit": schedule(250,0, quit);
 
