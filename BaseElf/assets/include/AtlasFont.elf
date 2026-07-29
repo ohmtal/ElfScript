@@ -1,6 +1,12 @@
 // AtlasFont must be a TextureObject
 // assuming the AtlasFont's grid is 10x10
 
+//FIXME move this to a Cpp !!!
+$FONT_EFFECT_WAVE=1;
+$FONT_EFFECT_SHAKE=2;
+$FONT_EFFECT_RAINBOW=3;
+$FONT_EFFECT_PULSE=4;
+
 // to export it i used my Bitmap Font Tool:
 //  https://github.com/ohmtal/OhmFlux/tree/main/Tools/BitmapFont/qt
 
@@ -66,7 +72,7 @@ function AtlasFont::DrawText(%this, %x, %y, %text, %color) {
 
 // ------------------------ animatated text ---------------------------------
 
-// Animtypes: "wave", "shake", "rainbow", "pulse"
+// Animtypes: "wave", "shake", "rainbow", "pulse" << FONT_EFFECT_*
 // GetGameTime() can be used for time but you can also change the speed by multiply it
 
 function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %animType) {
@@ -92,19 +98,19 @@ function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %a
             %curY = %y;
             %curColor = %baseColor;
 
-            if (%animType $= "wave") {
+            if (%animType == $FONT_EFFECT_WAVE) {
                 %offsetY = mSin(%time * 5.0 + %i * 0.5) * 10.0;
                 %curY += %offsetY;
             }
-            else if (%animType $= "shake") {
+            else if (%animType == $FONT_EFFECT_SHAKE) {
                 %curX += getRandom(-2, 2);
                 %curY += getRandom(-2, 2);
             }
-            else if (%animType $= "rainbow") {
+            else if (%animType == $FONT_EFFECT_RAINBOW) {
                 %hue = mFmod((%time * 50.0) + (%i * 20.0), 360.0);
                 %curColor = getColorFromHSV(%hue, 1.0, 1.0);
             }
-            else if (%animType $= "pulse") {
+            else if (%animType == $FONT_EFFECT_PULSE) {
                 %scale = 1.0 + mSin(%time * 4.0) * 0.15;
                 %scaledW = %cw * %scale;
                 %scaledH = %ch * %scale;

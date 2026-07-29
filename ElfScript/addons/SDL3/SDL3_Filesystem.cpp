@@ -14,26 +14,25 @@ namespace ElfSDL3 {
 
 // -----------------------------------------------------------------------------
 void RegisterFileSystemConstants() {
-    #define REGISTER_SDL_CONST(constName) Con::setScriptConstant(#constName, (S32)constName)
 
 
-    REGISTER_SDL_CONST(SDL_PATHTYPE_NONE);      /**< path does not exist */
-    REGISTER_SDL_CONST(SDL_PATHTYPE_FILE);      /**< a normal file */
-    REGISTER_SDL_CONST(SDL_PATHTYPE_DIRECTORY); /**< a directory */
-    REGISTER_SDL_CONST(SDL_PATHTYPE_OTHER);      /**< something completely different like a device node (not a symlink, those are always followed) */
+    Con::REGISTER_CONST_S32(SDL_PATHTYPE_NONE);      /**< path does not exist */
+    Con::REGISTER_CONST_S32(SDL_PATHTYPE_FILE);      /**< a normal file */
+    Con::REGISTER_CONST_S32(SDL_PATHTYPE_DIRECTORY); /**< a directory */
+    Con::REGISTER_CONST_S32(SDL_PATHTYPE_OTHER);      /**< something completely different like a device node (not a symlink, those are always followed) */
     // ----------------
-    REGISTER_SDL_CONST(SDL_FOLDER_HOME);        /**< The folder which contains all of the current user's data); preferences); and documents. It usually contains most of the other folders. If a requested folder does not exist); the home folder can be considered a safe fallback to store a user's documents. */
-    REGISTER_SDL_CONST(SDL_FOLDER_DESKTOP);     /**< The folder of files that are displayed on the desktop. Note that the existence of a desktop folder does not guarantee that the system does show icons on its desktop; certain GNU/Linux distros with a graphical environment may not have desktop icons. */
-    REGISTER_SDL_CONST(SDL_FOLDER_DOCUMENTS);   /**< User document files); possibly application-specific. This is a good place to save a user's projects. */
-    REGISTER_SDL_CONST(SDL_FOLDER_DOWNLOADS);   /**< Standard folder for user files downloaded from the internet. */
-    REGISTER_SDL_CONST(SDL_FOLDER_MUSIC);       /**< Music files that can be played using a standard music player (mp3); ogg...). */
-    REGISTER_SDL_CONST(SDL_FOLDER_PICTURES);    /**< Image files that can be displayed using a standard viewer (png); jpg...). */
-    REGISTER_SDL_CONST(SDL_FOLDER_PUBLICSHARE); /**< Files that are meant to be shared with other users on the same computer. */
-    REGISTER_SDL_CONST(SDL_FOLDER_SAVEDGAMES);  /**< Save files for games. */
-    REGISTER_SDL_CONST(SDL_FOLDER_SCREENSHOTS); /**< Application screenshots. */
-    REGISTER_SDL_CONST(SDL_FOLDER_TEMPLATES);   /**< Template files to be used when the user requests the desktop environment to create a new file in a certain folder); such as "New Text File.txt".  Any file in the Templates folder can be used as a starting point for a new file. */
-    REGISTER_SDL_CONST(SDL_FOLDER_VIDEOS);      /**< Video files that can be played using a standard video player (mp4); webm...). */
-    REGISTER_SDL_CONST(SDL_FOLDER_COUNT);        /**< Total number of types in this enum); not a folder type by itself. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_HOME);        /**< The folder which contains all of the current user's data); preferences); and documents. It usually contains most of the other folders. If a requested folder does not exist); the home folder can be considered a safe fallback to store a user's documents. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_DESKTOP);     /**< The folder of files that are displayed on the desktop. Note that the existence of a desktop folder does not guarantee that the system does show icons on its desktop; certain GNU/Linux distros with a graphical environment may not have desktop icons. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_DOCUMENTS);   /**< User document files); possibly application-specific. This is a good place to save a user's projects. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_DOWNLOADS);   /**< Standard folder for user files downloaded from the internet. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_MUSIC);       /**< Music files that can be played using a standard music player (mp3); ogg...). */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_PICTURES);    /**< Image files that can be displayed using a standard viewer (png); jpg...). */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_PUBLICSHARE); /**< Files that are meant to be shared with other users on the same computer. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_SAVEDGAMES);  /**< Save files for games. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_SCREENSHOTS); /**< Application screenshots. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_TEMPLATES);   /**< Template files to be used when the user requests the desktop environment to create a new file in a certain folder); such as "New Text File.txt".  Any file in the Templates folder can be used as a starting point for a new file. */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_VIDEOS);      /**< Video files that can be played using a standard video player (mp4); webm...). */
+    Con::REGISTER_CONST_S32(SDL_FOLDER_COUNT);        /**< Total number of types in this enum); not a folder type by itself. */
 
 
 }

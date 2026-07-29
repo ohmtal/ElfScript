@@ -138,31 +138,6 @@ function CameraTest::OnUpdate(%this, %dt) {
     // LightMap.color = getScaledColorSaturation(LightMap.basecolor, mSin(getGameTime())* 0.3  + 0.5);
     // LightMap.color = getScaledColor(LightMap.basecolor, mSin(getGameTime())* 1.0  + 1.2);
 
-    if (isObject(MyFish)) {
-        MyFish.moveLinear(%dt);
-        if (MyFish.x > 1200) {
-            MyFish.x = 1200;
-            MyFish.veloX = -100.0;
-            MyFish.flip = 1;
-        } else if (MyFish.x < -300) {
-            MyFish.x = -300;
-            MyFish.veloX = 100.0;
-            MyFish.flip = 0;
-        }
-    }
-
-    foreach(%bubble in BubbleSet) {
-        %bubble.moveLinear(%dt);
-        // %bubble.moveGravity(0,-200);
-        // %bubble.moveOrbital(MyFish.getCenter2F(), -50);
-        if (%bubble.y < -30) {
-            %bubble.y = 480;
-            %bubble.x = getRandom(20, 1100);
-            %bubble.veloY = getRandom(-20, -50);
-            %bubble.velox = 0.0;
-        }
-    }
-
 
     %speed = %dt * 100;
     if (SDL_IsKeyDown(SDL_SCANCODE_LEFT))     Camera.x -= %speed;
@@ -211,6 +186,37 @@ function CameraTest::Render(%this) {
 
     FieldInspector.render();
 
+
+
+    %dt = GetFrameTime();
+
+    if (isObject(MyFish)) {
+        MyFish.moveLinear(%dt);
+        if (MyFish.x > 1200) {
+            MyFish.x = 1200;
+            MyFish.veloX = -100.0;
+            MyFish.flip = 1;
+        } else if (MyFish.x < -300) {
+            MyFish.x = -300;
+            MyFish.veloX = 100.0;
+            MyFish.flip = 0;
+        }
+    }
+
+    foreach(%bubble in BubbleSet) {
+        %bubble.moveLinear(%dt);
+        // %bubble.moveGravity(0,-200);
+        // %bubble.moveOrbital(MyFish.getCenter2F(), -50);
+        if (%bubble.y < -30) {
+            %bubble.y = 480;
+            %bubble.x = getRandom(20, 1100);
+            %bubble.veloY = getRandom(-20, -50);
+            %bubble.velox = 0.0;
+        }
+    }
+
+
+
     SceneObjects.drawAtlasBatch(Spritesheet.getId(), Camera.getId());
 
 
@@ -233,9 +239,10 @@ function CameraTest::Render(%this) {
 
 
     %y = 10;
+    DrawText(10,%y, "Cam + Light + Scene loader Demo", 2, WHITE);
+    %y += 25;
     DrawText(10,%y, "Mouse:" SPC GetMousePosition() SPC "/" SPC Camera.GetMousePosition(), 1.2, WHITE);
     %y += 15; DrawText(10,%y, "CAM:" SPC Camera.x SPC Camera.y SPC Camera.zoom , 1.2, WHITE);
-    // %y += 15; DrawText(10,%y, "ScreenRect:" SPC %obj.screenRect, 1.2, WHITE);
 }
 //----------------------------------------------------------------------
 function CameraTest::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {}

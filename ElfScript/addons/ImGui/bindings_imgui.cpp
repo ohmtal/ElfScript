@@ -99,289 +99,282 @@ static ImU32 ParseColor(F32 r, F32 g, F32 b, F32 a = 1.0f) {
 
 // -----------------------------------------------------------------------------
 void RegisterImGuiWindowConstants() {
-    #define REGISTER_IMGUI_CONST(constName) Con::setScriptConstant(#constName, (S32)constName)
-
     // Window Flags (ImGuiWindowFlags_)
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoTitleBar);                // Disable title-bar
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoResize);                  // Disable user resizing with the lower-right corner
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoMove);                    // Disable user moving the window
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoScrollbar);               // Disable scrollbars (window can still scroll with mouse wheel)
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoScrollWithMouse);         // Disable user vertically scrolling with mouse wheel
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoCollapse);                // Disable user collapsing window by double-clicking it
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_AlwaysAutoResize);          // Resize every frame to its content
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoBackground);              // Disable drawing background color and margins
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoSavedSettings);           // Never load/save settings in .ini file
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoMouseInputs);             // Disable catching mouse inputs
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_MenuBar);                  // Has a menu-bar (required for ImBeginMenuBar)
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_HorizontalScrollbar);       // Allow horizontal scrollbar to appear
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoFocusOnAppearing);        // Disable taking focus when transitioning from hidden to visible state
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoBringToFrontOnFocus);     // Disable bringing window to front when clicking on it
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_AlwaysVerticalScrollbar);   // Always show vertical scrollbar
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_AlwaysHorizontalScrollbar); // Always show horizontal scrollbar
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoNavFocus);                // No focusing navigation inside window
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_UnsavedDocument);           // Display a dot next to the title (indicates unsaved changes)
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoNav);                     // Combination of NoNavInputs and NoNavFocus
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoDecoration);              // Combination of NoTitleBar, NoResize, NoScrollbar, NoCollapse
-    REGISTER_IMGUI_CONST(ImGuiWindowFlags_NoInputs);                  // Combination of NoMouseInputs, NoNavInputs, NoNavFocus
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoTitleBar);                // Disable title-bar
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoResize);                  // Disable user resizing with the lower-right corner
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoMove);                    // Disable user moving the window
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoScrollbar);               // Disable scrollbars (window can still scroll with mouse wheel)
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoScrollWithMouse);         // Disable user vertically scrolling with mouse wheel
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoCollapse);                // Disable user collapsing window by double-clicking it
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_AlwaysAutoResize);          // Resize every frame to its content
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoBackground);              // Disable drawing background color and margins
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoSavedSettings);           // Never load/save settings in .ini file
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoMouseInputs);             // Disable catching mouse inputs
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_MenuBar);                  // Has a menu-bar (required for ImBeginMenuBar)
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_HorizontalScrollbar);       // Allow horizontal scrollbar to appear
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoFocusOnAppearing);        // Disable taking focus when transitioning from hidden to visible state
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoBringToFrontOnFocus);     // Disable bringing window to front when clicking on it
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_AlwaysVerticalScrollbar);   // Always show vertical scrollbar
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_AlwaysHorizontalScrollbar); // Always show horizontal scrollbar
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoNavFocus);                // No focusing navigation inside window
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_UnsavedDocument);           // Display a dot next to the title (indicates unsaved changes)
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoNav);                     // Combination of NoNavInputs and NoNavFocus
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoDecoration);              // Combination of NoTitleBar, NoResize, NoScrollbar, NoCollapse
+    Con::REGISTER_CONST_S32(ImGuiWindowFlags_NoInputs);                  // Combination of NoMouseInputs, NoNavInputs, NoNavFocus
 
     // ------------ Node Flags:
     // Tree Node Flags (ImGuiTreeNodeFlags_)
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Selected);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Framed);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_AllowOverlap);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NoTreePushOnOpen);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NoAutoOpenOnLog);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DefaultOpen);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_OpenOnDoubleClick);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_OpenOnArrow);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Leaf);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_Bullet);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_FramePadding);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanAvailWidth);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanFullWidth);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanLabelWidth);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_SpanAllColumns);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_LabelSpanAllColumns);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_NavLeftJumpsToParent);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_CollapsingHeader);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesNone);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesFull);
-    REGISTER_IMGUI_CONST(ImGuiTreeNodeFlags_DrawLinesToNodes);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_Selected);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_Framed);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_AllowOverlap);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_NoTreePushOnOpen);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_NoAutoOpenOnLog);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_DefaultOpen);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_OpenOnDoubleClick);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_OpenOnArrow);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_Leaf);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_Bullet);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_FramePadding);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_SpanAvailWidth);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_SpanFullWidth);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_SpanLabelWidth);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_SpanAllColumns);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_LabelSpanAllColumns);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_NavLeftJumpsToParent);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_CollapsingHeader);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_DrawLinesNone);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_DrawLinesFull);
+    Con::REGISTER_CONST_S32(ImGuiTreeNodeFlags_DrawLinesToNodes);
 
     // Popup Flags (ImGuiPopupFlags_)
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonLeft);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonRight);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMiddle);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonMask_);
-    // REGISTER_IMGUI_CONST(ImGuiPopupFlags_MouseButtonDefault_);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoReopen);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverExistingPopup);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_NoOpenOverItems);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopupId);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopupLevel);
-    REGISTER_IMGUI_CONST(ImGuiPopupFlags_AnyPopup);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_MouseButtonLeft);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_MouseButtonRight);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_MouseButtonMiddle);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_MouseButtonMask_);
+    // Con::REGISTER_CONST_S32(ImGuiPopupFlags_MouseButtonDefault_);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_NoReopen);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_NoOpenOverExistingPopup);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_NoOpenOverItems);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_AnyPopupId);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_AnyPopupLevel);
+    Con::REGISTER_CONST_S32(ImGuiPopupFlags_AnyPopup);
 
     // Color Indices (ImGuiCol_)
-    REGISTER_IMGUI_CONST(ImGuiCol_Text);
-    REGISTER_IMGUI_CONST(ImGuiCol_TextDisabled);
-    REGISTER_IMGUI_CONST(ImGuiCol_WindowBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_ChildBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_PopupBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_Border);
-    REGISTER_IMGUI_CONST(ImGuiCol_BorderShadow);
-    REGISTER_IMGUI_CONST(ImGuiCol_FrameBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_FrameBgHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_FrameBgActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_TitleBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_TitleBgActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_TitleBgCollapsed);
-    REGISTER_IMGUI_CONST(ImGuiCol_MenuBarBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrab);
-    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrabHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_ScrollbarGrabActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_CheckMark);
-    REGISTER_IMGUI_CONST(ImGuiCol_SliderGrab);
-    REGISTER_IMGUI_CONST(ImGuiCol_SliderGrabActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_Button);
-    REGISTER_IMGUI_CONST(ImGuiCol_ButtonHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_ButtonActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_Header);
-    REGISTER_IMGUI_CONST(ImGuiCol_HeaderHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_HeaderActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_Separator);
-    REGISTER_IMGUI_CONST(ImGuiCol_SeparatorHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_SeparatorActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGrip);
-    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGripHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_ResizeGripActive);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_Tab);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabSelected);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabSelectedOverline);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmed);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmedSelected);
-    REGISTER_IMGUI_CONST(ImGuiCol_TabDimmedSelectedOverline);
-    REGISTER_IMGUI_CONST(ImGuiCol_PlotLines);
-    REGISTER_IMGUI_CONST(ImGuiCol_PlotLinesHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_PlotHistogram);
-    REGISTER_IMGUI_CONST(ImGuiCol_PlotHistogramHovered);
-    REGISTER_IMGUI_CONST(ImGuiCol_TableHeaderBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_TableBorderStrong);
-    REGISTER_IMGUI_CONST(ImGuiCol_TableBorderLight);
-    REGISTER_IMGUI_CONST(ImGuiCol_TableRowBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_TableRowBgAlt);
-    REGISTER_IMGUI_CONST(ImGuiCol_TextLink);
-    REGISTER_IMGUI_CONST(ImGuiCol_TextSelectedBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_DragDropTarget);
-    REGISTER_IMGUI_CONST(ImGuiCol_NavHighlight);
-    REGISTER_IMGUI_CONST(ImGuiCol_NavWindowingHighlight);
-    REGISTER_IMGUI_CONST(ImGuiCol_NavWindowingDimBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_ModalWindowDimBg);
-    REGISTER_IMGUI_CONST(ImGuiCol_COUNT);
+    Con::REGISTER_CONST_S32(ImGuiCol_Text);
+    Con::REGISTER_CONST_S32(ImGuiCol_TextDisabled);
+    Con::REGISTER_CONST_S32(ImGuiCol_WindowBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_ChildBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_PopupBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_Border);
+    Con::REGISTER_CONST_S32(ImGuiCol_BorderShadow);
+    Con::REGISTER_CONST_S32(ImGuiCol_FrameBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_FrameBgHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_FrameBgActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_TitleBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_TitleBgActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_TitleBgCollapsed);
+    Con::REGISTER_CONST_S32(ImGuiCol_MenuBarBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_ScrollbarBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_ScrollbarGrab);
+    Con::REGISTER_CONST_S32(ImGuiCol_ScrollbarGrabHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_ScrollbarGrabActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_CheckMark);
+    Con::REGISTER_CONST_S32(ImGuiCol_SliderGrab);
+    Con::REGISTER_CONST_S32(ImGuiCol_SliderGrabActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_Button);
+    Con::REGISTER_CONST_S32(ImGuiCol_ButtonHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_ButtonActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_Header);
+    Con::REGISTER_CONST_S32(ImGuiCol_HeaderHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_HeaderActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_Separator);
+    Con::REGISTER_CONST_S32(ImGuiCol_SeparatorHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_SeparatorActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_ResizeGrip);
+    Con::REGISTER_CONST_S32(ImGuiCol_ResizeGripHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_ResizeGripActive);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_Tab);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabSelected);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabSelectedOverline);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabDimmed);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabDimmedSelected);
+    Con::REGISTER_CONST_S32(ImGuiCol_TabDimmedSelectedOverline);
+    Con::REGISTER_CONST_S32(ImGuiCol_PlotLines);
+    Con::REGISTER_CONST_S32(ImGuiCol_PlotLinesHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_PlotHistogram);
+    Con::REGISTER_CONST_S32(ImGuiCol_PlotHistogramHovered);
+    Con::REGISTER_CONST_S32(ImGuiCol_TableHeaderBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_TableBorderStrong);
+    Con::REGISTER_CONST_S32(ImGuiCol_TableBorderLight);
+    Con::REGISTER_CONST_S32(ImGuiCol_TableRowBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_TableRowBgAlt);
+    Con::REGISTER_CONST_S32(ImGuiCol_TextLink);
+    Con::REGISTER_CONST_S32(ImGuiCol_TextSelectedBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_DragDropTarget);
+    Con::REGISTER_CONST_S32(ImGuiCol_NavHighlight);
+    Con::REGISTER_CONST_S32(ImGuiCol_NavWindowingHighlight);
+    Con::REGISTER_CONST_S32(ImGuiCol_NavWindowingDimBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_ModalWindowDimBg);
+    Con::REGISTER_CONST_S32(ImGuiCol_COUNT);
 
     // Style Variables (ImGuiStyleVar_)
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_Alpha);               // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_DisabledAlpha);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowPadding);       // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowRounding);      // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowBorderSize);    // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowMinSize);       // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_WindowTitleAlign);    // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ChildRounding);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ChildBorderSize);     // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_PopupRounding);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_PopupBorderSize);     // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_FramePadding);        // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_FrameRounding);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_FrameBorderSize);     // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ItemSpacing);         // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ItemInnerSpacing);    // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_IndentSpacing);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_CellPadding);         // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ScrollbarSize);       // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ScrollbarRounding);    // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_GrabMinSize);         // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_GrabRounding);        // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabRounding);         // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabBarBorderSize);    // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_TabBarOverlineSize);  // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_TableAngledHeadersAngle); // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_TableAngledHeadersTextAlign); // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_ButtonTextAlign);     // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_SelectableTextAlign); // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextPadding); // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextAlign);  // ImVec2
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_SeparatorTextBorderSize); // float
-    REGISTER_IMGUI_CONST(ImGuiStyleVar_COUNT);
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_Alpha);               // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_DisabledAlpha);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_WindowPadding);       // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_WindowRounding);      // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_WindowBorderSize);    // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_WindowMinSize);       // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_WindowTitleAlign);    // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ChildRounding);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ChildBorderSize);     // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_PopupRounding);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_PopupBorderSize);     // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_FramePadding);        // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_FrameRounding);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_FrameBorderSize);     // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ItemSpacing);         // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ItemInnerSpacing);    // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_IndentSpacing);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_CellPadding);         // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ScrollbarSize);       // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ScrollbarRounding);    // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_GrabMinSize);         // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_GrabRounding);        // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_TabRounding);         // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_TabBarBorderSize);    // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_TabBarOverlineSize);  // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_TableAngledHeadersAngle); // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_TableAngledHeadersTextAlign); // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_ButtonTextAlign);     // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_SelectableTextAlign); // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_SeparatorTextPadding); // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_SeparatorTextAlign);  // ImVec2
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_SeparatorTextBorderSize); // float
+    Con::REGISTER_CONST_S32(ImGuiStyleVar_COUNT);
 
     // Input Text Flags (ImGuiInputTextFlags_)
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsDecimal);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsHexadecimal);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsUppercase);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsNoBlank);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AutoSelectAll);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_EnterReturnsTrue);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackCompletion);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackHistory);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackAlways);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackCharFilter);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AllowTabInput);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CtrlEnterForNewLine);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_NoHorizontalScroll);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_AlwaysOverwrite);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_ReadOnly);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_Password);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_NoUndoRedo);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CharsScientific);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackResize);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_CallbackEdit);
-    REGISTER_IMGUI_CONST(ImGuiInputTextFlags_EscapeClearsAll);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CharsDecimal);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CharsHexadecimal);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CharsUppercase);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CharsNoBlank);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_AutoSelectAll);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_EnterReturnsTrue);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackCompletion);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackHistory);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackAlways);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackCharFilter);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_AllowTabInput);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CtrlEnterForNewLine);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_NoHorizontalScroll);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_AlwaysOverwrite);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_ReadOnly);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_Password);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_NoUndoRedo);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CharsScientific);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackResize);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_CallbackEdit);
+    Con::REGISTER_CONST_S32(ImGuiInputTextFlags_EscapeClearsAll);
 
 
-    #undef REGISTER_IMGUI_CONST
 }
 
 // -----------------------------------------------------------------------------
 void RegisterImGuiKeyConstants() {
-    #define REGISTER_IMGUI_CONST(constName) Con::setScriptConstant(#constName, (S32)constName)
 
     // Modifiers / Chords
-    REGISTER_IMGUI_CONST(ImGuiMod_None);
-    REGISTER_IMGUI_CONST(ImGuiMod_Ctrl);
-    REGISTER_IMGUI_CONST(ImGuiMod_Shift);
-    REGISTER_IMGUI_CONST(ImGuiMod_Alt);
-    REGISTER_IMGUI_CONST(ImGuiMod_Super);
+    Con::REGISTER_CONST_S32(ImGuiMod_None);
+    Con::REGISTER_CONST_S32(ImGuiMod_Ctrl);
+    Con::REGISTER_CONST_S32(ImGuiMod_Shift);
+    Con::REGISTER_CONST_S32(ImGuiMod_Alt);
+    Con::REGISTER_CONST_S32(ImGuiMod_Super);
 
     // Alphabet
-    REGISTER_IMGUI_CONST(ImGuiKey_A); REGISTER_IMGUI_CONST(ImGuiKey_B);
-    REGISTER_IMGUI_CONST(ImGuiKey_C); REGISTER_IMGUI_CONST(ImGuiKey_D);
-    REGISTER_IMGUI_CONST(ImGuiKey_E); REGISTER_IMGUI_CONST(ImGuiKey_F);
-    REGISTER_IMGUI_CONST(ImGuiKey_G); REGISTER_IMGUI_CONST(ImGuiKey_H);
-    REGISTER_IMGUI_CONST(ImGuiKey_I); REGISTER_IMGUI_CONST(ImGuiKey_J);
-    REGISTER_IMGUI_CONST(ImGuiKey_K); REGISTER_IMGUI_CONST(ImGuiKey_L);
-    REGISTER_IMGUI_CONST(ImGuiKey_M); REGISTER_IMGUI_CONST(ImGuiKey_N);
-    REGISTER_IMGUI_CONST(ImGuiKey_O); REGISTER_IMGUI_CONST(ImGuiKey_P);
-    REGISTER_IMGUI_CONST(ImGuiKey_Q); REGISTER_IMGUI_CONST(ImGuiKey_R);
-    REGISTER_IMGUI_CONST(ImGuiKey_S); REGISTER_IMGUI_CONST(ImGuiKey_T);
-    REGISTER_IMGUI_CONST(ImGuiKey_U); REGISTER_IMGUI_CONST(ImGuiKey_V);
-    REGISTER_IMGUI_CONST(ImGuiKey_W); REGISTER_IMGUI_CONST(ImGuiKey_X);
-    REGISTER_IMGUI_CONST(ImGuiKey_Y); REGISTER_IMGUI_CONST(ImGuiKey_Z);
+    Con::REGISTER_CONST_S32(ImGuiKey_A); Con::REGISTER_CONST_S32(ImGuiKey_B);
+    Con::REGISTER_CONST_S32(ImGuiKey_C); Con::REGISTER_CONST_S32(ImGuiKey_D);
+    Con::REGISTER_CONST_S32(ImGuiKey_E); Con::REGISTER_CONST_S32(ImGuiKey_F);
+    Con::REGISTER_CONST_S32(ImGuiKey_G); Con::REGISTER_CONST_S32(ImGuiKey_H);
+    Con::REGISTER_CONST_S32(ImGuiKey_I); Con::REGISTER_CONST_S32(ImGuiKey_J);
+    Con::REGISTER_CONST_S32(ImGuiKey_K); Con::REGISTER_CONST_S32(ImGuiKey_L);
+    Con::REGISTER_CONST_S32(ImGuiKey_M); Con::REGISTER_CONST_S32(ImGuiKey_N);
+    Con::REGISTER_CONST_S32(ImGuiKey_O); Con::REGISTER_CONST_S32(ImGuiKey_P);
+    Con::REGISTER_CONST_S32(ImGuiKey_Q); Con::REGISTER_CONST_S32(ImGuiKey_R);
+    Con::REGISTER_CONST_S32(ImGuiKey_S); Con::REGISTER_CONST_S32(ImGuiKey_T);
+    Con::REGISTER_CONST_S32(ImGuiKey_U); Con::REGISTER_CONST_S32(ImGuiKey_V);
+    Con::REGISTER_CONST_S32(ImGuiKey_W); Con::REGISTER_CONST_S32(ImGuiKey_X);
+    Con::REGISTER_CONST_S32(ImGuiKey_Y); Con::REGISTER_CONST_S32(ImGuiKey_Z);
 
     // Numbers
-    REGISTER_IMGUI_CONST(ImGuiKey_0); REGISTER_IMGUI_CONST(ImGuiKey_1);
-    REGISTER_IMGUI_CONST(ImGuiKey_2); REGISTER_IMGUI_CONST(ImGuiKey_3);
-    REGISTER_IMGUI_CONST(ImGuiKey_4); REGISTER_IMGUI_CONST(ImGuiKey_5);
-    REGISTER_IMGUI_CONST(ImGuiKey_6); REGISTER_IMGUI_CONST(ImGuiKey_7);
-    REGISTER_IMGUI_CONST(ImGuiKey_8); REGISTER_IMGUI_CONST(ImGuiKey_9);
+    Con::REGISTER_CONST_S32(ImGuiKey_0); Con::REGISTER_CONST_S32(ImGuiKey_1);
+    Con::REGISTER_CONST_S32(ImGuiKey_2); Con::REGISTER_CONST_S32(ImGuiKey_3);
+    Con::REGISTER_CONST_S32(ImGuiKey_4); Con::REGISTER_CONST_S32(ImGuiKey_5);
+    Con::REGISTER_CONST_S32(ImGuiKey_6); Con::REGISTER_CONST_S32(ImGuiKey_7);
+    Con::REGISTER_CONST_S32(ImGuiKey_8); Con::REGISTER_CONST_S32(ImGuiKey_9);
 
     // Function Keys
-    REGISTER_IMGUI_CONST(ImGuiKey_F1);  REGISTER_IMGUI_CONST(ImGuiKey_F2);
-    REGISTER_IMGUI_CONST(ImGuiKey_F3);  REGISTER_IMGUI_CONST(ImGuiKey_F4);
-    REGISTER_IMGUI_CONST(ImGuiKey_F5);  REGISTER_IMGUI_CONST(ImGuiKey_F6);
-    REGISTER_IMGUI_CONST(ImGuiKey_F7);  REGISTER_IMGUI_CONST(ImGuiKey_F8);
-    REGISTER_IMGUI_CONST(ImGuiKey_F9);  REGISTER_IMGUI_CONST(ImGuiKey_F10);
-    REGISTER_IMGUI_CONST(ImGuiKey_F11); REGISTER_IMGUI_CONST(ImGuiKey_F12);
+    Con::REGISTER_CONST_S32(ImGuiKey_F1);  Con::REGISTER_CONST_S32(ImGuiKey_F2);
+    Con::REGISTER_CONST_S32(ImGuiKey_F3);  Con::REGISTER_CONST_S32(ImGuiKey_F4);
+    Con::REGISTER_CONST_S32(ImGuiKey_F5);  Con::REGISTER_CONST_S32(ImGuiKey_F6);
+    Con::REGISTER_CONST_S32(ImGuiKey_F7);  Con::REGISTER_CONST_S32(ImGuiKey_F8);
+    Con::REGISTER_CONST_S32(ImGuiKey_F9);  Con::REGISTER_CONST_S32(ImGuiKey_F10);
+    Con::REGISTER_CONST_S32(ImGuiKey_F11); Con::REGISTER_CONST_S32(ImGuiKey_F12);
 
     // Navigation & Editing
-    REGISTER_IMGUI_CONST(ImGuiKey_Tab);
-    REGISTER_IMGUI_CONST(ImGuiKey_LeftArrow);
-    REGISTER_IMGUI_CONST(ImGuiKey_RightArrow);
-    REGISTER_IMGUI_CONST(ImGuiKey_UpArrow);
-    REGISTER_IMGUI_CONST(ImGuiKey_DownArrow);
-    REGISTER_IMGUI_CONST(ImGuiKey_PageUp);
-    REGISTER_IMGUI_CONST(ImGuiKey_PageDown);
-    REGISTER_IMGUI_CONST(ImGuiKey_Home);
-    REGISTER_IMGUI_CONST(ImGuiKey_End);
-    REGISTER_IMGUI_CONST(ImGuiKey_Insert);
-    REGISTER_IMGUI_CONST(ImGuiKey_Delete);
-    REGISTER_IMGUI_CONST(ImGuiKey_Backspace);
-    REGISTER_IMGUI_CONST(ImGuiKey_Space);
-    REGISTER_IMGUI_CONST(ImGuiKey_Enter);
-    REGISTER_IMGUI_CONST(ImGuiKey_Escape);
+    Con::REGISTER_CONST_S32(ImGuiKey_Tab);
+    Con::REGISTER_CONST_S32(ImGuiKey_LeftArrow);
+    Con::REGISTER_CONST_S32(ImGuiKey_RightArrow);
+    Con::REGISTER_CONST_S32(ImGuiKey_UpArrow);
+    Con::REGISTER_CONST_S32(ImGuiKey_DownArrow);
+    Con::REGISTER_CONST_S32(ImGuiKey_PageUp);
+    Con::REGISTER_CONST_S32(ImGuiKey_PageDown);
+    Con::REGISTER_CONST_S32(ImGuiKey_Home);
+    Con::REGISTER_CONST_S32(ImGuiKey_End);
+    Con::REGISTER_CONST_S32(ImGuiKey_Insert);
+    Con::REGISTER_CONST_S32(ImGuiKey_Delete);
+    Con::REGISTER_CONST_S32(ImGuiKey_Backspace);
+    Con::REGISTER_CONST_S32(ImGuiKey_Space);
+    Con::REGISTER_CONST_S32(ImGuiKey_Enter);
+    Con::REGISTER_CONST_S32(ImGuiKey_Escape);
 
     // Mouse Button Enums
-    REGISTER_IMGUI_CONST(ImGuiMouseButton_Left);
-    REGISTER_IMGUI_CONST(ImGuiMouseButton_Right);
-    REGISTER_IMGUI_CONST(ImGuiMouseButton_Middle);
+    Con::REGISTER_CONST_S32(ImGuiMouseButton_Left);
+    Con::REGISTER_CONST_S32(ImGuiMouseButton_Right);
+    Con::REGISTER_CONST_S32(ImGuiMouseButton_Middle);
 
-    #undef REGISTER_IMGUI_CONST
 }
 // -----------------------------------------------------------------------------
 void RegisterImGuiTableConstants() {
-    #define REGISTER_IMGUI_CONST(constName) Con::setScriptConstant(#constName, (S32)constName)
 
     // Table Flags (ImGuiTableFlags_)
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_Resizable);        // Make columns resizable
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_Reorderable);      // Allow reordering columns via drag-and-drop
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_Hideable);         // Allow hiding columns via right-click
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_Sortable);         // Enable sorting features
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_NoSavedSettings);  // Don't save style modifications to .ini
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_ContextMenuInBody);// Right-click inside table body opens options
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_Resizable);        // Make columns resizable
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_Reorderable);      // Allow reordering columns via drag-and-drop
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_Hideable);         // Allow hiding columns via right-click
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_Sortable);         // Enable sorting features
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_NoSavedSettings);  // Don't save style modifications to .ini
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_ContextMenuInBody);// Right-click inside table body opens options
 
     // Table Decorations / Styling
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_RowBg);            // Alternating row background colors (Zebra stripes)
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_BordersInnerH);    // Draw horizontal borders inside
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_BordersOuterH);    // Draw horizontal borders outside
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_BordersInnerV);    // Draw vertical borders inside
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_BordersOuterV);    // Draw vertical borders outside
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_Borders);          // Full border grid combination
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_ScrollX);          // Enable horizontal scrolling inside table
-    REGISTER_IMGUI_CONST(ImGuiTableFlags_ScrollY);          // Enable vertical scrolling inside table
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_RowBg);            // Alternating row background colors (Zebra stripes)
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_BordersInnerH);    // Draw horizontal borders inside
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_BordersOuterH);    // Draw horizontal borders outside
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_BordersInnerV);    // Draw vertical borders inside
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_BordersOuterV);    // Draw vertical borders outside
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_Borders);          // Full border grid combination
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_ScrollX);          // Enable horizontal scrolling inside table
+    Con::REGISTER_CONST_S32(ImGuiTableFlags_ScrollY);          // Enable vertical scrolling inside table
 
     // Column Configuration Flags (ImGuiTableColumnFlags_)
-    REGISTER_IMGUI_CONST(ImGuiTableColumnFlags_None);
-    REGISTER_IMGUI_CONST(ImGuiTableColumnFlags_Disabled);    // Completely hide/disable column
-    REGISTER_IMGUI_CONST(ImGuiTableColumnFlags_DefaultHide); // Hidden by default, user can turn it on
-    REGISTER_IMGUI_CONST(ImGuiTableColumnFlags_WidthFixed);
-    REGISTER_IMGUI_CONST(ImGuiTableColumnFlags_WidthStretch);
+    Con::REGISTER_CONST_S32(ImGuiTableColumnFlags_None);
+    Con::REGISTER_CONST_S32(ImGuiTableColumnFlags_Disabled);    // Completely hide/disable column
+    Con::REGISTER_CONST_S32(ImGuiTableColumnFlags_DefaultHide); // Hidden by default, user can turn it on
+    Con::REGISTER_CONST_S32(ImGuiTableColumnFlags_WidthFixed);
+    Con::REGISTER_CONST_S32(ImGuiTableColumnFlags_WidthStretch);
 
-    #undef REGISTER_IMGUI_CONST
 }
 
 // -----------------------------------------------------------------------------
