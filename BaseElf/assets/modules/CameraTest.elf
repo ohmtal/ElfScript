@@ -77,13 +77,19 @@ function CameraTest::onAdd(%this) {
     //      -- light with ~ "255 230 180 255" SDL_BLENDMODE_ADD
     // 3. lightMap add to screen with SDL_BLENDMODE_MUL
 
-    %this.add(new TextureObject(TexOmniLight) {
-       fileName = "assets:/texture/spotlight.png";
-       // fileName = "assets:/texture/omnilight.png";
-       // blendMode = SDL_BLENDMODE_ADD;
-       // blendMode = SDL_BLENDMODE_ADD_PREMULTIPLIED;
-       blendMode = SDL_BLENDMODE_MUL;
-    });
+
+    // %pointLight = CreateSpotlightTexture(128, 45, WHITE, true); // 256x256
+    %pointLight = CreatePointLightTexture(128, WHITE); // 256x256
+    %pointLight.name = TexOmniLight;
+    %this.add(%pointLight);
+
+    // %this.add(new TextureObject(TexOmniLight) {
+    //    fileName = "assets:/texture/spotlight.png";
+    //    // fileName = "assets:/texture/omnilight.png";
+    //    // blendMode = SDL_BLENDMODE_ADD;
+    //    // blendMode = SDL_BLENDMODE_ADD_PREMULTIPLIED;
+    //    blendMode = SDL_BLENDMODE_MUL;
+    // });
     %this.add(new SpriteObject( OmniLight ) {
         // dstRect = "-600 -600 2000 2000";
         dstRect = "0 -150 1152 800";

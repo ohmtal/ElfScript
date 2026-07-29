@@ -481,7 +481,6 @@ class TextureObject : public SimGroup
     bool mOwnsTexture = false; // we need to take care or removing!
 
     Color mCurrentColor = BLACK;
-    SDL_BlendMode mDefaultBlendMode = SDL_BLENDMODE_BLEND;
     SDL_BlendMode mCurrentBlendMode = SDL_BLENDMODE_INVALID; //trigger inital setup
 
     void addObject( SimObject* obj ) override {
@@ -501,6 +500,9 @@ class TextureObject : public SimGroup
 
 public:
     DECLARE_CONOBJECT(TextureObject);
+
+    SDL_BlendMode mDefaultBlendMode = SDL_BLENDMODE_BLEND;
+
     TextureObject() {
          mFileName = StringTable->EmptyString();
     }
@@ -1516,6 +1518,43 @@ DefineEngineFunction(SetRenderTarget, bool  , (SimObjectId texObjectID),,
 // -----------------------------------------------------------------------------
 DefineEngineFunction(GetRendererName, String, (), ,"Get the current renderer name") {
     return SDL_GetRendererName(app.getRenderer());
+}
+// -----------------------------------------------------------------------------
+// Lights /*
+// SDL_Texture* CreatePointLightTexture(SDL_Renderer* renderer, int radius, SDL_Color color);
+
+DefineEngineFunction(CreatePointLightTexture, S32, (S32 radius, Color color, bool diffuse), (WHITE, true),
+        "Create Point Light Texture object" ) {
+    SDL_Texture* target_texture = BaseFlux::CreatePointLightTexture(app.getRenderer(), radius, color, diffuse);
+    if (!target_texture) {
+        Con::errorf("Failed to create Point Light Texture!");
+        return 0;
+    }
+    TextureObject* result = new TextureObject();
+    result->registerObject(); // before set because this calles add
+    if (!result->set(target_texture, true)) {
+        result->deleteObject();
+        return 0;
+    }
+    result->mDefaultBlendMode = SDL_BLENDMODE_MUL;
+    return result->getId();
+}
+// SDL_Texture* CreateSpotlightTexture(SDL_Renderer* renderer, int radius, float coneAngleDegrees, SDL_Color color);*/
+DefineEngineFunction(CreateSpotlightTexture, S32, (S32 radius, F32 coneAngleDegrees,  Color color, bool diffuse), (WHITE, true),
+        "Create Spot Light Texture object" ) {
+    SDL_Texture* target_texture = BaseFlux::CreateSpotlightTexture(app.getRenderer(), radius, coneAngleDegrees, color, diffuse);
+    if (!target_texture) {
+        Con::errorf("Failed to create Spot Light Texture!");
+        return 0;
+    }
+    TextureObject* result = new TextureObject();
+    result->registerObject(); // before set because this calles add
+    if (!result->set(target_texture, true)) {
+        result->deleteObject();
+        return 0;
+    }
+    result->mDefaultBlendMode = SDL_BLENDMODE_MUL;
+    return result->getId();
 }
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(SDL);
