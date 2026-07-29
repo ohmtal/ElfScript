@@ -111,7 +111,7 @@ function BaseDemo::Render(%this) {
         %y+= %addY;DrawText(%x,%y,"[X] atlas font script", %fontScale, GREEN, true, SLATEGRAY);
         // %y+= %addY;DrawText(%x,%y,"[ ] add source editor with example", %fontScale, DARKGRAY, true, SLATEGRAY);
         %y+= %addY;DrawText(%x,%y,"[X] SDL_SetRenderTarget / create target TextureObject +SDL_SavePNG", %fontScale, GREEN, true, SLATEGRAY);
-        %y+= %addY;DrawText(%x,%y,"[X] (Base)SpriteObject with movement and collation", %fontScale, GREEN, true, SLATEGRAY);
+        %y+= %addY;DrawText(%x,%y,"[X] (Base)SpriteObject with movement and collision", %fontScale, GREEN, true, SLATEGRAY);
         %y+= %addY;DrawText(%x,%y,"[X] Camera2D Object", %fontScale, GREEN, true, SLATEGRAY);
         %y+= %addY;DrawText(%x,%y,"[X] Add SDL_BLENDMODE_* to TextureObject draw calls", %fontScale, GREEN, true, SLATEGRAY);
         %y+= %addY;DrawText(%x,%y,"[X] Test Lights with SDL_BLENDMODE_ADD", %fontScale, GREEN, true, SLATEGRAY);
