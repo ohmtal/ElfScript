@@ -67,6 +67,7 @@ function Aquarium::onAdd(%this) {
     %this.paintFlip = 0;
 
     %this.add( new SpriteGroup(SceneObjects));
+    SceneObjects.viewPort = "1152 648";
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
     %this.selectedSceneObject = 0;
     %this.add( new SimSet(SelectList));
@@ -74,7 +75,7 @@ function Aquarium::onAdd(%this) {
     %this.hideSpriteSheet = false;
 
 
-    %target = CreateRenderTarget(getScreenSize());
+    %target = CreateRenderTarget(SceneObjects.viewPort);
     %target.name = "RenderTarget";
     %this.add( %target );
 
@@ -163,7 +164,7 @@ function Aquarium::DrawSpriteSheet(%this) {
                     // TypeRectF dstRect = %dstRect;
                     TypeF32   angle = %this.paintAngle;
                     TypeF32   centerPoint = %this.paintCenterPoint;
-                    TypeColor color=WHITEBLEND;
+                    TypeColor color=WHITE;
                     TypeS32   flip = %this.paintFlip;
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                     TypeString textureName = %name;
@@ -213,6 +214,8 @@ function Aquarium::load(%this) {
         warn("will delete previous scene in 100ms id:" SPC %savScene);
         // add new one to this:
         %this.add(SceneObjects);
+
+        if (SceneObjects.viewPort $= "") SceneObjects.viewPort = "1152 648";
 
         //update objects to current version
         foreach(%obj in SceneObjects) {
@@ -306,7 +309,7 @@ function Aquarium::Render(%this) {
 
     if (%this.showInspector && %this.selectedSceneObject != 0) FieldInspector.render();
 
-    %screenSize = getScreenSize();
+    %screenSize = SceneObjects.viewPort; //getScreenSize();
     %mousePos = GetMousePosition();
     %haveMouseObject = isObject(%this.mouseObject);
     %haveOverlay =  GuiTool.haveOverlay();
@@ -401,7 +404,8 @@ function Aquarium::Render(%this) {
 
         if (SelectList.getCount() == 1) {
             %this.selectedSceneObject = SelectList.getObject(0);
-            Inspector.inspect(%this.selectedSceneObject);
+            FieldInspector.inspect(%this.selectedSceneObject);
+            echo("select:" SPC %this.selectedSceneObject.textureName);
         } else {
             %this.SelectObjectMenu.MenuEntries = "";
             %this.SelectObjectMenu.MenuTextureRects = "";

@@ -439,64 +439,6 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  TextureObject : public SimObject {
-  public:
-   /** --- bool load ---
-    * Load a Texture
-    * @return bool
-    */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
-   /*!
-    */
-   uint blendMode;
-};
 /*!
 @brief A collection of SimObjects.
 It is often necessary to keep track of an arbitrary set of SimObjects. For instance, Torque's networking code needs to not only keep track of the set of objects which need to be ghosted, but also the set of objects which must <i>always</i> be ghosted. It does this by working with two sets. The first of these is the RootGroup (which is actually a SimGroup) and the second is the GhostAlwaysSet, which contains objects which must always be ghosted to the client.
@@ -676,6 +618,64 @@ class  SimGroup : public SimSet {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  TextureObject : public SimGroup {
+  public:
+   /** --- bool load ---
+    * Load a Texture
+    * @return bool
+    */
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
+   /*!
+    */
+   uint blendMode;
+};
 /*!
 @brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.
 @tsexample
@@ -733,6 +733,28 @@ class  ScriptObject : public SimObject {
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
+};
+class  AtlasEntryObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   RectF rect;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float width;
+   /*!
+    */
+   float height;
 };
 class  SettingsObject : public SimObject {
   public:
@@ -799,6 +821,10 @@ class  SpriteBaseObject : public SimObject {
     * center the centerPoint inside the dstRect
     */
       function CenterCenterPoint();
+   /** --- void colorFromHSV ---
+    * Set the color from hue(0..359), sat (0..1), value(0..1)
+    */
+      function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -955,6 +981,7 @@ class  SpriteObject : public SpriteBaseObject {
       function solveCollideRect( RectF otherRect, bool stopMovement=false );
    /** --- bool DrawTexture ---
     * Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)
+    * When useScreenRect is enabled centerDraw is not allowed!!!
     * @return bool
     */
       function DrawTexture( SimObjectId texObjectID, bool centerDraw=false, bool useScreenRect=false );
@@ -983,7 +1010,8 @@ class  SpriteObject : public SpriteBaseObject {
     */
    uint layer;
    /*!
-   SDL_BLENDMODE_
+   SDL_BLENDMODE_ overwrite the Texture blendmode
+default SDL_BLENDMODE_INVALID => not overwritten
    
     */
    uint blendMode;
@@ -1927,6 +1955,26 @@ namespace Global {
     * recheck we want to enable onRender and onUpdate
     */
       function checkLoopFunc();
+   /** --- Color getColorFromHSV ---
+    * get the color from hue(0..359), sat (0..1), value(0..1)
+    * @return Color
+    */
+      function getColorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
+   /** --- Color getScaledColorSaturation ---
+    * scale the color saturation 
+    * @return Color
+    */
+      function getScaledColorSaturation( Color color, float scale );
+   /** --- Color getScaledColorValue ---
+    * scale the color value 
+    * @return Color
+    */
+      function getScaledColorValue( Color color, float scale );
+   /** --- Color getScaledColor ---
+    * scale the color
+    * @return Color
+    */
+      function getScaledColor( Color color, float scale );
    /** --- Group: SDL ---
     * SDL/BaseFlux functions
     */
@@ -1953,8 +2001,9 @@ namespace Global {
     */
       function SetColor( Color color );
    /** --- void BeginBlendMode ---
+    *  see also SDL_BLENDMODE_*
     */
-      function BeginBlendMode();
+      function BeginBlendMode( uint blendmode=SDL_BLENDMODE_BLEND );
    /** --- void EndBlendMode ---
     */
       function EndBlendMode();
@@ -2055,6 +2104,16 @@ namespace Global {
     * @return String
     */
       function GetRendererName();
+   /** --- S32 CreatePointLightTexture ---
+    * Create Point Light Texture object
+    * @return S32
+    */
+      function CreatePointLightTexture( int radius, Color color=WHITE, bool diffuse=true );
+   /** --- S32 CreateSpotlightTexture ---
+    * Create Spot Light Texture object
+    * @return S32
+    */
+      function CreateSpotlightTexture( int radius, float coneAngleDegrees, Color color=WHITE, bool diffuse=true );
    /** --- Group: BaseFlux ---
     * BaseFlux Functions: getFPS, ...
     */
@@ -2078,6 +2137,11 @@ namespace Global {
     * @return F32
     */
       function getFrameTime();
+   /** --- U64 SDL_GetTicks ---
+    * Ticks from SDL
+    * @return U64
+    */
+      function SDL_GetTicks();
    /** --- S32 getRealTime ---
     * get current time from script engine
     * @return S32

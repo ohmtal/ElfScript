@@ -209,41 +209,43 @@ class SpriteBaseObject :public SimObject
     typedef SimObject Parent;
 public:
     DECLARE_CONOBJECT(SpriteBaseObject);
-    RectF mSrcRect = { 0.f, 0.f, 0.f, 0.f};
-    RectF mDstRect = { 0.f, 0.f, 0.f, 0.f};
-    F32   mAngle   = 0.f;
+    RectF   mSrcRect = { 0.f, 0.f, 0.f, 0.f};
+    RectF   mDstRect = { 0.f, 0.f, 0.f, 0.f};
+    F32     mAngle   = 0.f;
     Point2F mCenterPoint = {0.f, 0.f};
-    S32 mFlip = 0; // (SDL_FlipMode)
-    Color mColor = WHITEBLEND;
+    S32     mFlip = 0; // (SDL_FlipMode)
+    Color   mColor = WHITEBLEND;
+    bool    mVisible = true;
 
     // this is used for camera !!!!
-    RectF mScreenRect = { 0.f, 0.f, 0.f, 0.f};
+    RectF   mScreenRect = { 0.f, 0.f, 0.f, 0.f};
     Point2F mScreenCenterPoint = { 0.f, 0.f};
 
     static void initPersistFields() {
         Parent::initPersistFields();
-        addField("srcRect", TypeRectF, Offset(mSrcRect,SpriteBaseObject));
+        addField("srcRect", TypeRectF, Offset(mSrcRect,SpriteBaseObject), "Rect on Texture.");
         addField("srcX", TypeF32, Offset(mSrcRect.x,SpriteBaseObject));
         addField("srcY", TypeF32, Offset(mSrcRect.y,SpriteBaseObject));
         addField("srcWidth", TypeF32, Offset(mSrcRect.w,SpriteBaseObject));
         addField("srcHeight", TypeF32, Offset(mSrcRect.h,SpriteBaseObject));
 
-        addField("dstRect", TypeRectF, Offset(mDstRect,SpriteBaseObject));
+        addField("dstRect", TypeRectF, Offset(mDstRect,SpriteBaseObject), "Rect on Render Target.");
         addField("x", TypeF32, Offset(mDstRect.x,SpriteBaseObject));
         addField("y", TypeF32, Offset(mDstRect.y,SpriteBaseObject));
         addField("width", TypeF32, Offset(mDstRect.w,SpriteBaseObject));
         addField("height", TypeF32, Offset(mDstRect.h,SpriteBaseObject));
 
-        addField("angle", TypeF32, Offset(mAngle,SpriteBaseObject));
-        addField("centerPoint", TypePoint2F, Offset(mCenterPoint,SpriteBaseObject));
-        addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject));
+        addField("angle", TypeF32, Offset(mAngle,SpriteBaseObject), "Rotation Angle on Render Target (degree)");
+        addField("centerPoint", TypePoint2F, Offset(mCenterPoint,SpriteBaseObject), "The Centerpoit of the Rotation - when angle is set.");
+        addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject), "Flip mode on Render Target 0..3, see also SDL_FlipMode");
 
-        addField("color", TypeColor, Offset(mColor,SpriteBaseObject));
+        addField("color", TypeColor, Offset(mColor,SpriteBaseObject), "Color in Byte representation default WHITE = 255 255 255 255");
         addField("r", TypeS8, Offset(mColor.r,SpriteBaseObject));
         addField("g", TypeS8, Offset(mColor.g,SpriteBaseObject));
         addField("b", TypeS8, Offset(mColor.b,SpriteBaseObject));
         addField("a", TypeS8, Offset(mColor.g,SpriteBaseObject));
 
+        addField("visible", TypeBool, Offset(mVisible,SpriteBaseObject), "Flag for Rendering with SpriteGroup or manually checked.");
 
         addField("ScreenRect", TypeRectF, Offset(mScreenRect,SpriteBaseObject), "Translated rect when using camera translate");
         addField("ScreenCenterPoint", TypePoint2F, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
@@ -264,15 +266,15 @@ DefineEngineMethod(SpriteBaseObject, CenterCenterPoint,void, (),,"center the cen
 }
 
 DefineEngineMethod(SpriteBaseObject, colorFromHSV, void, (S32 hue, F32 saturation, F32 value, U8 alpha)
-    , (255), "Set the color from hue(0..359), sat (0..1), value(0..1)") {
+    , (255), "Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)") {
         object->mColor = fromHSV(hue, saturation, value, alpha);
 }
 
 
 
-// -.-
+// ---------- color Manupulation ----------
 DefineEngineFunction(getColorFromHSV, Color , (S32 hue, F32 saturation, F32 value, U8 alpha)
-, (255), "get the color from hue(0..359), sat (0..1), value(0..1)") {
+, (255), "get the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)") {
     return fromHSV(hue, saturation, value, alpha);
 }
 
@@ -386,7 +388,8 @@ public:
     // -------------------------------------------------------------------------
     // Translate a SpriteBaseObject
     bool Translate(SpriteBaseObject* sprite) {
-        if (!sprite) return false;
+        // skip invisible
+        if (!sprite || !sprite->mVisible) return false;
         sprite->mScreenCenterPoint = sprite->mCenterPoint;
         sprite->mScreenRect = sprite->mDstRect;
         return Translate(sprite->mScreenRect, sprite->mScreenCenterPoint);
@@ -785,6 +788,7 @@ public:
     U32     mLayer = 0;
     SDL_BlendMode mBlendMode = SDL_BLENDMODE_INVALID;
 
+
     static void initPersistFields() {
         Parent::initPersistFields();
         addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject), "velocity as point see also veloX veloY");
@@ -957,222 +961,7 @@ DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bo
         (SDL_FlipMode)object->mFlip, object->mColor
         ,object->mBlendMode
     );
-
 }
-
-/* redesign! and only 2D!
-class GameObject :public SimObject
-{
-    typedef SimObject Parent;
-public:
-    DECLARE_CONOBJECT(GameObject);
-    Point3F mPoint = {0.f,0.f,0.f};
-    Point3F mSize = {0.f,0.f,0.f};
-    Point3F mVelo = {0.f,0.f,0.f};
-    Color mColor = {0,0,0, 0};
-
-    F32   mRotateAngle = 0.f;
-    S32   mFlip = 0; //SDL_FlipMode
-
-
-    static void initPersistFields() {
-          Parent::initPersistFields();
-        addField("position", TypePoint3F, Offset(mPoint,GameObject));
-        addField("x", TypeF32, Offset(mPoint.x,GameObject));
-        addField("y", TypeF32, Offset(mPoint.y,GameObject));
-        addField("z", TypeF32, Offset(mPoint.z,GameObject));
-
-        addField("velocity", TypePoint3F, Offset(mVelo,GameObject));
-        addField("veloX", TypeF32, Offset(mVelo.x,GameObject));
-        addField("veloY", TypeF32, Offset(mVelo.y,GameObject));
-        addField("veloZ", TypeF32, Offset(mVelo.z,GameObject));
-
-        addField("size", TypePoint2F, Offset(mSize.x,GameObject));
-        addField("width", TypeF32, Offset(mSize.x,GameObject));
-        addField("heigth", TypeF32, Offset(mSize.y,GameObject));
-
-        addField("color", TypeColor, Offset(mColor,GameObject));
-        addField("r", TypeS8, Offset(mColor.r,GameObject));
-        addField("g", TypeS8, Offset(mColor.g,GameObject));
-        addField("b", TypeS8, Offset(mColor.b,GameObject));
-        addField("a", TypeS8, Offset(mColor.g,GameObject));
-
-
-        addField("rotate", TypeF32, Offset(mRotateAngle,GameObject), "angle in degree");
-        addField("flip", TypeS32, Offset(mFlip,GameObject), "is flipped (SDL_FlipMode)");
-    }
-
-    RectF getRectF() {
-       return {mPoint.x, mPoint.y, mSize.x, mSize.y};
-    }
-    Point2F getCenter2F() {
-        return {mPoint.x + mSize.x / 2, mPoint.y + mSize.y / 2.f};
-    }
-
-}; //CLASS
-IMPLEMENT_CONOBJECT(GameObject);
-
-DefineEngineMethod(GameObject, getRectF, RectF, (), ,"get the current rect") {
-    return object->getRectF();
-}
-DefineEngineMethod(GameObject, getCenter2F, Point2F, (), ,"get the center point") {
-    return object->getCenter2F();
-}
-DefineEngineMethod(GameObject, moveLinear, void, (), ,"Move Linear position/velocity") {
-    F32 dt =  (F32)BaseFlux::getFrameTime();
-    object->mPoint.x += object->mVelo.x * dt;
-    object->mPoint.y += object->mVelo.y * dt;
-    object->mPoint.z += object->mVelo.z * dt;
-}
-
-DefineEngineMethod(GameObject, moveGravity, void, (F32 gravityX, F32 gravityY, F32 gravityZ),
-                        (0.f, 9.81f, 0.f) ,
-                    "Move with gravity acceleration default: 0,-9.81,0") {
-    F32 dt = (F32)BaseFlux::getFrameTime();
-
-    object->mVelo.x += gravityX * dt;
-    object->mVelo.y += gravityY * dt;
-    object->mVelo.z += gravityZ * dt;
-
-    object->mPoint.x += object->mVelo.x * dt;
-    object->mPoint.y += object->mVelo.y * dt;
-    object->mPoint.z += object->mVelo.z * dt;
-}
-
-DefineEngineMethod(GameObject, moveOrbital, void, (Point3F centerPoint, F32 centerMass), ,"Move in a gravitational field") {
-    F32 dt = (F32)BaseFlux::getFrameTime();
-
-    Point3F direction = centerPoint - object->mPoint;
-    F32 distance = direction.len();
-
-    F32 softening = 0.1f;
-
-    if (distance > 0.00001f) {
-        direction.normalize();
-
-        F32 G = 6.674f;
-
-        F32 gravityPull = (G * centerMass) / (distance * distance + softening);
-
-        object->mVelo.x += direction.x * gravityPull * dt;
-        object->mVelo.y += direction.y * gravityPull * dt;
-        object->mVelo.z += direction.z * gravityPull * dt;
-    }
-
-    object->mPoint.x += object->mVelo.x * dt;
-    object->mPoint.y += object->mVelo.y * dt;
-    object->mPoint.z += object->mVelo.z * dt;
-}
-
-DefineEngineMethod(GameObject, moveOrbital2D, void,
-    (Point3F centerPoint, F32 gravity, F32 softening, F32 maxSpeed),
-                   (10.f, 150.f, 350.f) ,"2D Safe Orbital Movement")
-{
-    F32 dt = (F32)BaseFlux::getFrameTime();
-
-    Point3F direction = centerPoint - object->mPoint;
-    direction.z = 0.f;
-
-    F32 distance = direction.len();
-
-    // F32 G = 9.81f;
-
-    if (distance > 0.0001f) {
-        direction.normalize();
-        F32 gravityPull = (gravity * 1000.f) / (distance * distance + softening);
-
-        object->mVelo.x += direction.x * gravityPull * dt;
-        object->mVelo.y += direction.y * gravityPull * dt;
-    }
-
-    // F32 drag = 0.995f;
-    // object->mVelo.x *= drag;
-    // object->mVelo.y *= drag;
-
-    F32 currentSpeed = sqrt(object->mVelo.x * object->mVelo.x + object->mVelo.y * object->mVelo.y);
-    if (currentSpeed > maxSpeed && currentSpeed > 0.0f) {
-        object->mVelo.x = (object->mVelo.x / currentSpeed) * maxSpeed;
-        object->mVelo.y = (object->mVelo.y / currentSpeed) * maxSpeed;
-    }
-
-    object->mPoint.x += object->mVelo.x * dt;
-    object->mPoint.y += object->mVelo.y * dt;
-}
-
-
-DefineEngineMethod(GameObject, DrawTexture, bool, (SimObjectId texObjectID, bool center),(true) ,"Draw2D") {
-    TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
-    if (!texObject) return false;
-    if (object->mSize.x <= 0.f || object->mSize.y <= 0.f ) {
-        object->mSize.x = (F32)texObject->get()->w;
-        object->mSize.y = (F32)texObject->get()->h;
-    }
-    RectF rect;
-    if (center) rect = {
-        object->mPoint.x - object->mSize.x / 2.f,object->mPoint.y - object->mSize.y / 2.f
-        , object->mSize.x, object->mSize.y };
-    else rect = { object->mPoint.x,object->mPoint.y, object->mSize.x, object->mSize.y };
-
-    if (object->mRotateAngle != 0.f || object->mFlip != 0) {
-        RectF srcRect = {0.f,0.f,(F32)texObject->get()->w, (F32)texObject->get()->h};
-        return texObject->DrawRotatedSrcDstRect(srcRect, rect,
-                object->mRotateAngle, {object->mSize.x / 2.f, object->mSize.y / 2.f },
-                (SDL_FlipMode)object->mFlip, object->mColor);
-    }
-    return texObject->DrawRect( rect , object->mColor);
-}
-
-DefineEngineMethod(GameObject, solveCollideLine,bool, (RectF linePoints, F32 bounceStrength)
-        ,(0.2f),"check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)")
-{
-    BaseFlux::Collision::Info info;
-    RectF myRect = object->getRectF();
-    if ( BaseFlux::Collision::getInfoRectLine(myRect
-      , linePoints.x, linePoints.y, linePoints.w, linePoints.h
-      , info)) {
-
-        BaseFlux::Collision::solveOberlap(myRect, info);
-        object->mPoint.x = myRect.x;
-        object->mPoint.y = myRect.y;
-
-///
-        if (bounceStrength > 0.f) {
-            float dotProduct = (object->mVelo.x * info.mNormal.x) + (object->mVelo.y * info.mNormal.y);
-            if (dotProduct < 0.0f) {
-                float impulse = -(1.0f + bounceStrength) * dotProduct;
-                object->mVelo.x += info.mNormal.x * impulse;
-                object->mVelo.y += info.mNormal.y * impulse;
-            }
-        }
-///
-
-        return true;
-    }
-    return false;
-}
-
-
-DefineEngineMethod(GameObject, getCollideRectF,bool, (SimObjectId gameObjectID, bool alsoNullVelo)
-    ,(false),"Check collide and move out")
-{
-    if (object->mSize.x <= 0.f || object->mSize.y <= 0.f ) return false; //invalid size!
-    GameObject* other = dynamic_cast<GameObject*>(Sim::findObject(gameObjectID));
-    if (!other) return false;
-    BaseFlux::Collision::Info info;
-    RectF myRect = object->getRectF();
-    if (BaseFlux::Collision::getInfoRectF(myRect, other->getRectF(), info)) {
-        BaseFlux::Collision::solveOberlap(myRect, info);
-        object->mPoint.x = myRect.x;
-        object->mPoint.y = myRect.y;
-        if (alsoNullVelo) { //else let the script decide
-            object->mVelo.x = 0.f;
-            object->mVelo.y = 0.f;
-        }
-        return true;
-    }
-    return false;
-}
-*/
 // =============================================================================
 //  SpriteGroup
 //  - A Group which only accepts SpriteObjects
@@ -1196,6 +985,9 @@ public:
         lock();
         for( SimSet::iterator iter = begin(); iter != end(); ++ iter ) {
             SpriteObject* sprite = static_cast<SpriteObject*>(*iter);
+
+            if (!sprite->mVisible) continue;
+
             if (camera) {
                 // Translate also make a frustum check :
                 if (camera->Translate(sprite)) {
@@ -1522,7 +1314,6 @@ DefineEngineFunction(GetRendererName, String, (), ,"Get the current renderer nam
 // -----------------------------------------------------------------------------
 // Lights /*
 // SDL_Texture* CreatePointLightTexture(SDL_Renderer* renderer, int radius, SDL_Color color);
-
 DefineEngineFunction(CreatePointLightTexture, S32, (S32 radius, Color color, bool diffuse), (WHITE, true),
         "Create Point Light Texture object" ) {
     SDL_Texture* target_texture = BaseFlux::CreatePointLightTexture(app.getRenderer(), radius, color, diffuse);
@@ -1536,13 +1327,35 @@ DefineEngineFunction(CreatePointLightTexture, S32, (S32 radius, Color color, boo
         result->deleteObject();
         return 0;
     }
-    result->mDefaultBlendMode = SDL_BLENDMODE_MUL;
+    result->mDefaultBlendMode = SDL_BLENDMODE_ADD;
     return result->getId();
 }
+
+// SDL_Texture* CreateRayLightTexture(SDL_Renderer* renderer, int length, int width, SDL_Color color, bool diffuse = true);
+DefineEngineFunction(CreateRayLightTexture, S32, ( S32 width, S32 height, Color color, bool diffuse), (WHITE, true),
+        "Create Ray/Beam Light Texture object" ) {
+    SDL_Texture* target_texture = BaseFlux::CreateRayLightTexture(app.getRenderer(), width, height, color, diffuse);
+    if (!target_texture) {
+        Con::errorf("Failed to create Ray Light Texture!");
+        return 0;
+    }
+    TextureObject* result = new TextureObject();
+    result->registerObject(); // before set because this calles add
+    if (!result->set(target_texture, true)) {
+        result->deleteObject();
+        return 0;
+    }
+    result->mDefaultBlendMode = SDL_BLENDMODE_ADD;
+    return result->getId();
+}
+
 // SDL_Texture* CreateSpotlightTexture(SDL_Renderer* renderer, int radius, float coneAngleDegrees, SDL_Color color);*/
-DefineEngineFunction(CreateSpotlightTexture, S32, (S32 radius, F32 coneAngleDegrees,  Color color, bool diffuse), (WHITE, true),
-        "Create Spot Light Texture object" ) {
-    SDL_Texture* target_texture = BaseFlux::CreateSpotlightTexture(app.getRenderer(), radius, coneAngleDegrees, color, diffuse);
+DefineEngineFunction(CreateSpotlightTexture, S32, (S32 radius, F32 coneAngleDegrees,  Color color, bool diffuse, bool damping)
+    , (WHITE, true, false), "Create Spot Light Texture object. diffuse remove the hard ray in the middle, damping make it more foggy" ) {
+    SDL_Texture* target_texture = BaseFlux::CreateSpotlightTexture(
+        app.getRenderer(), radius, coneAngleDegrees,
+        color, diffuse, damping
+    );
     if (!target_texture) {
         Con::errorf("Failed to create Spot Light Texture!");
         return 0;
@@ -1553,7 +1366,7 @@ DefineEngineFunction(CreateSpotlightTexture, S32, (S32 radius, F32 coneAngleDegr
         result->deleteObject();
         return 0;
     }
-    result->mDefaultBlendMode = SDL_BLENDMODE_MUL;
+    result->mDefaultBlendMode = SDL_BLENDMODE_ADD;
     return result->getId();
 }
 // -----------------------------------------------------------------------------

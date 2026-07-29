@@ -65,46 +65,67 @@ function CameraTest::onAdd(%this) {
 
     }
 
+    if (SceneObjects.viewPort $= "")  SceneObjects.viewPort =  "1152 648";
+
     MyFish.veloX = 100.0;
     %this.add(SceneObjects);
 
     %this.add( new Camera2DObject(Camera));
 
-    // NOTE BEST WOULD BE RENDER PASS =>
-    // 1. normal rendering to renderer
-    // 2. render lights  to RenderTarget (lightmap) with
-    //      -- backgroud ~ "40 40 60 255"
-    //      -- light with ~ "255 230 180 255" SDL_BLENDMODE_ADD
-    // 3. lightMap add to screen with SDL_BLENDMODE_MUL
+    // ------------------ Lightmap -------------------
+    // I create a static lightmap here but it can also be added
+    // to render loop to create it dynamicly
+
+    // Create Lights
+    %SpotLight = CreateSpotlightTexture(128, 90, WHITE, true, false); // 256x256
+    %SpotLight.name = TexSpotLight;
+
+    %RayLight = CreateRaylightTexture(256,256, WHITE, true); // 256x256
+    %RayLight.name = TexRayLight;
+
+    %pointLight = CreatePointLightTexture(128, WHITE, true); // 256x256
+    %pointLight.name = TexPointLight;
+
+    %LightMapSize = "1200 800";
+
+    // Create Ligthmap render target (TextObject)
+    %lightMap = CreateRenderTarget(%LightMapSize);
+    %lightMap.name = "TexLightMap";
+    %lightMap.blendMode = SDL_BLENDMODE_MUL;
+    %this.add( %lightMap );
 
 
-    // %pointLight = CreateSpotlightTexture(128, 45, WHITE, true); // 256x256
-    %pointLight = CreatePointLightTexture(128, WHITE); // 256x256
-    %pointLight.name = TexOmniLight;
-    %this.add(%pointLight);
+    // Paint Lights to LightMap
+    SetRenderTarget(TexLightMap.getId());
+    ClearBackground("20 20 20");
 
-    // %this.add(new TextureObject(TexOmniLight) {
-    //    fileName = "assets:/texture/spotlight.png";
-    //    // fileName = "assets:/texture/omnilight.png";
-    //    // blendMode = SDL_BLENDMODE_ADD;
-    //    // blendMode = SDL_BLENDMODE_ADD_PREMULTIPLIED;
-    //    blendMode = SDL_BLENDMODE_MUL;
-    // });
-    %this.add(new SpriteObject( OmniLight ) {
-        // dstRect = "-600 -600 2000 2000";
-        dstRect = "0 -150 1152 800";
-        // angle = -25;
-        // basecolor   = "120 0 255 120";
-        // basecolor   = "10 10 60 120";
-        // color = "150 150 255"; //MUL color !
-        color = "100 150 255 255";
-        layer = 1;
+    // vinette
+    %pointLight.DrawRect("0 0 1200 800", "80 80 100", SDL_BLENDMODE_ADD);
+
+    %SpotLight.DrawRect("-350 -1024 1024 2048", WHITE, SDL_BLENDMODE_ADD);
+    %SpotLight.DrawRect("50 -1024 1024 2048", WHITE, SDL_BLENDMODE_ADD);
+    %SpotLight.DrawRect("450 -1024 1024 2048", WHITE, SDL_BLENDMODE_ADD);
+
+    // %RayLight.DrawRect("300 0 1024 1024", WHITE, SDL_BLENDMODE_ADD);
+
+    SetRenderTarget(0);
+
+    // Lights are not longer used ... so i
+    %Spotlight.delete();
+    %RayLight.delete();
+    %pointLight.delete();
+
+
+    // Crate Sprite ... for easier cam handling
+    %this.add(new SpriteObject( LightMap ) {
+        dstRect = "0 -150" SPC %LightMapSize;
+        color = WHITE;
+        layer = 0;
     });
-    // OmniLight.color = getScaledColorSaturation(OmniLight.basecolor, getRandomF(0.4,0.6));
-    OmniLight.CenterCenterPoint();
+    LightMap.CenterCenterPoint();
 
     %this.add ( new SimObject(FieldInspector));
-    FieldInspector.inspect(OmniLight.getId());
+    FieldInspector.inspect(LightMap.getId());
 
     return true;
 }
@@ -114,8 +135,8 @@ function CameraTest::OnRemove(%this) {
 //----------------------------------------------------------------------
 function CameraTest::OnUpdate(%this, %dt) {
 
-    // OmniLight.color = getScaledColorSaturation(OmniLight.basecolor, mSin(getGameTime())* 0.3  + 0.5);
-    // OmniLight.color = getScaledColor(OmniLight.basecolor, mSin(getGameTime())* 1.0  + 1.2);
+    // LightMap.color = getScaledColorSaturation(LightMap.basecolor, mSin(getGameTime())* 0.3  + 0.5);
+    // LightMap.color = getScaledColor(LightMap.basecolor, mSin(getGameTime())* 1.0  + 1.2);
 
     if (isObject(MyFish)) {
         MyFish.moveLinear(%dt);
@@ -196,9 +217,9 @@ function CameraTest::Render(%this) {
     // Example how to do it manually ... drawAtlasBatch does it all for me
     // %obj = MySprite.getId();
     //NOTE translate dstRect to screenRect and centerPoint to screenCenterPoint
-    %doRender = Camera.TranslateSpriteBaseObject(OmniLight.getId());
+    %doRender = Camera.TranslateSpriteBaseObject(LightMap.getId());
     //
-    if (%doRender) OmniLight.DrawTexture(TexOmniLight.getId(), false, true);
+    if (%doRender) LightMap.DrawTexture(TexLightMap.getId(), false, true);
     // if (%doRender) {
     //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
     //                                       %obj.screenRect, //NOTE this!
