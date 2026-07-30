@@ -40,6 +40,7 @@ exec ("include/GuiTool.elf");
 #define SHOW_PREVIEW 0
 #define BACKGROUND_COLOR "176 233 252"
 #define SCENE_FILE "pref:/aquarium.elfscene"
+#define SCENE_PATH "pref:/"
 #define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
 
 function createAquarium() {
@@ -53,6 +54,8 @@ function createAquarium() {
 function Aquarium::onAdd(%this) {
 
     SetClearBackground(BACKGROUND_COLOR); //only set once
+
+     %this.currentSceneFile = "";
 
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
     %this.Spritesheet.name = "SpriteSheet";
@@ -121,6 +124,9 @@ function Aquarium::onAdd(%this) {
     GuiTool.CurrentMenu = 0; //reset
 
 
+    %this.add(singleton FileDialogObject(FileDialog));
+    FileDialog.init(getFullPath(SCENE_PATH), ".elfscene");
+    FileDialog.open = false;
 
     return true;
 }
@@ -201,9 +207,9 @@ function Aquarium::removeSceneObject(%this,%obj) {
     %this.dirty = true;
 }
 //----------------------------------------------------------------------
-function Aquarium::load(%this) {
-    %path = getFullPath(SCENE_FILE);
+function Aquarium::load(%this, %path) {
 
+     %this.currentSceneFile = %path;
 
     %savScene = SceneObjects.getId();
     %savScene.name = "savScene";
@@ -249,9 +255,9 @@ function Aquarium::onSelectObject(%this, %menuId, %menuCaption) {
     // warn("SELECT " SPC %menuId SPC  %menuCaption SPC "=>" SPC %obj);
 }
 //----------------------------------------------------------------------
-function Aquarium::save(%this) {
+function Aquarium::save(%this, %path) {
 
-    %path = getFullPath(SCENE_FILE);
+     %this.currentSceneFile = %path;
     if (SceneObjects.save(%path)) GuiTool.ShowMessage("Scene saved to:\n" SPC %path);
     else GuiTool.ShowMessage("[error] Failed to save Scene to:\n" SPC %path);
     %this.dirty = true;
@@ -259,8 +265,8 @@ function Aquarium::save(%this) {
 //----------------------------------------------------------------------
 function Aquarium::onConfirmMenu(%this, %menuId, %menuCaption) {
 
-    if (%this.ConfirmMenu.action $= "Save Scene" && %menuId == 0) {
-        %this.save();
+    if (%this.ConfirmMenu.action $= "Overwrite Scene?" && %menuId == 0) {
+        %this.save(FileDialog.getSelectedFile());
     }
     GuiTool.CurrentMenu = 0;
 }
@@ -270,18 +276,21 @@ function Aquarium::onMainMenu(%this, %menuId, %menuCaption) {
     switch$ (%menuCaption) {
 
         case "Save Scene":
+            GuiTool.CurrentMenu = 0;
             if (SceneObjects.getCount() == 0) {
                 GuiTool.ShowMessage("Skip save empty scene!");
                 return;
             }
-            %this.ConfirmMenu.MenuCaption = "Confirm Save Scene";
-            %this.ConfirmMenu.action = "Save Scene";
-            GuiTool.CurrentMenu = %this.ConfirmMenu;
-
+            FileDialog.setSaveMode(  %this.currentSceneFile, ".elfscene", "Save Scene", ".elfscene");
+            FileDialog.open = true;
 
         case "Load Scene":
             GuiTool.CurrentMenu = 0;
-            %this.load();
+
+            FileDialog.setLoadMode(  %this.currentSceneFile, "Load Scene", ".elfscene");
+            FileDialog.open = true;
+
+
 
         case "Export Image":
             GuiTool.CurrentMenu = 0;
@@ -468,6 +477,32 @@ function Aquarium::Render(%this) {
 
 
     GuiTool.Render(%screenSize);
+
+    if (FileDialog.open && FileDialog.Draw()) {
+
+
+        %message = "FileDialog returned true!!" SPC FileDialog.getSelectedFile()
+                    SPC "Pressed cancel:" SPC FileDialog.getCancelPressed() SPC "SAVEMODE:" SPC FileDialog.IsSaveMode();
+        warn(%message);
+
+        if (FileDialog.getCancelPressed()) {
+            FileDialog.open = false;
+        } else {
+            if (FileDialog.IsSaveMode()) {
+                if (SDL_FileExists(FileDialog.getSelectedFile())) {
+                    %this.ConfirmMenu.MenuCaption = "Confirm Save Scene";
+                    %this.ConfirmMenu.action = "Save Scene";
+                    GuiTool.CurrentMenu = %this.ConfirmMenu;
+                } else {
+                    %this.save(FileDialog.getSelectedFile());
+                }
+            } else {
+                //FIXME check something is changed...
+                %this.load(FileDialog.getSelectedFile());
+            }
+        }
+        FileDialog.open = false;
+    }
 
 
 

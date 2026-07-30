@@ -1250,11 +1250,9 @@ U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       ip = objectExpr->compile(codeStream, ip, TypeReqString);
       codeStream.emit(OP_SETCUROBJECT);
 
-      // 1. ALWAYS emit the standard field setup so "curField" is populated in the VM!
       codeStream.emit(OP_SETCURFIELD);
       codeStream.emitSTE(slotName);
 
-      // 2. NOW, if we know the strict type, inform the VM about it as well
       if (typeID == TypeS32 || typeID == TypeF32)
       {
             codeStream.emit(OP_SETCURFIELD_TYPE);

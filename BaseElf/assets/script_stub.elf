@@ -439,6 +439,57 @@ class  SimObject {
     */
    pid persistentId;
 };
+class  FileDialogObject : public SimObject {
+  public:
+   /** --- void Init ---
+    * set path and filter of FileDialog filer are TAB separated extension
+    */
+      function Init( string path, string filterTabSep );
+   /** --- void setSaveMode ---
+    * set save mode fileName, fileExt, caption  and filter of FileDialog filer are TAB separated extension like .wav TAB .ogg
+    */
+      function setSaveMode( string fileName, string fileExt, string caption, string filterTabSep );
+   /** --- void Reset ---
+    * reset current settings - when set to save for example
+    */
+      function Reset();
+   /** --- bool Draw ---
+    * Draw the Filedialog, return true on action
+    * You can check saveMode is set and save the selectedFileName
+    * if selectedExt is empty you can append it.
+    * @return bool
+    */
+      function Draw();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+   Current selected file,
+   
+    */
+   string selectedFile;
+   /*!
+   Current selected file extension
+   
+    */
+   string selectedExt;
+   /*!
+   the user pressed cancel
+   
+    */
+   bool cancelPressed;
+   /*!
+   Default file extension in save mode
+   
+    */
+   bool SaveMode;
+   /*!
+   Default file extension in save mode
+   
+    */
+   string SaveExt;
+};
 /*!
 @brief A collection of SimObjects.
 It is often necessary to keep track of an arbitrary set of SimObjects. For instance, Torque's networking code needs to not only keep track of the set of objects which need to be ghosted, but also the set of objects which must <i>always</i> be ghosted. It does this by working with two sets. The first of these is the RootGroup (which is actually a SimGroup) and the second is the GhostAlwaysSet, which contains objects which must always be ghosted to the client.
@@ -712,6 +763,22 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  SpriteGroup : public SimGroup {
+  public:
+   /** --- void sortLayers ---
+    * Sort SpriteObject's by layer
+    */
+      function sortLayers();
+   /** --- bool drawAtlasBatch ---
+    * Draw all sprites in the group with option camera object
+    * @return bool
+    */
+      function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
 /*!
 @brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
 ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
@@ -822,7 +889,7 @@ class  SpriteBaseObject : public SimObject {
     */
       function CenterCenterPoint();
    /** --- void colorFromHSV ---
-    * Set the color from hue(0..359), sat (0..1), value(0..1)
+    * Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
     */
       function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
    // --- Group: Ungrouped ---
@@ -830,6 +897,8 @@ class  SpriteBaseObject : public SimObject {
    // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
+   Rect on Texture.
+   
     */
    RectF srcRect;
    /*!
@@ -845,6 +914,8 @@ class  SpriteBaseObject : public SimObject {
     */
    float srcHeight;
    /*!
+   Rect on Render Target.
+   
     */
    RectF dstRect;
    /*!
@@ -860,15 +931,23 @@ class  SpriteBaseObject : public SimObject {
     */
    float height;
    /*!
+   Rotation Angle on Render Target (degree)
+   
     */
    float angle;
    /*!
+   The Centerpoit of the Rotation - when angle is set.
+   
     */
    Point2F centerPoint;
    /*!
+   Flip mode on Render Target 0..3, see also SDL_FlipMode
+   
     */
    int flip;
    /*!
+   Color in Byte representation default WHITE = 255 255 255 255
+   
     */
    Color color;
    /*!
@@ -883,6 +962,11 @@ class  SpriteBaseObject : public SimObject {
    /*!
     */
    char a;
+   /*!
+   Flag for Rendering with SpriteGroup or manually checked.
+   
+    */
+   bool visible;
    /*!
    Translated rect when using camera translate
    
@@ -1015,22 +1099,6 @@ default SDL_BLENDMODE_INVALID => not overwritten
    
     */
    uint blendMode;
-};
-class  SpriteGroup : public SimGroup {
-  public:
-   /** --- void sortLayers ---
-    * Sort SpriteObject's by layer
-    */
-      function sortLayers();
-   /** --- bool drawAtlasBatch ---
-    * Draw all sprites in the group with option camera object
-    * @return bool
-    */
-      function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
 };
 class  SoundObject : public SimObject {
   public:
@@ -1956,7 +2024,7 @@ namespace Global {
     */
       function checkLoopFunc();
    /** --- Color getColorFromHSV ---
-    * get the color from hue(0..359), sat (0..1), value(0..1)
+    * get the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
     * @return Color
     */
       function getColorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
@@ -2109,11 +2177,16 @@ namespace Global {
     * @return S32
     */
       function CreatePointLightTexture( int radius, Color color=WHITE, bool diffuse=true );
-   /** --- S32 CreateSpotlightTexture ---
-    * Create Spot Light Texture object
+   /** --- S32 CreateRayLightTexture ---
+    * Create Ray/Beam Light Texture object
     * @return S32
     */
-      function CreateSpotlightTexture( int radius, float coneAngleDegrees, Color color=WHITE, bool diffuse=true );
+      function CreateRayLightTexture( int width, int height, Color color=WHITE, bool diffuse=true );
+   /** --- S32 CreateSpotlightTexture ---
+    * Create Spot Light Texture object. diffuse remove the hard ray in the middle, damping make it more foggy
+    * @return S32
+    */
+      function CreateSpotlightTexture( int radius, float coneAngleDegrees, Color color=WHITE, bool diffuse=true, bool damping=false );
    /** --- Group: BaseFlux ---
     * BaseFlux Functions: getFPS, ...
     */
@@ -4727,8 +4800,11 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  TEX_SIZE = 16
-  BOUNCY = 6.66
+  PLAYER_SIZE = "16 16"
+  SCENE_PATH = "pref:/"
+  BACKGROUND_COLOR = "176 233 252"
+  SCALE_SNAP = 8
+  SCENE_FILE = "pref:/aquarium.elfscene"
   SDL_FOLDER_VIDEOS = 10
   SDL_FOLDER_SCREENSHOTS = 8
   SDL_FOLDER_PUBLICSHARE = 6
@@ -4771,12 +4847,12 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
+  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
   SDL_SCANCODE_KP_MEMCLEAR = 210
   SDL_SCANCODE_KP_MEMRECALL = 209
-  BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
   SDL_SCANCODE_KP_SPACE = 205
   SDL_SCANCODE_KP_COLON = 203
@@ -4817,7 +4893,6 @@ namespace Global {
   ImGuiTreeNodeFlags_DrawLinesNone = 262144
   ImGuiKey_7 = 543
   ImGuiStyleVar_GrabRounding = 22
-  LOGO_SPAWN_RATE = 50
   ImGuiStyleVar_GrabMinSize = 21
   ImGuiStyleVar_CellPadding = 17
   ImGuiInputTextFlags_CharsDecimal = 1
@@ -4916,6 +4991,7 @@ namespace Global {
   SDL_SCALEMODE_NEAREST = 0
   SDL_SCANCODE_MEDIA_NEXT_TRACK = 267
   SDL_SCANCODE_INTERNATIONAL4 = 138
+  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
   GREEN = "0 228 48 255"
@@ -4928,7 +5004,6 @@ namespace Global {
   SDL_SCANCODE_KP_MINUS = 86
   ImGuiKey_Escape = 526
   BLUE = "0 121 241 255"
-  MAG_DIR_VALUE = 15
   SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR = 4
   SDL_SCALEMODE_PIXELART = 2
   MAROON = "190 33 55 255"
@@ -5023,6 +5098,7 @@ namespace Global {
   ImGuiStyleVar_WindowTitleAlign = 6
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
+  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_LANG3 = 146
@@ -5086,6 +5162,7 @@ namespace Global {
   ImGuiWindowFlags_MenuBar = 1024
   ImGuiTreeNodeFlags_OpenOnArrow = 128
   ImGuiWindowFlags_NoSavedSettings = 256
+  MAX_SCALE = 1024
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiWindowFlags_NoDecoration = 43
   ImGuiTreeNodeFlags_None = 0
@@ -5111,6 +5188,7 @@ namespace Global {
   cl_Orange = "1.000000 0.500000 0.000000 1.000000"
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
+  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiStyleVar_ChildBorderSize = 8
   ImGuiTreeNodeFlags_DrawLinesFull = 524288
@@ -5140,7 +5218,6 @@ namespace Global {
   SDL_SCANCODE_F23 = 114
   ImGuiMod_Super = 32768
   ImGuiKey_A = 546
-  MAG_MAX = 5000
   ImGuiKey_C = 548
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiKey_E = 550
@@ -5156,7 +5233,6 @@ namespace Global {
   ImGuiKey_J = 555
   ImGuiKey_PageUp = 517
   ImGuiKey_0 = 536
-  LOGO_SIZE = 32
   SDL_SCANCODE_KP_LEFTPAREN = 182
   SDL_SCANCODE_D = 7
   ImGuiKey_M = 558
@@ -5336,7 +5412,6 @@ namespace Global {
   SDL_SCANCODE_KP_0 = 98
   SDL_SCANCODE_NONUSBACKSLASH = 100
   SDL_SCANCODE_APPLICATION = 101
-  LOGO_START_SPEED = 100
   SDL_SCANCODE_KP_EQUALS = 103
   SDL_SCANCODE_7 = 36
   SDL_SCANCODE_F15 = 106
@@ -5380,5 +5455,5 @@ namespace Global {
   SDL_SCANCODE_KP_00 = 176
   ImGuiKey_Q = 562
   SDL_SCANCODE_THOUSANDSSEPARATOR = 178
---- End of Dump (653 items) ---
+--- End of Dump (655 items) ---
 */
