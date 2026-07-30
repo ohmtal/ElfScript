@@ -35,6 +35,34 @@ extern SDL_Point gMousePos;
 
 
 
+// ---------------------------- Helper -------------------------------------
+String getFullPath(String pathIdent = "base:/") {
+    if (pathIdent.isEmpty()) pathIdent = "base:/";
+    if (pathIdent.equal("script:/")) return Torque::FS::GetCwd().getFullPath();
+    std::string tmp = pathIdent.c_str();
+    app.setFullPath(tmp);
+    return tmp.c_str();
+}
+namespace ElfSDL3 {
+
+    SDL_Point GetScreenSize() {
+        SDL_Point screenSize = {0,0};
+        SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
+
+        if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
+        } else {
+            Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
+        }
+        // fallback
+        if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
+
+        return screenSize;
+    }
+
+
+
+} // namespace
+
 // -----------------------------------------------------------------------------
 void registerColors() {
     const String prefix = "";
@@ -171,27 +199,6 @@ DefineEngineMethod(SettingsObject, sync, void, (),,"Settings must be synced to g
 
 SettingsObject* gSettingsObject;
 
-
-// ---------------------------- Helper -------------------------------------
-namespace ElfSDL3 {
-
-    SDL_Point GetScreenSize() {
-        SDL_Point screenSize = {0,0};
-        SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
-
-        if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
-        } else {
-            Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
-        }
-        // fallback
-        if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
-
-        return screenSize;
-    }
-
-
-
-} // namespace
 
 
 // =============================================================================
@@ -1463,13 +1470,7 @@ DefineEngineFunction(getAppPath, String,(),, "Get the directory where the applic
     return BaseFlux::Tools::getBasePath().c_str();
 }
 
-String getFullPath(String pathIdent = "base:/") {
-    if (pathIdent.isEmpty()) pathIdent = "base:/";
-    if (pathIdent.equal("script:/")) return Torque::FS::GetCwd().getFullPath();
-    std::string tmp = pathIdent.c_str();
-    app.setFullPath(tmp);
-    return tmp.c_str();
-}
+
 
 DefineEngineFunction(dumpPathes, void,(),, "print all known pathes on console output") {
     // "base:/ || assets:/ || sound:/ || texture:/ || pref:/ || script:/"

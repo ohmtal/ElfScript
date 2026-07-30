@@ -13,7 +13,8 @@ function createCameraTest() {
 //----------------------------------------------------------------------
 function CameraTest::onAdd(%this) {
     // SetClearBackground("160 160 200"); //only set once
-    SetClearBackground("20 20 20 255");
+    // SetClearBackground("20 20 20 255");
+    SetClearBackground("80 80 140 255");
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
     %this.Spritesheet.name = "SpriteSheet";
 

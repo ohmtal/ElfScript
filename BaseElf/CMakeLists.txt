@@ -9,6 +9,7 @@ project(BaseElf)
 set(PROJECT_SRC
     src/main.cpp
     src/bindings_sdl.cpp
+    src/bindings/FileDialog.cpp
     src/myPlatformProcess.cc
     src/ConsoleTypes.cpp
 )
