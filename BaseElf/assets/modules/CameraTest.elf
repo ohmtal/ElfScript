@@ -59,6 +59,8 @@ function CameraTest::onAdd(%this) {
                 // break;
             }
             if (%obj.textureName $= "bubble_a") {
+                %obj.width = getRandom(30,50);
+                %obj.height = %obj.width;
                 %obj.veloY = getRandom(-20, -50);
                 BubbleSet.add(%obj);
             }
@@ -211,6 +213,8 @@ function CameraTest::Render(%this) {
         if (%bubble.y < -30) {
             %bubble.y = 480;
             %bubble.x = getRandom(20, 1100);
+            %bubble.width = getRandom(30,50);
+            %bubble.height = %bubble.width;
             %bubble.veloY = getRandom(-20, -50);
             %bubble.velox = 0.0;
         }

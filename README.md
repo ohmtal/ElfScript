@@ -63,8 +63,15 @@ Functions.
 - [ElfScript](./ElfScript/)
 
 ## Folder: BaseElf
+![ScreenShots](./BaseElf/ScreenShotsCombined.png)
 
-Located in Folder [BaseElf](./BaseElf): A minimal Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as base for SDL3/ImGui/ResourceManager and ElfScript. It's also an enhanced example how to embed ElfScript.
+Located in Folder [BaseElf](./BaseElf): 
+
+A neat basic Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as 
+base for SDL3/ImGui/ResourceManager and ElfScript. It's also an enhanced example 
+how to embed ElfScript.
+
+This is a nice place to learn ElfScript (aka TorqueScipt ). 
 
 ## Folder: TorqueScript
 

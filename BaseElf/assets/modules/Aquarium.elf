@@ -266,6 +266,7 @@ function Aquarium::save(%this, %path) {
 function Aquarium::onConfirmMenu(%this, %menuId, %menuCaption) {
 
     if (%this.ConfirmMenu.action $= "Overwrite Scene?" && %menuId == 0) {
+
         %this.save(FileDialog.getSelectedFile());
     }
     GuiTool.CurrentMenu = 0;
@@ -490,8 +491,8 @@ function Aquarium::Render(%this) {
         } else {
             if (FileDialog.IsSaveMode()) {
                 if (SDL_FileExists(FileDialog.getSelectedFile())) {
-                    %this.ConfirmMenu.MenuCaption = "Confirm Save Scene";
-                    %this.ConfirmMenu.action = "Save Scene";
+                    %this.ConfirmMenu.MenuCaption = "Confirm overwrite Scene";
+                    %this.ConfirmMenu.action = "Overwrite Scene?";
                     GuiTool.CurrentMenu = %this.ConfirmMenu;
                 } else {
                     %this.save(FileDialog.getSelectedFile());
@@ -521,6 +522,10 @@ function Aquarium::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isR
 
     if (%isDown) {
         if (%scancode == SDL_SCANCODE_ESCAPE) {
+            if (FileDialog.open) {
+                FileDialog.open = false;
+                return;
+            }
             if (GuiTool.CurrentMenu == 0) GuiTool.CurrentMenu =%this.MainMenu;
             else GuiTool.CurrentMenu = 0;
         }
