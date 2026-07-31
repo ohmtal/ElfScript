@@ -49,7 +49,7 @@ function CameraTest::onAdd(%this) {
         // i want MyFish ;)
         foreach(%obj in SceneObjects) {
             // %obj.color = getScaledColor(%obj.color , 0.25); //make dark we have a light ..
-
+             %obj.textureObjectId = SpriteSheet.getId();
 
             if (%obj.textureName $= "fish_brown_outline") {
                 %obj.name = MyFish;
@@ -92,14 +92,14 @@ function CameraTest::onAdd(%this) {
     %LightMapSize = "1200 800";
 
     // Create Ligthmap render target (TextObject)
-    %lightMap = CreateRenderTarget(%LightMapSize);
-    %lightMap.name = "TexLightMap";
-    %lightMap.blendMode = SDL_BLENDMODE_MUL;
-    %this.add( %lightMap );
-
+    %lm = CreateRenderTarget(%LightMapSize);
+    %lm.name =  "TexLightMap";
+    %lm.blendMode = SDL_BLENDMODE_MUL;
+    %this.add(%lm);
 
     // Paint Lights to LightMap
     SetRenderTarget(TexLightMap.getId());
+    // error("SET RENDER TARGET TO:" SPC TexLightMap.getId());
     ClearBackground("20 20 20");
 
     // vinette
@@ -121,11 +121,15 @@ function CameraTest::onAdd(%this) {
 
     // Crate Sprite ... for easier cam handling
     %this.add(new SpriteObject( LightMap ) {
+        srcRect = "0 0" SPC %LightMapSize;
         dstRect = "0 -150" SPC %LightMapSize;
         color = WHITE;
         layer = 0;
+        textureObjectId = TexLightMap.getId();
     });
     LightMap.CenterCenterPoint();
+    SceneObjects.add(LightMap);
+    SceneObjects.sortLayers();
 
     %this.add ( new SimObject(FieldInspector));
     FieldInspector.inspect(LightMap.getId());
@@ -222,25 +226,11 @@ function CameraTest::Render(%this) {
 
 
 
-    SceneObjects.drawAtlasBatch(Spritesheet.getId(), Camera.getId());
+    SceneObjects.drawBatch(Camera.getId());
+    // SceneObjects.drawAtlasBatch(Spritesheet.getId(), Camera.getId());
 
-
-    // Example how to do it manually ... drawAtlasBatch does it all for me
-    // %obj = MySprite.getId();
-    //NOTE translate dstRect to screenRect and centerPoint to screenCenterPoint
-    %doRender = Camera.TranslateSpriteBaseObject(LightMap.getId());
-    //
-    if (%doRender) LightMap.DrawTexture(TexLightMap.getId(), false, true);
-    // if (%doRender) {
-    //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
-    //                                       %obj.screenRect, //NOTE this!
-    //                                       %obj.angle,
-    //                                       %obj.screenCenterPoint, //NOTE and this!
-    //                                       %obj.flip,
-    //                                       %obj.color
-    //     );
-    // }
-
+    // TexLightMap.DrawRect("0 0 1200 800");
+    // LightMap.Draw(Camera.getId());
 
 
     %y = 10;

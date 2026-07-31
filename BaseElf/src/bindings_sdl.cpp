@@ -10,6 +10,7 @@
 #include "console/simSet.h"
 #include "core/volume.h"
 #include "math/mMathFn.h"
+#include "core/util/tDictionary.h"
 
 #include <string>
 #include <format>
@@ -794,6 +795,8 @@ public:
     Point2F mVelo = {0.f, 0.f };
     U32     mLayer = 0;
     SDL_BlendMode mBlendMode = SDL_BLENDMODE_INVALID;
+    SimObjectId mTextureObjectId = 0;
+    StringTableEntry mTextureName = StringTable->EmptyString();
 
 
     static void initPersistFields() {
@@ -803,8 +806,9 @@ public:
         addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject), "Y velocity");
         addField("layer", TypeU32, Offset(mLayer,SpriteObject), "Layer of the Sprite. ");
         addField("blendMode", TypeU32, Offset(mBlendMode,SpriteObject), "SDL_BLENDMODE_ overwrite the Texture blendmode\ndefault SDL_BLENDMODE_INVALID => not overwritten");
+        addField("textureObjectId", TypeU32, Offset(mTextureObjectId,SpriteObject), "Id of the Texture Object. Must be set after loading from file. The id is not persistent!");
+        addField("textureName", TypeString, Offset(mTextureName,SpriteObject), "optional Texturename");
     }
-
     // -------------------------------------------------------------------------
     RectF getRectF() {
         return mDstRect;
@@ -894,12 +898,119 @@ public:
         return false;
     }
     // -------------------------------------------------------------------------
+    bool Draw(Camera2DObject* camera = nullptr , bool ignoreVisible = false) {
+        if (!this->mVisible && !ignoreVisible) return false;
+         // we have to fetch the texture
+        TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(this->mTextureObjectId));
+        if (!texObject) return false;
+
+        Draw(texObject, camera, ignoreVisible);
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    // called from DrawBatch/drawAtlasBatch
+    bool Draw(TextureObject* texture,  Camera2DObject* camera = nullptr , bool ignoreVisible = false)
+    {
+
+        if (!this->mVisible && !ignoreVisible) return false;
+
+        if (!texture) return false;
+
+        // autosize src if not set or invalid
+        if (this->mSrcRect.w <= 0.f || this->mSrcRect.h <= 0.f) {
+            this->mSrcRect = RectF(
+                0.f,
+                0.f,
+                (F32)texture->get()->w,
+                (F32)texture->get()->h
+            );
+        }
+        if (camera) {
+            // Translate also make a frustum check :
+            if (camera->Translate(this)) {
+               return texture->DrawRotatedSrcDstRect(
+                    this->mSrcRect,
+                    this->mScreenRect,
+                    this->mAngle,
+                    this->mScreenCenterPoint,
+                    (SDL_FlipMode)this->mFlip,
+                    this->mColor,
+                    this->mBlendMode
+                );
+            }
+        } else {
+            return texture->DrawRotatedSrcDstRect(
+                this->mSrcRect,
+                this->mDstRect,
+                this->mAngle,
+                this->mCenterPoint,
+                (SDL_FlipMode)this->mFlip,
+                this->mColor,
+                this->mBlendMode
+            );
+        }
+        return false;
+    }
+    // -------------------------------------------------------------------------
 };
 IMPLEMENT_CONOBJECT(SpriteObject);
 
 DefineEngineMethod(SpriteObject, getCenter2F, Point2F, (), ,"get the center point") {
     return object->getCenter2F();
 }
+// -------------------------------------------------------------------------
+// Draw
+// -------------------------------------------------------------------------
+DefineEngineMethod(SpriteObject, Draw, bool, (U32 camera2DObjectId),(0),
+                   "Draw the Texture") {
+    Camera2DObject* camera = nullptr;
+    if (camera2DObjectId > 0) {
+        camera = dynamic_cast<Camera2DObject*>(Sim::findObject(camera2DObjectId));
+    }
+    return object->Draw(camera);
+}
+
+// OBSOLETE!
+// DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bool centerDraw, bool useScreenRect),(false, false),
+//                    "Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)\n"
+//                    "When useScreenRect is enabled centerDraw is not allowed!!!") {
+//     TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
+//     if (!texObject) return false;
+//     RectF srcRect  = object->mSrcRect;
+//     if (srcRect.w <= 0 || srcRect.h <= 0) {
+//         srcRect.x = 0;
+//         srcRect.y = 0;
+//         srcRect.w = (F32)texObject->get()->w;
+//         srcRect.h = (F32)texObject->get()->h;
+//     }
+//
+//     if (useScreenRect && centerDraw) {
+//         centerDraw = false;
+//         //show a error ?!
+//     }
+//
+//     RectF dstRect; // had pointer but need a copy for centerDraw
+//     Point2F* centerPoint;
+//     if (useScreenRect) { //See also Camera2DObject
+//         dstRect = object->mScreenRect;
+//         centerPoint = &object->mScreenCenterPoint;
+//     } else {
+//         dstRect = object->mDstRect;
+//         centerPoint = &object->mCenterPoint;
+//     }
+//     if (centerDraw) {
+//         dstRect.x -= dstRect.w / 2.f;
+//         dstRect.y -= dstRect.h / 2.f;
+//     }
+//
+//     return texObject->DrawRotatedSrcDstRect(
+//         srcRect, dstRect,
+//         object->mAngle, *centerPoint,
+//         (SDL_FlipMode)object->mFlip, object->mColor
+//         ,object->mBlendMode
+//     );
+// }
+
 // -------------------------------------------------------------------------
 // Movement
 // -------------------------------------------------------------------------
@@ -930,45 +1041,6 @@ DefineEngineMethod(SpriteObject, solveCollideRect,bool, (RectF otherRect, bool s
 }
 
 
-DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bool centerDraw, bool useScreenRect),(false, false),
-                   "Simple Draw2D, useScreenRect use the screenRect instead of the destionationrect (Camera2DObject)\n"
-                   "When useScreenRect is enabled centerDraw is not allowed!!!") {
-    TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));
-    if (!texObject) return false;
-    RectF srcRect  = object->mSrcRect;
-    if (srcRect.w <= 0 || srcRect.h <= 0) {
-        srcRect.x = 0;
-        srcRect.y = 0;
-        srcRect.w = (F32)texObject->get()->w;
-        srcRect.h = (F32)texObject->get()->h;
-    }
-
-    if (useScreenRect && centerDraw) {
-        centerDraw = false;
-        //show a error ?!
-    }
-
-    RectF dstRect; // had pointer but need a copy for centerDraw
-    Point2F* centerPoint;
-    if (useScreenRect) { //See also Camera2DObject
-        dstRect = object->mScreenRect;
-        centerPoint = &object->mScreenCenterPoint;
-    } else {
-        dstRect = object->mDstRect;
-        centerPoint = &object->mCenterPoint;
-    }
-    if (centerDraw) {
-        dstRect.x -= dstRect.w / 2.f;
-        dstRect.y -= dstRect.h / 2.f;
-    }
-
-    return texObject->DrawRotatedSrcDstRect(
-        srcRect, dstRect,
-        object->mAngle, *centerPoint,
-        (SDL_FlipMode)object->mFlip, object->mColor
-        ,object->mBlendMode
-    );
-}
 // =============================================================================
 //  SpriteGroup
 //  - A Group which only accepts SpriteObjects
@@ -977,8 +1049,16 @@ DefineEngineMethod(SpriteObject, DrawTexture, bool, (SimObjectId texObjectID, bo
 class SpriteGroup : public SimGroup
 {
     typedef SimGroup Parent;
+
+    Map<U32, TextureObject*> mTextureMap;
+
 public:
     DECLARE_CONOBJECT(SpriteGroup);
+
+    SpriteGroup() {
+        mTextureMap.clear();
+    }
+
     void addObject( SimObject* obj ) override {
         // NOTE: make sure we only add SpriteObject's
         SpriteObject* sprite = dynamic_cast<SpriteObject*>(obj);
@@ -986,6 +1066,38 @@ public:
         Parent::addObject(obj);
     }
     void sortLayers();
+
+
+    void drawBatch(Camera2DObject* camera = nullptr) {
+        TextureObject* texture = nullptr;
+        mTextureMap.clear(); //this is slower but keep dangling pointers away
+        lock();
+        for( SimSet::iterator iter = begin(); iter != end(); ++ iter ) {
+            SpriteObject* sprite = static_cast<SpriteObject*>(*iter);
+
+            if (!sprite->mVisible) continue;
+
+            if (sprite->mTextureObjectId == 0) continue;
+            texture  = mTextureMap[sprite->mTextureObjectId];
+
+            if (!texture) {
+                texture = dynamic_cast<TextureObject*>(Sim::findObject(sprite->mTextureObjectId));
+                if (!texture) {
+                    Con::errorf("Sprite: %d Invalid Texture ID: %d ==> i set the sprite to invisible!"
+                        ,sprite->getId(),sprite->mTextureObjectId );
+                    sprite->mVisible = false;
+                    continue;
+                }
+                mTextureMap[sprite->mTextureObjectId] = texture;
+            }
+
+
+            sprite->Draw(texture, camera);
+
+        }
+        unlock();
+    }
+
 
     void drawAtlasBatch(TextureObject* texture, Camera2DObject* camera = nullptr) {
         if (!texture) return;
@@ -995,30 +1107,8 @@ public:
 
             if (!sprite->mVisible) continue;
 
-            if (camera) {
-                // Translate also make a frustum check :
-                if (camera->Translate(sprite)) {
-                    texture->DrawRotatedSrcDstRect(
-                        sprite->mSrcRect,
-                        sprite->mScreenRect,
-                        sprite->mAngle,
-                        sprite->mScreenCenterPoint,
-                        (SDL_FlipMode)sprite->mFlip,
-                        sprite->mColor,
-                        sprite->mBlendMode
-                    );
-                }
-            } else {
-                texture->DrawRotatedSrcDstRect(
-                    sprite->mSrcRect,
-                    sprite->mDstRect,
-                    sprite->mAngle,
-                    sprite->mCenterPoint,
-                    (SDL_FlipMode)sprite->mFlip,
-                    sprite->mColor,
-                    sprite->mBlendMode
-                );
-            }
+             sprite->Draw(texture, camera);
+
         }
         unlock();
     }
@@ -1056,6 +1146,16 @@ DefineEngineMethod(SpriteGroup, sortLayers, void, (),,"Sort SpriteObject's by la
 // -----------------------------------------------------------------------------
 // DrawBatch and Camera
 // -----------------------------------------------------------------------------
+DefineEngineMethod(SpriteGroup, drawBatch, bool, (S32 camera2DObjectId), (0),
+                     "Draw all sprites in the group with option camera object") {
+    Camera2DObject* camObject = nullptr;
+    if (camera2DObjectId > 0) {
+        camObject = dynamic_cast<Camera2DObject*>(Sim::findObject(camera2DObjectId));
+    }
+    object->drawBatch(camObject);
+    return true;
+}
+
 DefineEngineMethod(SpriteGroup, drawAtlasBatch, bool, (S32 texObjectID, S32 camera2DObjectId), (0),
                      "Draw all sprites in the group with option camera object") {
     TextureObject* texObject = dynamic_cast<TextureObject*>(Sim::findObject(texObjectID));

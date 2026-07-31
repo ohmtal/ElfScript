@@ -175,6 +175,7 @@ function Aquarium::DrawSpriteSheet(%this) {
                     TypeF32   layer = %this.placementLayer; //higher = rendered first
                     TypeString textureName = %name;
                     TypeBool ignoreOnMultiSelect = false;
+                    TypeU32  textureObjectId = SpriteSheet.getId();
                 };
                 SceneObjects.add( %this.mouseObject);
                 SelectList.clear();
@@ -226,6 +227,9 @@ function Aquarium::load(%this, %path) {
         //update objects to current version
         foreach(%obj in SceneObjects) {
             // when a version is changed ... for future use
+            // if (!%obj.textureObjectId)
+            // must be set on load!!!
+            %obj.textureObjectId = SpriteSheet.getId();
         }
 
 
@@ -331,7 +335,11 @@ function Aquarium::Render(%this) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}
         ClearBackground(BACKGROUND_COLOR);
 
+        // we only have one texture here so go ahead:
         SceneObjects.drawAtlasBatch(SpriteSheet.getId(), 0);
+
+        // Tested ... draw using SpriteObject's textureObjectId: SceneObjects.drawBatch( 0);
+
         // foreach(%obj in SceneObjects) {
         //     Spritesheet.DrawRotatedSrcDstRect(%obj.srcRect,
         //                                       %obj.dstRect,
