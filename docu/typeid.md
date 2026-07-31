@@ -45,13 +45,15 @@ TODO: ?
 ## XXTH type safety ELFSCRIPT_STRICT_SLOT_TYPE:
 
 simple rule: same slotname, same type
++ added PoD handling so you can use foo.bar={10,10};
 
 1. SlotAssignNode::alloc added map to store the set type and restore id set before
 2. U32 SlotAssignNode::compile (replaced)
 3. U32 SlotAccessNode::compile (replaced)
     - struct SlotAccessNode => U32 typeID added
     - SlotAccessNode* SlotAccessNode::alloc => setting the typeID
-
+4.) Added OP_BUILD_VECTOR_STRING for vector handling this may also uses as a fastpath but since i removed the PoD types 
+i have to tranlate it to string :(
 
 ---
 

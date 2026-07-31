@@ -29,7 +29,11 @@ function Main::loadModule(%this, %setNewModuleIndex) {
         %this.module.delete();
     }
     // --- old Module unloaded go ahead
-    %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
+    // %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
+    // using the ElfScript's formatString :) not so cryptic as the concat before
+    %cmd = formatString("%d.module = Create%s();",%this.getId(), %this.moduleName);
+
+
     echo("loadModule command is:" SPC %cmd);
     eval(%cmd);
     %created = isObject(%this.module);

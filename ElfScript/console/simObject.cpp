@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -919,7 +920,7 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 }
 
 //-----------------------------------------------------------------------------
-//XXTH Speed HACK FastPath
+//ElfScript XXTH Speed HACK FastPath
 bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
 
       if (fld->type == TypeF64) {
@@ -1008,6 +1009,14 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
                         targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(S32)));
                         *(S32*)targetAddr = dAtoi(value);
                         handled = true;
+                  } else if (fld->type == TypeS64) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(int64_t)));
+                        *(int64_t*)targetAddr = (int64_t)dAtoll(value);
+                        handled = true;
+                  } else if (fld->type == TypeU32) {
+                        targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(U32)));
+                        *(U32*)targetAddr = dAtoui(value);
+                        handled = true;
                   } else if (fld->type == TypeF64) {
                         targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(F64)));
                         *(F64*)targetAddr = dAtod(value);
@@ -1031,46 +1040,6 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
                   }
             }
          }
-
-         // if (array1 == 0) //FAST PATH
-         // {
-         //    if (fld->writeDataFn == &defaultProtectedWriteFn
-         //       && fld->setDataFn == &defaultProtectedSetFn
-         //    ) {
-         //          bool handled = false;
-         //          if (fld->type == TypeF32 ) {
-         //                F32* target = (F32*)(((const char*)this) + fld->offset);
-         //                *target = dAtof(value);
-         //                handled = true;
-         //          } else if (fld->type == TypeS32 ) {
-         //                S32* target = (S32*)(((const char*)this) + fld->offset);
-         //                *target = dAtoi(value);
-         //                handled = true;
-         //          }  else if (fld->type == TypeF64 ) {
-         //                F64* target = (F64*)(((const char*)this) + fld->offset);
-         //                *target = dAtod(value);
-         //                handled = true;
-         //          } else if (fld->type == TypeBool ) {
-         //                bool* target = (bool*)(((const char*)this) + fld->offset);
-         //                *target = dAtob(value);
-         //                handled = true;
-         //          } else if (fld->type == TypeString ) {
-         //                const char** target = (const char**)(((const char*)this) + fld->offset);
-         //                *target = StringTable->insert(value);
-         //                handled = true;
-         //          }
-         //
-         //          if (handled) {
-         //                if(fld->validator)
-         //                      fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
-         //
-         //                onStaticModified( slotName, value );
-         //                return;
-         //          }
-         //
-         //    }
-         // }
-         // < --------------------------------------- XXTH
 #endif
 
          //XXTH NOTE: the following is a real handbreak. And no matter which type the

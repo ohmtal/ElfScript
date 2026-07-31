@@ -2,6 +2,7 @@
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
 // Copyright (c) 2021 TGEMIT Authors & Contributors
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -2319,6 +2320,41 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
       } //OP_CALLFUNC
 
+      // ===========================================================================================
+#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+// PoD !! :D only kosmetic max 16 elements
+case OP_BUILD_VECTOR_STRING: {
+      // read the count
+      U32 count = code[ip++];
+
+      const U32 MAX_ELEMENTS = 16;
+      const char* stringValues[MAX_ELEMENTS];
+
+      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+
+      // get values from stack
+      for (S32 i = count - 1; i >= 0; i--) {
+            stringValues[i] = stack[_STK].getString();
+            _STK--;
+      }
+
+      // i have to translate it to a string again :(
+      char buffer[256];
+      int offset = 0;
+      buffer[0] = '\0';
+
+      for (U32 i = 0; i < count; i++) {
+            offset += dSprintf(buffer + offset
+            , sizeof(buffer) - offset
+            , (i == 0) ? "%s" : " %s", stringValues[i]);
+      }
+
+      _STK++;
+      stack[_STK].setString(buffer);
+      break;
+}
+
+#endif
       // ===========================================================================================
 #ifdef ELFSCRIPT_CALLFUNC_CACHED
       // XXTH the monster get some new stuff to eat:

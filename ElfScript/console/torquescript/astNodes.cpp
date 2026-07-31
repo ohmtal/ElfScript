@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -1358,7 +1359,7 @@ TypeReq InternalSlotAccessNode::getPreferredType()
 }
 
 //-----------------------------------------------------------------------------
-//XXTH Typesafety attempt:
+//XXTH Typesafety attempt: (2026-08-01 added PoD)
 #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
 
 U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
@@ -1368,18 +1369,48 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       // Determine the required type based on the dynamic console type variables
       TypeReq valueTypeReq = TypeReqString;
 
-      // TypeS32 and TypeF32 are extern S32 variables registered by the engine
-      if (typeID == TypeS32)
+      if (typeID == TypeS32 || typeID == TypeS64 || typeID == TypeU32 )
       {
             valueTypeReq = TypeReqUInt;
       }
-      else if (typeID == TypeF32)
+      else if (typeID == TypeF32 || typeID == TypeF64)
       {
             valueTypeReq = TypeReqFloat;
       }
 
-      // Compile the value expression with the strict type requirement
-      ip = valueExpr->compile(codeStream, ip, valueTypeReq);
+      // enable PoD { 10, 20 }
+      bool isVectorInit = (valueExpr && valueExpr->next != nullptr);
+      if (isVectorInit)
+      {
+            U32 elementCount = 0;
+            for (ExprNode* expr = valueExpr; expr; expr = (ExprNode*)(expr->next)) // <- Hier 'next' anpassen
+            {
+                  ip = expr->compile(codeStream, ip, TypeReqString);
+                  elementCount++;
+            }
+
+            if (elementCount > 16)
+            {
+                  const char* errStr = avar(
+                        "Script Error: Vector initialization for slot '%s' has too many elements (%d). "
+                        "Maximum is 16.\nFile: %s\nLine Num: %d",
+                        slotName,
+                        elementCount,
+                        CodeBlock::smCurrentParser->getCurrentFile(),
+                        dbgLineNumber
+                  );
+                  scriptErrorHandler(errStr);
+            }
+
+
+            codeStream.emit(OP_BUILD_VECTOR_STRING);
+            codeStream.emit(elementCount);
+      }
+      else
+      {
+            // Compile the value expression with the strict type requirement
+            ip = valueExpr->compile(codeStream, ip, valueTypeReq);
+      }
 
       if (arrayExpr)
       {
@@ -1411,13 +1442,13 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       }
 
       // Emit the strict type opcodes before saving the field data
-      if (typeID == TypeS32)
+      if (!isVectorInit &&  valueTypeReq == TypeReqUInt)
       {
             codeStream.emit(OP_SETCURFIELD_TYPE);
             codeStream.emit(typeID);
             codeStream.emit(OP_SAVEFIELD_UINT);
       }
-      else if (typeID == TypeF32)
+      else  if (!isVectorInit && valueTypeReq == TypeReqFloat)
       {
             codeStream.emit(OP_SETCURFIELD_TYPE);
             codeStream.emit(typeID);
