@@ -12,16 +12,19 @@
 // fast path for int and float fields
 #define ELFSCRIPT_FASTPATH_FLD
 
+
+// ============================================================================
+// Experimental stuff - not recommended:
+// ============================================================================
 // make slots type save but same slotname always have the same type
 // #define ELFSCRIPT_STRICT_SLOT_TYPE
 
 // Autodelete objects on shutdown - this can slowdown delete on many objects
 // #define ELFSCRIPT_GARBAGECOLLECTION
 
-
 // cache function calls WARNING: inconsitent
 // #define ELFSCRIPT_CALLFUNC_CACHED
-
+// ============================================================================
 
 
 // ----------------------------------------------------------------------------
