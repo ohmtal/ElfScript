@@ -83,14 +83,9 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/astAlloc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/ast.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/astNodes.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/bison.simple
-    # ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/cmdgram.cpp
-    # ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.y
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDgram.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDscan.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDscan.l
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp

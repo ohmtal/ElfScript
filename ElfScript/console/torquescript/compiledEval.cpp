@@ -1993,6 +1993,52 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             break;
 #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
 
+      // ElfScript we try to get the fieldtype!!!
+      case OP_SAVEFIELD_FASTPATH:
+
+            if (curObject) {
+                  //XXTH Fastpath:
+                  bool fastPath  = false;
+                  const AbstractClassRep::Field *fld = curObject->findField(curField);
+
+                  if (fld && (
+                        fld->type == TypeF32
+                        || fld->type == TypeS32
+                        || fld->type == TypeBool
+                        || fld->type == TypeU32
+                        || fld->type == TypeS64
+                        || fld->type == TypeU64
+                        || fld->type == TypeF64
+                        || fld->type == TypeS8
+                  ))
+                  {
+                        const char* array = (const char*) curFieldArray;
+                        S32 array1 = array ? dAtoi(array) : 0;
+
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn
+                              && fld->flag == 0
+                        ) {
+                              if (fld->type == TypeF32 || fld->type == TypeF64)
+                                    fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+                              else
+                                    fastPath = curObject->setDataField(fld,stack[_STK].getInt() );
+                        }
+
+                  }
+                  if (!fastPath) {
+                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+                  }
+
+            } else {
+                  // The field is not being set on an object. Maybe it's a special accessor?
+                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+                  prevObject = NULL;
+            }
+            break;
+
+      break;
+
       case OP_SAVEFIELD_STR:
          if (curObject)
             curObject->setDataField(curField, curFieldArray, stack[_STK].getString());

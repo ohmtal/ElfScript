@@ -1539,9 +1539,11 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_SETCURFIELD_ARRAY);
       codeStream.emit(OP_POP_STK);
    }
-
+   #ifdef ELFSCRIPT_FASTPATH_FLD
+   codeStream.emit(OP_SAVEFIELD_FASTPATH);
+   #else
    codeStream.emit(OP_SAVEFIELD_STR);
-
+   #endif
    if (typeID != -1)
    {
       codeStream.emit(OP_SETCURFIELD_TYPE);

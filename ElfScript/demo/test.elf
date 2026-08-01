@@ -75,7 +75,7 @@ function SpeedTest() {
             // THIS MUST BE A BUG !!! .x is slow like hell while myFloat is ok
             // -- x,y,z,w,r,g,b,a are defined in parser ---
             // 600 ms for this .... omg
-            // %foo.x += 0.1; //NOTE VERY VERY SLOW
+            %foo.x += 0.1; //WAS "VERY VERY SLOW" => now fast path...;)
 
             // BUG testFloat is 600ms!!!
             // so its not the .x
@@ -89,7 +89,7 @@ function SpeedTest() {
             // %foo.testFloat = 4.2;
 
            // all three 87
-            %foo.testFloat += 0.1; // 67 ms now !!!
+            // %foo.testFloat += 0.1; // 67 ms now !!!
 
             // %bar = %foo.testFloat * 1.001;
             // %foo.testFloat = %bar;
@@ -192,6 +192,38 @@ function SpeedTest() {
             %y = %foo.y * 1;
         }
     }
+    if ($mode == 13) {
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            $myVector = %i SPC %i*2 SPC %i / 2;
+        }
+    }
+    if ($mode == 14) {
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            $myVector = { %i, %i*2 , %i / 2};
+        }
+    }
+    if ($mode == 15) {
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            $myVector.x =  %i;
+            $myVector.y =  %i * 2;
+            $myVector.z =  %i / 2;
+        }
+    }
+    if ($mode == 16) {
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            $myVectorX =  %i;
+            $myVectorY =  %i * 2;
+            $myVectorZ =  %i / 2;
+        }
+    }
+    if ($mode == 17) {
+         %foo = $foo;
+        for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            %foo.x =  %i * 1;
+            %foo.y =  %i * 2;
+            %foo.z =  %i / 2;
+        }
+    }
 }
 
 
@@ -204,7 +236,7 @@ function MainLoop() {
         $times += GetFrameTime();
         if ($i >= 10) {
             $i -= 10;
-            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat/int/bool:" SPC $foo.testFloat SPC $foo.testInt SPC $foo.testBool);
+            echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat/int/bool:" SPC $foo.testFloat SPC $foo.testInt SPC $foo.testBool SPC $foo.x SPC $foo.y SPC $foo.z);
             $times = 0;
         }
     }
