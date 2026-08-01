@@ -162,6 +162,12 @@ struct Token
 %type <var>    var_list
 %type <var>    var_list_decl
 %type <asn>    assign_op_struct
+/* ==================== new PoD* ============== */
+%type <expr> func_arg_item
+%type <expr> func_arg_list
+%type <expr> func_arg_list_decl
+/* ============================================ */
+
 
 // Operator precedence — lowest to highest.
 // FIX: opMDASN, opNDASN, opNTASN were listed here but were never defined
@@ -243,6 +249,16 @@ stmt
       { $$ = ReturnStmtNode::alloc( $1.lineNumber, NULL ); }
    | rwRETURN expr ';'
       { $$ = ReturnStmtNode::alloc( $1.lineNumber, $2 ); }
+    /* ==================== new PoD* ============== */
+   | rwRETURN '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$3; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = ReturnStmtNode::alloc( $1.lineNumber, vecNode );
+      }
+    /* ============================================ */
    | expression_stmt ';'
       { $$ = $1; }
    | TTAG '=' expr ';'
@@ -521,6 +537,7 @@ expr
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, NULL); }
    | VAR '[' aidx_expr ']'
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, $3 ); }
+
    ;
 
 slot_acc
@@ -643,19 +660,63 @@ stmt_expr
 //       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $4); }
 //    ;
 
+
+/* ==================== new PoD* ============== */
 funcall_expr
    // Global function call:  name(args)
-   : IDENT '(' expr_list_decl ')'
+   : IDENT '(' func_arg_list_decl ')'
       { $$ = FuncCallExprNode::alloc( $1.lineNumber, $1.value, NULL, $3, false); }
    // Static/namespace call:  Namespace::name(args)
-   | IDENT opCOLONCOLON IDENT '(' expr_list_decl ')'
+   | IDENT opCOLONCOLON IDENT '(' func_arg_list_decl ')'
       { $$ = FuncCallExprNode::alloc( $1.lineNumber, $3.value, $1.value, $5, false); }
    // Method call:  object.method(args)
-   // The object expression is prepended to the arg list so that exec() can
-   // find it as callArgv[1] (the implicit 'this').
-   | expr '.' IDENT '(' expr_list_decl ')'
+   | expr '.' IDENT '(' func_arg_list_decl ')'
       { $1->append($5); $$ = FuncCallExprNode::alloc( $1->dbgLineNumber, $3.value, NULL, $1, true); }
    ;
+
+
+func_arg_item
+   : expr
+      { $$ = $1; }
+   | '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = vecNode;
+      }
+   ;
+
+func_arg_list
+   : func_arg_item
+      { $$ = $1; }
+   | func_arg_list ',' func_arg_item
+      { ($1)->append($3); $$ = $1; }
+   ;
+
+func_arg_list_decl
+   :
+      { $$ = NULL; }
+   | func_arg_list
+      { $$ = $1; }
+   ;
+//Orig:
+// funcall_expr
+//    // Global function call:  name(args)
+//    : IDENT '(' expr_list_decl ')'
+//       { $$ = FuncCallExprNode::alloc( $1.lineNumber, $1.value, NULL, $3, false); }
+//    // Static/namespace call:  Namespace::name(args)
+//    | IDENT opCOLONCOLON IDENT '(' expr_list_decl ')'
+//       { $$ = FuncCallExprNode::alloc( $1.lineNumber, $3.value, $1.value, $5, false); }
+//    // Method call:  object.method(args)
+//    // The object expression is prepended to the arg list so that exec() can
+//    // find it as callArgv[1] (the implicit 'this').
+//    | expr '.' IDENT '(' expr_list_decl ')'
+//       { $1->append($5); $$ = FuncCallExprNode::alloc( $1->dbgLineNumber, $3.value, NULL, $1, true); }
+//    ;
+//
+/* ============================================================================== */
 
 assert_expr
    : rwASSERT '(' expr ')'

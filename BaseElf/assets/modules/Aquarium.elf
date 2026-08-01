@@ -38,7 +38,7 @@ exec ("include/GuiTool.elf");
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
-#define BACKGROUND_COLOR "176 233 252"
+#define BACKGROUND_COLOR { 176, 233, 252 }
 #define SCENE_FILE "pref:/aquarium.elfscene"
 #define SCENE_PATH "pref:/"
 #define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
@@ -66,11 +66,11 @@ function Aquarium::onAdd(%this) {
 
     %this.paintSize = 48;
     %this.paintAngle = 0;
-    %this.paintCenterPoint = "24 24";
+    %this.paintCenterPoint = {24, 24};
     %this.paintFlip = 0;
 
     %this.add( new SpriteGroup(SceneObjects));
-    SceneObjects.viewPort = "1152 648";
+    SceneObjects.viewPort = {1152, 648};
     %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
     %this.selectedSceneObject = 0;
     %this.add( new SimSet(SelectList));
@@ -115,7 +115,7 @@ function Aquarium::onAdd(%this) {
         OnMenuObject = %this;
         OnMenuMethod = "onSelectObject";
         MenuTextureAtlas = %this.SpriteSheet;
-        MenuTextureAtlasSize = "24 24";
+        MenuTextureAtlasSize = { 24, 24 };
         MenuEntries = "";
         MenuTextureRects = "";
         NoDarkenOverlay = true;
@@ -151,7 +151,7 @@ function Aquarium::DrawSpriteSheet(%this) {
     // BeginBlendMode();
     if (%this.Spritesheet.backRect !$= "") {
         BeginBlendMode();
-        DrawRectRec(%this.Spritesheet.backRect, "50 50 50 100");
+        DrawRectRec(%this.Spritesheet.backRect, { 50, 50, 50, 100});
         EndBlendMode();
     }
 
@@ -190,9 +190,9 @@ function Aquarium::DrawSpriteSheet(%this) {
         if (%x > %maxX) %maxX = %x;
         if (%y > %maxY) %maxY = %y;
     }
-    %this.Spritesheet.backRect = "0 0" SPC %maxX + %size SPC %maxY + %size;
+    %this.Spritesheet.backRect = {0, 0, %maxX + %size, %maxY + %size};
 
-    if (!isObject(%this.mouseObject))  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure , 1.8, "128 255 0", true, BLACK);
+    if (!isObject(%this.mouseObject))  DrawText(%mousePos.x + 8, %mousePos.y + 8,%this.cursorTexure , 1.8, {128, 255, 0}, true, BLACK);
 }
 //----------------------------------------------------------------------
 // sort by layers higher == move to back (render first)
@@ -222,7 +222,7 @@ function Aquarium::load(%this, %path) {
         // add new one to this:
         %this.add(SceneObjects);
 
-        if (SceneObjects.viewPort $= "") SceneObjects.viewPort = "1152 648";
+        if (SceneObjects.viewPort $= "") SceneObjects.viewPort = {1152, 648};
 
         //update objects to current version
         foreach(%obj in SceneObjects) {
@@ -401,7 +401,7 @@ function Aquarium::Render(%this) {
     if (!%haveMouseObject) {
         if (!%haveOverlay) {
             if ( %this.hideSpriteSheet ) {
-                DrawText(0,0,"[TAB]",1.5, "200 200 0 150", true);
+                DrawText(0,0,"[TAB]",1.5, { 200, 200, 0, 150}, true);
             } else {
                 %this.DrawSpriteSheet();
             }
