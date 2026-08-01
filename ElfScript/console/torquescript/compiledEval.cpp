@@ -455,7 +455,12 @@ TORQUE_FORCEINLINE inline void doFloatMathOperation()
    ConsoleValue& a = stack[_STK];
    ConsoleValue& b = stack[_STK - 1];
 
-   S32 fastIf = (a.getType() == ConsoleValueType::cvFloat) & (b.getType() == ConsoleValueType::cvFloat);
+   // S32 fastIf = (a.getType() == ConsoleValueType::cvFloat) & (b.getType() == ConsoleValueType::cvFloat);
+   // XXTH FIX Compiler warning:
+   S32 fastIf = static_cast<S32>(a.getType() == ConsoleValueType::cvFloat)
+   & static_cast<S32>(b.getType() == ConsoleValueType::cvFloat);
+
+
    if (fastIf)
    {
       // Arithmetic
@@ -1607,11 +1612,36 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          _STK++;
          break;
 
+
+      // ElfScript Optimization
       case OP_LOADVAR_STR:
-         currentRegister = -1;
-         stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
-         _STK++;
-         break;
+      currentRegister = -1;
+      {
+            // check the type first!
+            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
+
+            if (varEntry && (varEntry->value.getType() == ConsoleValueType::cvFloat ||
+                  varEntry->value.getType() == ConsoleValueType::cvInteger))
+            {
+                  // Fastpath
+                  stack[_STK + 1] = varEntry->value;
+            }
+            else
+            {
+                  // Slowpath: Fallback auf das alte Verhalten, falls es wirklich ein String ist
+                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+            }
+      }
+      _STK++;
+      break;
+
+
+      // orig:
+      // case OP_LOADVAR_STR:
+      //    currentRegister = -1;
+      //    stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+      //    _STK++;
+      //    break;
 
       case OP_SAVEVAR_UINT:
          Script::gEvalState.setIntVariable(stack[_STK].getInt());
@@ -1651,19 +1681,50 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          _STK++;
          break;
 
+         // ElfScript Optimization:
       case OP_LOAD_LOCAL_VAR_STR:
-         reg = code[ip++];
-         currentRegister = reg;
+            reg = code[ip++];
+            currentRegister = reg;
 
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
+            // See OP_SETCURVAR
+            prevField = NULL;
+            prevObject = NULL;
+            curObject = NULL;
+            {
+                  const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+                  if (localVal.getType() == ConsoleValueType::cvFloat ||
+                        localVal.getType() == ConsoleValueType::cvInteger)
+                  {
+                        //fast fetch
+                        stack[_STK + 1] = localVal;
+                  }
+                  else
+                  {
+                        // fallback
+                        val = Script::gEvalState.getLocalStringVariable(reg);
+                        stack[_STK + 1].setString(val);
+                  }
+            }
+            _STK++;
+            break;
 
-         val = Script::gEvalState.getLocalStringVariable(reg);
-         stack[_STK + 1].setString(val);
-         _STK++;
-         break;
+      // orig:
+      // case OP_LOAD_LOCAL_VAR_STR:
+      //    reg = code[ip++];
+      //    currentRegister = reg;
+      //
+      //    // See OP_SETCURVAR
+      //    prevField = NULL;
+      //    prevObject = NULL;
+      //    curObject = NULL;
+      //
+      //    val = Script::gEvalState.getLocalStringVariable(reg);
+      //    stack[_STK + 1].setString(val);
+      //    _STK++;
+      //    break;
+
+
+
 
       case OP_SAVE_LOCAL_VAR_UINT:
          reg = code[ip++];

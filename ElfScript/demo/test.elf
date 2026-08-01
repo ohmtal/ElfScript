@@ -216,10 +216,10 @@ function SpeedTest() {
             $myVectorZ =  %i / 2;
         }
     }
-    if ($mode == 17) {
+    if ($mode == 17) { //BANG OP_SAVEFIELD_FASTPATH
          %foo = $foo;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
-            %foo.x =  %i * 1;
+            %foo.x =  %i; //BANG => OP_LOAD_LOCAL_VAR_STR FastPath // Not longer  * 1.0; //Typecast %i IMPORTANT!!, else VM thinks it's a string - stupid shit i know
             %foo.y =  %i * 2;
             %foo.z =  %i / 2;
         }
@@ -233,7 +233,7 @@ function MainLoop() {
 
     if ($mode >= 0) {
         $i++;
-        $times += GetFrameTime();
+        $times += GetFrameTime() -16; // mainloop sleeps 16ms
         if ($i >= 10) {
             $i -= 10;
             echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat/int/bool:" SPC $foo.testFloat SPC $foo.testInt SPC $foo.testBool SPC $foo.x SPC $foo.y SPC $foo.z);
