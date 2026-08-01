@@ -1479,7 +1479,40 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    precompileIdent(slotName);
 
-   ip = valueExpr->compile(codeStream, ip, TypeReqString);
+   // enable PoD { 10, 20 }
+   bool isVectorInit = (valueExpr && valueExpr->next != nullptr);
+   if (isVectorInit)
+   {
+         U32 elementCount = 0;
+         for (ExprNode* expr = valueExpr; expr; expr = (ExprNode*)(expr->next)) // <- Hier 'next' anpassen
+         {
+               ip = expr->compile(codeStream, ip, TypeReqString);
+               elementCount++;
+         }
+
+         if (elementCount > 16)
+         {
+               const char* errStr = avar(
+                     "Script Error: Vector initialization for slot '%s' has too many elements (%d). "
+                     "Maximum is 16.\nFile: %s\nLine Num: %d",
+                     slotName,
+                     elementCount,
+                     CodeBlock::smCurrentParser->getCurrentFile(),
+                                         dbgLineNumber
+               );
+               scriptErrorHandler(errStr);
+         }
+
+
+         codeStream.emit(OP_BUILD_VECTOR_STRING);
+         codeStream.emit(elementCount);
+   }
+   else
+   {
+         // with only one parameter
+         ip = valueExpr->compile(codeStream, ip, TypeReqString);
+   }
+
    if (arrayExpr)
    {
       ip = arrayExpr->compile(codeStream, ip, TypeReqString);

@@ -493,3 +493,32 @@ FunctionDeclStmtNode* FunctionDeclStmtNode::alloc(S32 lineNumber, StringTableEnt
    ret->package = NULL;
    return ret;
 }
+
+// Elfscript PoD (XXTH) --------------------------------------------
+// #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+VectorConstructorNode* VectorConstructorNode::alloc(S32 lineNumber)
+{
+      VectorConstructorNode* ret = new VectorConstructorNode();
+      ret->dbgLineNumber = lineNumber;
+      return ret;
+}
+
+U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
+{
+      for (ExprNode* expr : elements)
+      {
+            ip = expr->compile(codeStream, ip, TypeReqString);
+      }
+
+      codeStream.emit(OP_BUILD_VECTOR_STRING);
+      codeStream.emit((U32)elements.size());
+
+      return codeStream.tell();
+}
+
+TypeReq VectorConstructorNode::getPreferredType()
+{
+      return TypeReqString;
+}
+// #endif
+// -----------------------------------------------------------------

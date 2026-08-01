@@ -2321,7 +2321,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       } //OP_CALLFUNC
 
       // ===========================================================================================
-#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+// #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
 // PoD !! :D only kosmetic max 16 elements
 case OP_BUILD_VECTOR_STRING: {
       // read the count
@@ -2354,7 +2354,7 @@ case OP_BUILD_VECTOR_STRING: {
       break;
 }
 
-#endif
+// #endif
       // ===========================================================================================
 #ifdef ELFSCRIPT_CALLFUNC_CACHED
       // XXTH the monster get some new stuff to eat:

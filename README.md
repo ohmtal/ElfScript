@@ -6,13 +6,13 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 
 ## Notable changes:
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before.
+- 🚀 **ElfScript:** Syntax Highlight: You can set PoD types in c style: **Foo.MyVector = { 50.1, 78.5 };** 
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling 
 - 🤘 Added **ImGui** bindings to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/ImGui). Demo: [BaseElf](./BaseElf)
 - 🤘 Added **SDL3** Input (keyboard/mouse) handling and binding with events and polling to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/SDL3). Demo: [BaseElf](./BaseElf)
 - 😍 **ElfScript:** Added some handy console functions but this is my favorite: formatString(string format, ...) where you are able to add up to 31 parameter to really format a string :)
 - **ElfScript:** Added Con::ConsoleDocForStub default false to make the classes/function dumps better human readable but kept the code when it's exported for an parser.
 - **ElfScript:** Added IMPLEMENT_ENGINE_TYPE_TRAITS for non PoD console types (C linkage incompatible warning)
-- **ElfScript:** When enabled ELFSCRIPT_STRICT_SLOT_TYPE you can set PoD types in c style: **Foo.MyVector = { 50.1, 78.5 };**
 - Made it standalone
 - Added optional GarabageCollectionSet
 - EngineGlue for init/process/shutdown

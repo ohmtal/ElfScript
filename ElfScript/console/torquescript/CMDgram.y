@@ -571,6 +571,7 @@ assign_op_struct
       { $$.lineNumber = $1.lineNumber; $$.token = opSHR; $$.expr = $2; }
    ;
 
+
 stmt_expr
    : funcall_expr
       { $$ = $1; }
@@ -580,8 +581,32 @@ stmt_expr
       { $$ = $1; }
    | VAR '=' expr
       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, $3); }
+
+   /* ==================== new PoD* ==================== */
+   | VAR '=' '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
+      }
+   /* ============================================================================== */
+
    | VAR '[' aidx_expr ']' '=' expr
       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, $6); }
+
+   /* ==================== new PoD* ============== */
+   | VAR '[' aidx_expr ']' '=' '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, vecNode);
+      }
+   /* ============================================================================== */
+
    | VAR assign_op_struct
       { $$ = AssignOpExprNode::alloc( $1.lineNumber, $1.value, NULL, $2.expr, $2.token); }
    | VAR '[' aidx_expr ']' assign_op_struct
@@ -593,6 +618,30 @@ stmt_expr
    | slot_acc '=' '{' expr_list '}'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $4); }
    ;
+
+// XXTH orig:
+// stmt_expr
+//    : funcall_expr
+//       { $$ = $1; }
+//    | assert_expr
+//       { $$ = $1; }
+//    | object_decl
+//       { $$ = $1; }
+//    | VAR '=' expr
+//       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, $3); }
+//    | VAR '[' aidx_expr ']' '=' expr
+//       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, $6); }
+//    | VAR assign_op_struct
+//       { $$ = AssignOpExprNode::alloc( $1.lineNumber, $1.value, NULL, $2.expr, $2.token); }
+//    | VAR '[' aidx_expr ']' assign_op_struct
+//       { $$ = AssignOpExprNode::alloc( $1.lineNumber, $1.value, $3, $5.expr, $5.token); }
+//    | slot_acc assign_op_struct
+//       { $$ = SlotAssignOpNode::alloc( $1.lineNumber, $1.object, $1.slotName, $1.array, $2.token, $2.expr); }
+//    | slot_acc '=' expr
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $3); }
+//    | slot_acc '=' '{' expr_list '}'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $4); }
+//    ;
 
 funcall_expr
    // Global function call:  name(args)
@@ -643,18 +692,71 @@ slot_assign_list
       { $1->append($2); $$ = $1; }
    ;
 
+// ElfScript PoD:
 slot_assign
    : IDENT '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, $3); }
+
+   /* ==================== new PoD: ==================== */
+   | IDENT '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
+      }
+   /* ======================================================================= */
+
    | TYPEIDENT IDENT '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, $4, $1.value); }
+
+   /* ==================== new: PoD ================= */
+   | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$5; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, vecNode, $1.value);
+      }
+   /* ======================================================================= */
+
    | rwDATABLOCK '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, StringTable->insert("datablock"), $3); }
    | IDENT '[' aidx_expr ']' '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, $6); }
+
+   /* ==================== new PoD ======================= */
+   | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
+            vecNode->elements.push_back(expr);
+         }
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, vecNode);
+      }
+   /* ======================================================================= */
+
    | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $4, $2.value, $7, $1.value); }
    ;
+
+
+
+// orig:
+// slot_assign
+//    : IDENT '=' expr ';'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, $3); }
+//    | TYPEIDENT IDENT '=' expr ';'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, $4, $1.value); }
+//    | rwDATABLOCK '=' expr ';'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, StringTable->insert("datablock"), $3); }
+//    | IDENT '[' aidx_expr ']' '=' expr ';'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, $6); }
+//    | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $4, $2.value, $7, $1.value); }
+//    ;
 
 // Array index expressions.  Multiple comma-separated indices get
 // concatenated with '_' separators at runtime (e.g. arr[1,2] → "arr_1_2").

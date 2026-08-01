@@ -612,5 +612,19 @@ namespace Script
    inline U32 gAnonFunctionID = 0;
 }
 
+// Elfscript PoD (XXTH) --------------------------------------------
+// #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
+struct VectorConstructorNode : ExprNode
+{
+   Vector<ExprNode*> elements;
+
+   static VectorConstructorNode* alloc(S32 lineNumber);
+
+   U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
+   TypeReq getPreferredType() override;
+   DBG_STMT_TYPE(VectorConstructorNode);
+};
+// #endif
+// ---------------------------------------------------------------
 
 #endif
