@@ -6,6 +6,7 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 
 ## Notable changes:
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before. (ELFSCRIPT_FASTPATH_FLD)
+- 🚀 **ElfScript:** Variable FastPath: OP_LOADVAR_STR and OP_LOAD_LOCAL_VAR_STR lookup the variable type to return not always string which make the previous setting to float/int useless. 
 - 🚀 **ElfScript:** Neat Syntax Enhancement: You can set PoD types in C style: **Foo.MyVector = { 50.1, 78.5 };**. Foo.MyVector= { $a * 5, $b * 4}; looks much better than: Foo.MyVector= $a * 5 SPC $b * 4; Also implemented for function calls: `myFunction({1,2,3});` .
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling (ELFSCRIPT_PREPROCESSOR)
 - 🤘 Added **ImGui** bindings to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/ImGui). Demo: [BaseElf](./BaseElf)

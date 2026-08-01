@@ -219,7 +219,7 @@ function SpeedTest() {
     if ($mode == 17) { //BANG OP_SAVEFIELD_FASTPATH
          %foo = $foo;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
-            %foo.x =  %i; //BANG => OP_LOAD_LOCAL_VAR_STR FastPath // Not longer  * 1.0; //Typecast %i IMPORTANT!!, else VM thinks it's a string - stupid shit i know
+            %foo.x =  %i; //BANG => OP_LOAD_LOCAL_VAR_STR FastPath // Not longer  * 1.0; //Typecast %i IMPORTANT!!, else VM thinks it's a string - stupid shit i know << FIXED :D !!
             %foo.y =  %i * 2;
             %foo.z =  %i / 2;
         }

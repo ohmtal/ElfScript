@@ -1617,7 +1617,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_LOADVAR_STR:
       currentRegister = -1;
       {
-            // check the type first!
+            // i check the type first!
             const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
 
             if (varEntry && (varEntry->value.getType() == ConsoleValueType::cvFloat ||
@@ -1628,7 +1628,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
             else
             {
-                  // Slowpath: Fallback auf das alte Verhalten, falls es wirklich ein String ist
+                  // Slowpath: Fallback
                   stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
             }
       }
