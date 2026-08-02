@@ -1,0 +1,139 @@
+# ElfScript Syntax Handbook - Operators and Control Statements
+
+[Back to Main](./Main.md)
+
+## Operators
+
+Most operators are the same as used in C/C++.
+
+ - '+' plus
+ - '-' minus 
+ - '*' multiplication
+ - '/' division
+ 
+ - '$=' equal (string)
+ - '$!=' not equal (string)
+ - '==' equal (numeric)
+ - '!=' not equal (numeric)
+ - '<' lower 
+ - '>' greater
+ - '>=' greater equal (numeric)
+ - '<=' lower equal (numeric)
+
+ - '=' assignment
+ - '+=', '*=', '-=' and '/=' and some more an be comined. So `$a+=5;` is the same as `$a = $a + 5;`
+ - '++' add one. only allowed like $a++ NOT ++$a;
+ - '--' decrement one. only allowed like $a-- NOT --$a;
+ 
+ - '%' modulo
+ - '|' Bitwise or
+ - '^' Bitwise xor
+ - '&' Bitwise and
+ - '>>' SHR
+ - '<<' SHL
+ 
+ - '&&' and in Statements
+ - '||' or in Statements
+ 
+ - '//' one line comment 
+ - '/* */' inline or multiline comment 
+
+Maybe I missed something ;)
+ 
+## if and switch 
+
+**if** by example:
+```
+$foo = 1;
+/* without brakets at one statement: */
+if ($foo == 1) echo("$foo is one!");
+if ($foo != 1) echo("$foo is not one!");
+if ($foo >= 1) echo("$foo is not one or more!");
+/* with brakets: */
+if ( $foo <= 1) {
+    echo("$foo is less than 1 let increment it");
+    $foo++;
+}
+/* for strings: */
+if ($foo $= "1") echo ("$foo is" SPC $foo);
+
+/* short if then */
+echo ( $foo == 1 ? "ONE" : "something else");
+
+```
+
+**switch** by example:
+```
+$foo = 4;
+
+switch ($foo) {
+    case 1: echo("$foo is one!");
+    case 2: echo("$foo is two!");
+    default: echo("$foo is" SPC $foo);
+}
+``` 
+You may notice i did not write a break. In ElfScript you don't need to add a break
+at the end of a case statement.
+
+On Strings we need to add a "$" like comparing with if.
+```
+$foo = "bar";
+
+switch$ ($foo) {
+    case "a": echo("$foo is a!");
+    case "bar": echo("$foo is bar!");
+    default: echo("$foo is" SPC $foo);
+}
+```
+
+## for,  while and foreach
+
+Example *for*:
+```
+for (%i = 0; %i < 10; %i ++) {
+    echo("%i is:" SPC %i);
+}
+```
+
+Example *while* with skip (continue) and stop loop (break). Dont forget to increment
+before continue ;) 
+```
+%i = 0;
+while ( %i < 20 ) {
+    if (%i == 5) { 
+        %i++; 
+        continue;
+    } 
+    if (%i == 10) break;  
+    echo("%i is:" SPC %i);
+    %i++;
+}
+```
+
+*foreach* it special. It's designed for SimSet's and SimGroup's to loop it's members
+which is very usefull. But *foreach$* can be used for words.
+
+SimSet Example with named Object  and cleanup:
+``` 
+new SimSet(MySimSet);
+MySimSet.add ( new SimObject() { foo = 1;});
+MySimSet.add ( new SimObject() { foo = 2;});
+MySimSet.add ( new SimObject() { foo = 3;});
+
+foreach(%obj in MySimSet) {
+    echo("The foo of object" SPC %obj.getId() SPC "is" SPC %obj.foo);
+}
+
+MySimSet.deleteAllObjects();
+MySimSet.delete();
+```
+
+String Example:
+
+```
+%MyString = "Die Kuh lief um den Teich.";
+foreach$(%word in %MyString) {
+    echo("..", %word, "..");
+}
+echo("Drei mal ganz schnell hintereinander...");
+```
