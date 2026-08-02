@@ -3,9 +3,13 @@
 - LuaJit (2.1.1784580905): 0.355u 0.003s 0:00.35 100.0%    0+0k 0+0io 0pf+0w
 - Lua (5.5.0): 3.504u 0.003s 0:03.52 99.4%     0+0k 0+0io 0pf+0w
 - PHP (8.5.8): 3.644u 0.019s 0:03.66 99.7%     0+0k 0+0io 0pf+0w
-- ElfScript(0.4a (*3)): 15.979u 0.000s 0:15.99 99.8%    0+0k 0+0io 0pf+0w
+- 📌 ElfScript(0.4a (*3)): 15.979u 0.000s 0:15.99 99.8%    0+0k 0+0io 0pf+0w
 - Python 3 (3.14.6): 40.648u 0.006s 0:40.71 99.8%    0+0k 0+0io 0pf+0w
+- Duktape (2.7.0 RelWithDeb): 179.464u 0.000s 2:59.77 99.8%   0+0k 0+0io 0pf+0w
 - Bash (5.3.15(1) (*4)): Canceled after: 2151.499u 0.891s 36:04.93 99.4%       0+0k 0+0io 0pf+0w
+
+- 🌩️ ChaiScript ( v6.1.0 RelWithDeb (*5)): **Segmentation fault (core dumped)** after: 190.456u 0.148s 3:11.52 99.5%   0+0k 1312+0io 9pf+0w
+
 
 ---
 
@@ -23,6 +27,9 @@ time /opt/ElfScript/HelloElf --script counter.elf
 time /opt/ElfScript/HelloElf --script counter.elf
 
 (*4) After some time (10 min or so) i started working with the pc. I had to cancel 
+
+(*5) ChaiScript tested with a modified main.cpp in scriptFlux using chai->eval. 
+
 
 # II. For loop test counting to one billion (1000000000) and output %
 
@@ -62,7 +69,7 @@ for ( $i = 0; $i < 1000000000; $i++) {
 - LuaJit (2.1.1784580905): 4.268u 0.000s 0:04.27 99.7%     0+0k 0+0io 0pf+0w
 - PHP 8.5.8: 19.318u 0.009s 0:19.37 99.6%    0+0k 0+0io 0pf+0w
 - Lua (5.5.0): 20.083u 0.011s 0:20.13 99.8%    0+0k 0+0io 0pf+0w
-- ElfScipt(0.4a (*3)): 52.887u 0.003s 0:52.94 99.8%    0+0k 0+0io 0pf+0w
+- 📌 ElfScipt(0.4a (*3)): 52.887u 0.003s 0:52.94 99.8%    0+0k 0+0io 0pf+0w
 - Python 3 (3.14.6): 89.470u 0.026s 1:29.74 99.7%    0+0k 0+0io 0pf+0w
 
 
@@ -93,4 +100,4 @@ echo(%i);
 
 - PHP 8.5.8: 7.606u 0.006s 0:07.62 99.7%     0+0k 184+0io 1pf+0w
 - Lua (5.5.0): 10.003u 0.003s 0:10.01 99.9%    0+0k 0+0io 0pf+0w
-- ElfScipt(0.4a (*3)): 28.889u 0.006s 0:28.94 99.7%    0+0k 0+0io 0pf+0w
+- 📌 ElfScipt(0.4a (*3)): 28.889u 0.006s 0:28.94 99.7%    0+0k 0+0io 0pf+0w
