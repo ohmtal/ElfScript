@@ -137,3 +137,8 @@ foreach$(%word in %MyString) {
 }
 echo("Drei mal ganz schnell hintereinander...");
 ```
+---
+
+[Objects and Functions](./Objects.md) 
+
+[Back to Main](./Main.md)

@@ -27,7 +27,7 @@ foo("lisa", "30", "f");
 ## Objects
 
 - Objects are used a lot to organize the code and to speed up execution. Like you 
-create an Object in C++ to represet a Sprite with all it's Properties and methods. 
+create an Object in C++ to represent a Sprite with all it's Properties and methods. 
 - The script does not use pointer to objects. It uses ObjectId's (unsigned integer)
 - So we can store the reference in every variable 
 - Or use a Name. which is set like this `new ScriptObject(MyObject); `
@@ -88,3 +88,5 @@ GameGroup.delete();
 
 echo("Object exits:" SPC isObject($saveID));
 ```
+
+[Back to Main](./Main.md)
