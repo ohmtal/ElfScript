@@ -2085,7 +2085,7 @@ DefineEngineStringlyVariadicFunction( print, void, 2, 0, "( string message... ) 
             dStrcat(ret, argv[i], (U64)(len + 1));
 
       // Con::printf("%s", ret);
-      dPrintf("%s", ret);
+      dPrintf("%s\n", ret);
       ret[0] = 0;
 }
 
