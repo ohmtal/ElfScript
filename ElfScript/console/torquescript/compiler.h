@@ -167,9 +167,7 @@ namespace Compiler
       OP_ITER,             ///< Enter foreach loop.
       OP_ITER_END,         ///< End foreach loop.
 
-#ifdef ELFSCRIPT_CALLFUNC_CACHED
-      OP_CALLFUNC_CACHED, //XXTH new for cached function calls!
-#endif
+
       OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
       OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
       OP_INVALID,   // 90

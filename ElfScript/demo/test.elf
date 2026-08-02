@@ -11,6 +11,11 @@ function rl(%mode) {
 }
 
 
+
+
+
+
+
 // benchmark
 $foo = new TestObj() {
     TypeF32 bar = 0.0;

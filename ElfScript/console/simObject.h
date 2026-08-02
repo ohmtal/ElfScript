@@ -490,6 +490,10 @@ class SimObject: public ConsoleObject
       ///                      (if field is an array); if NULL, it is ignored.
       const char *getDataField(StringTableEntry slotName, const char *array);
 
+      //ElfScript set the ConsoleValue directly
+      bool stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP);
+
+
       /// Set the value of a field on the object.
       ///
       /// See @ref simobject_console "here" for a detailed discussion of what this

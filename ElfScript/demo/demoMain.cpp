@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 
 
     )";
-    Con::evaluate(code.c_str(), false, "");
+    if (gShutDownRequest) Con::evaluate(code.c_str(), false, "");
 
     // argv[0] is not the best way to get it but since i dont have
     // the platform source here and use the placeholder

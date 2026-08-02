@@ -945,6 +945,13 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
             *target = (S8)value;
             return true;
       }
+
+      if (fld->type == TypeS16) {
+            S16* target = (S16*)(((const char*)this) + fld->offset);
+            *target = (S16)value;
+            return true;
+      }
+
       if (fld->type == TypeBool) {
             bool* target = (bool*)(((const char*)this) + fld->offset);
             *target = (value != 0.0);
@@ -1136,6 +1143,15 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
             outValue = (F64)(*source);
             return true;
       }
+
+      if (fld->type == TypeS16) {
+            S16* source = (S16*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+
+
+
       if (fld->type == TypeBool) {
             bool* source = (bool*)(((const char*)this) + fld->offset);
             outValue = *source ? 1.0f : 0.0f;
@@ -1143,23 +1159,99 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
       }
 
 
-      // if (fld->type == TypeU32)
-      // {
-      //       U32* source = (U32*)(((const char*)this) + fld->offset);
-      //       outValue = (F64)(*source);
-      //       return true;
-      // }
-      //
-      // if (fld->type == TypeS64)
-      // {
-      //       U32* source = (S64*)(((const char*)this) + fld->offset);
-      //       outValue = (F64)(*source);
-      //       return true;
-      // }
+      if (fld->type == TypeU32)
+      {
+            U32* source = (U32*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+
+      if (fld->type == TypeS64)
+      {
+            S64* source = (S64*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
+
+      if (fld->type == TypeU64)
+      {
+            U64* source = (U64*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
       return false;
 }
 
 //-----------------------------------------------------------------------------
+//ElfScript replacement for getDataField to set to right type
+bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
+      if(mFlags.test(ModStaticFields))
+      {
+            S32 array1 = array ? dAtoi(array) : -1;
+            const AbstractClassRep::Field *fld = findField(slotName);
+
+            if(fld)
+            {
+                  if(array1 == -1 && fld->elementCount == 1) {
+                        stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) ));
+                        return true;
+                  }
+                  if(array1 >= 0 && array1 < fld->elementCount) {
+
+                        //FastPath skip convert to string and back >>>>
+                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                              && fld->setDataFn == &defaultProtectedSetFn) {
+
+                              F64 floatValue = 0.f;
+                              if (getDataField(fld, floatValue)) {
+                                    if (fld->type == TypeF64 || fld->type == TypeF32) {
+                                          stackP->setFastFloat(floatValue);
+                                    } else {
+                                          stackP->setFastInt((S64)floatValue);
+                                    }
+                                    return true;
+                              }
+                        } //Fastpath <<<
+
+                        stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), array1, fld->table, fld->flag) ));
+                        return true;
+                  }
+                   stackP->setString(""); //???
+                   return true;
+            }
+      }
+
+      if(mFlags.test(ModDynamicFields))
+      {
+            if(!mFieldDictionary) {
+                  stackP->setString("");
+                  return true;
+            }
+
+            if(!array)
+            {
+                  if (const char* val = mFieldDictionary->getFieldValue(slotName)) {
+                        stackP->setString(val);
+                        return true;
+                  }
+            }
+            else
+            {
+                  static char buf[256];
+                  dStrcpy(buf, slotName, 256);
+                  dStrcat(buf, array, 256);
+                  if (const char* val = mFieldDictionary->getFieldValue(StringTable->insert(buf))) {
+                        stackP->setString(val);
+                        return true;
+                  }
+
+            }
+      }
+
+      stackP->setString("");
+      return true;
+
+}
 
 const char *SimObject::getDataField(StringTableEntry slotName, const char *array)
 {

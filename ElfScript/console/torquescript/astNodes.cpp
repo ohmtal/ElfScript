@@ -1184,21 +1184,11 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       ip = walk->compile(codeStream, ip, walkType);
       codeStream.emit(OP_PUSH);
    }
-#ifdef ELFSCRIPT_CALLFUNC_CACHED
-#error do not use this!
-   //XXTH cached function
-   codeStream.emit(OP_CALLFUNC_CACHED);
-   codeStream.emitSTE(funcName);
-   codeStream.emitSTE(nameSpace);
-   codeStream.emit(callType);
-   codeStream.emit(U32(0)); // Slot 1 for pointer
-   codeStream.emit(U32(0)); // Slot 2 for pointer
-#else
+
    codeStream.emit(OP_CALLFUNC);
    codeStream.emitSTE(funcName);
    codeStream.emitSTE(nameSpace);
    codeStream.emit(callType);
-#endif
 
 
    if (type == TypeReqNone)
@@ -1235,57 +1225,6 @@ TypeReq AssertCallExprNode::getPreferredType()
 }
 
 //------------------------------------------------------------
-// XXTH TypeSafety READ
-#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
-U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
-{
-      if (type == TypeReqNone)
-            return ip;
-
-      precompileIdent(slotName);
-
-      if (arrayExpr)
-      {
-            ip = arrayExpr->compile(codeStream, ip, TypeReqString);
-      }
-      ip = objectExpr->compile(codeStream, ip, TypeReqString);
-      codeStream.emit(OP_SETCUROBJECT);
-
-      codeStream.emit(OP_SETCURFIELD);
-      codeStream.emitSTE(slotName);
-
-      if (typeID == TypeS32 || typeID == TypeF32)
-      {
-            codeStream.emit(OP_SETCURFIELD_TYPE);
-            codeStream.emit(typeID);
-      }
-
-      codeStream.emit(OP_POP_STK);
-
-      if (arrayExpr)
-      {
-            codeStream.emit(OP_SETCURFIELD_ARRAY);
-            codeStream.emit(OP_POP_STK);
-      }
-
-      switch (type)
-      {
-            case TypeReqUInt:
-                  codeStream.emit(OP_LOADFIELD_UINT);
-                  break;
-            case TypeReqFloat:
-                  codeStream.emit(OP_LOADFIELD_FLT);
-                  break;
-            case TypeReqString:
-                  codeStream.emit(OP_LOADFIELD_STR);
-                  break;
-            case TypeReqNone:
-                  break;
-      }
-      return codeStream.tell();
-}
-
-#else //ELFSCRIPT_STRICT_SLOT_TYPE
 U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    if (type == TypeReqNone)
@@ -1327,7 +1266,7 @@ U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    }
    return codeStream.tell();
 }
-#endif // ELFSCRIPT_STRICT_SLOT_TYPE
+
 TypeReq SlotAccessNode::getPreferredType()
 {
    return TypeReqNone;
@@ -1359,122 +1298,6 @@ TypeReq InternalSlotAccessNode::getPreferredType()
 }
 
 //-----------------------------------------------------------------------------
-//XXTH Typesafety attempt: (2026-08-01 added PoD)
-#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
-
-U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
-{
-      precompileIdent(slotName);
-
-      // Determine the required type based on the dynamic console type variables
-      TypeReq valueTypeReq = TypeReqString;
-
-      if (typeID == TypeS32 || typeID == TypeS64 || typeID == TypeU32 )
-      {
-            valueTypeReq = TypeReqUInt;
-      }
-      else if (typeID == TypeF32 || typeID == TypeF64)
-      {
-            valueTypeReq = TypeReqFloat;
-      }
-
-      // enable PoD { 10, 20 }
-      bool isVectorInit = (valueExpr && valueExpr->next != nullptr);
-      if (isVectorInit)
-      {
-            U32 elementCount = 0;
-            for (ExprNode* expr = valueExpr; expr; expr = (ExprNode*)(expr->next)) // <- Hier 'next' anpassen
-            {
-                  ip = expr->compile(codeStream, ip, TypeReqString);
-                  elementCount++;
-            }
-
-            if (elementCount > 16)
-            {
-                  const char* errStr = avar(
-                        "Script Error: Vector initialization for slot '%s' has too many elements (%d). "
-                        "Maximum is 16.\nFile: %s\nLine Num: %d",
-                        slotName,
-                        elementCount,
-                        CodeBlock::smCurrentParser->getCurrentFile(),
-                        dbgLineNumber
-                  );
-                  scriptErrorHandler(errStr);
-            }
-
-
-            codeStream.emit(OP_BUILD_VECTOR_STRING);
-            codeStream.emit(elementCount);
-      }
-      else
-      {
-            // Compile the value expression with the strict type requirement
-            ip = valueExpr->compile(codeStream, ip, valueTypeReq);
-      }
-
-      if (arrayExpr)
-      {
-            ip = arrayExpr->compile(codeStream, ip, TypeReqString);
-      }
-
-      if (objectExpr)
-      {
-            ip = objectExpr->compile(codeStream, ip, TypeReqString);
-            codeStream.emit(OP_SETCUROBJECT);
-      }
-      else
-      {
-            codeStream.emit(OP_SETCUROBJECT_NEW);
-      }
-
-      codeStream.emit(OP_SETCURFIELD);
-      codeStream.emitSTE(slotName);
-
-      if (objectExpr)
-      {
-            codeStream.emit(OP_POP_STK);
-      }
-
-      if (arrayExpr)
-      {
-            codeStream.emit(OP_SETCURFIELD_ARRAY);
-            codeStream.emit(OP_POP_STK);
-      }
-
-      // Emit the strict type opcodes before saving the field data
-      if (!isVectorInit &&  valueTypeReq == TypeReqUInt)
-      {
-            codeStream.emit(OP_SETCURFIELD_TYPE);
-            codeStream.emit(typeID);
-            codeStream.emit(OP_SAVEFIELD_UINT);
-      }
-      else  if (!isVectorInit && valueTypeReq == TypeReqFloat)
-      {
-            codeStream.emit(OP_SETCURFIELD_TYPE);
-            codeStream.emit(typeID);
-            codeStream.emit(OP_SAVEFIELD_FLT);
-      }
-      else
-      {
-            // Fallback for generic or unhandled types
-            codeStream.emit(OP_SAVEFIELD_STR);
-            if (typeID != -1)
-            {
-                  codeStream.emit(OP_SETCURFIELD_TYPE);
-                  codeStream.emit(typeID);
-            }
-      }
-
-      if (type == TypeReqNone)
-      {
-            codeStream.emit(OP_POP_STK);
-      }
-
-      return codeStream.tell();
-}
-
-#else // orig code
-
 U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    precompileIdent(slotName);
@@ -1555,7 +1378,7 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
    return codeStream.tell();
 }
-#endif
+
 TypeReq SlotAssignNode::getPreferredType()
 {
    return TypeReqString;

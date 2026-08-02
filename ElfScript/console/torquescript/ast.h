@@ -502,9 +502,6 @@ struct SlotAccessNode : ExprNode
    TypeReq getPreferredType() override;
    DBG_STMT_TYPE(SlotAccessNode);
 
-#ifdef ELFSCRIPT_STRICT_SLOT_TYPE
-   U32 typeID = -1;
-#endif
 
 };
 
@@ -613,7 +610,6 @@ namespace Script
 }
 
 // Elfscript PoD (XXTH) --------------------------------------------
-// #ifdef ELFSCRIPT_STRICT_SLOT_TYPE
 struct VectorConstructorNode : ExprNode
 {
    Vector<ExprNode*> elements;
@@ -624,7 +620,6 @@ struct VectorConstructorNode : ExprNode
    TypeReq getPreferredType() override;
    DBG_STMT_TYPE(VectorConstructorNode);
 };
-// #endif
 // ---------------------------------------------------------------
 
 #endif
