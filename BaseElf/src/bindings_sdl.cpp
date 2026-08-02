@@ -20,7 +20,7 @@
 #include "BaseFlux/Collision.h"
 #include <console/script.h>
 
-#include "ConsoleTypes.h"
+#include "ConsoleTypes.h" //NOTE Moved to ElfScript Addons
 #include "ColorConstants.h"
 
 
@@ -1274,20 +1274,20 @@ DefineEngineFunction(EndScale, void , (),,"") {
 // -----------------------------------------------------------------------------
 DefineEngineFunction(PointInRectI, bool , (Point2I p, RectI rect),
                      ,"Check a point is in rect") {
-    return (bool)SDL_PointInRect(&p, &rect);
+    return SDL_PointInRect(&p, &rect);
 }
 DefineEngineFunction(PointInRect, bool , (Point2F p, RectF rect),
                      ,"Check a point is in rect") {
-    return (bool)SDL_PointInRectFloat(&p, &rect);
+    return SDL_PointInRectFloat(&p, &rect);
 }
 DefineEngineFunction(HasRectIntersectionI, bool , (RectI rectA, RectI rectB),
                      ,"Check rect intersection") {
-    return (bool)SDL_HasRectIntersection(&rectA, &rectB);
+    return SDL_HasRectIntersection(&rectA, &rectB);
 }
 
 DefineEngineFunction(HasRectIntersection, bool , (RectF rectA, RectF rectB),
                      ,"Check rect intersection") {
-    return (bool)SDL_HasRectIntersectionFloat(&rectA, &rectB);
+    return SDL_HasRectIntersectionFloat(&rectA, &rectB);
 }
 DefineEngineFunction(GetRectIntersection, RectF , (RectF rectA, RectF rectB),
                      ,"get rect intersection (overlap)") {

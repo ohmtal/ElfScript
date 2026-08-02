@@ -11,7 +11,7 @@ set(PROJECT_SRC
     src/bindings_sdl.cpp
     src/bindings/FileDialog.cpp
     src/myPlatformProcess.cc
-    src/ConsoleTypes.cpp
+    # src/ConsoleTypes.cpp moved to addons
 )
 
 set (ASSET_PATH ${CMAKE_CURRENT_LIST_DIR}/assets@assets)
@@ -70,6 +70,7 @@ else()
   # SDL3Elf
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
+  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
 endif()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 
@@ -93,6 +94,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   "${ELFSCRIPT_INCLUDES}"
+  "${ELF_MODULE}/addons/SDL3/"
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
