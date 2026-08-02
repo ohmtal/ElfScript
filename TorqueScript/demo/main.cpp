@@ -29,6 +29,7 @@ DefineEngineFunction(helloWorld, void, (String name), , "hello world")
 
 
 bool gShutDownRequest = false;
+String gScriptFile = "";
 
 int argParser(int argc, char* argv[]) {
 
@@ -47,8 +48,8 @@ int argParser(int argc, char* argv[]) {
         // filename test
         if (argStr.equal("--script")) {
             if (i + 1 < argc) {
-                String tmpFile = argv[++i];
-                Con::infof("Script File test: %s", tmpFile.c_str());
+                gScriptFile = argv[++i];
+                Con::infof("Script File: %s", gScriptFile.c_str());
             } else {
                 Con::errorf("--script but no file parameter usage: --script myFile.cs");
                 return 1;
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
         // -------------------------
 
     )";
-    Con::evaluate(code.c_str(), false, "");
+     if (gShutDownRequest) Con::evaluate(code.c_str(), false, "");
 
     // // ------ output log entries:
     // ConsoleLogEntry *log;
@@ -127,6 +128,9 @@ int main(int argc, char* argv[]) {
     // }
     //
     // Con::unlockLog();
+
+
+   if (!gScriptFile.isEmpty())   Con::executeFile(gScriptFile);
 
     // --------- advance time for scheduler this should be placed in the main loop
     while (!gShutDownRequest) {

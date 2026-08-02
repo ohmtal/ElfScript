@@ -35,6 +35,8 @@ enum MyEnum {
 
 bool gShutDownRequest = false;
 U64 gFrameTime = 0;
+
+String gScriptFile = "ElfScript/demo/test.elf";
 // ----------------------------------------------------------------------------
 DefineEngineFunction(getFrameTime, S32, (), , "get the time in ms the last loop did need to finish")
 {
@@ -59,8 +61,8 @@ int argParser(int argc, char* argv[]) {
         // filename test
         if (argStr.equal("--script")) {
             if (i + 1 < argc) {
-                String tmpFile = argv[++i];
-                Con::infof("Script File test: %s", tmpFile.c_str());
+                gScriptFile = argv[++i];
+                Con::infof("Script File: %s", gScriptFile.c_str());
             } else {
                 Con::errorf("--script but no file parameter usage: --script myFile.elf");
                 return 1;
@@ -75,7 +77,7 @@ int argParser(int argc, char* argv[]) {
 void MyLogger(U32 level, const char *consoleLine) {
 #if defined(__unix__)
     // we use console
-    if (!stdConsole) dPrintf("%s\n", consoleLine);
+    if (!stdConsole || !stdConsole->isEnabled()) dPrintf("%s\n", consoleLine);
 #else
     switch (level) {
         case 1: dPrintf("[warn] %s\n",  consoleLine); break;
@@ -103,6 +105,7 @@ int main(int argc, char* argv[]) {
 // moved to addons/shellConsole
 #if defined(__unix__)
     // console test:
+
     StdConsole::create();
     stdConsole->enable(!gShutDownRequest);
     stdConsole->enableInput(!gShutDownRequest);
@@ -180,7 +183,7 @@ int main(int argc, char* argv[]) {
     // Platform::FS::SetCwd(dir);
     // Con::printf("Current script directory: %s (argv[0] %s)",Torque::FS::GetCwd().getFullPath().c_str(), argv[0] );
 
-    Con::executeFile("ElfScript/demo/test.elf");
+    if (!gScriptFile.isEmpty())   Con::executeFile(gScriptFile);
 
     bool doMainLoop = Con::isFunction("MainLoop");
     auto start = std::chrono::steady_clock::now();

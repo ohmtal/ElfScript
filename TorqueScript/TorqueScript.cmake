@@ -126,6 +126,7 @@ set(CORE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/core/util/str.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/util/byteBuffer.cpp
 
+    # ${CMAKE_CURRENT_LIST_DIR}/core/stream/bitStream.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/core/util/hashFunction.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/util/tVector.cpp
