@@ -2069,8 +2069,8 @@ DefineEngineStringlyVariadicFunction( echo, void, 2, 0, "( string message... ) "
 }
 
 DefineEngineStringlyVariadicFunction( print, void, 2, 0, "( string message... ) "
-"@brief Logs a message to the std out \n"
-"Concatenates all given arguments to a single string and prints the string to the std out.\n"
+"@brief Logs a message to the console see also echo \n"
+"Concatenates all given arguments to a single string and prints the string to the console.\n"
 "A newline is added automatically after the text.\n"
 "@param message Any number of string arguments." )
 {
@@ -2084,8 +2084,8 @@ DefineEngineStringlyVariadicFunction( print, void, 2, 0, "( string message... ) 
       for(i = 1; i < argc; i++)
             dStrcat(ret, argv[i], (U64)(len + 1));
 
-      // Con::printf("%s", ret);
-      dPrintf("%s\n", ret);
+      Con::printf("%s", ret);
+      // dPrintf("%s\n", ret);
       ret[0] = 0;
 }
 
