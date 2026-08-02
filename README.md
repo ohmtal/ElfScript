@@ -14,10 +14,10 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 - 😍 **ElfScript:** Added some handy console functions but this is my favorite: formatString(string format, ...) where you are able to add up to 31 parameter to really format a string :)
 - **ElfScript:** Added Con::ConsoleDocForStub default false to make the classes/function dumps better human readable but kept the code when it's exported for an parser.
 - **ElfScript:** Added IMPLEMENT_ENGINE_TYPE_TRAITS for non PoD console types (C linkage incompatible warning)
-- ~~**ElfScript:** ELFSCRIPT_STRICT_SLOT_TYPE saving the name to type in the VM - not sure it this is faster or slower with the lookup overhead. **Not recommended** because it save the field name and then all fields with the same name are casted to the type of the first field it found. ~~
+- ~~**ElfScript:** ELFSCRIPT_STRICT_SLOT_TYPE saving the name to type in the VM - not sure it this is faster or slower with the lookup overhead. **Not recommended** because it save the field name and then all fields with the same name are casted to the type of the first field it found.~~
 - Made it standalone
 - Added optional GarabageCollectionSet (ELFSCRIPT_GARBAGECOLLECTION) **not recommended** it slowdown the delete process when using lots of objects 
-- ~~Experimental: **Really not recommended:**  ELFSCRIPT_CALLFUNC_CACHED a attempt to speed up but ended up in instable calls. ~~
+- ~~ Experimental: **Really not recommended:**  ELFSCRIPT_CALLFUNC_CACHED a attempt to speed up but ended up in instable calls.~~
 - EngineGlue for init/process/shutdown
 - Ripped out some stuff i dont need like Taml
 - Fixed some memory leaks :)
