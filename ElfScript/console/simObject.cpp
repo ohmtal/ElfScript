@@ -920,7 +920,7 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 }
 
 //-----------------------------------------------------------------------------
-//ElfScript XXTH Speed HACK FastPath
+//ElfScript XXTH Speed  FastPath
 bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
 
       if (fld->type == TypeF64) {
@@ -979,7 +979,7 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
       return false;
 }
 
-// <<<< speed HACK
+// <<<< fastpath version
 
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
@@ -1107,7 +1107,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
       }
       else
       {
-      //XXTH handbreak here !!
+      //FIXME XXTH handbreak here !!
          char buf[256];
          dStrcpy(buf, slotName, 256);
          dStrcat(buf, array, 256);
@@ -1119,7 +1119,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 }
 
 //-----------------------------------------------------------------------------
-// XXTH Fastpath HACK version
+// XXTH Fastpath  version
 bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
       if (fld->type == TypeF64) {
             F64* source = (F64*)(((const char*)this) + fld->offset);
@@ -1183,7 +1183,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 }
 
 //-----------------------------------------------------------------------------
-//ElfScript replacement for getDataField to set to right type
+//ElfScript replacement for getDataField to set to right type directly into stack
 bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
       if(mFlags.test(ModStaticFields))
       {
@@ -1240,11 +1240,24 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                   static char buf[256];
                   dStrcpy(buf, slotName, 256);
                   dStrcat(buf, array, 256);
-                  if (const char* val = mFieldDictionary->getFieldValue(StringTable->insert(buf))) {
-                        stackP->setString(val);
+
+
+                  SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(StringTable->insert(buf));
+                  if (entry) {
+                        U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
+
+                        if (type == TypeF32) {
+                              stackP->setFastFloat((F64)dAtof(entry->value));
+                              return true;
+                        }
+                        if (type == TypeS32) {
+                              stackP->setFastInt((S64)dAtoi(entry->value));
+                              return true;
+                        }
+                        //FIXME more types ? .... not sure this is really faster ...
+                        stackP->setString(entry->value);
                         return true;
                   }
-
             }
       }
 
