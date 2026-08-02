@@ -945,7 +945,11 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
             *target = (S8)value;
             return true;
       }
-
+      if (fld->type == TypeU8) {
+            U8* target = (U8*)(((const char*)this) + fld->offset);
+            *target = (U8)value;
+            return true;
+      }
       if (fld->type == TypeS16) {
             S16* target = (S16*)(((const char*)this) + fld->offset);
             *target = (S16)value;
@@ -1143,6 +1147,11 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
             outValue = (F64)(*source);
             return true;
       }
+      if (fld->type == TypeU8) {
+            U8* source = (U8*)(((const char*)this) + fld->offset);
+            outValue = (F64)(*source);
+            return true;
+      }
 
       if (fld->type == TypeS16) {
             S16* source = (S16*)(((const char*)this) + fld->offset);
@@ -1244,17 +1253,17 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
 
                   SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(StringTable->insert(buf));
                   if (entry) {
-                        U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
-
-                        if (type == TypeF32) {
-                              stackP->setFastFloat((F64)dAtof(entry->value));
-                              return true;
-                        }
-                        if (type == TypeS32) {
-                              stackP->setFastInt((S64)dAtoi(entry->value));
-                              return true;
-                        }
-                        //FIXME more types ? .... not sure this is really faster ...
+                        // NOT! this is slower !!!!!!!!!!!!!
+                        // the type on dynamic fields is nonsense :/
+                        // U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
+                        // if (type == TypeF32) {
+                        //       stackP->setFastFloat((F64)dAtof(entry->value));
+                        //       return true;
+                        // }
+                        // if (type == TypeS32) {
+                        //       stackP->setFastInt((S64)dAtoi(entry->value));
+                        //       return true;
+                        // }
                         stackP->setString(entry->value);
                         return true;
                   }

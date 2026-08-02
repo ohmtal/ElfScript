@@ -318,16 +318,37 @@ ConsoleGetType( TypeS8 )
 {
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
-   dSprintf(returnBuffer, bufSize, "%d", *((U8 *) dptr) );
+   dSprintf(returnBuffer, bufSize, "%d", *((S8 *) dptr) );
    return returnBuffer;
 }
 
 ConsoleSetType( TypeS8 )
 {
    if(argc == 1)
-      *((U8 *) dptr) = dAtoi(argv[0]);
+      *((S8 *) dptr) = dAtoi(argv[0]);
    else
-      Con::printf("(TypeU8) Cannot set multiple args to a single S8.");
+      Con::printf("(TypeS8) Cannot set multiple args to a single S8.");
+}
+//-----------------------------------------------------------------------------
+// TypeS8
+//-----------------------------------------------------------------------------
+ConsoleType(char, TypeU8, U8, "")
+ImplementConsoleTypeCasters( TypeU8, U8 )
+
+ConsoleGetType( TypeU8 )
+{
+      static const U32 bufSize = 256;
+      char* returnBuffer = Con::getReturnBuffer(bufSize);
+      dSprintf(returnBuffer, bufSize, "%d", *((U8 *) dptr) );
+      return returnBuffer;
+}
+
+ConsoleSetType( TypeU8 )
+{
+      if(argc == 1)
+            *((U8 *) dptr) = dAtoi(argv[0]);
+      else
+            Con::printf("(TypeU8) Cannot set multiple args to a single S8.");
 }
 
 //-----------------------------------------------------------------------------

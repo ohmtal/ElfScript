@@ -28,6 +28,12 @@ public:
     StringTableEntry mTestName;
     S32 mSlots[3];
     Vector<Point2F> mPoints;
+    S8 mS8 = 0;
+    S8 mU8 = 0;
+
+    U32 mU32 = 0;
+    U64 mU64 = 0;
+    S64 mS64 = 0;
 
     TestObj() {
         mX = mY = mZ = 0.f;
@@ -63,6 +69,11 @@ public:
     static void initPersistFields()
     {
         // Parent::initPersistFields();
+        addField("testS8", TypeS8, Offset(mS8, TestObj));
+        addField("testU8", TypeU8, Offset(mU8, TestObj));
+        addField("testU32", TypeU32, Offset(mU8, TestObj));
+        addField("testU64", TypeU64, Offset(mU8, TestObj));
+        addField("testS64", TypeS64, Offset(mU8, TestObj));
         addField("x",     TypeF32,     Offset(mX, TestObj));
         addField("y",     TypeF32,     Offset(mY, TestObj));
         addField("z",     TypeF32,     Offset(mZ, TestObj));

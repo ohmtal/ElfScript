@@ -2074,6 +2074,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                         || fld->type == TypeU64
                         || fld->type == TypeF64
                         || fld->type == TypeS8
+                        || fld->type == TypeU8
                         || fld->type == TypeS16
                   ))
                   {
