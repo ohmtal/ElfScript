@@ -1,12 +1,16 @@
 # I. For loop test counting to one billion (1000000000)
 
+- LuaJit (2.1.1784580905): 0.355u 0.003s 0:00.35 100.0%    0+0k 0+0io 0pf+0w
 - Lua (5.5.0): 3.504u 0.003s 0:03.52 99.4%     0+0k 0+0io 0pf+0w
+- PHP (8.5.8): 3.644u 0.019s 0:03.66 99.7%     0+0k 0+0io 0pf+0w
 - ElfScript(0.4a (*3)): 15.979u 0.000s 0:15.99 99.8%    0+0k 0+0io 0pf+0w
-- ElfScript(0.4a (*1)): 16.154u 0.013s 0:16.22 99.6%    0+0k 0+0io 0pf+0w
 - Python 3 (3.14.6): 40.648u 0.006s 0:40.71 99.8%    0+0k 0+0io 0pf+0w
-- ElfScipt(0.4a (*2)): 257.589u 0.023s 4:17.94 99.8%   0+0k 0+0io 0pf+0w
 - Bash (5.3.15(1) (*4)): Canceled after: 2151.499u 0.891s 36:04.93 99.4%       0+0k 0+0io 0pf+0w
 
+---
+
+- ElfScript(0.4a (*1)): 16.154u 0.013s 0:16.22 99.6%    0+0k 0+0io 0pf+0w
+- ElfScipt(0.4a (*2)): 257.589u 0.023s 4:17.94 99.8%   0+0k 0+0io 0pf+0w
 
 
 (*1) ElfScript from raylib-ElfScript **RelWithDeb** build :
@@ -62,3 +66,31 @@ for ( $i = 0; $i < 1000000000; $i++) {
 - Python 3 (3.14.6): 89.470u 0.026s 1:29.74 99.7%    0+0k 0+0io 0pf+0w
 
 
+# III Float Test with While
+
+
+```
+<?php
+$i = 0;
+while ($i < 100000000.0 ) $i += 0.1;
+?>
+```
+
+```
+-- Lua
+local i = 0
+while i < 100000000.0 do
+     i = i + 0.1
+end
+```
+
+```
+echo ("ElfScript: 100 Million but float + 0.1f and a while loop");
+%i = 0;
+while (%i < 100000000.0) %i+=0.1;
+echo(%i);
+```
+
+- PHP 8.5.8: 7.606u 0.006s 0:07.62 99.7%     0+0k 184+0io 1pf+0w
+- Lua (5.5.0): 10.003u 0.003s 0:10.01 99.9%    0+0k 0+0io 0pf+0w
+- ElfScipt(0.4a (*3)): 28.889u 0.006s 0:28.94 99.7%    0+0k 0+0io 0pf+0w
