@@ -54,19 +54,25 @@ struct InternalVector4{
     F32 w = 0;
 };
 
-inline float lengthXY(const InternalVector4& p) {
-    return ElfMath::mSqrt(p.x * p.x + p.y * p.y);
+// ------------ Vector2 helper ----------------
+inline float lengthSquaredXY(const F32 x, const F32 y) {
+    return x * x + y * y;
 }
 
-void normalizeXY(InternalVector4& p) {
-    float len = lengthXY(p);
+inline float lengthXY(const F32 x, const F32 y) {
+    return ElfMath::mSqrt(lengthSquaredXY(x,y));
+}
+
+void normalizeXY(F32& x, F32& y) {
+    float len = lengthXY(x,y);
     if (len > 0.0f) {
-        p.x /= len;
-        p.y /= len;
+        x /= len;
+        y /= len;
     }
 }
 
-// wrapped random:
+
+// ------------ tinyexpr wrapped random: -------------------
 static double tinyexpr_randf_0() {
     return (double)ElfMath::mRandF();
 }
@@ -193,7 +199,7 @@ public:
             String trimmedExpr = Expr.trim();
             if (trimmedExpr.equal("normalizeXY()", String::NoCase)) {
                 for (U32 i = startIndex; i <= endIndex; i++) {
-                    normalizeXY( mPoints[i] );
+                    normalizeXY( mPoints[i].x, mPoints[i].y );
                 }
                 return true;
             }
@@ -277,10 +283,17 @@ DefineEngineMethod(PointStorageObject, setPosVec, void, (String strVector), , "s
 
 // ---------- set Pos by float's ----------
 DefineEngineMethod(PointStorageObject, setPos, void, (F32 x, F32 y, F32 z, F32 w),(0.f,0.f) ,
-                   "Set point by method ") {
+                   "Set position by method ") {
     object->setPos(x,y,z,w);
 }
-
+DefineEngineMethod(PointStorageObject, normalizeXZ, void, (), ,
+                   "normalize the current position") {
+    normalizeXY(object->mX, object->mY);
+}
+DefineEngineMethod(PointStorageObject, getLen, F32, (), ,
+                   "len of current position") {
+    return lengthXY(object->mX, object->mY);
+}
 // -------------------------------------
 // ---------- mPoints storage ----------
 DefineEngineMethod(PointStorageObject, setPoint, bool, (U32 index, F32 x, F32 y, F32 z, F32 w),(0.f, 0.f) ,
