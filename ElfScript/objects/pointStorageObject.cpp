@@ -8,18 +8,12 @@
 // Store a VectorType with 4 Points inside a Vector
 // this can be used for a Vector2/3/4, Rectangle or UV
 //-----------------------------------------------------------------------------
-// TODO: this should be enhanced with usefull stuff:
-// - isValidRect
-//
-// - normalize
-// - len
-// - ....all the vector stuff
-//
-// - distance of 2 points inside the storage *haha*
-//
-// - create spline positions (catmul rom)
-//
-// - check what clone does with this object ....
+// applyMathOnPoints give special power to modify points in one call using tinyexpr.
+//-----------------------------------------------------------------------------
+// Examples:
+//  - store points for custom particles
+//  - results of a pathfind.
+//  and much more ;)
 //-----------------------------------------------------------------------------
 // Example usage:
 // Create a new Storage with space for 1k points:
@@ -47,7 +41,10 @@
 // for (%i = 0; %i < 1000; %i++) { echo(sto.getPointx(%i) SPC sto.getPointy(%i) SPC sto.getPointz(%i) SPC sto.getPointw(%i)); }
 //-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
-#include <console/consoleTypes.h>
+#include "console/consoleTypes.h"
+#include "math/mMathRand.h"
+#include "math/mMathFn.h"
+#include "ext/tinyexpr.h"
 
 
 struct InternalVector4{
@@ -57,6 +54,32 @@ struct InternalVector4{
     F32 w = 0;
 };
 
+inline float lengthXY(const InternalVector4& p) {
+    return ElfMath::mSqrt(p.x * p.x + p.y * p.y);
+}
+
+void normalizeXY(InternalVector4& p) {
+    float len = lengthXY(p);
+    if (len > 0.0f) {
+        p.x /= len;
+        p.y /= len;
+    }
+}
+
+// wrapped random:
+static double tinyexpr_randf_0() {
+    return (double)ElfMath::mRandF();
+}
+static double tinyexpr_randf_1(double min) {
+    return (double)ElfMath::mRandF((F32) min, 0.f);
+}
+static double tinyexpr_randf_2(double min, double max) {
+    return (double)ElfMath::mRandF((F32)min, (F32)max);
+}
+
+// For accessing current object from tinyexpr function
+class PointStorageObject;
+static PointStorageObject* sCurrentInstance = nullptr;
 
 class PointStorageObject: public SimObject
 {
@@ -75,8 +98,12 @@ public:
      */
     Vector<InternalVector4> mPoints;
 
+    // math (tinyexpr) operation direct access:
+    F64 mtX, mtY, mtZ, mtW;
+
     PointStorageObject() {
         mX = mY = mZ = mW = 0.f;
+        mtX =  mtY = mtZ =  mtW = 0.f;
     }
 
 
@@ -140,6 +167,100 @@ public:
         this->mW = vec4.w;
     }
 
+
+    /*
+     * applyMathOnPoints
+     * - Using tinyexpr
+     * - Format each statement separated by ";" => "x+5; y*2; z; w"
+     */
+    bool applyMathOnPoints(String Expr, U32 startIndex = 0, U32 endIndex = 0) {
+        if (endIndex == 0) endIndex = mPoints.size() -1;
+        if ( endIndex >= mPoints.size()
+            || startIndex >= mPoints.size()
+            || startIndex > endIndex
+        ) {
+            Con::errorf("Invalid Range parameter applyMathOnPoints ( %u .. %u )", startIndex, endIndex);
+            return false;
+        }
+
+
+
+        Vector<String> expressions;
+        Expr.split(";", expressions);
+
+        // special pathes !!
+        if (expressions.size() == 1) {
+            String trimmedExpr = Expr.trim();
+            if (trimmedExpr.equal("normalizeXY()", String::NoCase)) {
+                for (U32 i = startIndex; i <= endIndex; i++) {
+                    normalizeXY( mPoints[i] );
+                }
+                return true;
+            }
+        }
+
+        if (expressions.size() != 4) {
+
+            Con::errorf("applyMathOnPoints: Expected 4 expressions separated by ';' (e.g., 'x+1; y; z; w')");
+            return false;
+        }
+
+
+        sCurrentInstance = this;
+        const int paramCount = 7;
+        te_variable vars[paramCount] = {
+            {"x", &mtX, TE_VARIABLE},
+            {"y", &mtY, TE_VARIABLE},
+            {"z", &mtZ, TE_VARIABLE},
+            {"w", &mtW, TE_VARIABLE},
+            {"randf", (const void*)&tinyexpr_randf_0, TE_FUNCTION0},
+            {"randf1", (const void*)&tinyexpr_randf_1, TE_FUNCTION1},
+            {"randf2", (const void*)&tinyexpr_randf_2, TE_FUNCTION2}
+        };
+
+        int err;
+        te_expr* exprX = te_compile(expressions[0].c_str(), vars, paramCount, &err);
+        te_expr* exprY = te_compile(expressions[1].c_str(), vars, paramCount, &err);
+        te_expr* exprZ = te_compile(expressions[2].c_str(), vars, paramCount, &err);
+        te_expr* exprW = te_compile(expressions[3].c_str(), vars, paramCount, &err);
+
+        if (!exprX || !exprY || !exprZ || !exprW) {
+            Con::errorf("applyMathOnPoints: Formula compilation failed!");
+            if (exprX) te_free(exprX);
+            if (exprY) te_free(exprY);
+            if (exprZ) te_free(exprZ);
+            if (exprW) te_free(exprW);
+            return false;
+        }
+
+        for (U32 i = startIndex; i <= endIndex; i++) {
+            InternalVector4& p = mPoints[i];
+
+            mtX = (F64)p.x;
+            mtY = (F64)p.y;
+            mtZ = (F64)p.z;
+            mtW = (F64)p.w;
+
+            mtX = te_eval(exprX);
+            mtY = te_eval(exprY);
+            mtZ = te_eval(exprZ);
+            mtW = te_eval(exprW);
+
+            p.x = (F32)mtX;
+            p.y = (F32)mtY;
+            p.z = (F32)mtZ;
+            p.w = (F32)mtW;
+        }
+
+        sCurrentInstance = nullptr;
+
+        te_free(exprX);
+        te_free(exprY);
+        te_free(exprZ);
+        te_free(exprW);
+
+        return true;
+    }
 };
 
 IMPLEMENT_CONOBJECT(PointStorageObject);
@@ -258,10 +379,33 @@ DefineEngineMethod(PointStorageObject, pushPoint, bool, (U32 index), ,
 }
 
 DefineEngineMethod(PointStorageObject, popPoint, bool, (U32 index), ,
-                   "pop the point from the point storage from index to the current values x,y,z,w") {
+                   "pop the point from the point storage at index to the current values x,y,z,w") {
     if ( index >= object->mPoints.size()) return false;
 
     object->setPos( object->mPoints[index] );
 
     return true;
+}
+
+// ---------- mPoints storage tinyexpr ----------
+// Test:
+//
+/*
+function PointMathTest() {
+if (!isObject(sto)) new PointStorageObject(sto) { storageSize = 1000; };
+sto.applyMathOnPoints("x+3.14; sin(x);randf1(1.0);w");
+for (%i = 0; %i < 1000; %i++) { echo(sto.getPointVec(%i));}
+}
+*/
+DefineEngineMethod(PointStorageObject, applyMathOnPoints, bool, (String Expr, U32 startIndex, U32 endIndex),(0,0)
+        ,"Apply a Math expression on point Storage.\n"
+        "expected format: \"x+5; y*2; z; w\" separated by ';'\n"
+        "this execute 4 statements. one for each field. "
+        "abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh\n"
+        "Random: randf(), randf1(5.0), randf2(1.0,2.0)\n"
+        "Example ranomize all: sto.applyMathOnPoints(\"mrandf(),mrandf(),mrandf(),mrandf()\");"
+        "Special one parameter expression: \n"
+        "  normalizeXY => applyMathOnPoints(\"normalizeXY()\");"
+        ) {
+    return object->applyMathOnPoints( Expr, startIndex, endIndex);
 }

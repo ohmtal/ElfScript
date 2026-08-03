@@ -187,6 +187,9 @@ set(MATH_SRC
    ${CMAKE_CURRENT_LIST_DIR}/math/mConsoleFunctions.cpp
 )
 
+set(EXT_SRC
+   ${CMAKE_CURRENT_LIST_DIR}/ext/tinyexpr.c
+)
 
 if(WIN32)
     list(APPEND PLATFORM_SRC ${WIN_SRC})
@@ -200,5 +203,6 @@ set(ELFSCRIPT_SRC
     ${CORE_SRC}
     ${PLATFORM_SRC}
     ${MATH_SRC}
+    ${EXT_SRC}
 )
 
