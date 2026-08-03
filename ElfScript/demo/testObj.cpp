@@ -16,6 +16,8 @@ struct Point2F{
     F32 y = 0;
 };
 
+IMPLEMENT_ENGINE_TYPE_TRAITS(Vector<F32>);
+
 class TestObj: public SimObject
 {
     typedef SimObject Parent;
@@ -27,13 +29,22 @@ public:
     bool mBool;
     StringTableEntry mTestName;
     S32 mSlots[3];
-    Vector<Point2F> mPoints;
     S8 mS8 = 0;
     S8 mU8 = 0;
 
     U32 mU32 = 0;
     U64 mU64 = 0;
     S64 mS64 = 0;
+
+    /*
+     * Storing Point in a vector Vector implementation
+     *
+     * property pointSize set/get the size of this vector to speed up access
+     *          i fo not use push at mPoints this should be pretty fast
+     * setPoint store x,y at a index in this vector
+     * pushPoint set mX and mY to a point stored in mPoints(shoudnt it by pop? )
+     */
+    Vector<Point2F> mPoints;
 
     TestObj() {
         mX = mY = mZ = 0.f;
@@ -126,7 +137,8 @@ DefineEngineMethod(TestObj, setPoint, bool, (S32 index, F32 x, F32 y), , "Set po
 }
 
 
-DefineEngineMethod(TestObj, getPoint, Vector<F32>, (S32 index), , "Get point at index") {
+
+DefineEngineMethod(TestObj, getPoint, Vector<F32>, (S32 index), , "Get point at index and return it as vector<F32> basically a string, slow shit ;)") {
     if (index < 0 || index >= object->mPoints.size()) return {};
     Vector<F32> tmpVector;
     tmpVector.clear();
@@ -146,7 +158,7 @@ DefineEngineMethod(TestObj, pushPoint, bool, (S32 index), , "push point at index
 // this is executed at the same speed as .pushPoint. so the VM does NOT cache %this object in functions
 // Console value need a pointer field
 DefineEngineFunction(Test_PushPoint, bool, (S32 pId, S32 index), , "same as pushpoint but as function") {
-    TestObj* object = static_cast<TestObj*>(Sim::findObject(pId));
+    TestObj* object = dynamic_cast<TestObj*>(Sim::findObject(pId));
     if (!object || index < 0 || index >= object->mPoints.size()) return false;
     object->mX =  object->mPoints[index].x;
     object->mY = object->mPoints[index].y;

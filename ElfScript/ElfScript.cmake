@@ -106,6 +106,12 @@ set(CONSOLE_SRC
     # this is rock and roll!!
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.h
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.cpp
+
+    # some neat objects to work with
+    ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
+
+
+
 )
 
 set(CORE_SRC

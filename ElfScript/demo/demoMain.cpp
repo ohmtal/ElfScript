@@ -173,23 +173,14 @@ int main(int argc, char* argv[]) {
     )";
     if (gShutDownRequest) Con::evaluate(code.c_str(), false, "");
 
-    // argv[0] is not the best way to get it but since i dont have
-    // the platform source here and use the placeholder
-    // stub/platformProcess.cpp i use it for the demo.
-    // not!
-
-    // String dir = "/opt/TorqueScript/ElfScript/demo/";
-    // Platform::setMainDotCsDir(dir);
-    // Platform::FS::SetCwd(dir);
-    // Con::printf("Current script directory: %s (argv[0] %s)",Torque::FS::GetCwd().getFullPath().c_str(), argv[0] );
 
     if (!gScriptFile.isEmpty())   Con::executeFile(gScriptFile);
 
     bool doMainLoop = Con::isFunction("MainLoop");
     auto start = std::chrono::steady_clock::now();
 
-    // --------- advance time for scheduler this should be placed in the main loop
     while (!gShutDownRequest) {
+          // --------- advance time for scheduler this should be placed in the main loop
           engineGlue::process(gFrameTime);
 
           #if defined(__unix__)
@@ -202,7 +193,6 @@ int main(int argc, char* argv[]) {
 
           auto end = std::chrono::steady_clock::now();
 
-        // Differenz berechnen (z. B. in Millisekunden)
           auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
           gFrameTime = duration.count();
           start = end;
