@@ -38,6 +38,7 @@ String gDirectory = "";
 String gScriptFile = "main.elf";
 
 extern void InitBindings_SDL();
+extern void postInitBindings_SDL();
 extern void ShutdownBindings_SDL();
 extern void InitBindings_ImGui();
 
@@ -170,6 +171,8 @@ int main(int argc, char* argv[]) {
     // -------------------------------------------------------------------------
 
     if ( !app.InitSDL() ) return 1;
+
+    postInitBindings_SDL();
     app.initImGui();
 
 

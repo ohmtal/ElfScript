@@ -28,6 +28,9 @@ typedef SDL_Point Point2I;
 typedef SDL_FPoint Point2F;
 
 
+inline bool isValid(const RectF& rect) {
+    return (rect.w > 0 && rect.h > 0);
+}
 
 // -------------- SDL_Color --------------------
 inline bool operator==(const SDL_Color& a, const SDL_Color& b) {

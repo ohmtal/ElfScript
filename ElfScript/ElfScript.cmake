@@ -1,5 +1,8 @@
 # ElfScript Source Files definition
 
+add_compile_definitions(ELFSCRIPT_VERSION_0_4)
+
+
 set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/arrayObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/arrayObject.h

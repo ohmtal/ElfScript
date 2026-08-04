@@ -22,6 +22,7 @@
 
 #include "ConsoleTypes.h" //NOTE Moved to ElfScript Addons
 #include "ColorConstants.h"
+#include <SDL3_render.h>
 
 
 extern BaseFlux::Main app;
@@ -1671,36 +1672,24 @@ DefineEngineFunction( include,bool, (String fileName, bool noCalls),(true), "inc
 //-----------------------------------------------------------------------------
 ConsoleFunctionGroupEnd(BaseFlux);
 // -----------------------------------------------------------------------------
+void postInitBindings_SDL() {
+    ElfSDL3::WindowMap.add(app.getWindow());
+    ElfSDL3::RendererMap.add(app.getRenderer());
+
+}
+
 // added at bottom
 void InitBindings_SDL() {
 
-    Con::setScriptConstant("SDL_WINDOW_FULLSCREEN", SDL_WINDOW_FULLSCREEN);
-    Con::setScriptConstant("SDL_WINDOW_MAXIMIZED", SDL_WINDOW_MAXIMIZED);
-    Con::setScriptConstant("SDL_WINDOW_RESIZABLE", SDL_WINDOW_RESIZABLE);
-    Con::setScriptConstant("SDL_WINDOW_HIGH_PIXEL_DENSITY", SDL_WINDOW_HIGH_PIXEL_DENSITY);
+    ElfSDL3::InitRenderer();
+    // we add out window and render here  ;)
+    // Too early ^^
+    // ElfSDL3::WindowMap.add(app.getWindow());
+    // ElfSDL3::RendererMap.add(app.getRenderer());
 
-
-
-    Con::registerEnumS32<SDL_RendererLogicalPresentation>("", false);
-    Con::registerEnumS32<SDL_ScaleMode>("", false);
-    Con::registerEnumS32<SDL_FlipMode>("", false);
     registerColors();
 
-    // Blend >>
-    // SDL_BlendMode
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_NONE);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_BLEND);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_BLEND_PREMULTIPLIED);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_ADD);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_ADD_PREMULTIPLIED);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_MOD);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_MUL);
-    Con::REGISTER_CONST_U32(SDL_BLENDMODE_INVALID);
 
-    Con::registerEnumS32<SDL_BlendOperation>("", false);
-    Con::registerEnumS32<SDL_BlendFactor>("", false);
-
-    // << Blend
 
 
     gSettingsObject = new SettingsObject();
@@ -1709,6 +1698,7 @@ void InitBindings_SDL() {
     // -----
 }
 void ShutdownBindings_SDL() {
+    ElfSDL3::ShutDownRenderer();
     Con::setIntVariable("$Settings", 0);
     gSettingsObject->deleteObject();
 }
