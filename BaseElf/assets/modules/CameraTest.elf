@@ -168,7 +168,7 @@ function CameraTest::OnUpdate(%this, %dt) {
     if (isObject(MyFish) && PointInRect(Camera.GetMousePosition(), MyFish.dstRect) ) {
         if (MyFish.layer > 0) {
             // playSound("sound/beep.wav");
-            MyFish.color = "128 255 0 254";
+            MyFish.color = {128, 255, 0, 254};
             // MyFish.x = MyFish.savDstRect.x - 10;
             // MyFish.y = MyFish.savDstRect.y - 10;
             // MyFish.width  = MyFish.savDstRect.width + 20;

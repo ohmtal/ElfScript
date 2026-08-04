@@ -1541,6 +1541,7 @@ void setData(S32 type, void *dptr, S32 index, S32 argc, const char **argv, const
 
 const char *getData(S32 type, void *dptr, S32 index, const EnumTable *tbl, BitSet32 flag)
 {
+   if (!dptr) return ""; //XXTH
    ConsoleBaseType *cbt = ConsoleBaseType::getType(type);
    AssertFatal(cbt, "Con::getData - could not resolve type ID!");
    return cbt->getData((void *) (((const char *)dptr) + index * cbt->getTypeSize()), tbl, flag);

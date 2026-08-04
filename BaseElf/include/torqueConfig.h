@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
-#define TEST_STRUCT_FAST_PATH //XXTH TEST
+// #define TEST_STRUCT_FAST_PATH //XXTH TEST
 // ----------------------------------------------------------------------------
 // enable #define in torque script
 #define ELFSCRIPT_PREPROCESSOR

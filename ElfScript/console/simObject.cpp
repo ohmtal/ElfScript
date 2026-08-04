@@ -1080,6 +1080,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             if(fld->validator)
                fld->validator->validateType(this, fld->pFieldname,  (void *) (((const char *)this) + fld->offset));
 
+            //FIXME network!
             // if (fld->networkMask != 0)
             // {
             //    NetObject* netObj = static_cast<NetObject*>(this);

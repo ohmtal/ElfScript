@@ -80,7 +80,8 @@ void ConsoleBaseType::initialize()
 
 ConsoleBaseType* ConsoleBaseType::getType(const S32 typeID)
 {
-   if( typeID == -1 || gConsoleTypeTable.size() <= typeID )
+   //orig: if( typeID == -1 || gConsoleTypeTable.size() <= typeID )
+   if( typeID < 0 || gConsoleTypeTable.size() <= typeID )
       return NULL;
       
    return gConsoleTypeTable[ typeID ];

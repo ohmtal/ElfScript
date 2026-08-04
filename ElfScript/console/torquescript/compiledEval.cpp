@@ -2494,14 +2494,21 @@ case OP_BUILD_VECTOR_STRING: {
       }
 
       _STK++;
-
-
       stack[_STK].setString(buffer);
-
 
 #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
       // after setString!!
       if (matchVectorFields) {
+            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+            // this break:
+            // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
+            // {
+            //       Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
+            // }
+            // not sure why because i return the string which is filled above
+            // but i only added a small part where  type is used so why knows .....
+
+
             stack[_STK].type = cvVector;
             // copy all to 0.f old values
             for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
