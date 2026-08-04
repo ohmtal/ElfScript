@@ -1,8 +1,3 @@
-// TestBed for ElfScript nativ SDL_render
-//  NOTE:
-//   included in BaseElf ... need a other project and more bindings to
-//   really test it!
-
 function createNativSDL() {
     %obj = new ScriptGroup() {
         class = "NativSDL";
@@ -12,34 +7,31 @@ function createNativSDL() {
 }
 //----------------------------------------------------------------------
 function NativSDL::onAdd(%this) {
-    SetClearBackground(SLATEGRAY); //only set once
 
-    // I create another Window ;)
-    // %flags = 0; //SDL_WINDOW_RESIZABLE;
-    // %this.window = SDL_CreateWindow("Nativ SDL Bindings.", 320, 200, %flags);
+    if (!SDL_Init()) return false;
 
-    // BaseElf window should be 1 if you did not SDL_RENDERER_SHUTDOWN
-    // status: OK
-    // %flags = SDL_WINDOW_POPUP_MENU; // | SDL_WINDOW_BORDERLESS;
-    // %this.window = SDL_CreatePopupWindow(1, 50,50, 320, 200, %flags);
+    // I create Window ;)
+    %flags = 0; //SDL_WINDOW_RESIZABLE;
+    %this.window = SDL_CreateWindow("Nativ SDL Bindings.", 320, 200, %flags);
 
-    // if (!%this.window) return false;
-    // %this.renderer = SDL_CreateRenderer(%this.window);
-    // if (!%this.renderer) {
-    //     SDL_DestroyWindow(%this.window);
-    //     return false;
-    // }
+
+    if (!%this.window) return false;
+    %this.renderer = SDL_CreateRenderer(%this.window);
+    if (!%this.renderer) {
+        SDL_DestroyWindow(%this.window);
+        return false;
+    }
 
     %this.renderer = 1; //use default window
 
     %surface = SDL_LoadSurface("assets/texture/icon_32.png");
-warn("surface is" SPC %surface);
+// warn("surface is" SPC %surface);
     if (%surface > 0) {
         %this.TexLogo = SDL_CreateTextureFromSurface(%this.renderer, %surface);
         %this.TextLogoSrcRect = SDL_GetTextureRect(%this.TexLogo);
     }
 
-warn("%this.TexLogo is" SPC %this.TexLogo);
+// warn("%this.TexLogo is" SPC %this.TexLogo);
     SDL_DestroySurface(%surface);
 
 
@@ -53,20 +45,13 @@ function NativSDL::OnRemove(%this) {
     if (%this.window > 1) SDL_DestroyWindow(%this.window);
 }
 //----------------------------------------------------------------------
-function NativSDL::OnUpdate(%this, %dt) {
-}
-//----------------------------------------------------------------------
 function NativSDL::Render(%this) {
     if (!%this.renderer) return;
 
-    // NOTE: this can be optimized for speed but it's a feature test.
-
-    if (%this.renderer > 1) {
-        // set the background color
-        SDL_SetRenderDrawColor(%this.renderer, 20,20,100);
-        // clear the screen
-        SDL_RenderClear(%this.renderer);
-    }
+    // set the background color
+    SDL_SetRenderDrawColor(%this.renderer, 20,20,100);
+    // clear the screen
+    SDL_RenderClear(%this.renderer);
 
     // a white filled rectangle
     SDL_SetRenderDrawColor(%this.renderer, 255,255,255);
@@ -93,7 +78,7 @@ function NativSDL::Render(%this) {
     // not sure where GetGameTime - i guess BaseElf
     SDL_RenderTextureRotated(%this.renderer, %this.TexLogo
         , %this.TextLogoSrcRect , { 175,80, 90, 90}
-        , mFMod(GetGameTime() * 100, 360.0)
+        , mFMod(SDL_GetTicks() * 0.1, 360.0)
         , {45.0, 45.0}
         , SDL_FLIP_NONE
     );
@@ -109,10 +94,33 @@ function NativSDL::Render(%this) {
     SDL_RenderRect(%this.renderer, { 10,10, 300, 180});
 
     // draw the stuff ...
-    if (%this.renderer > 1) SDL_RenderPresent(%this.renderer);
+    SDL_RenderPresent(%this.renderer);
 
 }
 //----------------------------------------------------------------------
-function NativSDL::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {}
-function NativSDL::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
-function NativSDL::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
+    if (!%isDown) return;
+
+    if (%scancode == SDL_SCANCODE_ESCAPE) {
+        echo("Bye Bye");
+        $running = false;
+    }
+
+}
+function onSDLMouseButtonEvent(%button, %isDown, %x, %y) {}
+function onSDLMouseWheelEvent(%wheelX, %wheelY){}
+
+
+new ScriptGroup(Main) {
+    class = "NativSDL";
+};
+
+$running = true;
+
+while ( $running ) {
+    Main.Render();
+    SDL_Delay(16);
+    if (!Loop()) break;
+}
+Main.delete();
+

@@ -1,4 +1,4 @@
-$MODULES = "CameraTest BaseDemo NativSDL ImGuiDemo Collision Aquarium";
+$MODULES = "CameraTest BaseDemo NativSDL ImGuiDemo Collision StarField Aquarium ";
 
 
 function Main::init(%this) {

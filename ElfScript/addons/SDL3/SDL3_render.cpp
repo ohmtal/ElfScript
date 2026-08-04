@@ -504,7 +504,6 @@ DefineEngineFunction(SDL_RenderRect, bool , (S32 rendererID, RectF rect),
     return SDL_RenderRect(renderer, &rect);
 }
 
-
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderRects(SDL_Renderer *renderer, const SDL_FRect *rects, int count);
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderFillRect(SDL_Renderer *renderer, const SDL_FRect *rect);
@@ -516,6 +515,16 @@ DefineEngineFunction(SDL_RenderFillRect, bool , (S32 rendererID, RectF rect),
     return SDL_RenderFillRect(renderer, &rect);
 }
 
+// RenderRect with float params instead of rect and bool filled
+DefineEngineFunction(SDL_RenderRectF, bool , (S32 rendererID, F32 x, F32 y, F32 w, F32 h, bool filled),(true)
+        ,"render a Rect  with float parameters and filled or not (not nativ SDL3)") {
+    SDL_Renderer* renderer = getRendererByID(rendererID);
+    if (!renderer) return false;
+    static RectF rect = {};
+    rect = {x,y,w,h};
+    if (filled ) return SDL_RenderFillRect(renderer, &rect);
+     return SDL_RenderRect(renderer, &rect);
+}
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderFillRects(SDL_Renderer *renderer, const SDL_FRect *rects, int count);
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderTexture(SDL_Renderer *renderer, SDL_Texture *texture,

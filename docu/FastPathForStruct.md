@@ -33,6 +33,11 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
 }
 ```
 
+2.) write to the variables:
+ 2.1) this ? used in const char *getFormattedData(S32 type, const char *data, const EnumTable *tbl, BitSet32 flag)
+  ==> void* variable = cbt->getNativeVariable();
+
+
 ## 2.) Another half-baked idea is to add a new type in ConsoleValue
 
 **OP_BUILD_VECTOR_STRING**
