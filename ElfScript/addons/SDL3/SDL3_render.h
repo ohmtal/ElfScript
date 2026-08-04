@@ -11,6 +11,7 @@
 
 namespace ElfSDL3 {
 
+    //Note dont forget to add them to ShutDownRenderer!!
     inline ElfResource::ElfStorage<SDL_Window*  , SDL_DestroyWindow>   WindowMap;
     inline ElfResource::ElfStorage<SDL_Renderer*, SDL_DestroyRenderer> RendererMap;
     inline ElfResource::ElfStorage<SDL_Surface* , SDL_DestroySurface>  SurfaceMap;

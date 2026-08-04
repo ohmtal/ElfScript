@@ -12,12 +12,17 @@
 #include "console/engineAPI.h"
 #include "console/script.h"
 #include "core/strings/stringUnit.h"
-#include "addons/SDL3/SDL3_input.h"
-#include "addons/SDL3/SDL3_Filesystem.h"
-#include "addons/SDL3/SDL3_render.h"
 
 // SDL3
 #include "SDL3/SDL.h"
+
+// ElfScript SDL3 addon
+#include "addons/SDL3/SDL3_core.h"
+#include "addons/SDL3/SDL3_render.h"
+#include "addons/SDL3/SDL3_audio.h"
+#include "addons/SDL3/SDL3_input.h"
+#include "addons/SDL3/SDL3_Filesystem.h"
+
 
 String gDirectory = "";
 String gScriptFile = "assets/main.elf";
@@ -65,15 +70,18 @@ int argParser(int argc, char* argv[]) {
 }
 // ----------------------------------------------------------------------------
 void InitSDLBindings() {
+    ElfSDL3::RegisterCoreConstants();
     ElfSDL3::InitKeyCodes();
     ElfSDL3::RegisterFileSystemConstants();
     ElfSDL3::InitRenderer();
+    // ElfSDL3::Audio::Init(); << must be done in script!
 }
 
 // DefineEngineFunction(InitSDLBindings, void, (), ,"Init the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
 
 void ShutdownSDLBindings(){
     ElfSDL3::ShutDownRenderer();
+    ElfSDL3::Audio::ShutDown();
 }
 // DefineEngineFunction(ShutdownSDLBindings, void, (), ,"ShutDown the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
 // ----------------------------------------------------------------------------
@@ -82,7 +90,8 @@ DefineEngineFunction(GetFrameTime, F64, (), , "Get the current frame time") {
     return gFrameTime;
 }
 // ----------------------------------------------------------------------------
-DefineEngineFunction(Loop, bool, (),,"Main Loop for events and more..." ) {
+DefineEngineFunction(SDL_MainLoop, bool, (S32 RendererID),(0),"Main Loop for events and more...\n"
+    "optional RendererID parameter is requiered when you set SDL_SetRenderLogicalPresentation " ) {
 
     static U32 lastTicks = SDL_GetTicks();
 
@@ -93,10 +102,17 @@ DefineEngineFunction(Loop, bool, (),,"Main Loop for events and more..." ) {
 
     ElfSDL3::ClearInputFrameTicks();
 
+    SDL_Renderer* renderer = nullptr;
+    if ( RendererID > 0 ) {
+        renderer = ElfSDL3::RendererMap.getValue(RendererID);
+    }
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         // when using SDL_SetRenderLogicalPresentation (scaling)
-        //FIXME  SDL_ConvertEventToRenderCoordinates(getRenderer(), &event);
+        if (renderer) {
+            SDL_ConvertEventToRenderCoordinates(renderer, &event);
+        }
 
         switch (event.type) {
             case SDL_EVENT_QUIT:

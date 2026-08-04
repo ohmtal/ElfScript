@@ -11,8 +11,8 @@ function NativSDL::onAdd(%this) {
     if (!SDL_Init()) return false;
 
     // I create Window ;)
-    %flags = 0; //SDL_WINDOW_RESIZABLE;
-    %this.window = SDL_CreateWindow("Nativ SDL Bindings.", 320, 200, %flags);
+    %flags = SDL_WINDOW_RESIZABLE;
+    %this.window = SDL_CreateWindow("Nativ SDL Bindings.", 640, 400, %flags);
 
 
     if (!%this.window) return false;
@@ -22,14 +22,26 @@ function NativSDL::onAdd(%this) {
         return false;
     }
 
-    %this.renderer = 1; //use default window
+    SDL_SetRenderVSync(%this.renderer, 1);
+
+
+    Audio_Init(); //Init Audio Subsystem
+    %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
+
+    // scale to 320x200 ^^
+    %this.scaledScreen = SDL_SetRenderLogicalPresentation(%this.renderer, 320,200);
 
     %surface = SDL_LoadSurface("assets/texture/icon_32.png");
 // warn("surface is" SPC %surface);
     if (%surface > 0) {
+        // create texture
         %this.TexLogo = SDL_CreateTextureFromSurface(%this.renderer, %surface);
         %this.TextLogoSrcRect = SDL_GetTextureRect(%this.TexLogo);
+
+        // this is also my Icon
+        SDL_SetWindowIcon(%this.window, %surface);
     }
+
 
 // warn("%this.TexLogo is" SPC %this.TexLogo);
     SDL_DestroySurface(%surface);
@@ -40,21 +52,22 @@ function NativSDL::onAdd(%this) {
 }
 //----------------------------------------------------------------------
 function NativSDL::OnRemove(%this) {
-    // 1 is my default renderer/window ;)
-    if (%this.renderer > 1) SDL_DestroyRenderer(%this.renderer);
-    if (%this.window > 1) SDL_DestroyWindow(%this.window);
+    SDL_DestroyRenderer(%this.renderer);
+    SDL_DestroyWindow(%this.window);
+    SDL_DestroyTexture(%this.TexLogo);
+    Audio_UnLoadWav(%this.SndBlop);
 }
 //----------------------------------------------------------------------
 function NativSDL::Render(%this) {
     if (!%this.renderer) return;
 
     // set the background color
-    SDL_SetRenderDrawColor(%this.renderer, 20,20,100);
+    SDL_SetRenderDrawColor(%this.renderer, 15,15,30);
     // clear the screen
     SDL_RenderClear(%this.renderer);
 
     // a white filled rectangle
-    SDL_SetRenderDrawColor(%this.renderer, 255,255,255);
+    SDL_SetRenderDrawColor(%this.renderer, 5,55,55);
     SDL_RenderRectF(%this.renderer, 10,10, 300, 180, true);
     // SDL_RenderFillRect(%this.renderer, { 10,10, 300, 180});
 
@@ -68,9 +81,19 @@ function NativSDL::Render(%this) {
 
     // a blended dark rect
     SDL_SetRenderDrawColor(%this.renderer, 10,10,10, 160);
-    SDL_SetRenderDrawBlendMode(%this.renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(%this.renderer, SDL_BLENDMODE_MUL);
 
 
+    if ( SDL_PointInRectFloat({SDL_GetMouseX(), SDL_GetMouseY()},{ 55,80, 90, 90}) ) {
+        SDL_SetTextureColorMod(%this.TexLogo, 255,255,0);
+        if (!%this.EnteredLogo) {
+            Audio_Play(%this.SndBlop);
+            %this.EnteredLogo = true;
+        }
+    } else {
+
+        %this.EnteredLogo = false;
+    }
     // set a invalid srcRect is set as nullptr. SDL3 uses the rect nullptr as fullsize
     SDL_RenderTexture(%this.renderer, %this.TexLogo, { 0,0,0,0}, { 55,80, 90, 90});
 
@@ -97,7 +120,7 @@ function NativSDL::Render(%this) {
     SDL_RenderRectF(%this.renderer, 10,10, 300, 180, false);
 
 
-    SDL_RenderDebugText(%this.renderer, 15,15, strFormat("%.4f sec.", GetFrameTime()) );
+    SDL_RenderDebugText(%this.renderer, 15,15, FormatString("%.4f sec. Mouse: %.0f,%.0f", GetFrameTime(), SDL_GetMouseX(), SDL_GetMouseY()) );
 
 
     // draw the stuff ...
@@ -126,8 +149,8 @@ $running = true;
 
 while ( $running ) {
     Main.Render();
-    SDL_Delay(16); //  ~ 60fps if render does nothing ;)
-    if (!Loop()) break;
+    // added vsnyc ... SDL_Delay(16); //  ~ 60fps if render does nothing ;)
+    if (!SDL_MainLoop(Main.scaledScreen ? Main.renderer : 0)) break;
 }
 Main.delete();
 

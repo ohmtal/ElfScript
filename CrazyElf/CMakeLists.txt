@@ -59,6 +59,7 @@ else()
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_core.cpp)
+  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_audio.cpp)
 endif()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 

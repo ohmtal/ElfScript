@@ -158,6 +158,8 @@ DefineEngineFunction(SDL_RENDERER_INIT, void, (),,"initialize the ElfSDL3::SDL3_
 void ShutDownRenderer() {
     RendererMap.clear();
     WindowMap.clear();
+    SurfaceMap.clear();
+    TextureMap.clear();
 }
 DefineEngineFunction(SDL_RENDERER_SHUTDOWN, void, (),,"shutdown and unload the ElfSDL3::SDL3_Render System") {
     ShutDownRenderer();
@@ -229,6 +231,78 @@ DefineEngineFunction( SDL_CreateWindow, S32,
     Con::errorf("SDL_CreateWindow: Failed to create Window: %s", SDL_GetError());
     return 0;
 }
+
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowTitle(SDL_Window *window, const char *title);
+// extern SDL_DECLSPEC const char * SDLCALL SDL_GetWindowTitle(SDL_Window *window);
+
+// SDL_video: extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowIcon(SDL_Window *window, SDL_Surface *icon);
+DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,"Set a Window Icon from Surface") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return false;
+    SDL_Surface* surface = SurfaceMap.getValue(SurfaceID);
+    if (!surface) {
+        Con::errorf("Failed to get Surface by SurfaceID: %d", SurfaceID);
+        return false;
+    }
+    return SDL_SetWindowIcon(window, surface);
+}
+
+// SDL_Video!! FIXME add SDL3_video!!
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowPosition(SDL_Window *window, int x, int y);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowPosition(SDL_Window *window, int *x, int *y);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowSize(SDL_Window *window, int w, int h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSize(SDL_Window *window, int *w, int *h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSafeArea(SDL_Window *window, SDL_Rect *rect);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAspectRatio(SDL_Window *window, float min_aspect, float max_aspect);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowAspectRatio(SDL_Window *window, float *min_aspect, float *max_aspect);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowBordersSize(SDL_Window *window, int *top, int *left, int *bottom, int *right);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSizeInPixels(SDL_Window *window, int *w, int *h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMinimumSize(SDL_Window *window, int min_w, int min_h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMinimumSize(SDL_Window *window, int *w, int *h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMaximumSize(SDL_Window *window, int max_w, int max_h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMaximumSize(SDL_Window *window, int *w, int *h);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowBordered(SDL_Window *window, bool bordered);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowResizable(SDL_Window *window, bool resizable);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAlwaysOnTop(SDL_Window *window, bool on_top);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFillDocument(SDL_Window *window, bool fill);
+// extern SDL_DECLSPEC bool SDLCALL SDL_ShowWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_HideWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_RaiseWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_MaximizeWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_MinimizeWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_RestoreWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFullscreen(SDL_Window *window, bool fullscreen);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SyncWindow(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_WindowHasSurface(SDL_Window *window);
+// extern SDL_DECLSPEC SDL_Surface * SDLCALL SDL_GetWindowSurface(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowSurfaceVSync(SDL_Window *window, int vsync);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSurfaceVSync(SDL_Window *window, int *vsync);
+// extern SDL_DECLSPEC bool SDLCALL SDL_UpdateWindowSurface(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_UpdateWindowSurfaceRects(SDL_Window *window, const SDL_Rect *rects, int numrects);
+// extern SDL_DECLSPEC bool SDLCALL SDL_DestroyWindowSurface(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowKeyboardGrab(SDL_Window *window, bool grabbed);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMouseGrab(SDL_Window *window, bool grabbed);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowKeyboardGrab(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMouseGrab(SDL_Window *window);
+// extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_GetGrabbedWindow(void);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMouseRect(SDL_Window *window, const SDL_Rect *rect);
+// extern SDL_DECLSPEC const SDL_Rect * SDLCALL SDL_GetWindowMouseRect(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowOpacity(SDL_Window *window, float opacity);
+// extern SDL_DECLSPEC float SDLCALL SDL_GetWindowOpacity(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowParent(SDL_Window *window, SDL_Window *parent);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowModal(SDL_Window *window, bool modal);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFocusable(SDL_Window *window, bool focusable);
+// extern SDL_DECLSPEC bool SDLCALL SDL_ShowWindowSystemMenu(SDL_Window *window, int x, int y);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowHitTest(SDL_Window *window, SDL_HitTest callback, void *callback_data);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowShape(SDL_Window *window, SDL_Surface *shape);
+// extern SDL_DECLSPEC bool SDLCALL SDL_FlashWindow(SDL_Window *window, SDL_FlashOperation operation);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowProgressState(SDL_Window *window, SDL_ProgressState state);
+// extern SDL_DECLSPEC SDL_ProgressState SDLCALL SDL_GetWindowProgressState(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowProgressValue(SDL_Window *window, float value);
+// extern SDL_DECLSPEC float SDLCALL SDL_GetWindowProgressValue(SDL_Window *window);
+// extern SDL_DECLSPEC bool SDLCALL SDL_ScreenSaverEnabled(void);
+// extern SDL_DECLSPEC bool SDLCALL SDL_EnableScreenSaver(void);
+// extern SDL_DECLSPEC bool SDLCALL SDL_DisableScreenSaver(void);
 
 // NOTE:SDL_video.h!! extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_CreatePopupWindow(SDL_Window *parent, int offset_x, int offset_y, int w, int h, SDL_WindowFlags flags);
 DefineEngineFunction( SDL_CreatePopupWindow, S32,
@@ -414,6 +488,17 @@ DefineEngineFunction(SDL_SetTextureBlendMode, bool, (S32 textureID, U32 blendMod
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture);
 // extern SDL_DECLSPEC SDL_Texture * SDLCALL SDL_GetRenderTarget(SDL_Renderer *renderer);
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderLogicalPresentation(SDL_Renderer *renderer, int w, int h, SDL_RendererLogicalPresentation mode);
+DefineEngineFunction(SDL_SetRenderLogicalPresentation, bool, (S32 RendererID,  S32 logicalWidth, S32 logicalHeight, S32 mode),
+                     ((S32)SDL_LOGICAL_PRESENTATION_STRETCH) ,
+                     "Set SDL_SetRenderLogicalPresentation which does scale the screen.\n"
+                     "Warning: ImGui windows (like console) looks a bit strange than!") {
+    SDL_Renderer* renderer = getRendererByID(RendererID);
+    if (!renderer) return false;
+   return SDL_SetRenderLogicalPresentation(renderer, logicalWidth, logicalHeight
+            ,(SDL_RendererLogicalPresentation) mode);
+}
+
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderLogicalPresentation(SDL_Renderer *renderer, int *w, int *h, SDL_RendererLogicalPresentation *mode);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderLogicalPresentationRect(SDL_Renderer *renderer, SDL_FRect *rect);
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderCoordinatesFromWindow(SDL_Renderer *renderer, float window_x, float window_y, float *x, float *y);
@@ -598,9 +683,26 @@ DefineEngineFunction(SDL_DestroyRenderer, bool , (S32 rendererID),
 // extern SDL_DECLSPEC void * SDLCALL SDL_GetRenderMetalLayer(SDL_Renderer *renderer);
 // extern SDL_DECLSPEC void * SDLCALL SDL_GetRenderMetalCommandEncoder(SDL_Renderer *renderer);
 // extern SDL_DECLSPEC bool SDLCALL SDL_AddVulkanRenderSemaphores(SDL_Renderer *renderer, Uint32 wait_stage_mask, Sint64 wait_semaphore, Sint64 signal_semaphore);
-// extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderVSync(SDL_Renderer *renderer, int vsync);
-// extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderVSync(SDL_Renderer *renderer, int *vsync);
 
+// extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderVSync(SDL_Renderer *renderer, int vsync);
+DefineEngineFunction(SDL_SetRenderVSync, bool , (S32 rendererID, S32 value),
+        ,"set vertical sync on/off") {
+    SDL_Renderer* renderer = getRendererByID(rendererID);
+    if (!renderer) return false;
+
+    return SDL_SetRenderVSync(renderer, value);
+}
+// extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderVSync(SDL_Renderer *renderer, int *vsync);
+DefineEngineFunction(SDL_GetRenderVSync, S32 , (S32 rendererID),
+        ,"get vertical sync is on/off") {
+    SDL_Renderer* renderer = getRendererByID(rendererID);
+    if (!renderer) return 0;
+
+    S32 result = 0;
+    if (!SDL_GetRenderVSync(renderer, &result)) return 0;
+
+    return result;
+}
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderDebugText(SDL_Renderer *renderer, float x, float y, const char *str);
 DefineEngineFunction(SDL_RenderDebugText, bool , (S32 rendererID, F32 x, F32 y, const char* str),
         ,"called all the rendering(drawing) is done") {
@@ -627,7 +729,7 @@ DefineEngineFunction(SDL_RenderDebugText, bool , (S32 rendererID, F32 x, F32 y, 
 //              in BaseElf
 // -----------------------------------------------------------------------------
 DefineEngineFunction(SDL_PointInRect, bool , (Point2I p, RectI rect),
-                     ,"Check a point is in rect") {
+                     ,"Check a point is in rect --- Integer Rect !! --") {
     return SDL_PointInRect(&p, &rect);
 }
 DefineEngineFunction(SDL_PointInRectFloat, bool , (Point2F p, RectF rect),
