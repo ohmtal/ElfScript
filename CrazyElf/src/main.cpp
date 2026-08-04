@@ -77,15 +77,18 @@ void ShutdownSDLBindings(){
 }
 // DefineEngineFunction(ShutdownSDLBindings, void, (), ,"ShutDown the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
 // ----------------------------------------------------------------------------
-/////// FIXME EVENTS ////////////
-
-bool gShutDown = false;
-
+F64 gFrameTime = 0.f;
+DefineEngineFunction(GetFrameTime, F64, (), , "Get the current frame time") {
+    return gFrameTime;
+}
+// ----------------------------------------------------------------------------
 DefineEngineFunction(Loop, bool, (),,"Main Loop for events and more..." ) {
-    if (gShutDown) return false;
 
     static U32 lastTicks = SDL_GetTicks();
-    engineGlue::process(/*FIXME gFrameTime*/ SDL_GetTicks() - lastTicks);
+
+    U32 msEllapsed = SDL_GetTicks() - lastTicks;
+    gFrameTime = msEllapsed / 1000.f;
+    engineGlue::process(msEllapsed );
     lastTicks = SDL_GetTicks();
 
     ElfSDL3::ClearInputFrameTicks();
@@ -98,13 +101,11 @@ DefineEngineFunction(Loop, bool, (),,"Main Loop for events and more..." ) {
         switch (event.type) {
             case SDL_EVENT_QUIT:
                 Con::printf("******* Quit Event ********");
-                gShutDown = true;
                 return false;
                 break;
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 Con::printf("******* Window Close Event ********");
                 //FIXME check main window ......
-                gShutDown = true;
 
                 break;
         };
@@ -117,12 +118,17 @@ DefineEngineFunction(Loop, bool, (),,"Main Loop for events and more..." ) {
 // ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     argParser(argc, argv);
+    Con::printf("engineGlue::init.....");
     engineGlue::init(nullptr, gDirectory );
+    Con::printf("InitSDLBindings.....");
     InitSDLBindings();
 
+    Con::printf("loading script %s", gScriptFile.c_str());
     Con::executeFile(gScriptFile);
 
+    Con::printf("ShutdownSDLBindings ....");
     ShutdownSDLBindings();
+    Con::printf("engineGlue::shutDown ....");
     engineGlue::shutDown();
     return 0;
 }

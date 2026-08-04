@@ -55,13 +55,14 @@ function NativSDL::Render(%this) {
 
     // a white filled rectangle
     SDL_SetRenderDrawColor(%this.renderer, 255,255,255);
-    SDL_RenderFillRect(%this.renderer, { 10,10, 300, 180});
+    SDL_RenderRectF(%this.renderer, 10,10, 300, 180, true);
+    // SDL_RenderFillRect(%this.renderer, { 10,10, 300, 180});
 
     // Write scaled text with a top and bottom line
     SDL_SetRenderDrawColor(%this.renderer, 128,20,255);
     SDL_RenderLine(%this.renderer, 25, 35, 280, 35);
     SDL_SetRenderScale(%this.renderer, 2.0, 2.0);
-    SDL_RenderDebugText(%this.renderer, 25 / 2.0, 40 / 2.0, "Hello Nativ SDL!");
+    SDL_RenderDebugText(%this.renderer, 25 / 2.0, 40 / 2.0, " Hello CrazyElf!");
     SDL_SetRenderScale(%this.renderer); //reset
     SDL_RenderLine(%this.renderer, 25, 60, 280, 60);
 
@@ -86,12 +87,18 @@ function NativSDL::Render(%this) {
 
     SDL_SetTextureColorMod(%this.TexLogo); //reset
 
-    SDL_RenderFillRect(%this.renderer, { 50,75, 220, 100});
+    // SDL_RenderFillRect(%this.renderer, { 50,75, 220, 100});
+    SDL_RenderRectF(%this.renderer, 50,75, 220, 100, true);
     SDL_SetRenderDrawBlendMode(%this.renderer, SDL_BLENDMODE_NONE);
 
     // a silver border
     SDL_SetRenderDrawColor(%this.renderer, 128,128,128);
-    SDL_RenderRect(%this.renderer, { 10,10, 300, 180});
+    // SDL_RenderRect(%this.renderer, { 10,10, 300, 180});
+    SDL_RenderRectF(%this.renderer, 10,10, 300, 180, false);
+
+
+    SDL_RenderDebugText(%this.renderer, 15,15, strFormat("%.4f sec.", GetFrameTime()) );
+
 
     // draw the stuff ...
     SDL_RenderPresent(%this.renderer);
@@ -119,7 +126,7 @@ $running = true;
 
 while ( $running ) {
     Main.Render();
-    SDL_Delay(16);
+    SDL_Delay(16); //  ~ 60fps if render does nothing ;)
     if (!Loop()) break;
 }
 Main.delete();
