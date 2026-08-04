@@ -2092,6 +2092,31 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                         }
 
                   }
+
+#ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
+else if (fld && fld->type != TypeString && fld->type != TypeName){
+
+      if ( stack[_STK].type == cvVector) {
+            Con::warnf("We got a  stack[_STK].type = cvVector !!! values are: %g,%g,%g,%g ", stack[_STK].v[0], stack[_STK].v[1], stack[_STK].v[2], stack[_STK].v[3]);
+      }
+
+      // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
+      ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
+
+      if (conType) {
+            const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
+
+            Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d)",
+                        curField,
+                        fld->type, stack[_STK].getString()
+                        ,  conType->getTypeName()
+                        , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
+            );
+      }
+}
+#endif
+
+
                   if (!fastPath) {
                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
                   }
@@ -2443,8 +2468,16 @@ case OP_BUILD_VECTOR_STRING: {
 
       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
 
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+      bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
+      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
+#endif
       // get values from stack
       for (S32 i = count - 1; i >= 0; i--) {
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+            if (matchVectorFields) v[i] = stack[_STK].getFloat();
+#endif
+
             stringValues[i] = stack[_STK].getString();
             _STK--;
       }
@@ -2461,7 +2494,23 @@ case OP_BUILD_VECTOR_STRING: {
       }
 
       _STK++;
+
+
       stack[_STK].setString(buffer);
+
+
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+      // after setString!!
+      if (matchVectorFields) {
+            stack[_STK].type = cvVector;
+            // copy all to 0.f old values
+            for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
+                   stack[_STK].v[i] = v[i];
+            }
+      }
+#endif
+
+
       break;
 }
 

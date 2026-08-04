@@ -120,8 +120,13 @@ struct ConsoleLogEntry
 
 typedef const char *StringTableEntry;
 
+#define CONSOLE_VALUE_VECTOR_FIELD_COUNT 4
+
 enum ConsoleValueType
 {
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+   cvVector  =          -6,
+#endif
    cvNULL =             -5,
    cvInteger =          -4,
    cvFloat =            -3,
@@ -142,6 +147,9 @@ public:
          F64   f;
          S64   i;
          char* s;
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+         F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 ?!
+#endif
       };
 
       struct
@@ -180,6 +188,9 @@ public:
       type = ConsoleValueType::cvSTEntry;
       s = const_cast<char*>(StringTable->EmptyString());
       bufferLen = 0;
+#ifdef TEST_STRUCT_FAST_PATH
+      for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v[i] = 0.f;
+#endif
    }
 
    ConsoleValue(const ConsoleValue& other)
@@ -297,6 +308,9 @@ public:
    {
       switch (type)
       {
+#ifdef  TEST_STRUCT_FAST_PATH  //NOTE this is WRONG but i need it for testing
+      case ConsoleValueType::cvVector:
+#endif
       case ConsoleValueType::cvSTEntry:
       case ConsoleValueType::cvString:
          return s;
