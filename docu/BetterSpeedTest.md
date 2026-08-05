@@ -3,13 +3,17 @@
 As expected, the static field followed by the global are the fastest. Also 
 after I added fast path to static fields. But I also optimized the local and
 global vars. I need to get a compare to the current Torque3D or OGE3D Script ..
-hard to setup to lauch a single script file. Maybe I compare it to Auteria TGE
-is much easier to setup as dedicated server running this script.
+hard to setup to lauch a single script file. 
+
+OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
 
 
 ## Local variable:
 
 - Version 0.4a (RelWithDebug) : 15.913u 0.198s 0:16.16 99.6%    0+0k 0+0io 0pf+0w
+- OGE3D (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
+
+**for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
 
 ```
 #define JLOOPS 25
@@ -51,6 +55,7 @@ echo("---------------------");
 ## Global variable :
 
 - Version 0.4a (RelWithDebug) :17.481u 0.182s 0:17.68 99.8%    0+0k 0+0io 0pf+0w
+- OGE3D (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
 
 ```
 #define JLOOPS 25
@@ -92,7 +97,9 @@ echo("---------------------");
 ## Static Float Field
 
 - Version 0.4a (RelWithDebug) : 29.871u 0.159s 0:30.06 99.8%    0+0k 0+0io 0pf+0w
+- OGE3D using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
 
+**Ok - it's slower than a dynamic field - here ElfScript fastpath really shine :)**
 
 ```
 #define JLOOPS 25
@@ -136,7 +143,6 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) : 34.982u 1.909s 0:36.97 99.7%    0+0k 0+0io 0pf+0w
 
-
 ```
 #define JLOOPS 25
 #define ILOOPS 1000000
@@ -179,6 +185,9 @@ echo("---------------------");
 # Dynamic (string) Field - named again
 
 - Version 0.4a (RelWithDebug) : 127.546u 2.019s 2:09.75 99.8%   0+0k 0+0io 0pf+0w
+- OGE3D using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
+
+**OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
 
 ```
 #define JLOOPS 25
