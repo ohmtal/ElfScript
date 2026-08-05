@@ -864,9 +864,222 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    static S32 VAL_BUFFER_SIZE = 1024;
    FrameTemp<char> valBuffer(VAL_BUFFER_SIZE);
 
-   for (;;)
-   {
-      U32 instruction = code[ip++];
+
+   // ==========================================================================
+   //  D i r e c t  T h r e a d i n g
+   //  ----- XXTH: insane change started at 2026-08-05 ------
+   // ==========================================================================
+
+
+   //XXTH ElfScript ( i guess i'am insane *haha* )
+   static const void* dispatch_table[] = {
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FUNC_DECL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DEFAULT_END,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CREATE_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_END_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FINISH_OBJECT,
+
+
+         &&handle_OP_JMPIFFNOT,
+         &&handle_OP_JMPIFNOT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPNOTSTRING,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFNOT_NP,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF_NP,    // 10
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMP,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_VOID,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_UINT,
+
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_XOR,         // 20
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MOD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITAND,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITOR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOTF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ONESCOMPLEMENT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_AND,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_OR,          // 30
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SUB,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MUL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DIV,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NEG,
+         &&handle_OP_INC,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_CREATE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY_CREATE,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_UINT,// 40
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_STR,
+
+         &&handle_OP_LOAD_LOCAL_VAR_UINT,
+         &&handle_OP_LOAD_LOCAL_VAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOAD_LOCAL_VAR_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVE_LOCAL_VAR_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVE_LOCAL_VAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVE_LOCAL_VAR_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_NEW,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_INTERNAL,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_ARRAY, // 50
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_TYPE,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_P &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_STK,
+
+         &&handle_OP_LOADIMMED_UINT,
+         &&handle_OP_LOADIMMED_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TAG_TO_STR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_STR, // 70
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DOCBLOCK_STR,  // 76
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_IDENT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CALLFUNC,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADVANCE_STR_APPENDCHAR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_REWIND_STR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TERMINATE_REWIND_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_COMPARE_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH_FRAME,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ASSERT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BREAK,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN,       ///< Prepare foreach iterator.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER,             ///< Enter foreach loop.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_END,         ///< End foreach loop.
+
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
+
+#ifdef ELFSCRIPT_INT_HACK
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE_UINT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INC_UINT,
+#endif
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INVALID,   //
+
+   };
+
+   // magic macro:
+   #define DISPATCH() goto *dispatch_table[code[ip++]]
+   // first command
+   DISPATCH();
+
+handle_OP_JMPIFFNOT:
+      if (stack[_STK--].getFloat())
+      {
+         ip++;
+         DISPATCH();
+      } else {
+
+         ip = code[ip];
+         DISPATCH();
+      }
+
+handle_OP_JMPIFNOT:
+      if (stack[_STK--].getInt())
+      {
+        ip++;
+        DISPATCH();
+      } else {
+        ip = code[ip];
+        DISPATCH();
+      }
+
+
+handle_OP_INC:
+      reg = code[ip++];
+      currentRegister = reg;
+      Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+      DISPATCH();
+
+handle_OP_LOAD_LOCAL_VAR_UINT:
+      reg = code[ip++];
+      currentRegister = reg;
+
+      // See OP_SETCURVAR
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
+      _STK++;
+      DISPATCH();
+
+
+handle_OP_LOAD_LOCAL_VAR_FLT:
+         reg = code[ip++];
+         currentRegister = reg;
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
+         _STK++;
+      DISPATCH();
+
+handle_OP_LOADIMMED_UINT:
+         stack[_STK + 1].setInt(code[ip++]);
+         _STK++;
+      DISPATCH();
+
+handle_OP_LOADIMMED_FLT:
+         stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+         _STK++;
+      DISPATCH();
+
+// ~~~~~~ F A L L  B A C K ~~~~~~~~~
+handle_FALLBACK_SWITCH:
+{
+   // U32 instruction = code[ip++];
+   U32 instruction = code[ip -1];
+ for (;;) {
    breakContinue:
       switch (instruction)
       {
@@ -1329,23 +1542,23 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
       }
 
-      case OP_JMPIFFNOT:
-         if (stack[_STK--].getFloat())
-         {
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIFNOT:
-         if (stack[_STK--].getInt())
-         {
-            ip++;
-            break;
-         }
-
-         ip = code[ip];
-         break;
+      // case OP_JMPIFFNOT:
+      //    if (stack[_STK--].getFloat())
+      //    {
+      //       ip++;
+      //       break;
+      //    }
+      //    ip = code[ip];
+      //    break;
+      // case OP_JMPIFNOT:
+      //    if (stack[_STK--].getInt())
+      //    {
+      //       ip++;
+      //       break;
+      //    }
+      //
+      //    ip = code[ip];
+      //    break;
       case OP_JMPNOTSTRING:
          if (stack[_STK--].getBool())
          {
@@ -1552,11 +1765,11 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          stack[_STK].setFloat(-stack[_STK].getFloat());
          break;
 
-      case OP_INC:
-         reg = code[ip++];
-         currentRegister = reg;
-         Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
-         break;
+      // case OP_INC:
+      //    reg = code[ip++];
+      //    currentRegister = reg;
+      //    Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+      //    break;
 
 #ifdef ELFSCRIPT_INT_HACK
       case OP_INC_UINT: // ElfScript
@@ -1702,31 +1915,31 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          Script::gEvalState.setStringVariable(stack[_STK].getString());
          break;
 
-      case OP_LOAD_LOCAL_VAR_UINT:
-         reg = code[ip++];
-         currentRegister = reg;
+      // case OP_LOAD_LOCAL_VAR_UINT:
+      //    reg = code[ip++];
+      //    currentRegister = reg;
+      //
+      //    // See OP_SETCURVAR
+      //    prevField = NULL;
+      //    prevObject = NULL;
+      //    curObject = NULL;
+      //
+      //    stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
+      //    _STK++;
+      //    break;
 
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
-         _STK++;
-         break;
-
-      case OP_LOAD_LOCAL_VAR_FLT:
-         reg = code[ip++];
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
-         _STK++;
-         break;
+      // case OP_LOAD_LOCAL_VAR_FLT:
+      //    reg = code[ip++];
+      //    currentRegister = reg;
+      //
+      //    // See OP_SETCURVAR
+      //    prevField = NULL;
+      //    prevObject = NULL;
+      //    curObject = NULL;
+      //
+      //    stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
+      //    _STK++;
+      //    break;
 
          // ElfScript Optimization:
       case OP_LOAD_LOCAL_VAR_STR:
@@ -2216,15 +2429,15 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
          POP_STK(); //XXTH memfix attempt orig: _STK--;
          break;
 
-      case OP_LOADIMMED_UINT:
-         stack[_STK + 1].setInt(code[ip++]);
-         _STK++;
-         break;
+      // case OP_LOADIMMED_UINT:
+      //    stack[_STK + 1].setInt(code[ip++]);
+      //    _STK++;
+      //    break;
 
-      case OP_LOADIMMED_FLT:
-         stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
-         _STK++;
-         break;
+      // case OP_LOADIMMED_FLT:
+      //    stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+      //    _STK++;
+      //    break;
 
       case OP_TAG_TO_STR:
          code[ip - 1] = OP_LOADIMMED_STR;
@@ -2828,8 +3041,26 @@ case OP_BUILD_VECTOR_STRING: {
          // error!
          AssertISV(false, "Invalid OPCode Processed!");
          goto execFinished;
-      }
-   }
+      } // ~~~~~~~~~~~~~~~~~~ END OF THE SWITCH ~~~~~~~~~~~~~~~~~~
+
+      DISPATCH();
+
+   } //welcome back ;)
+} //  handle_FALLBACK_SWITCH:
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // !!!!!!!!!!!!!! THE MONSTER LOOP ENDS HERE !!!!!!!!!!!!!!
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+
+
+
 execFinished:
 
    // if (telDebuggerOn && setFrame < 0)
