@@ -170,7 +170,18 @@ namespace Compiler
 
       OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
       OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
-      OP_INVALID,   // 90
+
+#ifdef ELFSCRIPT_INT_HACK
+      OP_CMPLT_UINT,
+      OP_CMPGR_UINT,
+      OP_CMPGE_UINT,
+      OP_CMPLE_UINT,
+      OP_CMPEQ_UINT,
+      OP_CMPNE_UINT,
+
+      OP_INC_UINT,
+#endif
+      OP_INVALID,   //
 
       MAX_OP_CODELEN ///< The amount of op codes.
    };

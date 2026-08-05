@@ -2,6 +2,10 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(TORQUE_DEBUG)
+endif()
+
 
 set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/arrayObject.cpp

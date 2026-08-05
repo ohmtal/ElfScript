@@ -12,6 +12,9 @@
 // fast path for int and float fields
 #define ELFSCRIPT_FASTPATH_FLD
 
+// added Integer operation, which should give a huge speed up but ended in a slower test!
+// #define ELFSCRIPT_INT_HACK
+
 // When set you need to write your own exec engine function
 // #define ELFSCRIPT_EXEC_OVERWRITE
 

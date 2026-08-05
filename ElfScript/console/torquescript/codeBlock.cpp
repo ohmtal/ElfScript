@@ -702,7 +702,7 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
 
 //XXTH changed to debug ! => #ifndef TORQUE_SHIPPING
 // FIXME if i need this i should change it to global var
-// reading a bool var here is a "handbreak".
+// reading a bool var here is a "handbreak?".
 #ifdef TORQUE_DEBUG
    if (Con::getBoolVariable("$Debug::DumpByteCode"))
    {
@@ -1056,6 +1056,14 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
+#ifdef ELFSCRIPT_INT_HACK
+      case OP_INC_UINT: //ElfScript
+      {
+            Con::printf("%i: OP_INC_UINT stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip;
+            break;
+      }
+#endif
       case OP_INC:
       {
          Con::printf("%i: OP_INC stk=0 reg=%i", ip - 1, code[ip]);

@@ -507,6 +507,16 @@ enum class IntegerOperation
 
    LogicalAnd,
    LogicalOr
+   #ifdef ELFSCRIPT_INT_HACK
+   // ElfScript:
+   ,LT,  // Less Than (<)
+   GT,  // Greater Than (>)
+   LE,  // Less Equal (<=)
+   GE,  // Greater Equal (>=)
+   EQ,  // Equal (==)
+   NE   // Not Equal (!=)
+#endif
+
 };
 
 template<IntegerOperation Op>
@@ -562,6 +572,36 @@ TORQUE_FORCEINLINE inline void doIntOperation()
       if constexpr (Op == IntegerOperation::LogicalOr)
          stack[_STK - 1].setBool(a.getFastInt() || b.getFastInt());
 
+#ifdef ELFSCRIPT_INT_HACK
+      // ElfScript ==============================>>>>>>
+         // Less Than (<)
+         if constexpr (Op == IntegerOperation::LT) {
+               // Con::printf("a:%d; b:%d", a.getFastInt(), b.getFastInt());
+               stack[_STK - 1].setFastInt(a.getFastInt() < b.getFastInt() ? 1 : 0);
+         }
+
+         // Greater Than (>)
+         else if constexpr (Op == IntegerOperation::GT)
+               stack[_STK - 1].setFastInt(a.getFastInt() > b.getFastInt() ? 1 : 0);
+
+         // Less Equal (<=)
+         else if constexpr (Op == IntegerOperation::LE)
+               stack[_STK - 1].setFastInt(a.getFastInt() <= b.getFastInt() ? 1 : 0);
+
+         // Greater Equal (>=)
+         else if constexpr (Op == IntegerOperation::GE)
+               stack[_STK - 1].setFastInt(a.getFastInt() >= b.getFastInt() ? 1 : 0);
+
+         // Equal (==)
+         else if constexpr (Op == IntegerOperation::EQ)
+               stack[_STK - 1].setFastInt(a.getFastInt() == b.getFastInt() ? 1 : 0);
+
+         // Not Equal (!=)
+         else if constexpr (Op == IntegerOperation::NE)
+               stack[_STK - 1].setFastInt(a.getFastInt() != b.getFastInt() ? 1 : 0);
+
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#endif
       POP_STK(); //XXTH memfix attempt orig: _STK--;
    }
    else
@@ -1518,6 +1558,13 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
          break;
 
+#ifdef ELFSCRIPT_INT_HACK
+      case OP_INC_UINT: // ElfScript
+         reg = code[ip++];
+         currentRegister = reg;
+         Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1);
+         break;
+#endif
       case OP_SETCURVAR:
          var = CodeToSTE(code, ip);
          ip += 2;
@@ -2129,6 +2176,30 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
             break;
 
       break;
+
+      // ----------------------- ELFSCRIPT ---------------------------------
+#ifdef ELFSCRIPT_INT_HACK
+      case OP_CMPLT_UINT:
+            doIntOperation<IntegerOperation::LT>();
+            break;
+      case OP_CMPGR_UINT:
+            doIntOperation<IntegerOperation::GT>();
+            break;
+      case OP_CMPLE_UINT:
+            doIntOperation<IntegerOperation::LE>();
+            break;
+      case OP_CMPGE_UINT:
+            doIntOperation<IntegerOperation::GE>();
+            break;
+      case OP_CMPEQ_UINT:
+            doIntOperation<IntegerOperation::EQ>();
+            break;
+      case OP_CMPNE_UINT:
+            doIntOperation<IntegerOperation::NE>();
+            break;
+#endif
+      // ----------------------- ELFSCRIPT ---------------------------------
+
 
       case OP_SAVEFIELD_STR:
          if (curObject)

@@ -248,7 +248,7 @@ function MainLoop() {
             echo("Speedtest MODE:" SPC $mode SPC "avg time:" SPC $times / 10 SPC "testfloat/int/bool:" SPC $foo.testFloat SPC $foo.testInt SPC $foo.testBool SPC $foo.x SPC $foo.y SPC $foo.z);
             $times = 0;
         }
+        SpeedTest();
     }
-    SpeedTest();
 
 }
