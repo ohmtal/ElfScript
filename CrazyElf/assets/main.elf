@@ -140,6 +140,13 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
 function onSDLMouseButtonEvent(%button, %isDown, %x, %y) {}
 function onSDLMouseWheelEvent(%wheelX, %wheelY){}
 
+// ------ PoD Test
+function p() {
+    if isObject(pObj) pObj.delete();
+    new Point2FObject(pObj); pObj.point= { 5.1, 6.2, 7.3 };
+    echo("pObj created");
+}
+// ---------------
 
 new ScriptGroup(Main) {
     class = "NativSDL";

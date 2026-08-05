@@ -24,13 +24,40 @@ namespace Con
 
    Module* getCurrentModule();
 
-   inline HashMap<S32, Runtime*> gRuntimes;
-   inline Runtime* getRuntime(S32 pRuntimeId = 0) { return gRuntimes[pRuntimeId]; }
+   // ElfScript new:
+   // Statt: inline HashMap<S32, Runtime*> gRuntimes;
+   // Nutzen Sie eine Funktion:
+   inline HashMap<S32, Runtime*>& getRuntimeMap() {
+     static HashMap<S32, Runtime*> instance; // Wird beim ersten Aufruf erstellt!
+     return instance;
+   }
+
+   inline Runtime* getRuntime(S32 pRuntimeId = 0) {
+     auto& runtimes = getRuntimeMap();
+     if (!runtimes.contains(pRuntimeId)) { // Ihre neue Sicherheitsprüfung
+       return nullptr;
+     }
+     return runtimes[pRuntimeId];
+   }
+
    inline void registerRuntime(S32 pRuntimeId, Runtime* pRuntime)
    {
-      AssertFatal(gRuntimes[pRuntimeId] == NULL, "A runtime with that ID already exists");
-      gRuntimes[pRuntimeId] = pRuntime;
+     auto& runtimes = getRuntimeMap(); // Holt die garantiert existierende Map
+     AssertFatal(runtimes[pRuntimeId] == NULL, "A runtime with that ID already exists");
+     runtimes[pRuntimeId] = pRuntime;
    }
+
+  // ElfScript IPO optimize fails with:
+  // NOTE ORIG:
+  //  inline HashMap<S32, Runtime*> gRuntimes;
+  //  inline Runtime* getRuntime(S32 pRuntimeId = 0) {
+  //    return gRuntimes[pRuntimeId];
+  // }
+   // inline void registerRuntime(S32 pRuntimeId, Runtime* pRuntime)
+   // {
+   //    AssertFatal(gRuntimes[pRuntimeId] == NULL, "A runtime with that ID already exists");
+   //    gRuntimes[pRuntimeId] = pRuntime;
+   // }
 
 
    /// Evaluate an arbitrary chunk of code.
@@ -68,7 +95,19 @@ namespace Con
    ///
    /// @return True if the script was successfully executed, false if not.
    //
-   inline bool executeFile(const char* fileName, bool noCalls = false, bool journalScript = false) { return getRuntime()->executeFile(fileName, noCalls, journalScript); };
+//orig:   inline bool executeFile(const char* fileName, bool noCalls = false, bool journalScript = false) { return getRuntime()->executeFile(fileName, noCalls, journalScript); };
+   inline bool executeFile(const char* fileName, bool noCalls = false, bool journalScript = false) {
+
+     Con::Runtime* runtime = getRuntime();
+     if (!runtime) {
+       Con::errorf("executeFile NO runtime object found!");
+       return false;
+    }
+     return runtime->executeFile(fileName, noCalls, journalScript);
+
+  };
+
+
 
    // ElfScript evalAutoComplete complete (); for console
    // like the function ConsoleEntry::eval() in TGE console script
@@ -97,6 +136,7 @@ namespace Con
       return evaluate(cmd.c_str());
    }
 
-}
+
+} //namespace
 
 #endif

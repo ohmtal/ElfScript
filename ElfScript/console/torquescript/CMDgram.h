@@ -128,7 +128,7 @@ extern int CMDdebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 107 "CMDgram.y"
+#line 108 "CMDgram.y"
 
    Token< char >           c;
    Token< int >            i;

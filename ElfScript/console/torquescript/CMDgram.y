@@ -42,7 +42,8 @@ template< typename T >
 struct Token
 {
    T value;
-   U32 lineNumber;
+//    U32 lineNumber;
+   S32 lineNumber;
 };
 
 %}

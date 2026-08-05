@@ -2,6 +2,8 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
+option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(TORQUE_DEBUG)
 endif()
@@ -95,7 +97,7 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/CMDscan.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/codeBlock.h
-    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiler.cpp
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiler.h
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/evalState.cpp
@@ -203,6 +205,14 @@ if(WIN32)
 elseif(UNIX)
     list(APPEND PLATFORM_SRC ${POSIX_SRC})
 endif()
+
+
+if (ENABLE_DIRECT_THREADING)
+    list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp)
+else()
+    list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp)
+endif()
+
 
 set(ELFSCRIPT_SRC
     ${CMAKE_CURRENT_LIST_DIR}/main/engineGlue.cpp

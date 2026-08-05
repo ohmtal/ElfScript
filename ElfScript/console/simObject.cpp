@@ -999,8 +999,8 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             return;
 
 
-         S32 array1 = array ? dAtoi(array) : 0;
 
+         S32 array1 = PARSE_ARRAY_INDEX(array);
 #ifdef ELFSCRIPT_FASTPATH_FLD
          // XXTH  --------------------------------------- >
         if (array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
@@ -1203,7 +1203,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
       if(mFlags.test(ModStaticFields))
       {
-            S32 array1 = array ? dAtoi(array) : -1;
+            S32 array1 = PARSE_ARRAY_INDEX_RETURN_MINUSONE(array);
             const AbstractClassRep::Field *fld = findField(slotName);
 
             if(fld)
@@ -1286,7 +1286,7 @@ const char *SimObject::getDataField(StringTableEntry slotName, const char *array
 {
    if(mFlags.test(ModStaticFields))
    {
-      S32 array1 = array ? dAtoi(array) : -1;
+      S32 array1 = PARSE_ARRAY_INDEX_RETURN_MINUSONE(array);
       const AbstractClassRep::Field *fld = findField(slotName);
 
       if(fld)

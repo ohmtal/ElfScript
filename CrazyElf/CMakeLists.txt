@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.24)
 project(CrazyElf)
 set(PROJECT_SRC
     src/main.cpp
+    src/pointObjects.cpp
     src/myPlatformProcess.cc
 )
 
@@ -60,6 +61,12 @@ else()
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_core.cpp)
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_audio.cpp)
+
+    if(UNIX)
+      list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
+    endif()
+    list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
+
 endif()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 

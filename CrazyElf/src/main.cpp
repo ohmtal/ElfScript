@@ -23,6 +23,11 @@
 #include "addons/SDL3/SDL3_input.h"
 #include "addons/SDL3/SDL3_Filesystem.h"
 
+#if defined(__unix__)
+#include "addons/shellConsole/POSIXStdConsole.h"
+// #include <platform/platformVolume.h>
+#endif
+
 
 String gDirectory = "";
 String gScriptFile = "assets/main.elf";
@@ -126,8 +131,12 @@ DefineEngineFunction(SDL_MainLoop, bool, (S32 RendererID),(0),"Main Loop for eve
                 break;
         };
         ElfSDL3::onEvent(event);
+
     }
 
+    #if defined(__unix__)
+    stdConsole->process();
+    #endif
 
     return true;
 }
@@ -138,6 +147,17 @@ int main(int argc, char* argv[]) {
     engineGlue::init(nullptr, gDirectory );
     Con::printf("InitSDLBindings.....");
     InitSDLBindings();
+
+    #if defined(__unix__)
+    // console test:
+
+    StdConsole::create();
+    stdConsole->enable(true);
+    stdConsole->enableInput(true);
+    #endif
+
+
+
 
     Con::printf("loading script %s", gScriptFile.c_str());
     Con::executeFile(gScriptFile);

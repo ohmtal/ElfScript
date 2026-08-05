@@ -12,6 +12,9 @@
 // fast path for int and float fields
 #define ELFSCRIPT_FASTPATH_FLD
 
+// fast path test for struct << i do test this in CrazyElf
+// #define TEST_STRUCT_FAST_PATH
+
 // added Integer operation, which should give a huge speed up but ended in a slower test!
 // #define ELFSCRIPT_INT_HACK
 

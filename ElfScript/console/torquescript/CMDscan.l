@@ -14,12 +14,13 @@
 #include "console/dynamicTypes.h"
 #include "core/strings/stringFunctions.h"
 
-template< typename T >
-struct Token
-{
-   T value;
-   S32 lineNumber;
-};
+// ElfScript was double defined!! =>
+// template< typename T >
+// struct Token
+// {
+//    T value;
+//    S32 lineNumber;
+// };
 
 // Can't have ctors in structs used in unions, so we have this.
 template< typename T >

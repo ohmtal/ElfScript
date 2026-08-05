@@ -20,8 +20,17 @@ namespace TorqueScript
       bool compile(const char* fileName, bool overrideNoDso);
    };
 
+   // ElfScript IPO optimize ..
+   // orig:
    inline TorqueScriptRuntime* gRuntime = new TorqueScriptRuntime();
    inline TorqueScriptRuntime* getRuntime() { return gRuntime; }
+
+   //XXTH maybe also this, but it should also add other instances ?! =>
+   // inline TorqueScriptRuntime* getRuntime() {
+   //    static TorqueScriptRuntime instance; // Erstellt die Runtime instanzsicher
+   //    return &instance;
+   // }
+
 }
 
 #endif

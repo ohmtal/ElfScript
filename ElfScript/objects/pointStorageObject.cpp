@@ -146,7 +146,7 @@ public:
 
     static void initPersistFields()
     {
-        // Parent::initPersistFields();
+        Parent::initPersistFields();
         addField("x",     TypeF32,     Offset(mX, PointStorageObject));
         addField("y",     TypeF32,     Offset(mY, PointStorageObject));
         addField("z",     TypeF32,     Offset(mZ, PointStorageObject));

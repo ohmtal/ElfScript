@@ -146,11 +146,17 @@ public:
       {
          F64   f;
          S64   i;
-         char* s;
 #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-         F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 ?!
+      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
 #endif
+         char* s;
       };
+// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+//       } scalar;
+//          F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
+// #else
+//      };
+// #endif
 
       struct
       {

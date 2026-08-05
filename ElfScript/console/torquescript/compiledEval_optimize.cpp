@@ -44,10 +44,8 @@
 
 using namespace Compiler;
 
-//XXTH macro to cleanup stack
-// XXTH I simply did not set:  ConsoleValue::resetConversionBuffer();  in my mainloop!
-// was a funny digging many hours long ;)
-#define POP_STK() { /*stack[_STK].cleanupData();*/ _STK--; }
+//XXTH macro to pop stk
+#define POP_STK() {  _STK--; }
 
 enum EvalConstants
 {
@@ -446,7 +444,7 @@ TORQUE_NOINLINE void doSlowMathOp()
    if constexpr (Op == FloatOperation::NE)
       stack[_STK - 1].setInt(a.getFloat() != b.getFloat());
 
-   POP_STK(); //XXTH memfix attempt orig: _STK--;
+   POP_STK();
 }
 
 template<FloatOperation Op>
@@ -487,7 +485,7 @@ TORQUE_FORCEINLINE inline void doFloatMathOperation()
       if constexpr (Op == FloatOperation::NE)
          stack[_STK - 1].setFastInt(a.getFastFloat() != b.getFastFloat());
 
-      POP_STK(); //XXTH memfix attempt orig: _STK--;
+      POP_STK();
    }
    else
    {
@@ -543,7 +541,7 @@ TORQUE_NOINLINE void doSlowIntegerOp()
    if constexpr (Op == IntegerOperation::LogicalOr)
       stack[_STK - 1].setBool(a.getInt() || b.getInt());
 
-   POP_STK(); //XXTH memfix attempt orig: _STK--;
+   POP_STK();
 }
 
 template<IntegerOperation Op>
@@ -602,7 +600,7 @@ TORQUE_FORCEINLINE inline void doIntOperation()
 
       // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #endif
-      POP_STK(); //XXTH memfix attempt orig: _STK--;
+      POP_STK();
    }
    else
    {
@@ -864,9 +862,289 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    static S32 VAL_BUFFER_SIZE = 1024;
    FrameTemp<char> valBuffer(VAL_BUFFER_SIZE);
 
-   for (;;)
-   {
-      U32 instruction = code[ip++];
+
+   // ==========================================================================
+   //  D i r e c t  T h r e a d i n g
+   //  ----- XXTH: insane change started at 2026-08-05 ------
+   // ==========================================================================
+
+
+   //XXTH ElfScript ( i guess i'am insane *haha* )
+   static const void* dispatch_table[] = {
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FUNC_DECL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DEFAULT_END,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CREATE_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_END_OBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FINISH_OBJECT,
+
+
+         &&handle_OP_JMPIFFNOT,
+         &&handle_OP_JMPIFNOT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPNOTSTRING,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFNOT_NP,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF_NP,    // 10
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMP,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_VOID,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_UINT,
+
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_XOR,         // 20
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MOD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITAND,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITOR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOTF,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ONESCOMPLEMENT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_AND,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_OR,          // 30
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SUB,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MUL,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DIV,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NEG,
+         &&handle_OP_INC,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_CREATE,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY_CREATE,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_UINT,// 40
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_STR,
+
+         &&handle_OP_LOAD_LOCAL_VAR_UINT,
+         &&handle_OP_LOAD_LOCAL_VAR_FLT,
+         &&handle_OP_LOAD_LOCAL_VAR_STR,
+
+         &&handle_OP_SAVE_LOCAL_VAR_UINT,
+         &&handle_OP_SAVE_LOCAL_VAR_FLT,
+         &&handle_OP_SAVE_LOCAL_VAR_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_NEW,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_INTERNAL,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_ARRAY, // 50
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_TYPE,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_P &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_STK,
+
+         &&handle_OP_LOADIMMED_UINT,
+         &&handle_OP_LOADIMMED_FLT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TAG_TO_STR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_STR, // 70
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DOCBLOCK_STR,  // 76
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_IDENT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CALLFUNC,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADVANCE_STR_APPENDCHAR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_REWIND_STR,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TERMINATE_REWIND_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_COMPARE_STR,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH_FRAME,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ASSERT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BREAK,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN,       ///< Prepare foreach iterator.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER,             ///< Enter foreach loop.
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_END,         ///< End foreach loop.
+
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
+
+#ifdef ELFSCRIPT_INT_HACK
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ_UINT,
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE_UINT,
+
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INC_UINT,
+#endif
+         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INVALID,   //
+
+   };
+
+   // magic macro:
+   #define DISPATCH() goto *dispatch_table[code[ip++]]
+   // first command
+   DISPATCH();
+
+handle_OP_JMPIFFNOT:
+      if (stack[_STK--].getFloat())
+      {
+         ip++;
+         DISPATCH();
+      } else {
+
+         ip = code[ip];
+         DISPATCH();
+      }
+
+handle_OP_JMPIFNOT:
+      if (stack[_STK--].getInt())
+      {
+        ip++;
+        DISPATCH();
+      } else {
+        ip = code[ip];
+        DISPATCH();
+      }
+
+
+handle_OP_INC:
+      reg = code[ip++];
+      currentRegister = reg;
+      Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+      DISPATCH();
+
+handle_OP_LOAD_LOCAL_VAR_UINT:
+      reg = code[ip++];
+      currentRegister = reg;
+
+      // See OP_SETCURVAR
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
+      _STK++;
+      DISPATCH();
+
+
+
+handle_OP_LOAD_LOCAL_VAR_FLT:
+         reg = code[ip++];
+         currentRegister = reg;
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
+         _STK++;
+      DISPATCH();
+
+handle_OP_LOAD_LOCAL_VAR_STR:
+      reg = code[ip++];
+      currentRegister = reg;
+
+      // See OP_SETCURVAR
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+      {
+            const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+            if (localVal.getType() == ConsoleValueType::cvFloat ||
+                  localVal.getType() == ConsoleValueType::cvInteger)
+            {
+                  //fast fetch
+                  stack[_STK + 1] = localVal;
+            }
+            else
+            {
+                  // fallback
+                  val = Script::gEvalState.getLocalStringVariable(reg);
+                  stack[_STK + 1].setString(val);
+            }
+      }
+      _STK++;
+      DISPATCH();
+
+
+handle_OP_SAVE_LOCAL_VAR_UINT:
+         reg = code[ip++];
+         currentRegister = reg;
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+         DISPATCH();
+
+handle_OP_SAVE_LOCAL_VAR_FLT:
+          reg = code[ip++];
+         currentRegister = reg;
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+
+         DISPATCH();
+
+handle_OP_SAVE_LOCAL_VAR_STR:
+         reg = code[ip++];
+         val = stack[_STK].getString();
+         currentRegister = reg;
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
+
+         DISPATCH();
+
+handle_OP_LOADIMMED_UINT:
+         stack[_STK + 1].setInt(code[ip++]);
+         _STK++;
+      DISPATCH();
+
+handle_OP_LOADIMMED_FLT:
+         stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+         _STK++;
+      DISPATCH();
+
+// ~~~~~~ F A L L  B A C K ~~~~~~~~~
+handle_FALLBACK_SWITCH:
+{
+   // U32 instruction = code[ip++];
+   U32 instruction = code[ip -1];
+ // to For or not to for that is the question: for (;;) {
    breakContinue:
       switch (instruction)
       {
@@ -932,13 +1210,13 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_DEFAULT_END:
       {
          returnValue = stack[_STK];
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
 
          while (iterDepth > 0)
          {
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
          }
 
          goto execFinished;
@@ -1313,7 +1591,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          // our group reference.
          bool placeAtRoot = code[ip++];
          if (!placeAtRoot)
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
          break;
       }
 
@@ -1373,7 +1651,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_JMPIFNOT_NP:
          if (stack[_STK].getInt())
          {
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
             ip++;
             break;
          }
@@ -1382,7 +1660,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_JMPIF_NP:
          if (!stack[_STK].getInt())
          {
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
             ip++;
             break;
          }
@@ -1402,7 +1680,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
                iterStack[--_ITER].mIsStringIter = false;
                --iterDepth;
 
-               POP_STK(); //XXTH memfix attempt orig: _STK--;    // this is a pop from foreach()
+               POP_STK();     // this is a pop from foreach()
             }
          }
 
@@ -1414,7 +1692,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       case OP_RETURN:
       {
          returnValue = (stack[_STK]);
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1422,14 +1700,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
          }
 
          goto execFinished;
       }
       case OP_RETURN_FLT:
          returnValue.setFloat(stack[_STK].getFloat());
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1437,14 +1715,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
          }
 
          goto execFinished;
 
       case OP_RETURN_UINT:
          returnValue.setInt(stack[_STK].getInt());
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
 
          // Clear iterator state.
          while (iterDepth > 0)
@@ -1452,7 +1730,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             iterStack[--_ITER].mIsStringIter = false;
             --iterDepth;
 
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
          }
 
          goto execFinished;
@@ -1544,7 +1822,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             stack[_STK - 1].setInt(stack[_STK].getInt() % divisor);
          else
             stack[_STK - 1].setInt(0);
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
          break;
       }
 
@@ -2150,69 +2428,15 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
       // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
       ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
 
-
-
       if (conType) {
             const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
 
-            if (typeInfo) {
-                  const EngineFieldTable* fieldTable = typeInfo->getFieldTable();
-                  Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d), conType->getTypeSize = %d, NUM Fields:  fieldTable->getNumFields() : %d",
-                              curField,
-                              fld->type, stack[_STK].getString()
-                              ,  conType->getTypeName()
-                              , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
-                              , conType->getTypeSize()
-                              , fieldTable ? fieldTable->getNumFields() : -1
-                  );
-
-                  if (fieldTable) {
-                      for (S32 i = 0; i < fieldTable->getNumFields(); i++) {
-                             const EngineFieldTable::Field& subField = (*fieldTable)[i];
-                             Con::printf("   #%d Name:%s Elements:%d, TypeKind: %d (0=EngineTypeKindPrimitive)", i, subField.getName(), subField.getNumElements()
-                                  , subField.getType() ? subField.getType()->getTypeKind() : -1
-
-                        );
-                      }
-
-                      // * * * *  subField.getType  ?? * * *
-
-                      // // FIXME UNFINISHED i need the real struct information !
-                      // U32 numFields = fieldTable->getNumFields();
-                      //
-                      // if (numFields > 0 && numFields <= CONSOLE_VALUE_VECTOR_FIELD_COUNT) {
-                      //
-                      //       // Point2F: 8 Byte / 2 = 4 Byte (F32)
-                      //       // ColorI:  4 Byte / 4 = 1 Byte (U8)
-                      //       // Point2I:  8 Byte / 2 = 4 Byte (S32)
-                      //       U32 elementSize = conType->getTypeSize() / numFields;
-                      //
-                      //       void* fieldPtr = (void*)((const char*)curObject + fld->offset);
-                      //
-                      //       if (stack[_STK].type == cvVector) { //FIXME cvVector
-                      //             // problem with other datatypes
-                      //             if (elementSize == sizeof(F32)) {
-                      //                   F32* dest = static_cast<F32*>(fieldPtr);
-                      //                   for (U32 i = 0; i < numFields; i++) {
-                      //                         dest[i] = static_cast<F32>(stack[_STK].v[i]);
-                      //                   }
-                      //             }
-                      //             else if (elementSize == sizeof(U8)) {
-                      //                   U8* dest = static_cast<U8*>(fieldPtr);
-                      //                   for (U32 i = 0; i < numFields; i++) {
-                      //                         S32 val = static_cast<S32>(stack[_STK].v[i]);
-                      //                         dest[i] = static_cast<U8>(val < 0 ? 0 : (val > 255 ? 255 : val));
-                      //                   }
-                      //             }
-                      //       }
-                      // }
-
-                  }
-
-            } else {
-                  Con::errorf("No type info!! for %s", conType->getTypeName());
-            }
-
+            Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d)",
+                        curField,
+                        fld->type, stack[_STK].getString()
+                        ,  conType->getTypeName()
+                        , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
+            );
       }
 }
 #endif
@@ -2267,7 +2491,7 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
          break;
 
       case OP_POP_STK:
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
          break;
 
       case OP_LOADIMMED_UINT:
@@ -2634,14 +2858,11 @@ case OP_BUILD_VECTOR_STRING: {
             // but i only added a small part where  type is used so why knows .....
 
 
-            // FIXME stack[_STK].type = cvVector;
-
+            stack[_STK].type = cvVector;
             // copy all to 0.f old values
-            // for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
-            //        stack[_STK].v[i] = v[i];
-            // }
-            // SPEED
-            dMemcpy(stack[_STK].v, v, sizeof(v));
+            for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
+                   stack[_STK].v[i] = v[i];
+            }
       }
 #endif
 
@@ -2671,13 +2892,13 @@ case OP_BUILD_VECTOR_STRING: {
          const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
 
          stack[_STK - 1].setStringRef(concat, len);
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
          break;
       }
 
       case OP_COMPARE_STR:
          stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
          break;
 
       case OP_PUSH:
@@ -2772,8 +2993,9 @@ case OP_BUILD_VECTOR_STRING: {
                Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
                ip = failIp;
                // Pop the iterated value
-               POP_STK(); //XXTH memfix attempt orig: _STK--;
-               continue;
+               POP_STK();
+               //  XXTH continue;
+               DISPATCH();
             }
 
             // Set up.
@@ -2806,7 +3028,8 @@ case OP_BUILD_VECTOR_STRING: {
             if (!str[startIndex])
             {
                ip = breakIp;
-               continue;
+               //  XXTH continue;
+               DISPATCH();
             }
 
             // Find right end of current component.
@@ -2851,7 +3074,8 @@ case OP_BUILD_VECTOR_STRING: {
             if (index >= set->size())
             {
                ip = breakIp;
-               continue;
+               //XXTH continue;
+               DISPATCH();
             }
 
             SimObjectId id = set->at(index)->getId();
@@ -2873,7 +3097,7 @@ case OP_BUILD_VECTOR_STRING: {
          --_ITER;
          --iterDepth;
 
-         POP_STK(); //XXTH memfix attempt orig: _STK--;
+         POP_STK();
 
          iterStack[_ITER].mIsStringIter = false;
          break;
@@ -2885,8 +3109,26 @@ case OP_BUILD_VECTOR_STRING: {
          // error!
          AssertISV(false, "Invalid OPCode Processed!");
          goto execFinished;
-      }
-   }
+      } // ~~~~~~~~~~~~~~~~~~ END OF THE SWITCH ~~~~~~~~~~~~~~~~~~
+
+      DISPATCH();
+
+   // } //welcome back for loop
+} //  handle_FALLBACK_SWITCH:
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // !!!!!!!!!!!!!! THE MONSTER LOOP ENDS HERE !!!!!!!!!!!!!!
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+
+
+
 execFinished:
 
    // if (telDebuggerOn && setFrame < 0)
