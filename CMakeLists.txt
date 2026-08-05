@@ -37,15 +37,18 @@ if (BUILD_ELFSCRIPT)
       # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/core/stream/bitStream.cpp)
       # list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/platformNet.cpp)
       
-           
-      
+
+
     add_executable(${TARGET_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/demoMain.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/testObj.cpp
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
-    
+
+    # target_compile_options(${TARGET_NAME} PRIVATE
+    # $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-O3>
+    # )
     # Windows - winVolume :: need to set on all builds
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE "/Zc:wchar_t-")
