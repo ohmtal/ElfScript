@@ -3,7 +3,8 @@
 As expected, the static field followed by the global are the fastest. Also 
 after I added fast path to static fields. But I also optimized the local and
 global vars. I need to get a compare to the current Torque3D or OGE3D Script ..
-hard to setup to lauch a single script file ^^. 
+hard to setup to lauch a single script file. Maybe I compare it to Auteria TGE
+is much easier to setup as dedicated server running this script.
 
 
 ## Local variable:
