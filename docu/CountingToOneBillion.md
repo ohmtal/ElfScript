@@ -209,6 +209,9 @@ THIS => void IntBinaryExprNode::getSubTypeOperand()
 I added lot of changed to make it faster (#define ELFSCRIPT_INT_HACK) but it
 ended with a slower loop test. too bad. 
 
+
+### Direct Threading
+
 Another but painful change would be => ***Direct Threading***
 The enourmous compiledEval switch/case is maybe the reason why it was slower
 after my changes.
@@ -240,8 +243,7 @@ instead of:
 it maybe there is a new function which would look like:
 
 ```
-void executeBytecode(const U32* code)
-{
+
    U32 ip = 0; // Instruction Pointer
 
    static const void* dispatch_table[] = {
@@ -299,6 +301,7 @@ handle_FALLBACK_OP:
    }
       
       
-``
+```
 
+Started with that but also same speed .... it's cursed :P
 

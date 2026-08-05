@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
 
 
     )";
-    if (gShutDownRequest) Con::evaluate(code.c_str(), false, "");
+    // if (gShutDownRequest) Con::evaluate(code.c_str(), false, "");
 
 
     if (!gScriptFile.isEmpty())   Con::executeFile(gScriptFile);
