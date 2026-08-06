@@ -189,7 +189,8 @@ function BaseDemo::Render(%this) {
                 if (%logo.y <= BORDER.0)  { %logo.VeloY *= -%damping; %logo.y = BORDER.01;}
                 else if ( %logo.y >= %by) { %logo.VeloY *= -%damping; %logo.y = %by - 0.01; }
             }
-            %logo.drawTexture(GrayTexture.getId(), true);
+            // %logo.drawTexture(GrayTexture.getId(), true);
+            %logo.draw();
         }
 
         // -----------------
@@ -220,6 +221,7 @@ function BaseDemo::addLogo(%this,%x,%y) {
         color = getRandom(0,255) SPC getRandom(0,255) SPC getRandom(0,255) SPC getRandom(32,255);
         width = LOGO_SIZE;
         height = LOGO_SIZE;
+        textureObjectId = GrayTexture.getId();
     };
     LogoList.add(%logo);
 

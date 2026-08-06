@@ -579,9 +579,8 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    char *string;
    chompUTF8BOM(inString, &string);
 
-//XXTH preprocessor
-// #define ELFSCRIPT_PREPROCESSOR
-#ifdef ELFSCRIPT_PREPROCESSOR
+//ElfScript preprocessor
+// #ifdef ELFSCRIPT_PREPROCESSOR
 
    // --- PREPROCESSOR PREPARATION ---
    // Store the preprocessed code safely on the C++ stack
@@ -602,10 +601,10 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
    string = processedString;
    inString = processedString; //  Update the original pointer
    // --- PREPROCESSOR INSERTION END ---
-#else
-   STEtoCode = evalSTEtoCode;
-   consoleAllocReset();
-#endif
+// #else
+//    STEtoCode = evalSTEtoCode;
+//    consoleAllocReset();
+// #endif
 
    name = fileName;
    smCurrentLineText = inString;

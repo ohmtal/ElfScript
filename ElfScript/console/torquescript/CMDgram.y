@@ -254,9 +254,10 @@ stmt
    | rwRETURN '{' expr_list '}' ';'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$3; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$3;
+//          for (ExprNode* expr = (ExprNode*)$3; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = ReturnStmtNode::alloc( $1.lineNumber, vecNode );
       }
     /* ============================================ */
@@ -604,9 +605,10 @@ stmt_expr
    | VAR '=' '{' expr_list '}'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$4;
+//          for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
+//              vecNode->elements.push_back(expr);
+//          }
          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
       }
    /* ============================================================================== */
@@ -618,9 +620,10 @@ stmt_expr
    | VAR '[' aidx_expr ']' '=' '{' expr_list '}'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+          vecNode->argList = (ExprNode*)$7;
+//          for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, vecNode);
       }
    /* ============================================================================== */
@@ -682,9 +685,10 @@ func_arg_item
    | '{' expr_list '}'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$2;
+//          for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = vecNode;
       }
    ;
@@ -763,9 +767,10 @@ slot_assign
    | IDENT '=' '{' expr_list '}' ';'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$4;
+//          for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
       }
    /* ======================================================================= */
@@ -777,9 +782,10 @@ slot_assign
    | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$5; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$5;
+//          for (ExprNode* expr = (ExprNode*)$5; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, vecNode, $1.value);
       }
    /* ======================================================================= */
@@ -793,9 +799,10 @@ slot_assign
    | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
-            vecNode->elements.push_back(expr);
-         }
+         vecNode->argList = (ExprNode*)$7;
+//          for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, vecNode);
       }
    /* ======================================================================= */

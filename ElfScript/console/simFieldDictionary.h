@@ -49,11 +49,13 @@ class SimFieldDictionary
 public:
    struct Entry
    {
-      Entry() : slotName(StringTable->EmptyString()),  next(NULL), type(NULL) {};
+      Entry() : slotName(StringTable->EmptyString()),  next(NULL), type(NULL) {
+
+      };
       // orig Entry() : slotName(StringTable->EmptyString()), value(NULL), next(NULL), type(NULL) {};
       StringTableEntry slotName;
 
-      ConsoleValue mValue = {};
+      ConsoleValue mValue;
       // char *value;
 
       Entry *next;

@@ -65,6 +65,9 @@ SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableE
    ret->slotName = slotName;
    ret->type = type;
 
+   ret->mValue.type = 0;
+   ret->mValue.f = 0.f;
+   ret->mValue.i = 0;
    ret->mValue.setString(value);
    // ElfScript ret->value = value;
 
@@ -87,6 +90,7 @@ SimFieldDictionary::SimFieldDictionary()
    : mNumFields(0),
    mVersion(0)
 {
+
    dMemset(mHashTable, 0, sizeof(mHashTable));
 }
 
@@ -138,11 +142,15 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
          // ElfScript update mValue!!
          S32 typeID = type->getTypeID();
          if ( typeID  == TypeF32 ||  typeID  == TypeF64 ) {
+            walk->mValue.setFloat(walk->mValue.getFloat());
             walk->mValue.type = ConsoleValueType::cvFloat;
-         } else if ( typeID  == TypeS32  || typeID  == TypeU32
-               || typeID  == TypeBool
-               //FIXME MORE
+         } else if (
+               typeID  == TypeS32  || typeID  == TypeU32
+               || typeID  == TypeBool  || typeID == TypeS16
+               || typeID == TypeS8 || typeID == TypeU8
+               || typeID == TypeS64 || typeID == TypeU64
             ) {
+            walk->mValue.setInt(walk->mValue.getInt());
             walk->mValue.type = ConsoleValueType::cvInteger;
          } else {
             walk->mValue.type = ConsoleValueType::cvString;
@@ -187,6 +195,7 @@ SimFieldDictionary::Entry *SimFieldDictionary::findDynamicField(StringTableEntry
 
    for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
    {
+
       if (walk->slotName == fieldName)
       {
          return walk;

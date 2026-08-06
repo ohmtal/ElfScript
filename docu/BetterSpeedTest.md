@@ -13,7 +13,7 @@ OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
 - Version 0.4a (RelWithDebug) : 15.913u 0.198s 0:16.16 99.6%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 5.199u 0.000s 0:05.20 99.8%     0+0k 0+0io 0pf+0w
-
+- Version 0.4f 🚀 (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
 
 **for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
 
@@ -59,7 +59,7 @@ echo("---------------------");
 - Version 0.4a (RelWithDebug) :17.481u 0.182s 0:17.68 99.8%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 6.622u 0.013s 0:06.64 99.8%     0+0k 0+0io 0pf+0w
-
+- Version 0.4f 🚀 (RelWithDebug) : 6.345u 0.003s 0:06.35 99.8%     0+0k 0+0io 0pf+0w
 ```
 #define JLOOPS 25
 #define ILOOPS 1000000
@@ -103,6 +103,7 @@ echo("---------------------");
 - OGE3D using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 31.224u 0.193s 0:31.45 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 21.784u 0.009s 0:21.82 99.8%    0+0k 0+0io 0pf+0w
+- Version 0.4f 🚀 (RelWithDebug) : 21.170u 0.003s 0:21.20 99.8%    0+0k 0+0io 0pf+0w
 
 
 
@@ -158,6 +159,7 @@ echo("---------------------");
 - Version 0.4a (RelWithDebug) : 34.982u 1.909s 0:36.97 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 24.884u 0.202s 0:25.12 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 13.967u 0.003s 0:13.99 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4f 🚀 (RelWithDebug) : 14.015u 0.009s 0:14.04 99.7%    0+0k 0+0io 0pf+0w
 
 
 ### So why is this slower (same with a global var):
@@ -282,6 +284,7 @@ echo("---------------------");
 - Version 0.4c 🚀 (RelWithDebug) : 125.068u 1.963s 2:07.38 99.7%   0+0k 1416+0io 8pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 124.605u 1.840s 2:06.71 99.7%   0+0k 0+0io 0pf+0w
 - Version 0.4e 🚀 (RelWithDebug) : 114.157u 1.692s 1:56.06 99.8%   0+0k 0+0io 0pf+0w
+- Version 0.4f 🚀 (RelWithDebug) : 22.012u 0.000s 0:22.04 99.8%    0+0k 0+0io 0pf+0w
 
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
@@ -343,7 +346,7 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
     ==> "named" speed test: 114.462u 1.952s 1:56.65 99.7%   0+0k 0+0io 0pf+0w
     thats fine same as before but with ConsoleValue in place 
     
-- [ ] use types in mValue SAVE:
+- [X] use types in mValue SAVE:
      bool pushDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP, S32 type_OP_path);
      
      called from OP_SAVEFIELD_FASTPATH
@@ -387,9 +390,10 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
     
 
     
+### Version 0.4f:
 
-- [ ] lot of testing 
-- [ ] cleanup compiled eval or completly switch to threaded!
+- [X] lot of testing << some but will be continued
+- [X] cleanup compiled eval or completly switch to threaded!
 
         - [X] make threaded as default add and test the latest changes!!! 
             -  OP_LOADFIELD_UINT
@@ -398,8 +402,9 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
             -  OP_SAVEFIELD_FLT:
             -  OP_SAVEFIELD_UINT:
             -  OP_SAVEFIELD_FASTPATH:
-        - [ ] remove GarbageCollection shit
-        - [ ] remove fast path ifdefs and make it default 
+        - [~] remove GarbageCollection shit
+        - [X] remove fast path ifdefs and make it default 
+        - [X] ELFSCRIPT_PREPROCESSOR also as default
         
 - [ ] Make a memleak check after that !!!!!!!!!!!
 

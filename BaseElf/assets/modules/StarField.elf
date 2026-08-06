@@ -19,6 +19,7 @@ function createStarField() {
         TypeF32 speed = 0.4;
         TypeBool drawLines = false;
     };
+    error("%obj.speed is" SPC %obj.speed);
     return %obj;
 }
 // -----------------------------------------------------------------------------

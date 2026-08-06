@@ -206,7 +206,7 @@ void StdConsole::process()
    if(stdConsoleEnabled)
    {
       //U16 key;
-      char typedData[64];  // damn, if you can type this fast... :-D
+      char typedData[2048];  // damn, if you can type this fast... :-D
 
       //XXTH FIXME ?!
       /*

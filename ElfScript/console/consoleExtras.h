@@ -35,9 +35,9 @@ namespace Con {
         for (std::size_t i = 0; i < count; ++i) {
             value = static_cast<S32>(enumValues[i]);
 
-#ifndef ELFSCRIPT_PREPROCESSOR
-    asConstantVariable = true;
-#endif
+// #ifndef ELFSCRIPT_PREPROCESSOR
+//     asConstantVariable = true;
+// #endif
             if (!asConstantVariable) {
                 std::string fullName = prefix + std::string(enumNames[i]);
                 Con::setScriptConstant(fullName, value);

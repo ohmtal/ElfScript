@@ -79,7 +79,7 @@ public:
 
     static void initPersistFields()
     {
-        // Parent::initPersistFields();
+        Parent::initPersistFields();
         addField("testS8", TypeS8, Offset(mS8, TestObj));
         addField("testU8", TypeU8, Offset(mU8, TestObj));
         addField("testU32", TypeU32, Offset(mU8, TestObj));

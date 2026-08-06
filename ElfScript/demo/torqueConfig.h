@@ -7,10 +7,10 @@
 
 // ----------------------------------------------------------------------------
 // enable #define in torque script
-#define ELFSCRIPT_PREPROCESSOR
+// removed now default #define ELFSCRIPT_PREPROCESSOR
 
 // fast path for int and float fields
-#define ELFSCRIPT_FASTPATH_FLD
+//remove is now default #define ELFSCRIPT_FASTPATH_FLD
 
 // fast path test for struct << i do test this in CrazyElf
 // #define TEST_STRUCT_FAST_PATH
