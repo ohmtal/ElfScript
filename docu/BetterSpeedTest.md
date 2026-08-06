@@ -281,7 +281,7 @@ echo("---------------------");
 - OGE3D using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 125.068u 1.963s 2:07.38 99.7%   0+0k 1416+0io 8pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 124.605u 1.840s 2:06.71 99.7%   0+0k 0+0io 0pf+0w
-
+- Version 0.4e 🚀 (RelWithDebug) : 114.157u 1.692s 1:56.06 99.8%   0+0k 0+0io 0pf+0w
 
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
@@ -292,7 +292,60 @@ echo("---------------------");
 - I could get a better result with local var instead of named now, but is not a 
 big difference.
 - It store the values in a fast Map as strings but i need the values also as float and int. 
-    - Maybe tomorrow ;) 
+    
+- value is stored in SimFieldDictionary: char *value;
+
+    - void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *value)
+    - SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value)
+    - const char *SimFieldDictionary::getFieldValue(StringTableEntry slotName)
+    - void SimFieldDictionary::printFields(SimObject *obj)
+    - Entry() : slotName(StringTable->EmptyString()), value(NULL), next(NULL), type(NULL) {};
+    - char *value;
+
+```
+% $sto = new PointStorageObject(sto);$Debug::DumpByteCode=1; 
+% $sto.self = $sto;
+0: OP_SETCURVAR stk=0 var=$sto
+3: OP_LOADVAR_STR stk=+1
+4: OP_SETCURVAR stk=0 var=$sto
+7: OP_LOADVAR_STR stk=+1
+8: OP_SETCUROBJECT stk=0
+9: OP_SETCURFIELD stk=0 field=self
+12: OP_POP_STK stk=-1
+13: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: 69)
+14: OP_POP_STK stk=-1
+15: OP_RETURN_VOID stk=0
+
+```
+OP_SAVEFIELD_FASTPATH is fine but curObject->findField(curField); is nullptr because
+it's dynamic field also fine. it enter SimObject::setDataField so we are in slow string mode. 
+It jumps to DynField.. but now it check for  `if(!array)` only. Not if it's also have 
+an entry. 
+
+test_dynamic_fields_localvar.elf 
+==> 106.306u 1.783s 1:48.25 99.8%   0+0k 0+0io 0pf+0w
+
+
+same on OP_LOADFIELD_STR => `if(!array)`
+
+test_dynamic_fields_localvar.elf
+==> 106.732u 1.770s 1:48.67 99.8%   0+0k 0+0io 0pf+0w
+
+??? slower ??? should be faster .. maybe my laptop is tired ... 
+
+
+==> 114.157u 1.692s 1:56.06 99.8%   0+0k 0+0io 0pf+0w
+overall 10sec faster ... when i want more i need to add float/int to SimFieldDictionary
+or instad of value a ConsoleValue object ?! << this would make sense or not ? 
+
+
+- [X] replaced const char* value with ConsoleValue mValue  -
+    ==> "named" speed test: 114.462u 1.952s 1:56.65 99.7%   0+0k 0+0io 0pf+0w
+    thats fine same as before but with ConsoleValue in place 
+    
+- [ ] use types in mValue
+
+- [ ] Make a memleak check after that !!!!!!!!!!!
 
 ---
 

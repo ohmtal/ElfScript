@@ -71,7 +71,8 @@ bool SimObject::writeObject(Stream *stream)
          SimFieldDictionary::Entry * entry = (*ditr);
 
          stream->writeString(entry->slotName);
-         stream->writeString(entry->value);
+         stream->writeString(entry->mValue.getString());
+         // stream->writeString(entry->value);
          numFields++;
       }
    }

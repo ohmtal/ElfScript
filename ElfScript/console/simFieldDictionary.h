@@ -39,6 +39,8 @@ class SimObject;
 #include "core/util/str.h"
 #endif
 
+#include "console.h" //Elfscript 0.4f
+
 /// Dictionary to keep track of dynamic fields on SimObject.
 class SimFieldDictionary
 {
@@ -47,10 +49,13 @@ class SimFieldDictionary
 public:
    struct Entry
    {
-      Entry() : slotName(StringTable->EmptyString()), value(NULL), next(NULL), type(NULL) {};
-      //XXTH ElfScript FIXME store string/float/int instead of only string => ConsoleValue mValue;
+      Entry() : slotName(StringTable->EmptyString()),  next(NULL), type(NULL) {};
+      // orig Entry() : slotName(StringTable->EmptyString()), value(NULL), next(NULL), type(NULL) {};
       StringTableEntry slotName;
-      char *value;
+
+      ConsoleValue mValue = {};
+      // char *value;
+
       Entry *next;
       ConsoleBaseType *type;
    };

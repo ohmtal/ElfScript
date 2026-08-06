@@ -1112,14 +1112,16 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
       if(!mFieldDictionary)
          mFieldDictionary = new SimFieldDictionary;
 
-      if(!array)
+      // ElfScript 0.4e
+      S32 array1 = PARSE_ARRAY_INDEX(array);
+      //orig:  if(!array)
+      if(array1 == 0)
       {
          mFieldDictionary->setFieldValue(slotName, value);
          onDynamicModified( slotName, value );
       }
       else
       {
-      //FIXME XXTH handbreak here !!
          char buf[256];
          dStrcpy(buf, slotName, 256);
          dStrcat(buf, array, 256);
@@ -1245,7 +1247,10 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                   return true;
             }
 
-            if(!array)
+            //Elfscript 0.4d:
+            // orig if(!array)
+            S32 array1 = PARSE_ARRAY_INDEX(array);
+            if (array1 == 0 )
             {
                   if (const char* val = mFieldDictionary->getFieldValue(slotName)) {
                         stackP->setString(val);
@@ -1272,7 +1277,8 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                         //       stackP->setFastInt((S64)dAtoi(entry->value));
                         //       return true;
                         // }
-                        stackP->setString(entry->value);
+                        stackP->setString(entry->mValue.getString());
+                        // stackP->setString(entry->value);
                         return true;
                   }
             }
@@ -3557,7 +3563,8 @@ DefineEngineMethod( SimObject, getDynamicField, const char*, ( S32 index ),,
    if (*itr)
    {
       SimFieldDictionary::Entry* entry = *itr;
-      dSprintf(buffer, bufSize, "%s\t%s", entry->slotName, entry->value);
+      dSprintf(buffer, bufSize, "%s\t%s", entry->slotName, entry->mValue.getString());
+      // dSprintf(buffer, bufSize, "%s\t%s", entry->slotName, entry->value);
       return buffer;
    }
 
