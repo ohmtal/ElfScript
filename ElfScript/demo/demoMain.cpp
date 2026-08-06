@@ -88,8 +88,8 @@ void MyLogger(U32 level, const char *consoleLine) {
 }
 
 
-DefineEngineFunction(HelloWorld, void, (String name), ("fooBar"),""){
-    Con::printf("Hello World %s!", name.c_str());
+DefineEngineFunction(MINUS1, S32, (), ,"get a int :P"){
+   return -1;
 }
 // ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {

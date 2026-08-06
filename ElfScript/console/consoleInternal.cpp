@@ -499,7 +499,9 @@ const char *Dictionary::getVariable(StringTableEntry name, bool *entValid)
    return "";
 }
 
-S32 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
+// ElfScript !
+// S32 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
+S64 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
 {
    Entry *ent = lookup(name);
    if (ent)
@@ -515,7 +517,9 @@ S32 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
    return 0;
 }
 
-F32 Dictionary::getFloatVariable(StringTableEntry name, bool *entValid)
+// ElfScript !
+// F32 Dictionary::getFloatVariable(StringTableEntry name, bool *entValid)
+F64 Dictionary::getFloatVariable(StringTableEntry name, bool *entValid)
 {
    Entry *ent = lookup(name);
    if (ent)

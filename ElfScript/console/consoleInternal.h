@@ -327,12 +327,16 @@ public:
 
       inline ConsoleValue getValue() { return (value); }
 
-      inline U32 getIntValue()
+      //ElfScript !
+      // inline U32 getIntValue()
+      inline S64 getIntValue()
       {
          return value.getInt();
       }
 
-      inline F32 getFloatValue()
+      //ElfScript !
+      // inline F32 getFloatValue()
+      inline F64 getFloatValue()
       {
          return value.getFloat();
       }
@@ -342,7 +346,9 @@ public:
          return value.getString();
       }
 
-      void setIntValue(U32 val)
+      // ElfScript !
+      // void setIntValue(U32 val)
+      void setIntValue(S64 val)
       {
          if (mIsConstant)
          {
@@ -352,7 +358,9 @@ public:
 
          if (value.isConsoleType())
          {
-            const char* dptr = Con::getData(TypeS32, &val, 0);
+            // ElfScript !
+            // const char* dptr = Con::getData(TypeS32, &val, 0);
+            const char* dptr = Con::getData(TypeS64, &val, 0);
             Con::setData(value.type, value.dataPtr, 0, 1, &dptr, value.enumTable);
          }
          else
@@ -365,7 +373,9 @@ public:
             notify->trigger();
       }
 
-      void setFloatValue(F32 val)
+      // ElfScript !
+      // void setFloatValue(F32 val)
+      void setFloatValue(F64 val)
       {
          if (mIsConstant)
          {
@@ -375,7 +385,9 @@ public:
 
          if (value.isConsoleType())
          {
-            const char* dptr = Con::getData(TypeF32, &val, 0);
+               // ElfScript !
+            // const char* dptr = Con::getData(TypeF32, &val, 0);
+            const char* dptr = Con::getData(TypeF64, &val, 0);
             Con::setData(value.type, value.dataPtr, 0, 1, &dptr, value.enumTable);
          }
          else
@@ -447,8 +459,11 @@ public:
 
    void setVariable(StringTableEntry name, const char *value);
    const char *getVariable(StringTableEntry name, bool *valid = NULL);
-   S32 getIntVariable(StringTableEntry name, bool *valid = NULL);
-   F32 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
+   // ElfScript !
+   // S32 getIntVariable(StringTableEntry name, bool *valid = NULL);
+   // F32 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
+   S64 getIntVariable(StringTableEntry name, bool *valid = NULL);
+   F64 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
 
    U32 getCount() const
    {

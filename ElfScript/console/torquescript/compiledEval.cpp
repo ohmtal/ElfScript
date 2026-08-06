@@ -1666,10 +1666,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       {
             // i check the type first!
             const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
-            S32 valueType = -1;
-            if (varEntry) valueType = varEntry->value.getType();
-            if (valueType == ConsoleValueType::cvFloat ||
-                valueType == ConsoleValueType::cvInteger)
+            bool fastPath = false;
+            if (varEntry) {
+                  static S32 valueType = 0;
+                  valueType = varEntry->value.getType();
+                  fastPath =  valueType == ConsoleValueType::cvFloat ||
+                  valueType == ConsoleValueType::cvInteger;
+            }
+            if (fastPath)
             {
                   // Fastpath
                   stack[_STK + 1] = varEntry->value;
@@ -1709,7 +1713,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
 
             if (stack[_STK].type == cvFloat) {
-                  Script::gEvalState.setIntVariable(stack[_STK].getFloat());
+                  Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
                   break;
             }
 
