@@ -80,13 +80,10 @@ how to embed ElfScript.
 
 This is a nice place to learn ElfScript (aka TorqueScipt ). 
 
-## Folder: TorqueScript
+## Folder: obsolete 
 
-My first working Version. I will not change this anymore. I work on the code in the ElfScript folder.
-
-## Folder: experimental 
-
-Unfinished non functional attempt to make it much smaller. 
+- TorqueScript : My first working Version. I will not change this anymore. I work on the code in the ElfScript folder.
+- experimental : Unfinished non functional attempt to make it much smaller. 
 
 ## Example / TestBed Application using OhmFlux:
 
