@@ -563,7 +563,7 @@ namespace _Private {
    _END_IMPLEMENT_STRUCT
 
 
-///
+/// NOTE: this defines : EngineFieldTable::Field
 #define _FIELD( fieldName, exportName, numElements, doc ) \
    { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), (U32)FIELDOFFSET( fieldName ) } // Artificial offset to avoid compiler warnings.
 

@@ -154,6 +154,7 @@ int main(int argc, char* argv[]) {
     StdConsole::create();
     stdConsole->enable(true);
     stdConsole->enableInput(true);
+    stdConsole->muteConMessage(true); //prevent double output
     #endif
 
 

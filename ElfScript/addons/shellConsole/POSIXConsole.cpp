@@ -118,7 +118,9 @@ bool StdConsole::isEnabled()
 
 static void stdConsoleConsumer(/*ConsoleLogEntry::Level*/ U32, const char *line)
 {
-   stdConsole->processConsoleLine(line);
+    if (!stdConsole->stdConsoleMuteConMessage)  {
+        stdConsole->processConsoleLine(line);
+    }
 }
 
 StdConsole::StdConsole()

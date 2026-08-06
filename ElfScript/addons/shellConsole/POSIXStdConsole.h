@@ -51,6 +51,7 @@ class StdConsole
    char rgCmds[MAX_CMDS][512];
    S32  iCmdIndex;
 
+
    // this holds the original terminal state
    // before we messed with it
    struct termios *originalTermState;
@@ -68,6 +69,10 @@ public:
    static void destroy();
    static bool isEnabled();
    void resetTerminal();
+
+
+   bool stdConsoleMuteConMessage; //XXTH
+   void muteConMessage(bool value) { stdConsoleMuteConMessage = value; }
 };
 
 extern StdConsole *stdConsole;

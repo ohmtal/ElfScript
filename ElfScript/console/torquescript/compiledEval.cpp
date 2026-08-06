@@ -2151,6 +2151,15 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
       ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
 
 
+      // ***************************************
+      //   ****  trapped in deadlock  ****
+      // i need to get the real type of every
+      // field  but i think it's a deadlock
+      // the best i get is
+      //          subtypeInfo->getTypeName()
+      // which is a string ... bad idea to use
+      // this
+      // ***************************************
 
       if (conType) {
             const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
@@ -2169,11 +2178,14 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
                   if (fieldTable) {
                       for (S32 i = 0; i < fieldTable->getNumFields(); i++) {
                              const EngineFieldTable::Field& subField = (*fieldTable)[i];
-                             Con::printf("   #%d Name:%s Elements:%d, TypeKind: %d (0=EngineTypeKindPrimitive)", i, subField.getName(), subField.getNumElements()
-                                  , subField.getType() ? subField.getType()->getTypeKind() : -1
+                             const EngineTypeInfo* subtypeInfo = subField.getType();
+                             Con::printf("   #%d Name:%s Elements:%d, TypeKind: %d (0=EngineTypeKindPrimitive), TypeName: %s", i, subField.getName(), subField.getNumElements()
+                                  , subtypeInfo ? subtypeInfo->getTypeKind() : -1
+                                  , subtypeInfo ? subtypeInfo->getTypeName() : "unknow"
 
                         );
                       }
+
 
                       // * * * *  subField.getType  ?? * * *
 

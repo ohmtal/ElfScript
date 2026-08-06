@@ -144,6 +144,11 @@ class EngineFieldTable
          /// Offset of the field in instances.
          U32 mOffset;
 
+         /// ElfScript Type of Field like TypeF32
+         // was an idea for TEST_STRUCT_FAST_PATH - i stop here - too tired ;)
+         // U32 mFieldType = 0;
+
+
          ///
          const char* getName() const { return mName; }
          
