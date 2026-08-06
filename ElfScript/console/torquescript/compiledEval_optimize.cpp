@@ -919,18 +919,18 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NEG,
          &&handle_OP_INC,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_CREATE,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURVAR_ARRAY_CREATE,
+         &&handle_OP_SETCURVAR,
+         &&handle_OP_SETCURVAR_CREATE,
+         &&handle_OP_SETCURVAR_ARRAY,
+         &&handle_OP_SETCURVAR_ARRAY_CREATE,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_UINT,// 40
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADVAR_STR,
+         &&handle_OP_LOADVAR_UINT,// 40
+         &&handle_OP_LOADVAR_FLT,
+         &&handle_OP_LOADVAR_STR,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEVAR_STR,
+         &&handle_OP_SAVEVAR_UINT,
+         &&handle_OP_SAVEVAR_FLT,
+         &&handle_OP_SAVEVAR_STR,
 
          &&handle_OP_LOAD_LOCAL_VAR_UINT,
          &&handle_OP_LOAD_LOCAL_VAR_FLT,
@@ -948,15 +948,15 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_ARRAY, // 50
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_TYPE,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADFIELD_STR,
+         &&handle_OP_LOADFIELD_UINT,
+         &&handle_OP_LOADFIELD_FLT,
+         &&handle_OP_LOADFIELD_STR,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_STR,
+         &&handle_OP_SAVEFIELD_UINT,
+         &&handle_OP_SAVEFIELD_FLT,
+         &&handle_FALLBACK_SWITCH,   // TODO: &&handle_OP_SAVEFIELD_STR,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_P &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_STK,
+         &&handle_FALLBACK_SWITCH,   // TODO: &&handle_OP_STK,
 
          &&handle_OP_LOADIMMED_UINT,
          &&handle_OP_LOADIMMED_FLT,
@@ -986,7 +986,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
 
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
+         &&handle_OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
 
 #ifdef ELFSCRIPT_INT_HACK
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT_UINT,
@@ -1035,11 +1035,12 @@ handle_OP_INC:
       Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
       DISPATCH();
 
+
+// ~~~~~~~~~~~~~~~~~~~~~~ LOCAL_VAR
 handle_OP_LOAD_LOCAL_VAR_UINT:
       reg = code[ip++];
       currentRegister = reg;
 
-      // See OP_SETCURVAR
       prevField = NULL;
       prevObject = NULL;
       curObject = NULL;
@@ -1054,7 +1055,6 @@ handle_OP_LOAD_LOCAL_VAR_FLT:
          reg = code[ip++];
          currentRegister = reg;
 
-         // See OP_SETCURVAR
          prevField = NULL;
          prevObject = NULL;
          curObject = NULL;
@@ -1067,7 +1067,6 @@ handle_OP_LOAD_LOCAL_VAR_STR:
       reg = code[ip++];
       currentRegister = reg;
 
-      // See OP_SETCURVAR
       prevField = NULL;
       prevObject = NULL;
       curObject = NULL;
@@ -1095,7 +1094,6 @@ handle_OP_SAVE_LOCAL_VAR_UINT:
          reg = code[ip++];
          currentRegister = reg;
 
-         // See OP_SETCURVAR
          prevField = NULL;
          prevObject = NULL;
          curObject = NULL;
@@ -1107,7 +1105,6 @@ handle_OP_SAVE_LOCAL_VAR_FLT:
           reg = code[ip++];
          currentRegister = reg;
 
-         // See OP_SETCURVAR
          prevField = NULL;
          prevObject = NULL;
          curObject = NULL;
@@ -1120,7 +1117,6 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          reg = code[ip++];
          currentRegister = reg;
 
-         // See OP_SETCURVAR
          prevField = NULL;
          prevObject = NULL;
          curObject = NULL;
@@ -1142,6 +1138,73 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          DISPATCH();
 
 
+// ~~~~~~~~~~~~~~~~~ FIELD
+handle_OP_LOADFIELD_UINT:
+            if (curObject)
+            {
+                  stack[_STK + 1].type = cvInteger; //HardCore!
+                  curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+
+            }
+            else
+            {
+                  char buff[FieldBufferSizeString];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setString(buff);
+            }
+            _STK++;
+            DISPATCH();
+
+handle_OP_LOADFIELD_FLT:
+            if (curObject)
+            {
+                  stack[_STK + 1].type = cvFloat; //HardCore!
+                  curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+
+            }
+            else
+            {
+                  char buff[FieldBufferSizeString];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setString(buff);
+            }
+            _STK++;
+            DISPATCH();
+
+handle_OP_LOADFIELD_STR:
+         if (curObject)
+         {
+            curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+
+         }
+         else
+         {
+            // The field is not being retrieved from an object. Maybe it's
+            // a special accessor?
+            char buff[FieldBufferSizeString];
+            memset(buff, 0, sizeof(buff));
+            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+            stack[_STK + 1].setString(buff);
+         }
+         _STK++;
+         DISPATCH();
+
+
+handle_OP_SAVEFIELD_UINT:
+handle_OP_SAVEFIELD_FLT:
+handle_OP_SAVEFIELD_FASTPATH:
+      if (curObject) {
+            curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
+      } else {
+            // The field is not being set on an object. Maybe it's a special accessor?
+            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            prevObject = NULL;
+      }
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~ IMMED
+
 handle_OP_LOADIMMED_UINT:
          stack[_STK + 1].setInt(code[ip++]);
          _STK++;
@@ -1152,6 +1215,142 @@ handle_OP_LOADIMMED_FLT:
          _STK++;
       DISPATCH();
 
+
+// ~~~~~~~~~~~~~~~~~ CURVAR
+handle_OP_SETCURVAR:
+         var = CodeToSTE(code, ip);
+         ip += 2;
+
+         // If a variable is set, then these must be NULL. It is necessary
+         // to set this here so that the vector parser can appropriately
+         // identify whether it's dealing with a vector.
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         // Used for local variable caching of what is active...when we
+         // set a global, we aren't active
+         currentRegister = -1;
+
+         Script::gEvalState.setCurVarName(var);
+
+         // In order to let docblocks work properly with variables, we have
+         // clear the current docblock when we do an assign. This way it
+         // won't inappropriately carry forward to following function decls.
+         curFNDocBlock = NULL;
+         curNSDocBlock = NULL;
+         DISPATCH();
+
+handle_OP_SETCURVAR_CREATE:
+         var = CodeToSTE(code, ip);
+         ip += 2;
+
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         currentRegister = -1;
+
+         Script::gEvalState.setCurVarNameCreate(var);
+
+         curFNDocBlock = NULL;
+         curNSDocBlock = NULL;
+         DISPATCH();
+
+handle_OP_SETCURVAR_ARRAY:
+         var = StringTable->insert(stack[_STK].getString());
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         // Used for local variable caching of what is active...when we
+         // set a global, we aren't active
+         currentRegister = -1;
+
+         Script::gEvalState.setCurVarName(var);
+
+         // See OP_SETCURVAR for why we do this.
+         curFNDocBlock = NULL;
+         curNSDocBlock = NULL;
+          DISPATCH();
+
+
+handle_OP_SETCURVAR_ARRAY_CREATE:
+         var = StringTable->insert(stack[_STK].getString());
+
+         // See OP_SETCURVAR
+         prevField = NULL;
+         prevObject = NULL;
+         curObject = NULL;
+
+         currentRegister = -1;
+
+         Script::gEvalState.setCurVarNameCreate(var);
+
+         curFNDocBlock = NULL;
+         curNSDocBlock = NULL;
+         DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~ LOADVAR
+handle_OP_LOADVAR_UINT:
+         currentRegister = -1;
+         stack[_STK + 1].setInt(Script::gEvalState.getIntVariable());
+         _STK++;
+         DISPATCH();
+handle_OP_LOADVAR_FLT:
+        currentRegister = -1;
+         stack[_STK + 1].setFloat(Script::gEvalState.getFloatVariable());
+         _STK++;
+         DISPATCH();
+
+handle_OP_LOADVAR_STR:
+      currentRegister = -1;
+      {
+            // i check the type first!
+            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
+            bool fastPath = false;
+            if (varEntry) {
+                  static S32 valueType = 0;
+                  valueType = varEntry->value.getType();
+                  fastPath =  valueType == ConsoleValueType::cvFloat ||
+                  valueType == ConsoleValueType::cvInteger;
+            }
+            if (fastPath)
+            {
+                  // Fastpath
+                  stack[_STK + 1] = varEntry->value;
+            }
+            else
+            {
+                  // Slowpath: Fallback
+                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+            }
+      }
+      _STK++;
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~ SAVEVAR
+handle_OP_SAVEVAR_UINT:
+      Script::gEvalState.setIntVariable(stack[_STK].getInt());
+      DISPATCH();
+handle_OP_SAVEVAR_FLT:
+      Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+      DISPATCH();
+handle_OP_SAVEVAR_STR:
+      if (stack[_STK].type == cvInteger) {
+            Script::gEvalState.setIntVariable(stack[_STK].getInt());
+            DISPATCH();
+      }
+
+      if (stack[_STK].type == cvFloat) {
+            Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+            DISPATCH();
+      }
+
+      Script::gEvalState.setStringVariable(stack[_STK].getString());
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~ F A L L  B A C K ~~~~~~~~~
 handle_FALLBACK_SWITCH:
 {

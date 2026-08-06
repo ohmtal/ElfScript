@@ -360,7 +360,7 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
         - 113.513u 1.814s 1:55.47 99.8%   0+0k 0+0io 0pf+0w
 
 
-- [ ] Find what is missing 
+- [X] Find what is missing 
     I made get and set and also added typed but is still slow !!!!
     - also added FLT_/INT_ oto this path 
     - => shit => 115.705u 1.714s 1:57.69 99.7%   0+0k 192+0io 2pf+0w
@@ -391,13 +391,13 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
 - [ ] lot of testing 
 - [ ] cleanup compiled eval or completly switch to threaded!
 
-        - [ ] make threaded as default add and test the latest changes!!! 
-            - [ ] OP_LOADFIELD_UINT
-            - [ ] OP_LOADFIELD_FLT
-            - [ ] OP_LOADFIELD_STR
-            - [ ] OP_SAVEFIELD_FLT:
-            - [ ] OP_SAVEFIELD_UINT:
-            - [ ] OP_SAVEFIELD_FASTPATH:
+        - [X] make threaded as default add and test the latest changes!!! 
+            -  OP_LOADFIELD_UINT
+            -  OP_LOADFIELD_FLT
+            -  OP_LOADFIELD_STR
+            -  OP_SAVEFIELD_FLT:
+            -  OP_SAVEFIELD_UINT:
+            -  OP_SAVEFIELD_FASTPATH:
         - [ ] remove GarbageCollection shit
         - [ ] remove fast path ifdefs and make it default 
         

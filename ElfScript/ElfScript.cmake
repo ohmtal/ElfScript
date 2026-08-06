@@ -2,7 +2,7 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
-option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
+# option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(TORQUE_DEBUG)
@@ -120,6 +120,8 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
 
 
+    # new monster:
+    ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp
 
 )
 
@@ -207,11 +209,11 @@ elseif(UNIX)
 endif()
 
 
-if (ENABLE_DIRECT_THREADING)
-    list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp)
-else()
-    list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp)
-endif()
+# if (ENABLE_DIRECT_THREADING)
+#     list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp)
+# else()
+#     list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp)
+# endif()
 
 
 set(ELFSCRIPT_SRC

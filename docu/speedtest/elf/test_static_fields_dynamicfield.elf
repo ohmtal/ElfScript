@@ -1,7 +1,9 @@
 #define JLOOPS 25
 #define ILOOPS 1000000
 
-new SimObject(Game);
+new SimObject(Game) {
+    TypeU32 stoObj = 0;
+};
 Game.stoObj = new PointStorageObject();
 
 Game.stoObj.x = 0;
