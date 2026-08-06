@@ -12,6 +12,8 @@ OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
 
 - Version 0.4a (RelWithDebug) : 15.913u 0.198s 0:16.16 99.6%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
+- Version 0.4d 🚀 (RelWithDebug) : 5.199u 0.000s 0:05.20 99.8%     0+0k 0+0io 0pf+0w
+
 
 **for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
 
@@ -56,6 +58,7 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) :17.481u 0.182s 0:17.68 99.8%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
+- Version 0.4d 🚀 (RelWithDebug) : 6.622u 0.013s 0:06.64 99.8%     0+0k 0+0io 0pf+0w
 
 ```
 #define JLOOPS 25
@@ -99,6 +102,9 @@ echo("---------------------");
 - Version 0.4a (RelWithDebug) : 29.871u 0.159s 0:30.06 99.8%    0+0k 0+0io 0pf+0w
 - OGE3D using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 31.224u 0.193s 0:31.45 99.8%    0+0k 0+0io 0pf+0w
+- Version 0.4d 🚀 (RelWithDebug) : 21.784u 0.009s 0:21.82 99.8%    0+0k 0+0io 0pf+0w
+
+
 
 Here 0.4c is slower than 0.4a (no idea why) - but 0.4b was at the same speed so rocket
 change did not cause it. Use local var is now the fastest. global is slightly 
@@ -151,6 +157,7 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) : 34.982u 1.909s 0:36.97 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 24.884u 0.202s 0:25.12 99.8%    0+0k 0+0io 0pf+0w
+- Version 0.4d 🚀 (RelWithDebug) : 13.967u 0.003s 0:13.99 99.7%    0+0k 0+0io 0pf+0w
 
 
 ### So why is this slower (same with a global var):
@@ -273,11 +280,13 @@ echo("---------------------");
 - Version 0.4a (RelWithDebug) : 127.546u 2.019s 2:09.75 99.8%   0+0k 0+0io 0pf+0w
 - OGE3D using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
 - Version 0.4c 🚀 (RelWithDebug) : 125.068u 1.963s 2:07.38 99.7%   0+0k 1416+0io 8pf+0w
+- Version 0.4d 🚀 (RelWithDebug) : 124.605u 1.840s 2:06.71 99.7%   0+0k 0+0io 0pf+0w
+
 
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
 
-### 0.4c This my problem child: 
+### 0.4c/d This my problem child: 
 
 - Dynamic fields in the object is one of the coolest features in Elf(Torque)Script.
 - I could get a better result with local var instead of named now, but is not a 
