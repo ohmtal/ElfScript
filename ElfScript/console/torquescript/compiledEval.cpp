@@ -1700,6 +1700,19 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
       case OP_SAVEVAR_STR:
+            // ElfScript 0.4c rocket change !
+            // XXTH inlining drives me crazy here -- using kdevelop
+            // i go for speed not for most beautiful code :P
+            if (stack[_STK].type == cvInteger) {
+                  Script::gEvalState.setIntVariable(stack[_STK].getInt());
+                  break;
+            }
+
+            if (stack[_STK].type == cvFloat) {
+                  Script::gEvalState.setIntVariable(stack[_STK].getFloat());
+                  break;
+            }
+
          Script::gEvalState.setStringVariable(stack[_STK].getString());
          break;
 
@@ -1800,8 +1813,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
       case OP_SAVE_LOCAL_VAR_STR:
+
          reg = code[ip++];
-         val = stack[_STK].getString();
          currentRegister = reg;
 
          // See OP_SETCURVAR
@@ -1809,6 +1822,19 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          prevObject = NULL;
          curObject = NULL;
 
+         // ElfScript 0.4c rocket change !
+         if (stack[_STK].type == cvInteger) {
+            Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+            break;
+         }
+
+         if (stack[_STK].type == cvFloat) {
+             Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+             break;
+         }
+
+         // orig slowmo =>
+         val = stack[_STK].getString();
          Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
          break;
 

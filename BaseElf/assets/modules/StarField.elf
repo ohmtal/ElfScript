@@ -43,12 +43,16 @@ function StarField::OnAdd(%this) {
 
     %this.updateSize();
 
-    %this.add( new PointStorageObject(starPoints) { storageSize = STAR_COUNT; } );
+    $pointStorage = new PointStorageObject(starPoints) {
+        storageSize = STAR_COUNT;
+    };
+    %this.add( $pointStorage  );
+
+    $starPoints = starPoints.getId();
 
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        // starPoints.setPoint(%i, GetRandomValue($minH , $maxH),GetRandomValue($minW , $maxW), 1.0 );
-        starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
+        $starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
 
 
@@ -102,37 +106,40 @@ function StarField::Render(%this) {
     %speed = %this.speed;
     SDL_SetRenderDrawColor(%renderer, 255,255,255);
 
+    %LocalPointStorage = $pointStorage; // slightly faster
+
+
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        starPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
+        %LocalPointStorage.popPoint(%i); // This writes from the point storage to .x,.y,.z
 
         // >>>>>>>>>>>>>>>> update point
-         starPoints.z -= %dt * %speed;
+         %LocalPointStorage.z -= %dt * %speed;
 
         // Calculate the screen position
-        %invZ = 1.0 /  starPoints.z;
-        %screenPos_X = $hW + (starPoints.x * %invZ);
-        %screenPos_Y = $hH + (starPoints.y * %invZ);
+        %invZ = 1.0 /  %LocalPointStorage.z;
+        %screenPos_X = $hW + (%LocalPointStorage.x * %invZ);
+        %screenPos_Y = $hH + (%LocalPointStorage.y * %invZ);
 
-        if ( starPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+        if ( %LocalPointStorage.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
              || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
         {
 
-            // starPoints.setPos(GetRandomValue($minH, $maxH), GetRandomValue($minH, $maxH), 1.0);
-            starPoints.setPos(GetRandom($minH, $maxH), GetRandom($minH, $maxH), 1.0);
-            %screenPos_X = $hW +  starPoints.x;
-            %screenPos_Y = $hH +  starPoints.y;
+            // %LocalPointStorage.setPos(GetRandomValue($minH, $maxH), GetRandomValue($minH, $maxH), 1.0);
+            %LocalPointStorage.setPos(GetRandom($minH, $maxH), GetRandom($minH, $maxH), 1.0);
+            %screenPos_X = $hW +  %LocalPointStorage.x;
+            %screenPos_Y = $hH +  %LocalPointStorage.y;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%drawLines)
         {
-            %t = mClampF(starPoints.z + %startDiv , 0.0 , 1.0 );
+            %t = mClampF(%LocalPointStorage.z + %startDiv , 0.0 , 1.0 );
 
-            if ( (%t - starPoints.z) > 1e-3)
+            if ( (%t - %LocalPointStorage.z) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = $hW + ( starPoints.x * %invT);
-                %startY = $hH + (  starPoints.y * %invT);
+                %startX = $hW + ( %LocalPointStorage.x * %invT);
+                %startY = $hH + (  %LocalPointStorage.y * %invT);
 
                 // DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, RAYWHITE);
                 SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
@@ -140,12 +147,12 @@ function StarField::Render(%this) {
         }
         else
         {
-            %radius = mLerp(3.0, 1.0, starPoints.z);
+            %radius = mLerp(3.0, 1.0, %LocalPointStorage.z);
             // DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
-        starPoints.pushPoint(%i); //this update the point storage from .x,.y,.z
+        %LocalPointStorage.pushPoint(%i); //this update the point storage from .x,.y,.z
     }
 
 

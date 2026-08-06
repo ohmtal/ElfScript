@@ -98,6 +98,14 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) : 29.871u 0.159s 0:30.06 99.8%    0+0k 0+0io 0pf+0w
 - OGE3D using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
+- Version 0.4c 🚀 (RelWithDebug) : 31.224u 0.193s 0:31.45 99.8%    0+0k 0+0io 0pf+0w
+
+Here 0.4c is slower than 0.4a (no idea why) - but 0.4b was at the same speed so rocket
+change did not cause it. Use local var is now the fastest. global is slightly 
+slower than local but still faster than named. 
+
+
+
 
 **Ok - it's slower than a dynamic field - here ElfScript fastpath really shine :)**
 
@@ -142,6 +150,8 @@ echo("---------------------");
 ## Static Float Field but with objectID (local var) 
 
 - Version 0.4a (RelWithDebug) : 34.982u 1.909s 0:36.97 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4c 🚀 (RelWithDebug) : 24.884u 0.202s 0:25.12 99.8%    0+0k 0+0io 0pf+0w
+
 
 ### So why is this slower (same with a global var):
 
@@ -178,8 +188,42 @@ Example call :
 # ElfScript 0.4c changed  OP_SETCUROBJECT to 🚀 rocket mode ;)
 After my change to directly call findObject ===>  24.916u 0.166s 0:25.11 99.8%    0+0k 0+0io 0pf+0w
 
+But i in script i don't get an advantage out of this. No matter how i try. The 
+assigned var becomes string 
 
+```
+% %sto = $sto;
+0: OP_SETCURVAR stk=0 var=$sto
+3: OP_LOADVAR_STR stk=+1
+4: OP_SAVE_LOCAL_VAR_STR stk=0 reg=2  << 💩  my rocket crash here too. $sto is integer . guess this can be fixed 
+6: OP_POP_STK stk=-1
+7: OP_RETURN_VOID stk=0
 
+```
+**fixed assign from global int var** .. still call OP_SAVE_LOCAL_VAR_STR but check which type the stack
+var have and set int/float/string ... my BaseElf starfield changed from named to
+local var assigned by the global object var raised up from 550 to 900 fps - holy cow.
+---
+
+So next one - DefineEngineMethod( SimObject, getId, S32 ....
+
+let see what the stack says in OP_SAVE_LOCAL_VAR_STR  .. .. let me double check 
+but we get an integer --- thats fine!!! 
+
+```
+% %sto = sto.getId();                                         
+0: OP_PUSH_FRAME stk=0 count=1
+2: OP_LOADIMMED_IDENT stk=+1 str=sto
+5: OP_PUSH stk=-1
+6: OP_CALLFUNC stk=+1 name=getId nspace=(null) callType=MethodCall
+12: OP_SAVE_LOCAL_VAR_STR stk=0 reg=2    << 💩  my rocket crash here 
+14: OP_POP_STK stk=-1
+15: OP_RETURN_VOID stk=0
+```
+
+- [X] Fine Fine but to make it complete - i also need to change global vars: `OP_SAVEVAR_STR`
+
+***Second rocket stage ignited: OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR***
 
 ### Code:
 

@@ -1118,7 +1118,6 @@ handle_OP_SAVE_LOCAL_VAR_FLT:
 
 handle_OP_SAVE_LOCAL_VAR_STR:
          reg = code[ip++];
-         val = stack[_STK].getString();
          currentRegister = reg;
 
          // See OP_SETCURVAR
@@ -1126,9 +1125,22 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          prevObject = NULL;
          curObject = NULL;
 
-         Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
+         // ElfScript 0.4c rocket change !
+         if (stack[_STK].type == cvInteger) {
+            Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+            DISPATCH();
+         }
 
+         if (stack[_STK].type == cvFloat) {
+             Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+             DISPATCH();
+         }
+
+         // orig slowmo =>
+         val = stack[_STK].getString();
+         Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
          DISPATCH();
+
 
 handle_OP_LOADIMMED_UINT:
          stack[_STK + 1].setInt(code[ip++]);
@@ -1980,6 +1992,19 @@ handle_FALLBACK_SWITCH:
          break;
 
       case OP_SAVEVAR_STR:
+            // ElfScript 0.4c rocket change !
+            // XXTH inlining drives me crazy here -- using kdevelop
+            // i go for speed not for most beautiful code :P
+            if (stack[_STK].type == cvInteger) {
+                  Script::gEvalState.setIntVariable(stack[_STK].getInt());
+                  break;
+            }
+
+            if (stack[_STK].type == cvFloat) {
+                  Script::gEvalState.setIntVariable(stack[_STK].getFloat());
+                  break;
+            }
+
          Script::gEvalState.setStringVariable(stack[_STK].getString());
          break;
 
