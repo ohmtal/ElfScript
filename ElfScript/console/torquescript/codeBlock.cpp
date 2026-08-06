@@ -1454,8 +1454,19 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
+      case OP_BUILD_VECTOR_STRING: {
+         Con::printf("%i: OP_BUILD_VECTOR_STRING stk=-1", ip - 1);
+         break;
+      }
+      case OP_SAVEFIELD_FASTPATH: {
+            U32 curCodeIP = code[ip];
+         Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u)", ip - 1, curCodeIP);
+         break;
+      }
+
       default:
-         Con::printf("%i: !!INVALID!!", ip - 1);
+         U32 curCodeIP = code[ip];
+         Con::printf("%i: !!INVALID!! (curCodeIP: %u) ", ip - 1, curCodeIP);
          break;
       }
    }

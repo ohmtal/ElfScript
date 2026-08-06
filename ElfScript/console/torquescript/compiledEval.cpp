@@ -1666,9 +1666,10 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       {
             // i check the type first!
             const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
-
-            if (varEntry && (varEntry->value.getType() == ConsoleValueType::cvFloat ||
-                  varEntry->value.getType() == ConsoleValueType::cvInteger))
+            S32 valueType = -1;
+            if (varEntry) valueType = varEntry->value.getType();
+            if (valueType == ConsoleValueType::cvFloat ||
+                valueType == ConsoleValueType::cvInteger)
             {
                   // Fastpath
                   stack[_STK + 1] = varEntry->value;
@@ -1739,8 +1740,9 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             curObject = NULL;
             {
                   const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-                  if (localVal.getType() == ConsoleValueType::cvFloat ||
-                        localVal.getType() == ConsoleValueType::cvInteger)
+                  S32 varType = localVal.getType();
+                  if (varType == ConsoleValueType::cvFloat ||
+                       varType == ConsoleValueType::cvInteger)
                   {
                         //fast fetch
                         stack[_STK + 1] = localVal;
@@ -1811,23 +1813,32 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
       case OP_SETCUROBJECT:
-         // Save the previous object for parsing vector fields.
-         prevObject = curObject;
-         val = stack[_STK].getString();
 
-         // Sim::findObject will sometimes find valid objects from
-         // multi-component strings. This makes sure that doesn't
-         // happen.
-         for (const char* check = val; *check; check++)
-         {
-            if (*check == ' ')
-            {
-               val = "";
-               break;
-            }
-         }
-         curObject = Sim::findObject(val);
-         break;
+          //ElfScript XXTH found the holy grail for ?!
+          prevObject = curObject;
+          curObject = Sim::findObject(stack[_STK]);
+          break;
+
+
+         // orig lame duck:
+
+         // // Save the previous object for parsing vector fields.
+         // prevObject = curObject;
+         // val = stack[_STK].getString();
+         //
+         // // Sim::findObject will sometimes find valid objects from
+         // // multi-component strings. This makes sure that doesn't
+         // // happen.
+         // for (const char* check = val; *check; check++)
+         // {
+         //    if (*check == ' ')
+         //    {
+         //       val = "";
+         //       break;
+         //    }
+         // }
+         // curObject = Sim::findObject(val);
+         // break;
 
       case OP_SETCUROBJECT_INTERNAL:
          ++ip; // To skip the recurse flag if the object wasnt found

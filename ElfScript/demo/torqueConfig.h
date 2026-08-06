@@ -16,6 +16,8 @@
 // #define TEST_STRUCT_FAST_PATH
 
 // added Integer operation, which should give a huge speed up but ended in a slower test!
+// also only tested with a for loop $foo++ still used float ...
+// i should live with it or add typed variables and modified the monster to keep type safety
 // #define ELFSCRIPT_INT_HACK
 
 // When set you need to write your own exec engine function

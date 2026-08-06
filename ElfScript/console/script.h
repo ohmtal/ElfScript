@@ -25,16 +25,14 @@ namespace Con
    Module* getCurrentModule();
 
    // ElfScript new:
-   // Statt: inline HashMap<S32, Runtime*> gRuntimes;
-   // Nutzen Sie eine Funktion:
    inline HashMap<S32, Runtime*>& getRuntimeMap() {
-     static HashMap<S32, Runtime*> instance; // Wird beim ersten Aufruf erstellt!
+     static HashMap<S32, Runtime*> instance;
      return instance;
    }
 
    inline Runtime* getRuntime(S32 pRuntimeId = 0) {
      auto& runtimes = getRuntimeMap();
-     if (!runtimes.contains(pRuntimeId)) { // Ihre neue Sicherheitsprüfung
+     if (!runtimes.contains(pRuntimeId)) {
        return nullptr;
      }
      return runtimes[pRuntimeId];
@@ -42,7 +40,7 @@ namespace Con
 
    inline void registerRuntime(S32 pRuntimeId, Runtime* pRuntime)
    {
-     auto& runtimes = getRuntimeMap(); // Holt die garantiert existierende Map
+     auto& runtimes = getRuntimeMap();
      AssertFatal(runtimes[pRuntimeId] == NULL, "A runtime with that ID already exists");
      runtimes[pRuntimeId] = pRuntime;
    }

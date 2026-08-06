@@ -1,0 +1,36 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+new SimObject(Game);
+Game.stoObj = new PointStorageObject();
+
+Game.stoObj.x = 0;
+for (%j = 0; %j < JLOOPS; %j++) {
+    for (%i = 0; %i < ILOOPS; %i++) {
+        Game.stoObj.x ++;
+    }
+    echo("SUM (++) IS:" SPC Game.stoObj.x);
+    for (%i = 0; %i < ILOOPS; %i++) {
+        Game.stoObj.x --;
+    }
+    echo("SUM (--) IS:" SPC Game.stoObj.x);
+    Game.stoObj.x = 66;
+    echo("set Sum to 66 == " SPC Game.stoObj.x * 1);
+    for (%i = 0; %i < ILOOPS; %i++) {
+        Game.stoObj.x *= %i + 1;
+        Game.stoObj.x /= %i + 1;
+    }
+    echo("SUM (*/ %i+1) IS:" SPC Game.stoObj.x);
+    for (%i = 0; %i < ILOOPS / 2.0; %i++) {
+        %ran = getRandomF(%i);
+        Game.stoObj.x -= %ran;
+        Game.stoObj.x += %ran;
+    }
+    echo("SUM (rand +-) IS:" SPC Game.stoObj.x);
+}
+Game.stoObj.x -= 66.0 ;
+echo("---------------------");
+echo("---------------------");
+echo("Final sum should be 0 == ", Game.stoObj.x);
+echo("---------------------");
+echo("---------------------");

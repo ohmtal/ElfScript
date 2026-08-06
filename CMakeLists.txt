@@ -15,21 +15,21 @@ option(BUILD_TORQUESCRIPT "Build the Torque Script" OFF)
 option(BUILD_EXPERIMENTAL "Build the Experimental" OFF)
 # -----------------------------------------------------------------------------
 # --- Speed Optimization (LTO) ---
-include(CheckIPOSupported)
-check_ipo_supported(RESULT ipo_supported)
-if(ipo_supported AND NOT ANDROID)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
-endif()
-
-add_library(flux_speed_profile INTERFACE)
-target_compile_options(flux_speed_profile INTERFACE
-    $<$<CONFIG:Release>:
-        $<$<CXX_COMPILER_ID:MSVC>:/O2 /Oi /Ot>
-        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-O3 -fno-strict-aliasing -g
-            $<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<NOT:$<BOOL:${ANDROID}>>>:-march=native>>
-    >
-)
-# FIXME -g !!
+# include(CheckIPOSupported)
+# check_ipo_supported(RESULT ipo_supported)
+# if(ipo_supported AND NOT ANDROID)
+#     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+# endif()
+#
+# add_library(flux_speed_profile INTERFACE)
+# target_compile_options(flux_speed_profile INTERFACE
+#     $<$<CONFIG:Release>:
+#         $<$<CXX_COMPILER_ID:MSVC>:/O2 /Oi /Ot>
+#         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-O3 -fno-strict-aliasing -g
+#             $<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<NOT:$<BOOL:${ANDROID}>>>:-march=native>>
+#     >
+# )
+# # FIXME -g !!
 # -----------------------------------------------------------------------------
 if (BUILD_ELFSCRIPT)
 
@@ -63,11 +63,9 @@ if (BUILD_ELFSCRIPT)
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
 
-    target_link_libraries(${TARGET_NAME} PUBLIC  flux_speed_profile)
+    # target_link_libraries(${TARGET_NAME} PUBLIC  flux_speed_profile)
 
-    target_compile_options(${TARGET_NAME} PRIVATE
-    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-O3>
-    )
+
     # Windows - winVolume :: need to set on all builds
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE "/Zc:wchar_t-")

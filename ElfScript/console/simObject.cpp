@@ -1040,7 +1040,8 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
                         targetAddr = (void*)(((const char*)this) + fld->offset + (array1 * sizeof(const char*)));
                         *(const char**)targetAddr = StringTable->insert(value);
                         handled = true;
-                  } else {
+                  }
+                  else {
 
                         //XXTH we have default handler and no array this should work!
                         // but it does not speed up ... or i testing wrong

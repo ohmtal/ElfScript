@@ -143,6 +143,46 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) : 34.982u 1.909s 0:36.97 99.7%    0+0k 0+0io 0pf+0w
 
+### So why is this slower (same with a global var):
+
+- 1. Object is created and %stoObj is set to unsigned int (OP_SAVEVAR_UINT). fine
+- 2. `%stoObj.x = 0;` It need to lookup the object and does OP_LOADIMMED_STR => OP_SETCURVAR => OP_LOADVAR_STR => OP_SETCUROBJECT
+So it need to convert the integer to string every time we use %stoObj.xxx.  
+SimObject* findObject(const char* name) is used  in OP_SETCUROBJECT. But there are 
+alternativ: SimObject* findObject(ConsoleValue*); or SimObject* findObject(const char* name);
+- 3. Concept to proof: OP_LOADIMMED_STR => 
+
+Example call :
+``` 
+% sto.x = 1;
+0: OP_LOADIMMED_STR stk=+1 str=1
+2: OP_LOADIMMED_IDENT stk=+1 str=sto
+5: OP_SETCUROBJECT stk=0
+6: OP_SETCURFIELD stk=0 field=x
+9: OP_POP_STK stk=-1
+10: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: 69)
+11: OP_POP_STK stk=-1
+12: OP_RETURN_VOID stk=0
+% $sto.y = 1;
+0: OP_LOADIMMED_STR stk=+1 str=1  << This saves the value "1" to the Stack
+2: OP_SETCURVAR stk=0 var=$sto    << loopup variable
+5: OP_LOADVAR_STR stk=+1          << set the content of $sto to the stack 
+6: OP_SETCUROBJECT stk=0          << now it uses the slow int=>string and the slow findObject(const char*)
+7: OP_SETCURFIELD stk=0 field=y
+10: OP_POP_STK stk=-1
+11: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: 69)
+12: OP_POP_STK stk=-1
+13: OP_RETURN_VOID stk=0 
+```
+
+# ElfScript 0.4c changed  OP_SETCUROBJECT to 🚀 rocket mode ;)
+After my change to directly call findObject ===>  24.916u 0.166s 0:25.11 99.8%    0+0k 0+0io 0pf+0w
+
+
+
+
+### Code:
+
 ```
 #define JLOOPS 25
 #define ILOOPS 1000000
