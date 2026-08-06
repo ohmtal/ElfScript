@@ -6,6 +6,8 @@
 // RelWithDebInfo > ~500 fps
 // Debug ~ 190
 //
+// using PointStorageObject (since ElfScript 0.4e) rocket mode (Rectangle)
+// RelWithDebInfo > ~900 fps ... with 4200 stars still 120fps yay, 9000 stats 60fps
 // -----------------------------------------------------------------------------
 
 // orig 420
