@@ -985,6 +985,135 @@ bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
 
 // <<<< fastpath version
 
+// ----------------------------------------------------------------------------
+// pushDataField - called by OP_SAVEFIELD_FASTPATH but
+// ~~type_OP_path is a ConsoleValueType and tell from where is this called~~
+//    cvInterer => OP_SAVEFIELD_UINT
+//    cvFloat   => OP_SAVEFIELD_FLT
+//    cvString  => OP_SAVEFIELD_STR or OP_SAVEFIELD_FASTPATH << can be renoved again ?
+//
+// ----------------------------------------------------------------------------
+bool SimObject::pushDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
+
+      if (!slotName) {
+            Con::errorf(" SimObject::pushDataField with out a slotName!");
+            return false;
+      }
+
+      if (!stackP) {
+            Con::errorf(" SimObject::pushDataField with out a stack variable! slotName:%s", slotName);
+            return false;
+      }
+
+      // REMOVE THIS!!
+      // Con::printf("SimObject::pushDataField: %s", slotName);
+
+      // ~~~~~~~~~ STATIC FIELDS ~~~~~~~~~~
+      if(mFlags.test(ModStaticFields))
+      {
+            bool fastPath  = false;
+            const AbstractClassRep::Field *fld = this->findField(slotName);
+
+            if (fld && (
+                  fld->type == TypeF32
+                  || fld->type == TypeS32
+                  || fld->type == TypeBool
+                  || fld->type == TypeU32
+                  || fld->type == TypeS64
+                  || fld->type == TypeU64
+                  || fld->type == TypeF64
+                  || fld->type == TypeS8
+                  || fld->type == TypeU8
+                  || fld->type == TypeS16
+            ))
+            {
+                  S32 array1 = PARSE_ARRAY_INDEX(array);
+
+                  if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                        && fld->setDataFn == &defaultProtectedSetFn
+                        && fld->flag == 0
+                  ) {
+                        if (fld->type == TypeF32 || fld->type == TypeF64)
+                              fastPath = this->setDataField(fld,stackP->getFloat() );
+                        else
+                              fastPath = this->setDataField(fld,stackP->getInt() );
+                  }
+
+                  if (!fastPath) {
+                        this->setDataField(slotName, array, stackP->getString());
+                  } else {
+                        //TODO on onStaticModified require string ... do i want that ??
+      //                   if(fld->validator)
+      //                         fld->validator->validateType(this, fld->pFieldname, targetAddr);
+      //
+      //                   onStaticModified( slotName, value );
+                  }
+
+
+                  return true;
+            }
+
+      }
+
+      // ~~~~~~~~~ DYNAMIC FIELDS ~~~~~~~~~~
+      // IT MUST BE A DYNAMIC FIELD ???!!! if(mFlags.test(canModDynamicFields()))
+      {
+            StringTableEntry dynamicFieldName = nullptr;
+
+            S32 array1 = PARSE_ARRAY_INDEX(array);
+            if(array1 == 0) {
+                  dynamicFieldName = slotName;
+            } else {
+                  char buf[256];
+                  dStrcpy(buf, slotName, 256);
+                  dStrcat(buf, array, 256);
+                  dynamicFieldName = StringTable->insert(buf);
+            }
+
+            SimFieldDictionary::Entry* entry = nullptr;
+            if(!mFieldDictionary) {
+                  mFieldDictionary = new SimFieldDictionary;
+            } else {
+                  entry = mFieldDictionary->findDynamicField(dynamicFieldName);
+            }
+
+
+            // let fetch the entry directly ::::: FIXME ConsoleBaseType ?!
+            if (!entry) entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
+
+
+            // ConsoleValueType
+            switch (stackP->getType()) {
+                  case ConsoleValueType::cvInteger:
+                        entry->mValue.setFastInt(stackP->getFastInt());
+                        break;
+                  case ConsoleValueType::cvFloat:
+                        entry->mValue.setFastFloat(stackP->getFastFloat());
+                        break;
+                  default: {
+                        switch (entry->mValue.type)  {
+                              case ConsoleValueType::cvInteger:
+                                   entry->mValue.setFastInt( stackP->getInt());
+                                    break;
+                              case ConsoleValueType::cvFloat:
+                                    entry->mValue.setFastFloat(stackP->getFloat());
+                                    break;
+                              default:
+                                    entry->mValue.setString(stackP->getString());
+                                    break;
+                        }
+
+                        break;
+                  }
+            }
+            return true;
+      }
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+// String version for setDatafield
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
    // first search the static fields if enabled
@@ -1204,85 +1333,150 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 //-----------------------------------------------------------------------------
 //ElfScript replacement for getDataField to set to right type directly into stack
 bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
+      S32 array1 = PARSE_ARRAY_INDEX(array);
       if(mFlags.test(ModStaticFields))
       {
-            S32 array1 = PARSE_ARRAY_INDEX_RETURN_MINUSONE(array);
             const AbstractClassRep::Field *fld = findField(slotName);
-
             if(fld)
             {
-                  if(array1 == -1 && fld->elementCount == 1) {
-                        stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) ));
-                        return true;
-                  }
-                  if(array1 >= 0 && array1 < fld->elementCount) {
-
-                        //FastPath skip convert to string and back >>>>
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                  if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
                               && fld->setDataFn == &defaultProtectedSetFn) {
 
-                              F64 floatValue = 0.f;
-                              if (getDataField(fld, floatValue)) {
-                                    if (fld->type == TypeF64 || fld->type == TypeF32) {
-                                          stackP->setFastFloat(floatValue);
-                                    } else {
-                                          stackP->setFastInt((S64)floatValue);
-                                    }
-                                    return true;
+                        F64 floatValue = 0.f;
+                        if (getDataField(fld, floatValue)) {
+                              if (fld->type == TypeF64 || fld->type == TypeF32) {
+                                    stackP->setFastFloat(floatValue);
+                              } else {
+                                    stackP->setFastInt((S64)floatValue);
                               }
-                        } //Fastpath <<<
+                              return true;
+                        }
+                  } //Fastpath <<<
 
-                        stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), array1, fld->table, fld->flag) ));
-                        return true;
-                  }
-                   stackP->setString(""); //???
-                   return true;
-            }
-      }
-
-      if(mFlags.test(ModDynamicFields))
-      {
-            if(!mFieldDictionary) {
-                  stackP->setString("");
+                  stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), array1, fld->table, fld->flag) ));
                   return true;
             }
-
-            //Elfscript 0.4d:
-            // orig if(!array)
-            S32 array1 = PARSE_ARRAY_INDEX(array);
-            if (array1 == 0 )
-            {
-                  if (const char* val = mFieldDictionary->getFieldValue(slotName)) {
-                        stackP->setString(val);
-                        return true;
-                  }
-            }
-            else
-            {
-                  static char buf[256];
-                  dStrcpy(buf, slotName, 256);
-                  dStrcat(buf, array, 256);
-
-
-                  SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(StringTable->insert(buf));
-                  if (entry) {
-                        // NOT! this is slower !!!!!!!!!!!!!
-                        // the type on dynamic fields is nonsense :/
-                        // U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
-                        // if (type == TypeF32) {
-                        //       stackP->setFastFloat((F64)dAtof(entry->value));
-                        //       return true;
-                        // }
-                        // if (type == TypeS32) {
-                        //       stackP->setFastInt((S64)dAtoi(entry->value));
-                        //       return true;
-                        // }
-                        stackP->setString(entry->mValue.getString());
-                        // stackP->setString(entry->value);
-                        return true;
-                  }
-            }
       }
+      //       S32 array1 = PARSE_ARRAY_INDEX_RETURN_MINUSONE(array);
+      //       const AbstractClassRep::Field *fld = findField(slotName);
+      //
+      //       if(fld)
+      //       {
+      //             if(array1 == -1 && fld->elementCount == 1) {
+      //                   stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) ));
+      //                   return true;
+      //             }
+      //             if(array1 >= 0 && array1 < fld->elementCount) {
+      //
+      //                   //FastPath skip convert to string and back >>>>
+      //                   if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+      //                         && fld->setDataFn == &defaultProtectedSetFn) {
+      //
+      //                         F64 floatValue = 0.f;
+      //                         if (getDataField(fld, floatValue)) {
+      //                               if (fld->type == TypeF64 || fld->type == TypeF32) {
+      //                                     stackP->setFastFloat(floatValue);
+      //                               } else {
+      //                                     stackP->setFastInt((S64)floatValue);
+      //                               }
+      //                               return true;
+      //                         }
+      //                   } //Fastpath <<<
+      //
+      //                   stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), array1, fld->table, fld->flag) ));
+      //                   return true;
+      //             }
+      //              stackP->setString(""); //???
+      //              return true;
+      //       }
+      // }
+
+      // ~~~~~~~~~ DYNAMIC FIELDS ~~~~~~~~~~
+      StringTableEntry dynamicFieldName = nullptr;
+      // S32 array1 = PARSE_ARRAY_INDEX(array);
+      if(array1 == 0) {
+            dynamicFieldName = slotName;
+      } else {
+            char buf[256];
+            dStrcpy(buf, slotName, 256);
+            dStrcat(buf, array, 256);
+            dynamicFieldName = StringTable->insert(buf);
+      }
+
+
+      SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(dynamicFieldName);
+
+      if (entry) {
+            switch (stackP->getType()) {
+                  case ConsoleValueType::cvInteger:
+                        stackP->setFastInt(entry->mValue.getInt());
+                        break;
+                  case ConsoleValueType::cvFloat:
+                        stackP->setFastFloat(entry->mValue.getFloat());
+                        break;
+                  default: {
+                        switch (entry->mValue.type)  {
+                              case ConsoleValueType::cvInteger:
+                                    stackP->setInt(entry->mValue.getFastInt());
+                                    break;
+                              case ConsoleValueType::cvFloat:
+                                    stackP->setFloat(entry->mValue.getFastFloat());
+                                    break;
+                              default:
+                                    stackP->setString(entry->mValue.getString());
+                                    break;
+                        }
+
+                        break;
+                  }
+               break;
+            }
+            return true;
+      }
+
+      // if(mFlags.test(ModDynamicFields))
+      // {
+      //       if(!mFieldDictionary) {
+      //             stackP->setString("");
+      //             return true;
+      //       }
+      //
+      //       //Elfscript 0.4d:
+      //       // orig if(!array)
+      //       S32 array1 = PARSE_ARRAY_INDEX(array);
+      //       if (array1 == 0 )
+      //       {
+      //             if (const char* val = mFieldDictionary->getFieldValue(slotName)) {
+      //                   stackP->setString(val);
+      //                   return true;
+      //             }
+      //       }
+      //       else
+      //       {
+      //             static char buf[256];
+      //             dStrcpy(buf, slotName, 256);
+      //             dStrcat(buf, array, 256);
+      //
+      //
+      //             SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(StringTable->insert(buf));
+      //             if (entry) {
+      //                   // NOT! this is slower !!!!!!!!!!!!!
+      //                   // the type on dynamic fields is nonsense :/
+      //                   // U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
+      //                   // if (type == TypeF32) {
+      //                   //       stackP->setFastFloat((F64)dAtof(entry->value));
+      //                   //       return true;
+      //                   // }
+      //                   // if (type == TypeS32) {
+      //                   //       stackP->setFastInt((S64)dAtoi(entry->value));
+      //                   //       return true;
+      //                   // }
+      //                   stackP->setString(entry->mValue.getString());
+      //                   // stackP->setString(entry->value);
+      //                   return true;
+      //             }
+      //       }
+      // }
 
       stackP->setString("");
       return true;

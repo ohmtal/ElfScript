@@ -102,6 +102,9 @@ public:
    Entry  *operator[](U32 index);
    void setFieldValue(StringTableEntry slotName, const char *value, ConsoleBaseType *type, bool no_replace);
    void assignFrom(SimFieldDictionary *dict, const char* filter, bool no_replace);
+
+   // ElfScript
+   Entry*         addEntry(StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
 };
 
 class SimFieldDictionaryIterator

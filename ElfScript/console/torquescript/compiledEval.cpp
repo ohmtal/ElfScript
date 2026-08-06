@@ -1919,50 +1919,50 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
 #ifdef ELFSCRIPT_FASTPATH_FLD
-      //XXTH FastPath HACK:
-      case OP_LOADFIELD_UINT:
-            if (curObject)
-            {
-                  bool fastPath = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-
-                  if (fld)
-                  {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        // Fastpath safety check for unmanaged, standard C++ fields
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn)
-                        {
-                              F64 val = 0.0;
-                              if (curObject->getDataField(fld, val))
-                              {
-                                    // Convert the F64 from our fastpath directly to an integer on the stack
-                                    // Note: Adjust .setInt() to your stack's actual integer/uint method if needed
-                                    stack[_STK + 1].setInt((S64)val);
-                                    fastPath = true;
-                              }
-                        }
-                  }
-
-                  if (!fastPath)
-                  {
-                        // Fallback for dynamic fields or fields with custom C++ logic
-                        stack[_STK + 1].setInt(dAtoi(curObject->getDataField(curField, curFieldArray)));
-                  }
-            }
-            else
-            {
-                  // The field is not being retrieved from an object. Maybe it's
-                  // a special accessor?
-                  char buff[FieldBufferSizeNumeric];
-                  memset(buff, 0, sizeof(buff));
-                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-                  stack[_STK + 1].setInt(dAtoi(buff));
-            }
-            _STK++;
-            break;
+      // //XXTH FastPath HACK:
+      // case OP_LOADFIELD_UINT:
+      //       if (curObject)
+      //       {
+      //             bool fastPath = false;
+      //             const AbstractClassRep::Field *fld = curObject->findField(curField);
+      //
+      //             if (fld)
+      //             {
+      //                   const char* array = (const char*) curFieldArray;
+      //                   S32 array1 = PARSE_ARRAY_INDEX(array);
+      //
+      //                   // Fastpath safety check for unmanaged, standard C++ fields
+      //                   if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+      //                         && fld->setDataFn == &defaultProtectedSetFn)
+      //                   {
+      //                         F64 val = 0.0;
+      //                         if (curObject->getDataField(fld, val))
+      //                         {
+      //                               // Convert the F64 from our fastpath directly to an integer on the stack
+      //                               // Note: Adjust .setInt() to your stack's actual integer/uint method if needed
+      //                               stack[_STK + 1].setInt((S64)val);
+      //                               fastPath = true;
+      //                         }
+      //                   }
+      //             }
+      //
+      //             if (!fastPath)
+      //             {
+      //                   // Fallback for dynamic fields or fields with custom C++ logic
+      //                   stack[_STK + 1].setInt(dAtoi(curObject->getDataField(curField, curFieldArray)));
+      //             }
+      //       }
+      //       else
+      //       {
+      //             // The field is not being retrieved from an object. Maybe it's
+      //             // a special accessor?
+      //             char buff[FieldBufferSizeNumeric];
+      //             memset(buff, 0, sizeof(buff));
+      //             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+      //             stack[_STK + 1].setInt(dAtoi(buff));
+      //       }
+      //       _STK++;
+      //       break;
 #else
       case OP_LOADFIELD_UINT:
          if (curObject)
@@ -1981,48 +1981,48 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
 
 #ifdef ELFSCRIPT_FASTPATH_FLD
-         //XXTH Fastpath HACK
-      case OP_LOADFIELD_FLT:
-            if (curObject)
-            {
-                  bool fastPath = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-
-                  if (fld)
-                  {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        // Fastpath safety check for unmanaged, standard C++ fields
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn)
-                        {
-                              F64 val = 0.0;
-                              if (curObject->getDataField(fld, val))
-                              {
-                                    stack[_STK + 1].setFloat(val);
-                                    fastPath = true;
-                              }
-                        }
-                  }
-
-                  if (!fastPath)
-                  {
-                        // Fallback for dynamic fields or fields with custom C++ logic
-                        stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
-                  }
-            }
-            else
-            {
-                  // The field is not being retrieved from an object. Maybe it's
-                  // a special accessor?
-                  char buff[FieldBufferSizeNumeric];
-                  memset(buff, 0, sizeof(buff));
-                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-                  stack[_STK + 1].setFloat(dAtod(buff));
-            }
-            _STK++;
-            break;
+//          //XXTH Fastpath HACK
+//       case OP_LOADFIELD_FLT:
+//             if (curObject)
+//             {
+//                   bool fastPath = false;
+//                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+//
+//                   if (fld)
+//                   {
+//                         const char* array = (const char*) curFieldArray;
+//                         S32 array1 = PARSE_ARRAY_INDEX(array);
+//
+//                         // Fastpath safety check for unmanaged, standard C++ fields
+//                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+//                               && fld->setDataFn == &defaultProtectedSetFn)
+//                         {
+//                               F64 val = 0.0;
+//                               if (curObject->getDataField(fld, val))
+//                               {
+//                                     stack[_STK + 1].setFloat(val);
+//                                     fastPath = true;
+//                               }
+//                         }
+//                   }
+//
+//                   if (!fastPath)
+//                   {
+//                         // Fallback for dynamic fields or fields with custom C++ logic
+//                         stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+//                   }
+//             }
+//             else
+//             {
+//                   // The field is not being retrieved from an object. Maybe it's
+//                   // a special accessor?
+//                   char buff[FieldBufferSizeNumeric];
+//                   memset(buff, 0, sizeof(buff));
+//                   getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+//                   stack[_STK + 1].setFloat(dAtod(buff));
+//             }
+//             _STK++;
+//             break;
 #else //#ifdef ELFSCRIPT_FASTPATH_FLD
       case OP_LOADFIELD_FLT:
          if (curObject)
@@ -2040,14 +2040,45 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 #endif
 
+#ifdef ELFSCRIPT_FASTPATH_FLD
+      case OP_LOADFIELD_UINT:
+            if (curObject)
+            {
+                  stack[_STK + 1].type = cvInteger; //HardCore!
+                  curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+
+            }
+            else
+            {
+                  char buff[FieldBufferSizeString];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setString(buff);
+            }
+            _STK++;
+            break;
+      case OP_LOADFIELD_FLT:
+            if (curObject)
+            {
+                  stack[_STK + 1].type = cvFloat; //HardCore!
+                  curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+
+            }
+            else
+            {
+                  char buff[FieldBufferSizeString];
+                  memset(buff, 0, sizeof(buff));
+                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  stack[_STK + 1].setString(buff);
+            }
+            _STK++;
+            break;
+#endif
       case OP_LOADFIELD_STR:
          if (curObject)
          {
             curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
 
-            // orig:
-            // val = curObject->getDataField(curField, curFieldArray);
-            // stack[_STK + 1].setString(val);
          }
          else
          {
@@ -2062,66 +2093,66 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          break;
 
 #ifdef ELFSCRIPT_FASTPATH_FLD
-      //XXTH fastPath :
-      case OP_SAVEFIELD_UINT:
-            if (curObject)
-            {
-                  bool fastPath = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-
-                  if (fld)
-                  {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn
-                              && fld->flag == 0
-                        ) {
-                              fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
-                        }
-                  }
-
-                  if (!fastPath)
-                  {
-                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-                  }
-            }
-            else
-            {
-                  // The field is not being set on an object. Maybe it's a special accessor?
-                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-                  prevObject = NULL;
-            }
-            break;
-
-      case OP_SAVEFIELD_FLT:
-            if (curObject) {
-                  //XXTH Fastpath:
-                  bool fastPath  = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-                  if (fld) {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn
-                              && fld->flag == 0
-                        ) {
-                              fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
-                        }
-
-                  }
-                  if (!fastPath) {
-                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-                  }
-
-            } else {
-                  // The field is not being set on an object. Maybe it's a special accessor?
-                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-                  prevObject = NULL;
-            }
-            break;
+      // //XXTH fastPath :
+      // case OP_SAVEFIELD_UINT:
+      //       if (curObject)
+      //       {
+      //             bool fastPath = false;
+      //             const AbstractClassRep::Field *fld = curObject->findField(curField);
+      //
+      //             if (fld)
+      //             {
+      //                   const char* array = (const char*) curFieldArray;
+      //                   S32 array1 = PARSE_ARRAY_INDEX(array);
+      //
+      //                   if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+      //                         && fld->setDataFn == &defaultProtectedSetFn
+      //                         && fld->flag == 0
+      //                   ) {
+      //                         fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
+      //                   }
+      //             }
+      //
+      //             if (!fastPath)
+      //             {
+      //                   curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+      //             }
+      //       }
+      //       else
+      //       {
+      //             // The field is not being set on an object. Maybe it's a special accessor?
+      //             setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+      //             prevObject = NULL;
+      //       }
+      //       break;
+      //
+      // case OP_SAVEFIELD_FLT:
+      //       if (curObject) {
+      //             //XXTH Fastpath:
+      //             bool fastPath  = false;
+      //             const AbstractClassRep::Field *fld = curObject->findField(curField);
+      //             if (fld) {
+      //                   const char* array = (const char*) curFieldArray;
+      //                   S32 array1 = PARSE_ARRAY_INDEX(array);
+      //
+      //                   if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+      //                         && fld->setDataFn == &defaultProtectedSetFn
+      //                         && fld->flag == 0
+      //                   ) {
+      //                         fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+      //                   }
+      //
+      //             }
+      //             if (!fastPath) {
+      //                   curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+      //             }
+      //
+      //       } else {
+      //             // The field is not being set on an object. Maybe it's a special accessor?
+      //             setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+      //             prevObject = NULL;
+      //       }
+      //       break;
 #else //#ifdef ELFSCRIPT_FASTPATH_FLD
       case OP_SAVEFIELD_UINT:
          if (curObject)
@@ -2144,137 +2175,16 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
             }
             break;
 #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
-
+      // ============================ OP_SAVEFIELD_FASTPATH ======================================
       // ElfScript we try to get the fieldtype!!!
-      case OP_SAVEFIELD_FASTPATH:
-
-            if (curObject) {
-                  //XXTH Fastpath:
-                  bool fastPath  = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-
-                  if (fld && (
-                        fld->type == TypeF32
-                        || fld->type == TypeS32
-                        || fld->type == TypeBool
-                        || fld->type == TypeU32
-                        || fld->type == TypeS64
-                        || fld->type == TypeU64
-                        || fld->type == TypeF64
-                        || fld->type == TypeS8
-                        || fld->type == TypeU8
-                        || fld->type == TypeS16
-                  ))
-                  {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn
-                              && fld->flag == 0
-                        ) {
-                              if (fld->type == TypeF32 || fld->type == TypeF64)
-                                    fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
-                              else
-                                    fastPath = curObject->setDataField(fld,stack[_STK].getInt() );
-                        }
-
-                  }
-
-#ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
-else if (fld && fld->type != TypeString && fld->type != TypeName){
-
-      if ( stack[_STK].type == cvVector) {
-            Con::warnf("We got a  stack[_STK].type = cvVector !!! values are: %g,%g,%g,%g ", stack[_STK].v[0], stack[_STK].v[1], stack[_STK].v[2], stack[_STK].v[3]);
-      }
-
-      // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
-      ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
-
-
-      // ***************************************
-      //   ****  trapped in deadlock  ****
-      // i need to get the real type of every
-      // field  but i think it's a deadlock
-      // the best i get is
-      //          subtypeInfo->getTypeName()
-      // which is a string ... bad idea to use
-      // this
-      // ***************************************
-
-      if (conType) {
-            const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
-
-            if (typeInfo) {
-                  const EngineFieldTable* fieldTable = typeInfo->getFieldTable();
-                  Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d), conType->getTypeSize = %d, NUM Fields:  fieldTable->getNumFields() : %d",
-                              curField,
-                              fld->type, stack[_STK].getString()
-                              ,  conType->getTypeName()
-                              , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
-                              , conType->getTypeSize()
-                              , fieldTable ? fieldTable->getNumFields() : -1
-                  );
-
-                  if (fieldTable) {
-                      for (S32 i = 0; i < fieldTable->getNumFields(); i++) {
-                             const EngineFieldTable::Field& subField = (*fieldTable)[i];
-                             const EngineTypeInfo* subtypeInfo = subField.getType();
-                             Con::printf("   #%d Name:%s Elements:%d, TypeKind: %d (0=EngineTypeKindPrimitive), TypeName: %s", i, subField.getName(), subField.getNumElements()
-                                  , subtypeInfo ? subtypeInfo->getTypeKind() : -1
-                                  , subtypeInfo ? subtypeInfo->getTypeName() : "unknow"
-
-                        );
-                      }
-
-
-                      // * * * *  subField.getType  ?? * * *
-
-                      // // FIXME UNFINISHED i need the real struct information !
-                      // U32 numFields = fieldTable->getNumFields();
-                      //
-                      // if (numFields > 0 && numFields <= CONSOLE_VALUE_VECTOR_FIELD_COUNT) {
-                      //
-                      //       // Point2F: 8 Byte / 2 = 4 Byte (F32)
-                      //       // ColorI:  4 Byte / 4 = 1 Byte (U8)
-                      //       // Point2I:  8 Byte / 2 = 4 Byte (S32)
-                      //       U32 elementSize = conType->getTypeSize() / numFields;
-                      //
-                      //       void* fieldPtr = (void*)((const char*)curObject + fld->offset);
-                      //
-                      //       if (stack[_STK].type == cvVector) { //FIXME cvVector
-                      //             // problem with other datatypes
-                      //             if (elementSize == sizeof(F32)) {
-                      //                   F32* dest = static_cast<F32*>(fieldPtr);
-                      //                   for (U32 i = 0; i < numFields; i++) {
-                      //                         dest[i] = static_cast<F32>(stack[_STK].v[i]);
-                      //                   }
-                      //             }
-                      //             else if (elementSize == sizeof(U8)) {
-                      //                   U8* dest = static_cast<U8*>(fieldPtr);
-                      //                   for (U32 i = 0; i < numFields; i++) {
-                      //                         S32 val = static_cast<S32>(stack[_STK].v[i]);
-                      //                         dest[i] = static_cast<U8>(val < 0 ? 0 : (val > 255 ? 255 : val));
-                      //                   }
-                      //             }
-                      //       }
-                      // }
-
-                  }
-
-            } else {
-                  Con::errorf("No type info!! for %s", conType->getTypeName());
-            }
-
-      }
-}
+#ifdef ELFSCRIPT_FASTPATH_FLD
+      case OP_SAVEFIELD_FLT:
+      case OP_SAVEFIELD_UINT:
 #endif
-
-
-                  if (!fastPath) {
-                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-                  }
-
+      case OP_SAVEFIELD_FASTPATH:
+            // direct push ElfScript 0.4f
+            if (curObject) {
+                  curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
             } else {
                   // The field is not being set on an object. Maybe it's a special accessor?
                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
@@ -2282,7 +2192,142 @@ else if (fld && fld->type != TypeString && fld->type != TypeName){
             }
             break;
 
-      break;
+
+//             if (curObject) {
+//                   //XXTH Fastpath:
+//                   bool fastPath  = false;
+//                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+//
+//                   if (fld && (
+//                         fld->type == TypeF32
+//                         || fld->type == TypeS32
+//                         || fld->type == TypeBool
+//                         || fld->type == TypeU32
+//                         || fld->type == TypeS64
+//                         || fld->type == TypeU64
+//                         || fld->type == TypeF64
+//                         || fld->type == TypeS8
+//                         || fld->type == TypeU8
+//                         || fld->type == TypeS16
+//                   ))
+//                   {
+//                         const char* array = (const char*) curFieldArray;
+//                         S32 array1 = PARSE_ARRAY_INDEX(array);
+//
+//                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+//                               && fld->setDataFn == &defaultProtectedSetFn
+//                               && fld->flag == 0
+//                         ) {
+//                               if (fld->type == TypeF32 || fld->type == TypeF64)
+//                                     fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+//                               else
+//                                     fastPath = curObject->setDataField(fld,stack[_STK].getInt() );
+//                         }
+//
+//                   }
+//
+// #ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
+// else if (fld && fld->type != TypeString && fld->type != TypeName){
+//
+//       if ( stack[_STK].type == cvVector) {
+//             Con::warnf("We got a  stack[_STK].type = cvVector !!! values are: %g,%g,%g,%g ", stack[_STK].v[0], stack[_STK].v[1], stack[_STK].v[2], stack[_STK].v[3]);
+//       }
+//
+//       // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
+//       ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
+//
+//
+//       // ***************************************
+//       //   ****  trapped in deadlock  ****
+//       // i need to get the real type of every
+//       // field  but i think it's a deadlock
+//       // the best i get is
+//       //          subtypeInfo->getTypeName()
+//       // which is a string ... bad idea to use
+//       // this
+//       // ***************************************
+//
+//       if (conType) {
+//             const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
+//
+//             if (typeInfo) {
+//                   const EngineFieldTable* fieldTable = typeInfo->getFieldTable();
+//                   Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d), conType->getTypeSize = %d, NUM Fields:  fieldTable->getNumFields() : %d",
+//                               curField,
+//                               fld->type, stack[_STK].getString()
+//                               ,  conType->getTypeName()
+//                               , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
+//                               , conType->getTypeSize()
+//                               , fieldTable ? fieldTable->getNumFields() : -1
+//                   );
+//
+//                   if (fieldTable) {
+//                       for (S32 i = 0; i < fieldTable->getNumFields(); i++) {
+//                              const EngineFieldTable::Field& subField = (*fieldTable)[i];
+//                              const EngineTypeInfo* subtypeInfo = subField.getType();
+//                              Con::printf("   #%d Name:%s Elements:%d, TypeKind: %d (0=EngineTypeKindPrimitive), TypeName: %s", i, subField.getName(), subField.getNumElements()
+//                                   , subtypeInfo ? subtypeInfo->getTypeKind() : -1
+//                                   , subtypeInfo ? subtypeInfo->getTypeName() : "unknow"
+//
+//                         );
+//                       }
+//
+//
+//                       // * * * *  subField.getType  ?? * * *
+//
+//                       // // FIXME UNFINISHED i need the real struct information !
+//                       // U32 numFields = fieldTable->getNumFields();
+//                       //
+//                       // if (numFields > 0 && numFields <= CONSOLE_VALUE_VECTOR_FIELD_COUNT) {
+//                       //
+//                       //       // Point2F: 8 Byte / 2 = 4 Byte (F32)
+//                       //       // ColorI:  4 Byte / 4 = 1 Byte (U8)
+//                       //       // Point2I:  8 Byte / 2 = 4 Byte (S32)
+//                       //       U32 elementSize = conType->getTypeSize() / numFields;
+//                       //
+//                       //       void* fieldPtr = (void*)((const char*)curObject + fld->offset);
+//                       //
+//                       //       if (stack[_STK].type == cvVector) { //FIXME cvVector
+//                       //             // problem with other datatypes
+//                       //             if (elementSize == sizeof(F32)) {
+//                       //                   F32* dest = static_cast<F32*>(fieldPtr);
+//                       //                   for (U32 i = 0; i < numFields; i++) {
+//                       //                         dest[i] = static_cast<F32>(stack[_STK].v[i]);
+//                       //                   }
+//                       //             }
+//                       //             else if (elementSize == sizeof(U8)) {
+//                       //                   U8* dest = static_cast<U8*>(fieldPtr);
+//                       //                   for (U32 i = 0; i < numFields; i++) {
+//                       //                         S32 val = static_cast<S32>(stack[_STK].v[i]);
+//                       //                         dest[i] = static_cast<U8>(val < 0 ? 0 : (val > 255 ? 255 : val));
+//                       //                   }
+//                       //             }
+//                       //       }
+//                       // }
+//
+//                   }
+//
+//             } else {
+//                   Con::errorf("No type info!! for %s", conType->getTypeName());
+//             }
+//
+//       }
+// }
+// #endif
+//
+//
+//                   if (!fastPath) {
+//                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+//                   }
+//
+//             } else {
+//                   // The field is not being set on an object. Maybe it's a special accessor?
+//                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+//                   prevObject = NULL;
+//             }
+//             break;
+//
+//       break;
 
       // ----------------------- ELFSCRIPT ---------------------------------
 #ifdef ELFSCRIPT_INT_HACK

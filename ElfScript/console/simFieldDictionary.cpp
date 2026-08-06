@@ -46,6 +46,10 @@ U32 SimFieldDictionary::getHashValue(const String& fieldName)
    return getHashValue(StringTable->insert(fieldName));
 }
 
+SimFieldDictionary::Entry *SimFieldDictionary::addEntry(StringTableEntry slotName, ConsoleBaseType* type, char* value) {
+      return addEntry(getHashValue(slotName), slotName, type, value);
+}
+
 SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value)
 {
    Entry* ret;
@@ -130,6 +134,21 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
       {
          // Found and type assigned, let's bail
          walk->type = type;
+
+         // ElfScript update mValue!!
+         S32 typeID = type->getTypeID();
+         if ( typeID  == TypeF32 ||  typeID  == TypeF64 ) {
+            walk->mValue.type = ConsoleValueType::cvFloat;
+         } else if ( typeID  == TypeS32  || typeID  == TypeU32
+               || typeID  == TypeBool
+               //FIXME MORE
+            ) {
+            walk->mValue.type = ConsoleValueType::cvInteger;
+         } else {
+            walk->mValue.type = ConsoleValueType::cvString;
+         }
+
+
          return;
       }
    }

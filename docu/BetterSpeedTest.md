@@ -2,7 +2,7 @@
 
 As expected, the local variables followed by the global are the fastest. The  
 static fields are many times faster than in in the vanilla torquescript. With 0.4d
-it became a real rocket only the Dynamic Fields are lame ducs but i started
+it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
 to change this.
 
 OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
@@ -113,7 +113,7 @@ slower than local but still faster than named.
 
 
 
-**Ok - it's slower than a dynamic field - here ElfScript fastpath really shine :)**
+**OGE3D :: it's slower than a dynamic field ? - here ElfScript fastpath really shine :)**
 
 ```
 #define JLOOPS 25
@@ -343,8 +343,64 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
     ==> "named" speed test: 114.462u 1.952s 1:56.65 99.7%   0+0k 0+0io 0pf+0w
     thats fine same as before but with ConsoleValue in place 
     
-- [ ] use types in mValue
+- [ ] use types in mValue SAVE:
+     bool pushDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP, S32 type_OP_path);
+     
+     called from OP_SAVEFIELD_FASTPATH
+        
+        - implemented status quo
+        - wrote new implemenation based on the incomming stack, the data is set.
+        - added also ConsoleValueType in SimFieldDictionary::setFieldType (float/int/string)
+        - bad: 112.777u 1.854s 1:54.86 99.7%   0+0k 0+0io 0pf+0w
 
+     
+
+- [X] use types in mValue LOAD:
+        - implemented fast set of stack 
+        - 113.513u 1.814s 1:55.47 99.8%   0+0k 0+0io 0pf+0w
+
+
+- [ ] Find what is missing 
+    I made get and set and also added typed but is still slow !!!!
+    - also added FLT_/INT_ oto this path 
+    - => shit => 115.705u 1.714s 1:57.69 99.7%   0+0k 192+0io 2pf+0w
+
+    Everything seams to work fine but somewhere it gets slow down ....
+    i break the test script in parts :
+    
+        - sto.DynX ++; : 20.060u 0.365s 0:20.46 99.8%    0+0k 0+0io 0pf+0w
+        - sto.DynX -- ; : 19.625u 0.398s 0:20.06 99.7%    0+0k 0+0io 0pf+0w
+        - */ : 37.276u 0.683s 0:38.00 99.8%    0+0k 0+0io 0pf+0w
+        - rand +-: 27.374u 0.296s 0:27.71 99.8%    0+0k 0+0io 0pf+0w
+    
+    All slow nothing special 
+    - setrand only: 10.443u 0.236s 0:10.69 99.8%    0+0k 0+0io 0pf+0w
+
+    👾 LOL! I had threaded on in releasebuild where the changes are not implemented so far
+    => 22.338u 0.009s 0:22.39 99.7%    0+0k 0+0io 0pf+0w
+    
+    🐞 the values are all ZERO ?! << FIXED
+    
+    22.151u 0.000s 0:22.17 99.9%    0+0k 0+0io 0pf+0w
+    
+    ==> SAME SPEED AS STATIC FIELDS  - ROCK AND ROLL
+    
+
+    
+
+- [ ] lot of testing 
+- [ ] cleanup compiled eval or completly switch to threaded!
+
+        - [ ] make threaded as default add and test the latest changes!!! 
+            - [ ] OP_LOADFIELD_UINT
+            - [ ] OP_LOADFIELD_FLT
+            - [ ] OP_LOADFIELD_STR
+            - [ ] OP_SAVEFIELD_FLT:
+            - [ ] OP_SAVEFIELD_UINT:
+            - [ ] OP_SAVEFIELD_FASTPATH:
+        - [ ] remove GarbageCollection shit
+        - [ ] remove fast path ifdefs and make it default 
+        
 - [ ] Make a memleak check after that !!!!!!!!!!!
 
 ---

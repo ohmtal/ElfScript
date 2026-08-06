@@ -493,6 +493,8 @@ class SimObject: public ConsoleObject
       //ElfScript set the ConsoleValue directly
       bool stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP);
 
+      // ElfScript get data from ConsoleValue directly ..
+      bool pushDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP);
 
       /// Set the value of a field on the object.
       ///

@@ -1,9 +1,10 @@
 #define JLOOPS 25
 #define ILOOPS 1000000
 
-new PointStorageObject(sto);
+new PointStorageObject(sto) {
+    TypeF32 DynX = 0;
+};
 
-sto.DynX = 0;
 for (%j = 0; %j < JLOOPS; %j++) {
     for (%i = 0; %i < ILOOPS; %i++) {
         sto.DynX ++;

@@ -1,0 +1,43 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+
+function PointStorageObject::runTest(%this)
+{
+    %this.x = 0;
+    for (%j = 0; %j < JLOOPS; %j++) {
+        for (%i = 0; %i < ILOOPS; %i++) {
+            %this.x ++;
+        }
+        echo("SUM (++) IS:" SPC %this.x);
+        for (%i = 0; %i < ILOOPS; %i++) {
+            %this.x --;
+        }
+        echo("SUM (--) IS:" SPC %this.x);
+        %this.x = 66;
+        echo("set Sum to 66 == " SPC %this.x * 1);
+        for (%i = 0; %i < ILOOPS; %i++) {
+            %this.x *= %i + 1;
+            %this.x /= %i + 1;
+        }
+        echo("SUM (*/ %i+1) IS:" SPC %this.x);
+        for (%i = 0; %i < ILOOPS / 2.0; %i++) {
+            %ran = getRandomF(%i);
+            %this.x -= %ran;
+            %this.x += %ran;
+        }
+        echo("SUM (rand +-) IS:" SPC %this.x);
+    }
+    %this.x -= 66.0 ;
+    echo("---------------------");
+    echo("---------------------");
+    echo("Final sum should be 0 == ", %this.x);
+    echo("---------------------");
+    echo("---------------------");
+}
+
+
+
+new PointStorageObject(sto);
+sto.runTest();
+
