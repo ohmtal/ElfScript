@@ -185,7 +185,7 @@ Example call :
 13: OP_RETURN_VOID stk=0 
 ```
 
-# ElfScript 0.4c changed  OP_SETCUROBJECT to 🚀 rocket mode ;)
+### ElfScript 0.4c changed  OP_SETCUROBJECT to 🚀 rocket mode ;)
 After my change to directly call findObject ===>  24.916u 0.166s 0:25.11 99.8%    0+0k 0+0io 0pf+0w
 
 But i in script i don't get an advantage out of this. No matter how i try. The 
@@ -200,9 +200,11 @@ assigned var becomes string
 7: OP_RETURN_VOID stk=0
 
 ```
+
 **fixed assign from global int var** .. still call OP_SAVE_LOCAL_VAR_STR but check which type the stack
 var have and set int/float/string ... my BaseElf starfield changed from named to
 local var assigned by the global object var raised up from 550 to 900 fps - holy cow.
+
 ---
 
 So next one - DefineEngineMethod( SimObject, getId, S32 ....
@@ -223,7 +225,7 @@ but we get an integer --- thats fine!!!
 
 - [X] Fine Fine but to make it complete - i also need to change global vars: `OP_SAVEVAR_STR`
 
-***Second rocket stage ignited: OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR***
+### 🚀 Second rocket stage ignited: OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR*
 
 ### Code:
 
@@ -270,8 +272,22 @@ echo("---------------------");
 
 - Version 0.4a (RelWithDebug) : 127.546u 2.019s 2:09.75 99.8%   0+0k 0+0io 0pf+0w
 - OGE3D using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
+- Version 0.4c 🚀 (RelWithDebug) : 125.068u 1.963s 2:07.38 99.7%   0+0k 1416+0io 8pf+0w
+
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
+
+### 0.4c This my problem child: 
+
+- Dynamic fields in the object is one of the coolest features in Elf(Torque)Script.
+- I could get a better result with local var instead of named now, but is not a 
+big difference.
+- It store the values in a fast Map as strings but i need the values also as float and int. 
+    - Maybe tomorrow ;) 
+
+---
+
+## Code: 
 
 ```
 #define JLOOPS 25

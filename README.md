@@ -1,6 +1,6 @@
 # ElfScript
 
-***Probably the fasted TorqueScript on Earth ;)*** Easy to embed scripting language with a amazing - hot reload - and - modify while running - capabilities. I use TorqueScript in my Game Auteria for almost 20 years and now i can embed it to any C++ project I like. It's not the fastest which is easy to bind - this is lua i would say - but it's also not the slowest. In some tests it outperforms python 3 and was much faster than some other interpreted embeded languages i tested. 
+***~~Probably~~ The fasted TorqueScript on Earth ;)*** Easy to embed scripting language with a amazing - hot reload - and - modify while running - capabilities. I use TorqueScript in my Game Auteria for almost 20 years and now i can embed it to any C++ project I like. It's not the fastest which is easy to bind - this is lua i would say - but it's also not the slowest. In some tests it outperforms python 3 and was much faster than some other interpreted embeded languages i tested. 
 
 Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 
@@ -9,7 +9,8 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 ## Notable changes:
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before. (ELFSCRIPT_FASTPATH_FLD)
 - 🚀 **ElfScript:** Variable FastPath: OP_LOADVAR_STR and OP_LOAD_LOCAL_VAR_STR lookup the variable type to return not always string which make the previous setting to float/int useless. 
-- 🚀 **ElfScript:** Neat Syntax Enhancement: You can set PoD types in C style: **Foo.MyVector = { 50.1, 78.5 };**. Foo.MyVector= { $a * 5, $b * 4}; looks much better than: Foo.MyVector= $a * 5 SPC $b * 4; Also implemented for function calls: `myFunction({1,2,3});` .
+- 🚀 **ElfScript (V0.4c):** Second rocket stage ignited: OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR. When i started with ElfScript (V0.0) the starfield demo in raylib-elfscript perfomed at 60fps. I optimzed the script as good as possible and got 75 fps. In Version 0.3 it was raised to about 500fps. After this last rocket change - which was quite easy - it's now raised from 550 to 900 fps (you should know i work on a 9 years old thinkpad with intel gpu) in BaseElf Starfield - did not check raylib so far. Holy cow ! 
+- 🌶️ **ElfScript:** Neat Syntax Enhancement: You can set PoD types in C style: **Foo.MyVector = { 50.1, 78.5 };**. Foo.MyVector= { $a * 5, $b * 4}; looks much better than: Foo.MyVector= $a * 5 SPC $b * 4; Also implemented for function calls: `myFunction({1,2,3});` .
 - 🚀 **ElfScript:** Added #define with code preprocessor for byte code fast constant handling (ELFSCRIPT_PREPROCESSOR)
 - 🤘 Added **ImGui** bindings to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/ImGui). Demo: [BaseElf](./BaseElf)
 - 🤘 Added **SDL3** Input (keyboard/mouse) handling and binding with events and polling to [ElfScript](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/SDL3). Demo: [BaseElf](./BaseElf)
