@@ -1,5 +1,7 @@
-Note: I know this is not a real benchmark for a script language .. i do this
-just for fun.
+Note: I know this is not a real benchmark for a script language .. i do this just for fun.
+
+My fastest Version 0.4g is a bit slower than 0.4a on this test, but does a 
+great job in my SpeedTest. I guess I'll never reach under 5sec at test I.
 
 # I. For loop test counting to one billion (1000000000)
 
@@ -9,15 +11,15 @@ just for fun.
 - PHP (8.5.8): 3.644u 0.019s 0:03.66 99.7%     0+0k 0+0io 0pf+0w
 - 📌 ElfScript(0.4a (*3)): 15.979u 0.000s 0:15.99 99.8%    0+0k 0+0io 0pf+0w
 - 📌 ElfScript(0.4b (*6)):  17.476u 0.003s 0:17.50 99.8%    0+0k 0+0io 0pf+0w
+- 📌 ElfScript(0.4f):  16.986u 0.000s 0:17.00 99.8%    0+0k 8+0io 0pf+0w
 - Python 3 (3.14.6): 40.648u 0.006s 0:40.71 99.8%    0+0k 0+0io 0pf+0w
 - ruby 3.4.10: 55.675u 0.023s 0:55.79 99.8%    0+0k 0+0io 0pf+0w
 - Duktape (2.7.0 RelWithDeb): 179.464u 0.000s 2:59.77 99.8%   0+0k 0+0io 0pf+0w
-- Bash (5.3.15(1) (*4)): Canceled after: 2151.499u 0.891s 36:04.93 99.4%       0+0k 0+0io 0pf+0w
 
+- Bash (5.3.15(1) (*4)): Canceled after: 2151.499u 0.891s 36:04.93 99.4%       0+0k 0+0io 0pf+0w
 - 🌩️ ChaiScript ( v6.1.0 RelWithDeb (*5)): **Segmentation fault (core dumped)** after: 190.456u 0.148s 3:11.52 99.5%   0+0k 1312+0io 9pf+0w
 
-
-
+I tried to fix the ChaiScript run but it Segfault. I dont want to dig in this code to find out why.
 
 ---
 
@@ -79,6 +81,7 @@ for ( $i = 0; $i < 1000000000; $i++) {
 - PHP 8.5.8: 19.318u 0.009s 0:19.37 99.6%    0+0k 0+0io 0pf+0w
 - Lua (5.5.0): 20.083u 0.011s 0:20.13 99.8%    0+0k 0+0io 0pf+0w
 - 📌 ElfScipt(0.4a (*3)): 52.887u 0.003s 0:52.94 99.8%    0+0k 0+0io 0pf+0w
+- 📌 ElfScipt(0.4g): 54.739u 0.013s 0:54.84 99.8%    0+0k 0+0io 0pf+0w
 - Python 3 (3.14.6): 89.470u 0.026s 1:29.74 99.7%    0+0k 0+0io 0pf+0w
 
 
@@ -110,6 +113,7 @@ echo(%i);
 - PHP 8.5.8: 7.606u 0.006s 0:07.62 99.7%     0+0k 184+0io 1pf+0w
 - Lua (5.5.0): 10.003u 0.003s 0:10.01 99.9%    0+0k 0+0io 0pf+0w
 - 📌 ElfScipt(0.4a (*3)): 28.889u 0.006s 0:28.94 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4g🚀 (RelWithDebug) : 31.617u 0.003s 0:31.64 99.9%    0+0k 0+0io 0pf+0w
 
 # IV Analysis
 

@@ -883,22 +883,22 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_JMPIFNOT,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPNOTSTRING,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFF,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF,
+         &&handle_OP_JMPIF,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFNOT_NP,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF_NP,    // 10
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMP,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_VOID,
+         &&handle_OP_RETURN_VOID,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_FLT,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_UINT,
 
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE,
+         &&handle_OP_CMPEQ,
+         &&handle_OP_CMPGR,
+         &&handle_OP_CMPGE,
+         &&handle_OP_CMPLT,
+         &&handle_OP_CMPLE,
+         &&handle_OP_CMPNE,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_XOR,         // 20
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MOD,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITAND,
@@ -912,11 +912,11 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_AND,
          &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_OR,          // 30
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SUB,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MUL,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DIV,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NEG,
+         &&handle_OP_ADD,
+         &&handle_OP_SUB,
+         &&handle_OP_MUL,
+         &&handle_OP_DIV,
+         &&handle_OP_NEG,
          &&handle_OP_INC,
 
          &&handle_OP_SETCURVAR,
@@ -956,7 +956,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_SAVEFIELD_FLT,
          &&handle_FALLBACK_SWITCH,   // TODO: &&handle_OP_SAVEFIELD_STR,
 
-         &&handle_FALLBACK_SWITCH,   // TODO: &&handle_OP_STK,
+         &&handle_OP_POP_STK,
 
          &&handle_OP_LOADIMMED_UINT,
          &&handle_OP_LOADIMMED_FLT,
@@ -1007,6 +1007,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    // first command
    DISPATCH();
 
+// ~~~~~~~~~~~~~~~~~~~~~~ JMP
 handle_OP_JMPIFFNOT:
       if (stack[_STK--].getFloat())
       {
@@ -1027,6 +1028,75 @@ handle_OP_JMPIFNOT:
         ip = code[ip];
         DISPATCH();
       }
+
+handle_OP_JMPIF:
+      if (!stack[_STK--].getFloat())
+      {
+            ip++;
+            DISPATCH();
+      }
+      ip = code[ip];
+      DISPATCH();
+
+
+handle_OP_RETURN_VOID:
+         if (iterDepth > 0)
+         {
+            // Clear iterator state.
+            while (iterDepth > 0)
+            {
+               iterStack[--_ITER].mIsStringIter = false;
+               --iterDepth;
+
+               POP_STK();
+            }
+         }
+         returnValue.setEmptyString();
+         goto execFinished;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~ CMP
+handle_OP_CMPEQ:
+      doFloatMathOperation<FloatOperation::EQ>();
+      DISPATCH();
+
+handle_OP_CMPGR:
+      doFloatMathOperation<FloatOperation::GR>();
+      DISPATCH();
+
+handle_OP_CMPGE:
+      doFloatMathOperation<FloatOperation::GE>();
+      DISPATCH();
+
+handle_OP_CMPLT:
+      doFloatMathOperation<FloatOperation::LT>();
+      DISPATCH();
+
+handle_OP_CMPLE:
+      doFloatMathOperation<FloatOperation::LE>();
+      DISPATCH();
+
+handle_OP_CMPNE:
+      doFloatMathOperation<FloatOperation::NE>();
+      DISPATCH();
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~
+
+handle_OP_ADD:
+      doFloatMathOperation<FloatOperation::Add>();
+      DISPATCH();
+handle_OP_SUB:
+      doFloatMathOperation<FloatOperation::Sub>();
+      DISPATCH();
+handle_OP_MUL:
+      doFloatMathOperation<FloatOperation::Mul>();
+      DISPATCH();
+handle_OP_DIV:
+      doFloatMathOperation<FloatOperation::Div>();
+      DISPATCH();
+handle_OP_NEG:
+      stack[_STK].setFloat(-stack[_STK].getFloat());
+      DISPATCH();
 
 
 handle_OP_INC:
@@ -1207,6 +1277,11 @@ handle_OP_SAVEFIELD_FASTPATH:
             prevObject = NULL;
       }
       DISPATCH();
+// ~~~~~~~~~~~~~~~~~ STACK
+handle_OP_POP_STK:
+      POP_STK();
+      DISPATCH();
+
 // ~~~~~~~~~~~~~~~~~ IMMED
 
 handle_OP_LOADIMMED_UINT:
