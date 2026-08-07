@@ -1,5 +1,13 @@
 # FIXME 
 
+
+
+
+
+
+
+# DONE:
+
 ## 0.4c OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR
 
 After my rocket change :

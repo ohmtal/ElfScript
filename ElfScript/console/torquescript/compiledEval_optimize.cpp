@@ -870,28 +870,26 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
 
    //XXTH ElfScript ( i guess i'am insane *haha* )
-   static const void* dispatch_table[] = {
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FUNC_DECL,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DEFAULT_END,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CREATE_OBJECT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADD_OBJECT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_END_OBJECT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_FINISH_OBJECT,
-
+   /*static*/ const void* dispatch_table[] = {
+         &&handle_OP_FUNC_DECL,
+         &&handle_OP_DEFAULT_END,
+         &&handle_OP_CREATE_OBJECT,
+         &&handle_OP_ADD_OBJECT,
+         &&handle_OP_END_OBJECT,
+         &&handle_OP_FINISH_OBJECT,
 
          &&handle_OP_JMPIFFNOT,
          &&handle_OP_JMPIFNOT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPNOTSTRING,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFF,
+         &&handle_OP_JMPNOTSTRING,
+         &&handle_OP_JMPIFF,
          &&handle_OP_JMPIF,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIFNOT_NP,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMPIF_NP,    // 10
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_JMP,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN,
+         &&handle_OP_JMPIFNOT_NP,
+         &&handle_OP_JMPIF_NP,
+         &&handle_OP_JMP,
+         &&handle_OP_RETURN,
          &&handle_OP_RETURN_VOID,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_RETURN_UINT,
-
+         &&handle_OP_RETURN_FLT,
+         &&handle_OP_RETURN_UINT,
 
          &&handle_OP_CMPEQ,
          &&handle_OP_CMPGR,
@@ -899,18 +897,18 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_CMPLT,
          &&handle_OP_CMPLE,
          &&handle_OP_CMPNE,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_XOR,         // 20
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_MOD,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITAND,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BITOR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_NOTF,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ONESCOMPLEMENT,
+         &&handle_OP_XOR,
+         &&handle_OP_MOD,
+         &&handle_OP_BITAND,
+         &&handle_OP_BITOR,
+         &&handle_OP_NOT,
+         &&handle_OP_NOTF,
+         &&handle_OP_ONESCOMPLEMENT,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SHL,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_AND,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_OR,          // 30
+         &&handle_OP_SHR,
+         &&handle_OP_SHL,
+         &&handle_OP_AND,
+         &&handle_OP_OR,
 
          &&handle_OP_ADD,
          &&handle_OP_SUB,
@@ -924,7 +922,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_SETCURVAR_ARRAY,
          &&handle_OP_SETCURVAR_ARRAY_CREATE,
 
-         &&handle_OP_LOADVAR_UINT,// 40
+         &&handle_OP_LOADVAR_UINT,
          &&handle_OP_LOADVAR_FLT,
          &&handle_OP_LOADVAR_STR,
 
@@ -940,13 +938,13 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_SAVE_LOCAL_VAR_FLT,
          &&handle_OP_SAVE_LOCAL_VAR_STR,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_NEW,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCUROBJECT_INTERNAL,
+         &&handle_OP_SETCUROBJECT,
+         &&handle_OP_SETCUROBJECT_NEW,
+         &&handle_OP_SETCUROBJECT_INTERNAL,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_ARRAY, // 50
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_SETCURFIELD_TYPE,
+         &&handle_OP_SETCURFIELD,
+         &&handle_OP_SETCURFIELD_ARRAY,
+         &&handle_OP_SETCURFIELD_TYPE,
 
          &&handle_OP_LOADFIELD_UINT,
          &&handle_OP_LOADFIELD_FLT,
@@ -954,58 +952,441 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
          &&handle_OP_SAVEFIELD_UINT,
          &&handle_OP_SAVEFIELD_FLT,
-         &&handle_FALLBACK_SWITCH,   // TODO: &&handle_OP_SAVEFIELD_STR,
+         &&handle_OP_SAVEFIELD_STR,
 
          &&handle_OP_POP_STK,
 
          &&handle_OP_LOADIMMED_UINT,
          &&handle_OP_LOADIMMED_FLT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TAG_TO_STR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_STR, // 70
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_DOCBLOCK_STR,  // 76
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_LOADIMMED_IDENT,
+         &&handle_OP_TAG_TO_STR,
+         &&handle_OP_LOADIMMED_STR,
+         &&handle_OP_DOCBLOCK_STR,
+         &&handle_OP_LOADIMMED_IDENT,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CALLFUNC,
+         &&handle_OP_CALLFUNC,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ADVANCE_STR_APPENDCHAR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_REWIND_STR,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_TERMINATE_REWIND_STR,
+         &&handle_OP_ADVANCE_STR_APPENDCHAR,
+         &&handle_OP_REWIND_STR,
+         &&handle_OP_TERMINATE_REWIND_STR,
+         &&handle_OP_COMPARE_STR,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_COMPARE_STR,
+         &&handle_OP_PUSH,
+         &&handle_OP_PUSH_FRAME,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_PUSH_FRAME,
+         &&handle_OP_ASSERT,
+         &&handle_OP_BREAK,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ASSERT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BREAK,
-
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN,       ///< Prepare foreach iterator.
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER,             ///< Enter foreach loop.
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_ITER_END,         ///< End foreach loop.
+         &&handle_OP_ITER_BEGIN,
+         &&handle_OP_ITER_BEGIN_STR,
+         &&handle_OP_ITER,
+         &&handle_OP_ITER_END,
 
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
-         &&handle_OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
+         &&handle_OP_BUILD_VECTOR_STRING,
+         &&handle_OP_SAVEFIELD_FASTPATH,
 
 #ifdef ELFSCRIPT_INT_HACK
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLT_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGR_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPGE_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPLE_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPEQ_UINT,
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_CMPNE_UINT,
+         &&handle_OP_CMPLT_UINT,
+         &&handle_OP_CMPGR_UINT,
+         &&handle_OP_CMPGE_UINT,
+         &&handle_OP_CMPLE_UINT,
+         &&handle_OP_CMPEQ_UINT,
+         &&handle_OP_CMPNE_UINT,
 
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INC_UINT,
+         &&handle_OP_INC_UINT,
 #endif
-         &&handle_FALLBACK_SWITCH,  // TODO: &&handle_OP_INVALID,   //
 
+         &&handle_OP_INVALID
    };
 
    // magic macro:
    #define DISPATCH() goto *dispatch_table[code[ip++]]
+
+   // replacement for  goto breakContinue; with op (old: instruction) parameter
+   #define DISPATCH_OPCODE(op) goto *dispatch_table[op]
    // first command
    DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~~~~~~ FUNC_DECL
+handle_OP_FUNC_DECL:
+{
+      //NOTE XXTH we have noCalls but we want to load the functions!
+      // NOTE rolled back cause memory leak!!
+      //orig: if (!noCalls)
+      {
+            fnName = CodeToSTE(code, ip);
+            fnNamespace = CodeToSTE(code, ip + 2);
+            fnPackage = CodeToSTE(code, ip + 4);
+            bool hasBody = (code[ip + 6] & 0x01) != 0;
+
+            Namespace::unlinkPackages();
+            if (fnNamespace == NULL && fnPackage == NULL)
+                  ns = Namespace::global();
+            else
+                  ns = Namespace::find(fnNamespace, fnPackage);
+
+            ns->addFunction(fnName, this, hasBody ? ip : 0);
+
+            if (curNSDocBlock)
+            {
+                  if (fnNamespace == StringTable->lookup(nsDocBlockClass))
+                  {
+                        char* usageStr = dStrdup(curNSDocBlock);
+                        usageStr[dStrlen(usageStr)] = '\0';
+                        ns->mUsage = usageStr;
+                        ns->mCleanUpUsage = true;
+                        curNSDocBlock = NULL;
+                  }
+            }
+
+            const U32 fnArgc = code[ip + 8];
+
+            Namespace::Entry* temp = ns->lookup(fnName);
+            temp->mArgFlags.setSize(fnArgc);
+            temp->mDefaultOffsets.setSize(fnArgc);
+
+            // Arg flags: ip + 10 + fnArgc
+            // Codelet IPs: ip + 10 + 2*fnArgc
+            const U32 flagBase = ip + 10 + fnArgc;
+            const U32 offsetBase = ip + 10 + 2 * fnArgc;
+
+            for (U32 fa = 0; fa < fnArgc; ++fa)
+            {
+                  temp->mArgFlags[fa] = code[flagBase + fa];
+                  temp->mDefaultOffsets[fa] = code[offsetBase + fa];
+            }
+
+            // No stack pops: mDefaultValues is gone.
+
+            Namespace::relinkPackages();
+            curFNDocBlock = NULL;
+      }
+
+      // Jump past header + body + codelets.  endIp is at code[ip + 7].
+      ip = code[ip + 7];
+      DISPATCH();
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~ DEFAULT_END
+handle_OP_DEFAULT_END:
+{
+      returnValue = stack[_STK];
+      POP_STK();
+
+      while (iterDepth > 0)
+      {
+            iterStack[--_ITER].mIsStringIter = false;
+            --iterDepth;
+            POP_STK();
+      }
+
+      goto execFinished;
+}
+// ~~~~~~~~~~~~~~~~~~~~~~ OBJECTS
+// cleaned up code removed datablocks .. i kept the old OP_CREATE_OBJECT in the legacy part
+handle_OP_CREATE_OBJECT:
+{
+      // Read some useful info.
+      objParent = CodeToSTE(code, ip);
+      // bool isDataBlock = code[ip + 2];
+      bool isInternal = code[ip + 3];
+      bool isSingleton = code[ip + 4];
+      U32  lineNumber = code[ip + 5];
+      failJump = code[ip + 6];
+
+      // If we don't allow calls, we certainly don't allow creating objects!
+      // Moved this to after failJump is set. Engine was crashing when
+      // noCalls = true and an object was being created at the beginning of
+      // a file. ADL.
+      if (noCalls)
+      {
+            ip = failJump;
+            DISPATCH(); // break;
+      }
+
+      // Push the old info to the stack
+      //Assert( objectCreationStackIndex < objectCreationStackSize );
+      objectCreationStack[objectCreationStackIndex].newObject = currentNewObject;
+      objectCreationStack[objectCreationStackIndex++].failJump = failJump;
+
+      // Get the constructor information off the stack.
+      gCallStack.argvc(NULL, callArgc, &callArgv);
+      AssertFatal(callArgc - 3 >= 0, avar("Call Arg needs at least 3, only has %d", callArgc));
+      const char* objectName = callArgv[2].getString();
+
+      currentNewObject = NULL;
+
+      if (!isInternal)
+      {
+            AbstractClassRep* rep = AbstractClassRep::findClassRep(objectName);
+            if (rep != NULL)
+            {
+                  Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
+                              getFileLine(ip), objectName);
+                  ip = failJump;
+                  gCallStack.popFrame();
+                   DISPATCH(); // break;
+            }
+
+            SimObject* obj = Sim::findObject((const char*)objectName);
+            if (obj)
+            {
+                  if (isSingleton)
+                  {
+                        // Make sure we're not trying to change types
+                        if (dStricmp(obj->getClassName(), callArgv[1].getString()) != 0)
+                        {
+                              Con::errorf(ConsoleLogEntry::General, "%s: Cannot re-declare object [%s] with a different class [%s] - was [%s].",
+                                          getFileLine(ip), objectName, callArgv[1].getString(), obj->getClassName());
+                              ip = failJump;
+                              gCallStack.popFrame();
+                               DISPATCH(); // break;
+                        }
+
+                        // We're creating a singleton, so use the found object instead of creating a new object.
+                        currentNewObject = obj;
+                        Con::warnf("%s: Singleton Object was already created with name %s. Using existing object.",
+                                   getFileLine(ip), objectName);
+                  }
+            }
+      }
+
+      gCallStack.popFrame();
+
+      if (!currentNewObject)
+      {
+            // Well, looks like we have to create a new object.
+            ConsoleObject* object = ConsoleObject::create(callArgv[1].getString());
+
+            // Deal with failure!
+            if (!object)
+            {
+                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-conobject class %s.", getFileLine(ip - 1), callArgv[1].getString());
+                  ip = failJump;
+                  DISPATCH(); // break;
+            }
+
+            // Finally, set currentNewObject to point to the new one.
+            currentNewObject = dynamic_cast<SimObject*>(object);
+
+            // Deal with the case of a non-SimObject.
+            if (!currentNewObject)
+            {
+                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip - 1), callArgv[1].getString());
+                  delete object;
+                  ip = failJump;
+                  DISPATCH(); // break;
+            }
+
+            // Set the declaration line
+            currentNewObject->setDeclarationLine(lineNumber);
+
+            // Set the file that this object was created in
+            currentNewObject->setFilename(this->name);
+
+            // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
+            if (*objParent)
+            {
+                  // Find it!
+                  SimObject* parent;
+                  if (Sim::findObject(objParent, parent))
+                  {
+                        // Con::printf(" - Parent object found: %s", parent->getClassName());
+
+                        currentNewObject->setCopySource(parent);
+                        currentNewObject->assignFieldsFrom(parent);
+
+                  }
+                  else
+                  {
+                        if (Con::gObjectCopyFailures == -1)
+                              Con::errorf(ConsoleLogEntry::General, "%s: Unable to find parent object %s for %s.", getFileLine(ip - 1), objParent, callArgv[1].getString());
+                        ++Con::gObjectCopyFailures;
+
+                        delete object;
+                        currentNewObject = NULL;
+                        ip = failJump;
+                        DISPATCH(); // break;
+                  }
+            }
+
+            // If a name was passed, assign it.
+            if (objectName[0])
+            {
+                  if (!isInternal)
+                        currentNewObject->assignName(objectName);
+                  else
+                        currentNewObject->setInternalName(objectName);
+
+                  // Set the original name
+                  currentNewObject->setOriginalName( objectName );
+            }
+
+            // Do the constructor parameters.
+            if (!currentNewObject->processArguments(callArgc - 3, callArgv + 3))
+            {
+                  delete currentNewObject;
+                  currentNewObject = NULL;
+                  ip = failJump;
+                  DISPATCH(); // break;
+            }
+
+            currentNewObject->setModStaticFields(true);
+            currentNewObject->setModDynamicFields(true);
+      }
+      else
+      {
+            currentNewObject->reloadReset(); // AFX (reload-reset)
+
+            // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
+            if (*objParent)
+            {
+                  // Find it!
+                  SimObject* parent;
+                  if (Sim::findObject(objParent, parent))
+                  {
+                        // Con::printf(" - Parent object found: %s", parent->getClassName());
+
+                        // temporarily block name change
+                        SimObject::preventNameChanging = true;
+                        currentNewObject->setCopySource(parent);
+                        currentNewObject->assignFieldsFrom(parent);
+                        // restore name changing
+                        SimObject::preventNameChanging = false;
+
+                  }
+                  else
+                  {
+                        Con::errorf(ConsoleLogEntry::General, "%d: Unable to find parent object %s for %s.", lineNumber, objParent, callArgv[1].getString());
+                  }
+            }
+      }
+
+      // Advance the IP past the create info...
+      ip += 7;
+      DISPATCH(); // break;
+}
+
+handle_OP_ADD_OBJECT:
+{
+      // See OP_SETCURVAR for why we do this.
+      curFNDocBlock = NULL;
+      curNSDocBlock = NULL;
+
+      // Do we place this object at the root?
+      bool placeAtRoot = code[ip++];
+
+      // Con::printf("Adding object %s", currentNewObject->getName());
+
+      // Make sure it wasn't already added, then add it.
+      if (currentNewObject == NULL)
+      {
+            DISPATCH(); // break;
+      }
+
+      bool isMessage = dynamic_cast<Message*>(currentNewObject) != NULL;
+
+      if (currentNewObject->isProperlyAdded() == false)
+      {
+            bool ret = false;
+            if (isMessage)
+            {
+                  SimObjectId id = Message::getNextMessageID();
+                  if (id != 0xffffffff)
+                        ret = currentNewObject->registerObject(id);
+                  else
+                        Con::errorf("%s: No more object IDs available for messages", getFileLine(ip));
+            }
+            else
+                  ret = currentNewObject->registerObject();
+
+            if (!ret)
+            {
+                  // This error is usually caused by failing to call Parent::initPersistFields in the class' initPersistFields().
+                  Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip - 2), currentNewObject->getName(), currentNewObject->getClassName());
+                  ++Con::gObjectCopyFailures;
+                  delete currentNewObject;
+                  currentNewObject = NULL;
+                  ip = failJump;
+                  DISPATCH(); // break;
+            }
+      }
+
+
+      // What group will we be added to, if any?
+      U32 groupAddId = (U32)stack[_STK].getInt();
+      SimGroup* grp = NULL;
+      SimSet* set = NULL;
+
+      if (!placeAtRoot || !currentNewObject->getGroup())
+      {
+            if (!isMessage)
+            {
+                  if (!placeAtRoot)
+                  {
+                        // Otherwise just add to the requested group or set.
+                        if (!Sim::findObject(groupAddId, grp))
+                              Sim::findObject(groupAddId, set);
+                  }
+
+                  if (placeAtRoot)
+                  {
+                        // Deal with the instantGroup if we're being put at the root or we're adding to a component.
+                        if (Con::gInstantGroup.isEmpty() || !Sim::findObject(Con::gInstantGroup, grp))
+                              grp = Sim::getRootGroup();
+                  }
+            }
+
+            // If we didn't get a group, then make sure we have a pointer to
+            // the rootgroup.
+            if (!grp)
+                  grp = Sim::getRootGroup();
+
+            // add to the parent group
+            grp->addObject(currentNewObject);
+
+            // If for some reason the add failed, add the object to the
+            // root group so it won't leak.
+            if (currentNewObject->getGroup() == NULL)
+                  Sim::getRootGroup()->addObject(currentNewObject);
+
+            // add to any set we might be in
+            if (set)
+                  set->addObject(currentNewObject);
+      }
+
+      // store the new object's ID on the stack (overwriting the group/set
+      // id, if one was given, otherwise getting pushed)
+      S32 id = currentNewObject->getId();
+      if (placeAtRoot)
+            stack[_STK].setInt(id);
+      else
+            stack[++_STK].setInt(id);
+
+      DISPATCH(); // break;
+}
+
+handle_OP_END_OBJECT:
+{
+      // If we're not to be placed at the root, make sure we clean up
+      // our group reference.
+      bool placeAtRoot = code[ip++];
+      if (!placeAtRoot)
+            POP_STK();
+      DISPATCH(); //break;
+}
+
+handle_OP_FINISH_OBJECT:
+{
+      if (currentNewObject)
+            currentNewObject->onPostAdd();
+
+      AssertFatal( objectCreationStackIndex >= 0, "Object Stack is empty." );
+      currentNewObject = objectCreationStack[--objectCreationStackIndex].newObject;
+      failJump = objectCreationStack[objectCreationStackIndex].failJump;
+      DISPATCH(); //break;
+}
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~ JMP
 handle_OP_JMPIFFNOT:
@@ -1029,6 +1410,27 @@ handle_OP_JMPIFNOT:
         DISPATCH();
       }
 
+
+handle_OP_JMPNOTSTRING:
+      if (stack[_STK--].getBool())
+      {
+            ip++;
+            DISPATCH(); // break;
+      }
+      ip = code[ip];
+      DISPATCH(); //break;
+
+handle_OP_JMPIFF:
+      if (!stack[_STK--].getFloat())
+      {
+            ip++;
+            DISPATCH(); //break;
+      }
+      ip = code[ip];
+      DISPATCH(); //break;
+
+
+
 handle_OP_JMPIF:
       if (!stack[_STK--].getFloat())
       {
@@ -1038,6 +1440,44 @@ handle_OP_JMPIF:
       ip = code[ip];
       DISPATCH();
 
+handle_OP_JMPIFNOT_NP:
+      if (stack[_STK].getInt())
+      {
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            ip++;
+            DISPATCH(); //break;
+      }
+      ip = code[ip];
+      DISPATCH(); //break;
+
+handle_OP_JMPIF_NP:
+      if (!stack[_STK].getInt())
+      {
+            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            ip++;
+            DISPATCH(); //break;
+      }
+      ip = code[ip];
+      DISPATCH(); //break;
+
+handle_OP_JMP:
+      ip = code[ip];
+      DISPATCH(); //break;
+
+handle_OP_RETURN:
+{
+      returnValue = (stack[_STK]);
+      POP_STK();
+
+      // Clear iterator state.
+      while (iterDepth > 0)
+      {
+            iterStack[--_ITER].mIsStringIter = false;
+            --iterDepth;
+            POP_STK();
+      }
+      goto execFinished;
+}
 
 handle_OP_RETURN_VOID:
          if (iterDepth > 0)
@@ -1053,6 +1493,32 @@ handle_OP_RETURN_VOID:
          }
          returnValue.setEmptyString();
          goto execFinished;
+
+handle_OP_RETURN_FLT:
+      returnValue.setFloat(stack[_STK].getFloat());
+      POP_STK();
+      // Clear iterator state.
+      while (iterDepth > 0)
+      {
+            iterStack[--_ITER].mIsStringIter = false;
+            --iterDepth;
+
+            POP_STK();
+      }
+      goto execFinished;
+
+handle_OP_RETURN_UINT:
+      returnValue.setInt(stack[_STK].getInt());
+      POP_STK();
+      // Clear iterator state.
+      while (iterDepth > 0)
+      {
+            iterStack[--_ITER].mIsStringIter = false;
+            --iterDepth;
+            POP_STK();
+      }
+      goto execFinished;
+
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~ CMP
 handle_OP_CMPEQ:
@@ -1079,6 +1545,51 @@ handle_OP_CMPNE:
       doFloatMathOperation<FloatOperation::NE>();
       DISPATCH();
 
+handle_OP_XOR:
+      doIntOperation<IntegerOperation::Xor>();
+      DISPATCH();
+
+handle_OP_MOD: {
+      S64 divisor = stack[_STK - 1].getInt();
+      if (divisor != 0)
+            stack[_STK - 1].setInt(stack[_STK].getInt() % divisor);
+      else
+            stack[_STK - 1].setInt(0);
+      POP_STK();
+      DISPATCH();
+}
+
+handle_OP_BITAND:
+      doIntOperation<IntegerOperation::BitAnd>();
+      DISPATCH();
+handle_OP_BITOR:
+      doIntOperation<IntegerOperation::BitOr>();
+      DISPATCH();
+handle_OP_NOT:
+      stack[_STK].setBool(!stack[_STK].getInt());
+      DISPATCH();
+handle_OP_NOTF:
+      stack[_STK].setInt(!stack[_STK].getFloat());
+      DISPATCH();
+handle_OP_ONESCOMPLEMENT:
+      stack[_STK].setInt(~stack[_STK].getInt());
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~~~~~~~~
+handle_OP_SHR:
+      doIntOperation<IntegerOperation::RShift>();
+      DISPATCH();
+
+handle_OP_SHL:
+      doIntOperation<IntegerOperation::LShift>();
+      DISPATCH();
+
+handle_OP_AND:
+      doIntOperation<IntegerOperation::LogicalAnd>();
+      DISPATCH();
+
+handle_OP_OR:
+      doIntOperation<IntegerOperation::LogicalOr>();
+      DISPATCH();
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1103,6 +1614,145 @@ handle_OP_INC:
       reg = code[ip++];
       currentRegister = reg;
       Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+      DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~ CURVAR
+handle_OP_SETCURVAR:
+      var = CodeToSTE(code, ip);
+      ip += 2;
+
+      // If a variable is set, then these must be NULL. It is necessary
+      // to set this here so that the vector parser can appropriately
+      // identify whether it's dealing with a vector.
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      // Used for local variable caching of what is active...when we
+      // set a global, we aren't active
+      currentRegister = -1;
+
+      Script::gEvalState.setCurVarName(var);
+
+      // In order to let docblocks work properly with variables, we have
+      // clear the current docblock when we do an assign. This way it
+      // won't inappropriately carry forward to following function decls.
+      curFNDocBlock = NULL;
+      curNSDocBlock = NULL;
+      DISPATCH();
+
+handle_OP_SETCURVAR_CREATE:
+      var = CodeToSTE(code, ip);
+      ip += 2;
+
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      currentRegister = -1;
+
+      Script::gEvalState.setCurVarNameCreate(var);
+
+      curFNDocBlock = NULL;
+      curNSDocBlock = NULL;
+      DISPATCH();
+
+      handle_OP_SETCURVAR_ARRAY:
+      var = StringTable->insert(stack[_STK].getString());
+
+      // See OP_SETCURVAR
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      // Used for local variable caching of what is active...when we
+      // set a global, we aren't active
+      currentRegister = -1;
+
+      Script::gEvalState.setCurVarName(var);
+
+      // See OP_SETCURVAR for why we do this.
+      curFNDocBlock = NULL;
+      curNSDocBlock = NULL;
+      DISPATCH();
+
+
+handle_OP_SETCURVAR_ARRAY_CREATE:
+      var = StringTable->insert(stack[_STK].getString());
+
+      // See OP_SETCURVAR
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      currentRegister = -1;
+
+      Script::gEvalState.setCurVarNameCreate(var);
+
+      curFNDocBlock = NULL;
+      curNSDocBlock = NULL;
+      DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~ LOADVAR
+handle_OP_LOADVAR_UINT:
+      currentRegister = -1;
+      stack[_STK + 1].setInt(Script::gEvalState.getIntVariable());
+      _STK++;
+      DISPATCH();
+
+handle_OP_LOADVAR_FLT:
+      currentRegister = -1;
+      stack[_STK + 1].setFloat(Script::gEvalState.getFloatVariable());
+      _STK++;
+      DISPATCH();
+
+handle_OP_LOADVAR_STR:
+      currentRegister = -1;
+      {
+            // i check the type first!
+            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
+            bool fastPath = false;
+            if (varEntry) {
+                  static S32 valueType = 0;
+                  valueType = varEntry->value.getType();
+                  fastPath =  valueType == ConsoleValueType::cvFloat ||
+                  valueType == ConsoleValueType::cvInteger;
+            }
+            if (fastPath)
+            {
+                  // Fastpath
+                  stack[_STK + 1] = varEntry->value;
+            }
+            else
+            {
+                  // Slowpath: Fallback
+                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+            }
+      }
+      _STK++;
+      DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~ SAVEVAR
+handle_OP_SAVEVAR_UINT:
+      Script::gEvalState.setIntVariable(stack[_STK].getInt());
+      DISPATCH();
+
+handle_OP_SAVEVAR_FLT:
+      Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+      DISPATCH();
+
+handle_OP_SAVEVAR_STR:
+      if (stack[_STK].type == cvInteger) {
+            Script::gEvalState.setIntVariable(stack[_STK].getInt());
+            DISPATCH();
+      }
+
+      if (stack[_STK].type == cvFloat) {
+            Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+            DISPATCH();
+      }
+
+      Script::gEvalState.setStringVariable(stack[_STK].getString());
       DISPATCH();
 
 
@@ -1208,6 +1858,59 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          DISPATCH();
 
 
+// ~~~~~~~~~~~~~~~~~ SETCUROBJECT
+handle_OP_SETCUROBJECT:
+      prevObject = curObject;
+      curObject = Sim::findObject(stack[_STK]);
+      DISPATCH();
+
+handle_OP_SETCUROBJECT_NEW:
+      curObject = currentNewObject;
+      DISPATCH();
+
+handle_OP_SETCUROBJECT_INTERNAL:
+      ++ip; // To skip the recurse flag if the object wasnt found
+      if (curObject)
+      {
+            SimSet* set = dynamic_cast<SimSet*>(curObject);
+            if (set)
+            {
+                  StringTableEntry intName = StringTable->insert(stack[_STK].getString());
+                  bool recurse = code[ip - 1];
+                  SimObject* obj = set->findObjectByInternalName(intName, recurse);
+                  stack[_STK].setInt(obj ? obj->getId() : 0);
+            }
+            else
+            {
+                  Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use -> on non-set %s of class %s.", getFileLine(ip - 2), curObject->getName(), curObject->getClassName());
+                  stack[_STK].setInt(0);
+            }
+      }
+      else
+      {
+            Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use ->, but the group object wasn't found.", getFileLine(ip - 2));
+            stack[_STK].setInt(0);
+      }
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~ SETCURFIELD
+handle_OP_SETCURFIELD:
+      // Save the previous field for parsing vector fields.
+      prevField = curField;
+      dStrcpy(prevFieldArray, curFieldArray, 256);
+      curField = CodeToSTE(code, ip);
+      curFieldArray[0] = 0;
+      ip += 2;
+      DISPATCH();
+
+handle_OP_SETCURFIELD_ARRAY:
+      dStrcpy(curFieldArray, stack[_STK].getString(), 256);
+      DISPATCH();
+
+handle_OP_SETCURFIELD_TYPE:
+      if(curObject)
+            curObject->setDataFieldType(code[ip], curField, curFieldArray);
+      ip++;
+      DISPATCH();;
 // ~~~~~~~~~~~~~~~~~ FIELD
 handle_OP_LOADFIELD_UINT:
             if (curObject)
@@ -1277,6 +1980,18 @@ handle_OP_SAVEFIELD_FASTPATH:
             prevObject = NULL;
       }
       DISPATCH();
+
+// replaced by fastpath
+handle_OP_SAVEFIELD_STR:
+      if (curObject) {
+            curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+      } else {
+            // The field is not being set on an object. Maybe it's a special accessor?
+            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            prevObject = NULL;
+      }
+DISPATCH();
+
 // ~~~~~~~~~~~~~~~~~ STACK
 handle_OP_POP_STK:
       POP_STK();
@@ -1294,1368 +2009,1943 @@ handle_OP_LOADIMMED_FLT:
          _STK++;
       DISPATCH();
 
+handle_OP_TAG_TO_STR:
+      code[ip - 1] = OP_LOADIMMED_STR;
+      // it's possible the string has already been converted
+      Con::warnf("Tagged string not supported in ElfScript or FIXME (%s:%d)", __FILE__, __LINE__);
+      // if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
+      // {
+      //    U32 id = GameAddTaggedString(curStringTable + code[ip]);
+      //    dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
+      //    *(curStringTable + code[ip]) = StringTagPrefixByte;
+      // }
+      //NOTE:  TORQUE_CASE_FALLTHROUGH;
+      goto handle_OP_LOADIMMED_STR;
 
-// ~~~~~~~~~~~~~~~~~ CURVAR
-handle_OP_SETCURVAR:
-         var = CodeToSTE(code, ip);
-         ip += 2;
+handle_OP_LOADIMMED_STR:
+            stack[_STK + 1].setString(curStringTable + code[ip++]);
+            _STK ++;
+            DISPATCH();
 
-         // If a variable is set, then these must be NULL. It is necessary
-         // to set this here so that the vector parser can appropriately
-         // identify whether it's dealing with a vector.
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
+handle_OP_DOCBLOCK_STR:
+{
+      // If the first word of the doc is '\class' or '@class', then this
+      // is a namespace doc block, otherwise it is a function doc block.
+      const char* docblock = curStringTable + code[ip++];
 
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
+      const char* sansClass = dStrstr(docblock, "@class");
+      if (!sansClass)
+            sansClass = dStrstr(docblock, "\\class");
 
-         Script::gEvalState.setCurVarName(var);
-
-         // In order to let docblocks work properly with variables, we have
-         // clear the current docblock when we do an assign. This way it
-         // won't inappropriately carry forward to following function decls.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         DISPATCH();
-
-handle_OP_SETCURVAR_CREATE:
-         var = CodeToSTE(code, ip);
-         ip += 2;
-
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarNameCreate(var);
-
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         DISPATCH();
-
-handle_OP_SETCURVAR_ARRAY:
-         var = StringTable->insert(stack[_STK].getString());
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarName(var);
-
-         // See OP_SETCURVAR for why we do this.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-          DISPATCH();
-
-
-handle_OP_SETCURVAR_ARRAY_CREATE:
-         var = StringTable->insert(stack[_STK].getString());
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarNameCreate(var);
-
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         DISPATCH();
-
-// ~~~~~~~~~~~~~~~~~ LOADVAR
-handle_OP_LOADVAR_UINT:
-         currentRegister = -1;
-         stack[_STK + 1].setInt(Script::gEvalState.getIntVariable());
-         _STK++;
-         DISPATCH();
-handle_OP_LOADVAR_FLT:
-        currentRegister = -1;
-         stack[_STK + 1].setFloat(Script::gEvalState.getFloatVariable());
-         _STK++;
-         DISPATCH();
-
-handle_OP_LOADVAR_STR:
-      currentRegister = -1;
+      if (sansClass)
       {
-            // i check the type first!
-            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
-            bool fastPath = false;
-            if (varEntry) {
-                  static S32 valueType = 0;
-                  valueType = varEntry->value.getType();
-                  fastPath =  valueType == ConsoleValueType::cvFloat ||
-                  valueType == ConsoleValueType::cvInteger;
-            }
-            if (fastPath)
+            // Don't save the class declaration. Scan past the 'class'
+            // keyword and up to the first whitespace.
+            sansClass += 7;
+            S32 index = 0;
+            while ((*sansClass != ' ') && (*sansClass != '\n') && *sansClass && (index < (nsDocLength - 1)))
             {
-                  // Fastpath
-                  stack[_STK + 1] = varEntry->value;
+                  nsDocBlockClass[index++] = *sansClass;
+                  sansClass++;
+            }
+            nsDocBlockClass[index] = '\0';
+
+            curNSDocBlock = sansClass + 1;
+      }
+      else
+            curFNDocBlock = docblock;
+
+      DISPATCH();
+}
+
+handle_OP_LOADIMMED_IDENT:
+      stack[_STK + 1].setStringTableEntry(CodeToSTE(code, ip));
+      _STK++;
+      ip += 2;
+      DISPATCH();
+
+// ~~~~~~~~~~~~~~~~~ CALLFUNC
+handle_OP_CALLFUNC:
+{
+      // This routingId is set when we query the object as to whether
+      // it handles this method.  It is set to an enum from the table
+      // above indicating whether it handles it on a component it owns
+      // or just on the object.
+      fnName = CodeToSTE(code, ip);
+      fnNamespace = CodeToSTE(code, ip + 2);
+      U32 callType = code[ip + 4];
+
+      //if this is called from inside a function, append the ip and codeptr
+      if (!Script::gEvalState.stack.empty())
+      {
+            Script::gEvalState.getCurrentFrame().module = this;
+            Script::gEvalState.getCurrentFrame().ip = ip - 1;
+      }
+
+      ip += 5;
+      gCallStack.argvc(fnName, callArgc, &callArgv);
+
+      if (callType == FuncCallExprNode::FunctionCall)
+      {
+            // Note: This works even if the function was in a package. Reason being is when
+            // activatePackage() is called, it swaps the namespaceEntry into the global namespace
+            // (and reverts it when deactivatePackage is called). Method or Static related ones work
+            // as expected, as the namespace is resolved on the fly.
+            nsEntry = Namespace::global()->lookup(fnName);
+            if (!nsEntry)
+            {
+                  Con::warnf(ConsoleLogEntry::General,
+                              "%s: Unable to find function %s",
+                              getFileLine(ip - 4), fnName);
+
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  DISPATCH();
+            }
+      }
+      else if (callType == FuncCallExprNode::StaticCall)
+      {
+            // Try to look it up.
+            ns = Namespace::find(fnNamespace);
+            nsEntry = ns->lookup(fnName);
+            if (!nsEntry)
+            {
+                  Con::warnf(ConsoleLogEntry::General,
+                              "%s: Unable to find function %s%s%s",
+                              getFileLine(ip - 4), fnNamespace ? fnNamespace : "",
+                              fnNamespace ? "::" : "", fnName);
+
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  DISPATCH();
+            }
+      }
+      else if (callType == FuncCallExprNode::MethodCall)
+      {
+            ConsoleValue& simObjectLookupValue = callArgv[1];
+            thisObject = getThisObject(simObjectLookupValue);
+
+            if (thisObject == NULL)
+            {
+                  Con::warnf(
+                        ConsoleLogEntry::General,
+                        "%s: Unable to find object: '%s' attempting to call function '%s'",
+                        getFileLine(ip - 6),
+                              simObjectLookupValue.getString(),
+                              fnName
+                  );
+
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  DISPATCH();
+            }
+
+            ns = thisObject->getNamespace();
+            if (ns)
+                  nsEntry = ns->lookup(fnName);
+            else
+                  nsEntry = NULL;
+      }
+      else // it's a ParentCall
+      {
+            ConsoleValue& simObjectLookupValue = callArgv[1];
+            thisObject = getThisObject(simObjectLookupValue);
+
+            if (thisObject == NULL)
+            {
+                  Con::warnf(
+                        ConsoleLogEntry::General,
+                        "%s: Unable to find object: '%s' attempting to call function '%s'",
+                        getFileLine(ip - 6),
+                              simObjectLookupValue.getString(),
+                              fnName
+                  );
+
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+                  DISPATCH();
+            }
+
+            if (thisNamespace)
+            {
+                  ns = thisNamespace->mParent;
+                  if (ns)
+                        nsEntry = ns->lookup(fnName);
+                  else
+                        nsEntry = NULL;
             }
             else
             {
-                  // Slowpath: Fallback
-                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+                  ns = NULL;
+                  nsEntry = NULL;
             }
       }
+
+      if (!nsEntry || noCalls)
+      {
+            if (!noCalls)
+            {
+                  Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", getFileLine(ip - 4), fnName);
+                  if (callType == FuncCallExprNode::MethodCall)
+                  {
+                        Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
+                                    thisObject->getName() ? thisObject->getName() : "",
+                                    thisObject->getId(), Con::getNamespaceList(ns));
+                  }
+            }
+            gCallStack.popFrame();
+            stack[_STK + 1].setEmptyString();
+            _STK++;
+            DISPATCH();
+      }
+      if (nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
+      {
+            if (nsEntry->mFunctionOffset)
+            {
+                  ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+                  stack[_STK + 1] = (returnFromFn);
+            }
+            else // no body
+                  stack[_STK + 1].setEmptyString();
+            _STK++;
+
+            gCallStack.popFrame();
+      }
+      else
+      {
+            if ((nsEntry->mMinArgs && S32(callArgc) < nsEntry->mMinArgs) || (nsEntry->mMaxArgs && S32(callArgc) > nsEntry->mMaxArgs))
+            {
+                  const char* nsName = ns ? ns->mName : "";
+                  Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments. got %d, expected %d to %d", getFileLine(ip - 4), nsName, fnName, S32(callArgc), nsEntry->mMinArgs, nsEntry->mMaxArgs);
+                  // ElfScript:
+                  Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s%s", getFileLine(ip - 4), nsEntry->mFunctionName,  nsEntry->getArgumentsString().c_str());
+                  if (strlen(nsEntry->mUsage)>0) Con::warnf(ConsoleLogEntry::Script, "%s: docu: %s", getFileLine(ip - 4), nsEntry->mUsage);
+                  gCallStack.popFrame();
+                  stack[_STK + 1].setEmptyString();
+                  _STK++;
+            }
+            else
+            {
+                  switch (nsEntry->mType)
+                  {
+                        case Namespace::Entry::StringCallbackType:
+                        {
+                              const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+                              stack[_STK + 1].setString(result);
+                              _STK++;
+                              break;
+                        }
+                        case Namespace::Entry::IntCallbackType:
+                        {
+                              S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
+
+                              stack[_STK + 1].setInt(result);
+                              _STK++;
+                              break;
+                        }
+                        case Namespace::Entry::FloatCallbackType:
+                        {
+                              F64 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
+
+                              stack[_STK + 1].setFloat(result);
+                              _STK++;
+                              break;
+                        }
+                        case Namespace::Entry::VoidCallbackType:
+                        {
+                              nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
+
+                              if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
+                              {
+                                    Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
+                              }
+
+                              stack[_STK + 1].setEmptyString();
+                              _STK++;
+
+                              break;
+                        }
+                        case Namespace::Entry::BoolCallbackType:
+                        {
+                              bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
+
+                              stack[_STK + 1].setBool(result);
+                              _STK++;
+
+                              break;
+                        }
+                  } // switch (nsEntry->mType)
+            }
+      }
+      DISPATCH();
+} //OP_CALLFUNC
+
+// ~~~~~~~~~~~~~~~~~ STR
+handle_OP_ADVANCE_STR_APPENDCHAR:
+{
+      char buff[2];
+      buff[0] = (char)code[ip++];
+      buff[1] = '\0';
+
+      S32 len;
+      const char* concat = tsconcat(stack[_STK].getString(), buff, len);
+
+      stack[_STK].setStringRef(concat, len);
+      DISPATCH();
+}
+
+handle_OP_REWIND_STR:
+      // TORQUE_CASE_FALLTHROUGH;
+handle_OP_TERMINATE_REWIND_STR:
+{
+      S32 len;
+      const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
+
+      stack[_STK - 1].setStringRef(concat, len);
+      POP_STK();
+      DISPATCH();
+}
+
+handle_OP_COMPARE_STR:
+      stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
+      POP_STK(); //XXTH memfix attempt orig: _STK--;
+      DISPATCH();
+// ~~~~~~~~~~~~~~~~~ STACK
+handle_OP_PUSH:
+      gCallStack.push((stack[_STK--]));
+      DISPATCH();
+
+handle_OP_PUSH_FRAME:
+      gCallStack.pushFrame(code[ip++]);
+      DISPATCH();
+
+
+// ~~~~~~~~~~~~~~~~~ ASSERT/BREAK
+handle_OP_ASSERT:
+{
+      if (!stack[_STK--].getBool())
+      {
+            const char* message = curStringTable + code[ip];
+
+            U32 breakLine, inst;
+            findBreakLine(ip - 1, breakLine, inst);
+
+            if (PlatformAssert::processAssert(PlatformAssert::Fatal,
+                  name ? name : "eval",
+                  breakLine,
+                  message))
+            {
+                  // FIXME ?
+                  // if (TelDebugger && TelDebugger->isConnected() && breakLine > 0)
+                  // {
+                  //    TelDebugger->breakProcess();
+                  // }
+                  // else
+                  Platform::debugBreak();
+            }
+      }
+
+      ip++;
+      DISPATCH();
+}
+
+handle_OP_BREAK:
+{
+      //append the ip and codeptr before managing the breakpoint!
+      AssertFatal(!Script::gEvalState.stack.empty(), "Empty eval stack on break!");
+      Script::gEvalState.getCurrentFrame().module = this;
+      Script::gEvalState.getCurrentFrame().ip = ip - 1;
+
+      U32 breakLine;
+      U32 curOpCode = code[ip]; //XXTH we dont have that here
+      findBreakLine(ip - 1, breakLine, curOpCode);
+      if (!breakLine)
+            DISPATCH_OPCODE(curOpCode); // goto breakContinue;
+      //FIXME? TelDebugger->executionStopped(this, breakLine);
+
+      DISPATCH_OPCODE(curOpCode); //goto breakContinue;
+}
+
+// ~~~~~~~~~~~~~~~~~ ITER (foreach)
+handle_OP_ITER_BEGIN:
+{
+      bool isGlobal = code[ip];
+
+      U32 failIp = code[ip + (isGlobal ? 3 : 2)];
+
+      IterStackRecord& iter = iterStack[_ITER];
+      iter.mIsGlobalVariable = isGlobal;
+
+      if (isGlobal)
+      {
+            StringTableEntry varName = CodeToSTE(code, ip + 1);
+            iter.mVar.mVariable = Con::gGlobalVars.add(varName);
+      }
+      else
+      {
+            iter.mVar.mRegister = code[ip + 1];
+      }
+
+      if (iter.mIsStringIter)
+      {
+            iter.mData.mStr.mString = stack[_STK].getString();
+            iter.mData.mStr.mIndex = 0;
+      }
+      else
+      {
+            // Look up the object.
+
+            SimSet* set;
+            if (!Sim::findObject(stack[_STK].getString(), set))
+            {
+                  Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
+                  Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
+                  ip = failIp;
+                  // Pop the iterated value
+                  POP_STK();
+                  DISPATCH(); // continue;
+            }
+
+            // Set up.
+
+            iter.mData.mObj.mSet = set;
+            iter.mData.mObj.mIndex = 0;
+      }
+
+      _ITER++;
+      iterDepth++;
+
+      ip += isGlobal ? 4 : 3;
+      DISPATCH();
+}
+
+
+handle_OP_ITER_BEGIN_STR:
+{
+      iterStack[_ITER].mIsStringIter = true;
+      //NOTE was before handle_OP_ITER_BEGIN
+      //          TORQUE_CASE_FALLTHROUGH;
+      goto handle_OP_ITER_BEGIN;
+}
+
+handle_OP_ITER:
+{
+      U32 breakIp = code[ip];
+      IterStackRecord& iter = iterStack[_ITER - 1];
+
+      if (iter.mIsStringIter)
+      {
+            const char* str = iter.mData.mStr.mString;
+
+            U32 startIndex = iter.mData.mStr.mIndex;
+            U32 endIndex = startIndex;
+
+            // Break if at end.
+
+            if (!str[startIndex])
+            {
+                  ip = breakIp;
+                  DISPATCH(); // continue;
+            }
+
+            // Find right end of current component.
+
+            if (!dIsspace(str[endIndex])) {
+                  while (str[endIndex] && !dIsspace(str[endIndex])) {
+                        ++endIndex;
+                  }
+                  // do ++endIndex;
+                  // while (str[endIndex] && !dIsspace(str[endIndex]));
+            }
+
+
+            // Extract component.
+
+            if (endIndex != startIndex)
+            {
+                  char savedChar = str[endIndex];
+                  const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+
+                  if (iter.mIsGlobalVariable)
+                        iter.mVar.mVariable->setStringValue(&str[startIndex]);
+                  else
+                        Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
+
+                  const_cast<char*>(str)[endIndex] = savedChar;
+            }
+            else
+            {
+                  if (iter.mIsGlobalVariable)
+                        iter.mVar.mVariable->setStringValue("");
+                  else
+                        Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
+            }
+
+            // Skip separator.
+            if (str[endIndex] != '\0')
+                  ++endIndex;
+
+            iter.mData.mStr.mIndex = endIndex;
+      }
+      else
+      {
+            U32 index = iter.mData.mObj.mIndex;
+            SimSet* set = iter.mData.mObj.mSet;
+
+            if (index >= set->size())
+            {
+                  ip = breakIp;
+                  DISPATCH(); // continue;
+            }
+
+            SimObjectId id = set->at(index)->getId();
+
+            if (iter.mIsGlobalVariable)
+                  iter.mVar.mVariable->setIntValue(id);
+            else
+                  Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
+
+            iter.mData.mObj.mIndex = index + 1;
+      }
+
+      ++ip;
+      DISPATCH();
+}
+
+handle_OP_ITER_END:
+{
+      --_ITER;
+      --iterDepth;
+
+      POP_STK(); //XXTH memfix attempt orig: _STK--;
+
+      iterStack[_ITER].mIsStringIter = false;
+      DISPATCH();;
+}
+
+// ~~~~~~~~~~~~~~~~~ VECTOR_STRING
+// PoD !! :D only kosmetic max 16 elements
+handle_OP_BUILD_VECTOR_STRING: {
+      // read the count
+      U32 count = code[ip++];
+
+      const U32 MAX_ELEMENTS = 16;
+      const char* stringValues[MAX_ELEMENTS];
+
+      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+
+      #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+      bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
+      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
+      #endif
+      // get values from stack
+      for (S32 i = count - 1; i >= 0; i--) {
+            #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+            if (matchVectorFields) v[i] = stack[_STK].getFloat();
+            #endif
+
+            stringValues[i] = stack[_STK].getString();
+            _STK--;
+      }
+
+      // i have to translate it to a string again :(
+      char buffer[256];
+      int offset = 0;
+      buffer[0] = '\0';
+
+      for (U32 i = 0; i < count; i++) {
+            offset += dSprintf(buffer + offset
+            , sizeof(buffer) - offset
+            , (i == 0) ? "%s" : " %s", stringValues[i]);
+      }
+
       _STK++;
-      DISPATCH();
-// ~~~~~~~~~~~~~~~~~ SAVEVAR
-handle_OP_SAVEVAR_UINT:
-      Script::gEvalState.setIntVariable(stack[_STK].getInt());
-      DISPATCH();
-handle_OP_SAVEVAR_FLT:
-      Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
-      DISPATCH();
-handle_OP_SAVEVAR_STR:
-      if (stack[_STK].type == cvInteger) {
-            Script::gEvalState.setIntVariable(stack[_STK].getInt());
-            DISPATCH();
-      }
+      stack[_STK].setString(buffer);
 
-      if (stack[_STK].type == cvFloat) {
-            Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
-            DISPATCH();
-      }
+      #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+      // after setString!!
+      if (matchVectorFields) {
+            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+            // this break:
+            // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
+            // {
+            //       Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
+            // }
+            // not sure why because i return the string which is filled above
+            // but i only added a small part where  type is used so why knows .....
 
-      Script::gEvalState.setStringVariable(stack[_STK].getString());
+
+            // FIXME stack[_STK].type = cvVector;
+
+            // copy all to 0.f old values
+            // for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
+            //        stack[_STK].v[i] = v[i];
+            // }
+            // SPEED
+            dMemcpy(stack[_STK].v, v, sizeof(v));
+      }
+      #endif
+
+
       DISPATCH();
+}
+
+// ~~~~~~~~~~~~~~~~~ SAVEFIELD_FASTPATH
+// NOTE placed under handle_OP_SAVEFIELD_FLT:
+
+// ~~~~~~~~~~~~~~~~~ EXPERIMENTAL UNIT
+#ifdef ELFSCRIPT_INT_HACK
+handle_OP_CMPLT_UINT:
+      doIntOperation<IntegerOperation::LT>();
+      DISPATCH();
+handle_OP_CMPGR_UINT:
+      doIntOperation<IntegerOperation::GT>();
+      DISPATCH();
+handle_OP_CMPLE_UINT:
+      doIntOperation<IntegerOperation::LE>();
+      DISPATCH();
+handle_OP_CMPGE_UINT:
+      doIntOperation<IntegerOperation::GE>();
+      DISPATCH();
+handle_OP_CMPEQ_UINT:
+      doIntOperation<IntegerOperation::EQ>();
+      DISPATCH();
+handle_OP_CMPNE_UINT:
+      doIntOperation<IntegerOperation::NE>();
+      DISPATCH();
+#endif
+
+// ~~~~~~~~~~~~~~~~~ INVALID
+handle_OP_INVALID:
+      AssertISV(false, "Invalid OPCode Processed!");
+      goto execFinished;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~ F A L L  B A C K ~~~~~~~~~
-handle_FALLBACK_SWITCH:
-{
-   // U32 instruction = code[ip++];
-   U32 instruction = code[ip -1];
- // to For or not to for that is the question: for (;;) {
-   breakContinue:
-      switch (instruction)
-      {
-      case OP_FUNC_DECL:
-      {
-         //NOTE XXTH we have noCalls but we want to load the functions!
-            // NOTE rolled back cause memory leak!!
-         //orig: if (!noCalls)
-         {
-            fnName = CodeToSTE(code, ip);
-            fnNamespace = CodeToSTE(code, ip + 2);
-            fnPackage = CodeToSTE(code, ip + 4);
-            bool hasBody = (code[ip + 6] & 0x01) != 0;
-
-            Namespace::unlinkPackages();
-            if (fnNamespace == NULL && fnPackage == NULL)
-               ns = Namespace::global();
-            else
-               ns = Namespace::find(fnNamespace, fnPackage);
-
-            ns->addFunction(fnName, this, hasBody ? ip : 0);
-
-            if (curNSDocBlock)
-            {
-               if (fnNamespace == StringTable->lookup(nsDocBlockClass))
-               {
-                  char* usageStr = dStrdup(curNSDocBlock);
-                  usageStr[dStrlen(usageStr)] = '\0';
-                  ns->mUsage = usageStr;
-                  ns->mCleanUpUsage = true;
-                  curNSDocBlock = NULL;
-               }
-            }
-
-            const U32 fnArgc = code[ip + 8];
-
-            Namespace::Entry* temp = ns->lookup(fnName);
-            temp->mArgFlags.setSize(fnArgc);
-            temp->mDefaultOffsets.setSize(fnArgc);
-
-            // Arg flags: ip + 10 + fnArgc
-            // Codelet IPs: ip + 10 + 2*fnArgc
-            const U32 flagBase = ip + 10 + fnArgc;
-            const U32 offsetBase = ip + 10 + 2 * fnArgc;
-
-            for (U32 fa = 0; fa < fnArgc; ++fa)
-            {
-               temp->mArgFlags[fa] = code[flagBase + fa];
-               temp->mDefaultOffsets[fa] = code[offsetBase + fa];
-            }
-
-            // No stack pops: mDefaultValues is gone.
-
-            Namespace::relinkPackages();
-            curFNDocBlock = NULL;
-         }
-
-         // Jump past header + body + codelets.  endIp is at code[ip + 7].
-         ip = code[ip + 7];
-         break;
-      }
-
-      case OP_DEFAULT_END:
-      {
-         returnValue = stack[_STK];
-         POP_STK();
-
-         while (iterDepth > 0)
-         {
-            iterStack[--_ITER].mIsStringIter = false;
-            --iterDepth;
-            POP_STK();
-         }
-
-         goto execFinished;
-      }
-
-      case OP_CREATE_OBJECT:
-      {
-         // Read some useful info.
-         objParent = CodeToSTE(code, ip);
-         // bool isDataBlock = code[ip + 2];
-         bool isInternal = code[ip + 3];
-         bool isSingleton = code[ip + 4];
-         U32  lineNumber = code[ip + 5];
-         failJump = code[ip + 6];
-
-         // If we don't allow calls, we certainly don't allow creating objects!
-         // Moved this to after failJump is set. Engine was crashing when
-         // noCalls = true and an object was being created at the beginning of
-         // a file. ADL.
-         if (noCalls)
-         {
-            ip = failJump;
-            break;
-         }
-
-         // Push the old info to the stack
-         //Assert( objectCreationStackIndex < objectCreationStackSize );
-         objectCreationStack[objectCreationStackIndex].newObject = currentNewObject;
-         objectCreationStack[objectCreationStackIndex++].failJump = failJump;
-
-         // Get the constructor information off the stack.
-         gCallStack.argvc(NULL, callArgc, &callArgv);
-         AssertFatal(callArgc - 3 >= 0, avar("Call Arg needs at least 3, only has %d", callArgc));
-         const char* objectName = callArgv[2].getString();
-
-         // Con::printf("Creating object...");
-
-         // objectName = argv[1]...
-         currentNewObject = NULL;
-
-         // Are we creating a datablock? If so, deal with case where we override
-         // an old one.
-   /*      if (isDataBlock)
-         {
-            // Con::printf("  - is a datablock");
-
-            // Find the old one if any.
-            SimObject* db = Sim::getDataBlockGroup()->findObject(objectName);
-
-            // Make sure we're not changing types on ourselves...
-            if (db && dStricmp(db->getClassName(), callArgv[1].getString()))
-            {
-               Con::errorf(ConsoleLogEntry::General, "Cannot re-declare data block %s with a different class.", objectName);
-               ip = failJump;
-               gCallStack.popFrame();
-               break;
-            }
-
-            // If there was one, set the currentNewObject and move on.
-            if (db)
-               currentNewObject = db;
-         }
-         else */if (!isInternal)
-         {
-            AbstractClassRep* rep = AbstractClassRep::findClassRep(objectName);
-            if (rep != NULL)
-            {
-               Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
-                  getFileLine(ip), objectName);
-               ip = failJump;
-               gCallStack.popFrame();
-               break;
-            }
-
-            SimObject* obj = Sim::findObject((const char*)objectName);
-            if (obj)
-            {
-               if (isSingleton)
-               {
-                  // Make sure we're not trying to change types
-                  if (dStricmp(obj->getClassName(), callArgv[1].getString()) != 0)
-                  {
-                     Con::errorf(ConsoleLogEntry::General, "%s: Cannot re-declare object [%s] with a different class [%s] - was [%s].",
-                        getFileLine(ip), objectName, callArgv[1].getString(), obj->getClassName());
-                     ip = failJump;
-                     gCallStack.popFrame();
-                     break;
-                  }
-
-                  // We're creating a singleton, so use the found object instead of creating a new object.
-                  currentNewObject = obj;
-                  Con::warnf("%s: Singleton Object was already created with name %s. Using existing object.",
-                     getFileLine(ip), objectName);
-               }
-            }
-         }
-
-         gCallStack.popFrame();
-
-         if (!currentNewObject)
-         {
-            // Well, looks like we have to create a new object.
-            ConsoleObject* object = ConsoleObject::create(callArgv[1].getString());
-
-            // Deal with failure!
-            if (!object)
-            {
-               Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-conobject class %s.", getFileLine(ip - 1), callArgv[1].getString());
-               ip = failJump;
-               break;
-            }
-
-            // Do special datablock init if appropros
-            // if (isDataBlock)
-            // {
-            //    SimDataBlock* dataBlock = dynamic_cast<SimDataBlock*>(object);
-            //    if (dataBlock)
-            //    {
-            //       dataBlock->assignId();
-            //    }
-            //    else
-            //    {
-            //       // They tried to make a non-datablock with a datablock keyword!
-            //       Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-datablock class %s.", getFileLine(ip - 1), callArgv[1].getString());
-            //
-            //       // Clean up...
-            //       delete object;
-            //       currentNewObject = NULL;
-            //       ip = failJump;
-            //       break;
-            //    }
-            // }
-
-            // Finally, set currentNewObject to point to the new one.
-            currentNewObject = dynamic_cast<SimObject*>(object);
-
-            // Deal with the case of a non-SimObject.
-            if (!currentNewObject)
-            {
-               Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip - 1), callArgv[1].getString());
-               delete object;
-               ip = failJump;
-               break;
-            }
-
-            // Set the declaration line
-            currentNewObject->setDeclarationLine(lineNumber);
-
-            // Set the file that this object was created in
-            currentNewObject->setFilename(this->name);
-
-            // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
-            if (*objParent)
-            {
-               // Find it!
-               SimObject* parent;
-               if (Sim::findObject(objParent, parent))
-               {
-                  // Con::printf(" - Parent object found: %s", parent->getClassName());
-
-                  currentNewObject->setCopySource(parent);
-                  currentNewObject->assignFieldsFrom(parent);
-
-                  // copy any substitution statements
-                  // SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
-                  // if (parent_db)
-                  // {
-                  //    SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
-                  //    if (currentNewObject_db)
-                  //       currentNewObject_db->copySubstitutionsFrom(parent_db);
-                  // }
-               }
-               else
-               {
-                  if (Con::gObjectCopyFailures == -1)
-                     Con::errorf(ConsoleLogEntry::General, "%s: Unable to find parent object %s for %s.", getFileLine(ip - 1), objParent, callArgv[1].getString());
-                  ++Con::gObjectCopyFailures;
-
-                  delete object;
-                  currentNewObject = NULL;
-                  ip = failJump;
-                  break;
-               }
-            }
-
-            // If a name was passed, assign it.
-            if (objectName[0])
-            {
-               if (!isInternal)
-                  currentNewObject->assignName(objectName);
-               else
-                  currentNewObject->setInternalName(objectName);
-
-               // Set the original name
-               currentNewObject->setOriginalName( objectName );
-            }
-
-            // Do the constructor parameters.
-            if (!currentNewObject->processArguments(callArgc - 3, callArgv + 3))
-            {
-               delete currentNewObject;
-               currentNewObject = NULL;
-               ip = failJump;
-               break;
-            }
-
-            // If it's not a datablock, allow people to modify bits of it.
-            // if (!isDataBlock)
-            // {
-            //    currentNewObject->setModStaticFields(true);
-            //    currentNewObject->setModDynamicFields(true);
-            // }
-         }
-         else
-         {
-            currentNewObject->reloadReset(); // AFX (reload-reset)
-
-            // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
-            if (*objParent)
-            {
-               // Find it!
-               SimObject* parent;
-               if (Sim::findObject(objParent, parent))
-               {
-                  // Con::printf(" - Parent object found: %s", parent->getClassName());
-
-                  // temporarily block name change
-                  SimObject::preventNameChanging = true;
-                  currentNewObject->setCopySource(parent);
-                  currentNewObject->assignFieldsFrom(parent);
-                  // restore name changing
-                  SimObject::preventNameChanging = false;
-
-                  // copy any substitution statements
-                  // SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
-                  // if (parent_db)
-                  // {
-                  //    SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
-                  //    if (currentNewObject_db)
-                  //       currentNewObject_db->copySubstitutionsFrom(parent_db);
-                  // }
-               }
-               else
-               {
-                  Con::errorf(ConsoleLogEntry::General, "%d: Unable to find parent object %s for %s.", lineNumber, objParent, callArgv[1].getString());
-               }
-            }
-         }
-
-         // Advance the IP past the create info...
-         ip += 7;
-         break;
-      }
-
-      case OP_ADD_OBJECT:
-      {
-         // See OP_SETCURVAR for why we do this.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-
-         // Do we place this object at the root?
-         bool placeAtRoot = code[ip++];
-
-         // Con::printf("Adding object %s", currentNewObject->getName());
-
-         // Make sure it wasn't already added, then add it.
-         if (currentNewObject == NULL)
-         {
-            break;
-         }
-
-         bool isMessage = dynamic_cast<Message*>(currentNewObject) != NULL;
-
-         if (currentNewObject->isProperlyAdded() == false)
-         {
-            bool ret = false;
-            if (isMessage)
-            {
-               SimObjectId id = Message::getNextMessageID();
-               if (id != 0xffffffff)
-                  ret = currentNewObject->registerObject(id);
-               else
-                  Con::errorf("%s: No more object IDs available for messages", getFileLine(ip));
-            }
-            else
-               ret = currentNewObject->registerObject();
-
-            if (!ret)
-            {
-               // This error is usually caused by failing to call Parent::initPersistFields in the class' initPersistFields().
-               Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip - 2), currentNewObject->getName(), currentNewObject->getClassName());
-               ++Con::gObjectCopyFailures;
-               delete currentNewObject;
-               currentNewObject = NULL;
-               ip = failJump;
-               break;
-            }
-         }
-
-         // Are we dealing with a datablock?
-         // SimDataBlock* dataBlock = dynamic_cast<SimDataBlock*>(currentNewObject);
-         // String errorStr;
-         //
-         // // If so, preload it.
-         // if (dataBlock && !dataBlock->preload(true, errorStr))
-         // {
-         //    Con::errorf(ConsoleLogEntry::General, "%s: preload failed for %s: %s.", getFileLine(ip - 2),
-         //       currentNewObject->getName(), errorStr.c_str());
-         //    ++Con::gObjectCopyFailures;
-         //    dataBlock->deleteObject();
-         //    currentNewObject = NULL;
-         //    ip = failJump;
-         //    break;
-         // }
-
-         // What group will we be added to, if any?
-         U32 groupAddId = (U32)stack[_STK].getInt();
-         SimGroup* grp = NULL;
-         SimSet* set = NULL;
-
-         if (!placeAtRoot || !currentNewObject->getGroup())
-         {
-            if (!isMessage)
-            {
-               if (!placeAtRoot)
-               {
-                  // Otherwise just add to the requested group or set.
-                  if (!Sim::findObject(groupAddId, grp))
-                     Sim::findObject(groupAddId, set);
-               }
-
-               if (placeAtRoot)
-               {
-                  // Deal with the instantGroup if we're being put at the root or we're adding to a component.
-                  if (Con::gInstantGroup.isEmpty() || !Sim::findObject(Con::gInstantGroup, grp))
-                     grp = Sim::getRootGroup();
-               }
-            }
-
-            // If we didn't get a group, then make sure we have a pointer to
-            // the rootgroup.
-            if (!grp)
-               grp = Sim::getRootGroup();
-
-            // add to the parent group
-            grp->addObject(currentNewObject);
-
-            // If for some reason the add failed, add the object to the
-            // root group so it won't leak.
-            if (currentNewObject->getGroup() == NULL)
-               Sim::getRootGroup()->addObject(currentNewObject);
-
-            // add to any set we might be in
-            if (set)
-               set->addObject(currentNewObject);
-         }
-
-         // store the new object's ID on the stack (overwriting the group/set
-         // id, if one was given, otherwise getting pushed)
-         S32 id = currentNewObject->getId();
-         if (placeAtRoot)
-            stack[_STK].setInt(id);
-         else
-            stack[++_STK].setInt(id);
-
-         break;
-      }
-
-      case OP_END_OBJECT:
-      {
-         // If we're not to be placed at the root, make sure we clean up
-         // our group reference.
-         bool placeAtRoot = code[ip++];
-         if (!placeAtRoot)
-            POP_STK();
-         break;
-      }
-
-      case OP_FINISH_OBJECT:
-      {
-         if (currentNewObject)
-            currentNewObject->onPostAdd();
-
-         AssertFatal( objectCreationStackIndex >= 0, "Object Stack is empty." );
-         // Restore the object info from the stack [7/9/2007 Black]
-         currentNewObject = objectCreationStack[--objectCreationStackIndex].newObject;
-         failJump = objectCreationStack[objectCreationStackIndex].failJump;
-         break;
-      }
-
-      case OP_JMPIFFNOT:
-         if (stack[_STK--].getFloat())
-         {
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIFNOT:
-         if (stack[_STK--].getInt())
-         {
-            ip++;
-            break;
-         }
-
-         ip = code[ip];
-         break;
-      case OP_JMPNOTSTRING:
-         if (stack[_STK--].getBool())
-         {
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIFF:
-         if (!stack[_STK--].getFloat())
-         {
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIF:
-         if (!stack[_STK--].getFloat())
-         {
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIFNOT_NP:
-         if (stack[_STK].getInt())
-         {
-            POP_STK();
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMPIF_NP:
-         if (!stack[_STK].getInt())
-         {
-            POP_STK();
-            ip++;
-            break;
-         }
-         ip = code[ip];
-         break;
-      case OP_JMP:
-         ip = code[ip];
-         break;
-
-      case OP_RETURN_VOID:
-      {
-         if (iterDepth > 0)
-         {
-            // Clear iterator state.
-            while (iterDepth > 0)
-            {
-               iterStack[--_ITER].mIsStringIter = false;
-               --iterDepth;
-
-               POP_STK();     // this is a pop from foreach()
-            }
-         }
-
-         returnValue.setEmptyString();
-
-         goto execFinished;
-      }
-
-      case OP_RETURN:
-      {
-         returnValue = (stack[_STK]);
-         POP_STK();
-
-         // Clear iterator state.
-         while (iterDepth > 0)
-         {
-            iterStack[--_ITER].mIsStringIter = false;
-            --iterDepth;
-
-            POP_STK();
-         }
-
-         goto execFinished;
-      }
-      case OP_RETURN_FLT:
-         returnValue.setFloat(stack[_STK].getFloat());
-         POP_STK();
-
-         // Clear iterator state.
-         while (iterDepth > 0)
-         {
-            iterStack[--_ITER].mIsStringIter = false;
-            --iterDepth;
-
-            POP_STK();
-         }
-
-         goto execFinished;
-
-      case OP_RETURN_UINT:
-         returnValue.setInt(stack[_STK].getInt());
-         POP_STK();
-
-         // Clear iterator state.
-         while (iterDepth > 0)
-         {
-            iterStack[--_ITER].mIsStringIter = false;
-            --iterDepth;
-
-            POP_STK();
-         }
-
-         goto execFinished;
-
-      case OP_CMPEQ:
-         doFloatMathOperation<FloatOperation::EQ>();
-         break;
-
-      case OP_CMPGR:
-         doFloatMathOperation<FloatOperation::GR>();
-         break;
-
-      case OP_CMPGE:
-         doFloatMathOperation<FloatOperation::GE>();
-         break;
-
-      case OP_CMPLT:
-         doFloatMathOperation<FloatOperation::LT>();
-         break;
-
-      case OP_CMPLE:
-         doFloatMathOperation<FloatOperation::LE>();
-         break;
-
-      case OP_CMPNE:
-         doFloatMathOperation<FloatOperation::NE>();
-         break;
-
-      case OP_XOR:
-         doIntOperation<IntegerOperation::Xor>();
-         break;
-
-      case OP_BITAND:
-         doIntOperation<IntegerOperation::BitAnd>();
-         break;
-
-      case OP_BITOR:
-         doIntOperation<IntegerOperation::BitOr>();
-         break;
-
-      case OP_NOT:
-         stack[_STK].setBool(!stack[_STK].getInt());
-         break;
-
-      case OP_NOTF:
-         stack[_STK].setInt(!stack[_STK].getFloat());
-         break;
-
-      case OP_ONESCOMPLEMENT:
-         stack[_STK].setInt(~stack[_STK].getInt());
-         break;
-
-      case OP_SHR:
-         doIntOperation<IntegerOperation::RShift>();
-         break;
-
-      case OP_SHL:
-         doIntOperation<IntegerOperation::LShift>();
-         break;
-
-      case OP_AND:
-         doIntOperation<IntegerOperation::LogicalAnd>();
-         break;
-
-      case OP_OR:
-         doIntOperation<IntegerOperation::LogicalOr>();
-         break;
-
-      case OP_ADD:
-         doFloatMathOperation<FloatOperation::Add>();
-         break;
-
-      case OP_SUB:
-         doFloatMathOperation<FloatOperation::Sub>();
-         break;
-
-      case OP_MUL:
-         doFloatMathOperation<FloatOperation::Mul>();
-         break;
-
-      case OP_DIV:
-         doFloatMathOperation<FloatOperation::Div>();
-         break;
-
-      case OP_MOD:
-      {
-         S64 divisor = stack[_STK - 1].getInt();
-         if (divisor != 0)
-            stack[_STK - 1].setInt(stack[_STK].getInt() % divisor);
-         else
-            stack[_STK - 1].setInt(0);
-         POP_STK();
-         break;
-      }
-
-      case OP_NEG:
-         stack[_STK].setFloat(-stack[_STK].getFloat());
-         break;
-
-      case OP_INC:
-         reg = code[ip++];
-         currentRegister = reg;
-         Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
-         break;
-
-#ifdef ELFSCRIPT_INT_HACK
-      case OP_INC_UINT: // ElfScript
-         reg = code[ip++];
-         currentRegister = reg;
-         Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1);
-         break;
-#endif
-      case OP_SETCURVAR:
-         var = CodeToSTE(code, ip);
-         ip += 2;
-
-         // If a variable is set, then these must be NULL. It is necessary
-         // to set this here so that the vector parser can appropriately
-         // identify whether it's dealing with a vector.
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarName(var);
-
-         // In order to let docblocks work properly with variables, we have
-         // clear the current docblock when we do an assign. This way it
-         // won't inappropriately carry forward to following function decls.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         break;
-
-      case OP_SETCURVAR_CREATE:
-         var = CodeToSTE(code, ip);
-         ip += 2;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarNameCreate(var);
-
-         // See OP_SETCURVAR for why we do this.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         break;
-
-      case OP_SETCURVAR_ARRAY:
-         var = StringTable->insert(stack[_STK].getString());
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarName(var);
-
-         // See OP_SETCURVAR for why we do this.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         break;
-
-      case OP_SETCURVAR_ARRAY_CREATE:
-         var = StringTable->insert(stack[_STK].getString());
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         // Used for local variable caching of what is active...when we
-         // set a global, we aren't active
-         currentRegister = -1;
-
-         Script::gEvalState.setCurVarNameCreate(var);
-
-         // See OP_SETCURVAR for why we do this.
-         curFNDocBlock = NULL;
-         curNSDocBlock = NULL;
-         break;
-
-      case OP_LOADVAR_UINT:
-         currentRegister = -1;
-         stack[_STK + 1].setInt(Script::gEvalState.getIntVariable());
-         _STK++;
-         break;
-
-      case OP_LOADVAR_FLT:
-         currentRegister = -1;
-         stack[_STK + 1].setFloat(Script::gEvalState.getFloatVariable());
-         _STK++;
-         break;
-
-
-      // ElfScript Optimization
-      case OP_LOADVAR_STR:
-      currentRegister = -1;
-      {
-            // i check the type first!
-            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
-
-            bool fastPath = false;
-            if (varEntry) {
-                  static S32 valueType = 0;
-                  valueType = varEntry->value.getType();
-                  fastPath =  valueType == ConsoleValueType::cvFloat ||
-                              valueType == ConsoleValueType::cvInteger;
-            }
-            if (fastPath)
-            {
-                  // Fastpath
-                  stack[_STK + 1] = varEntry->value;
-            }
-            else
-            {
-                  // Slowpath: Fallback
-                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
-            }
-      }
-      _STK++;
-      break;
-
-
-      // orig:
-      // case OP_LOADVAR_STR:
-      //    currentRegister = -1;
-      //    stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
-      //    _STK++;
-      //    break;
-
-      case OP_SAVEVAR_UINT:
-         Script::gEvalState.setIntVariable(stack[_STK].getInt());
-         break;
-
-      case OP_SAVEVAR_FLT:
-         Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
-         break;
-
-      case OP_SAVEVAR_STR:
-            // ElfScript 0.4c rocket change !
-            // XXTH inlining drives me crazy here -- using kdevelop
-            // i go for speed not for most beautiful code :P
-            if (stack[_STK].type == cvInteger) {
-                  Script::gEvalState.setIntVariable(stack[_STK].getInt());
-                  break;
-            }
-
-            if (stack[_STK].type == cvFloat) {
-                  Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
-                  break;
-            }
-
-         Script::gEvalState.setStringVariable(stack[_STK].getString());
-         break;
-
-      case OP_LOAD_LOCAL_VAR_UINT:
-         reg = code[ip++];
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
-         _STK++;
-         break;
-
-      case OP_LOAD_LOCAL_VAR_FLT:
-         reg = code[ip++];
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
-         _STK++;
-         break;
-
-         // ElfScript Optimization:
-      case OP_LOAD_LOCAL_VAR_STR:
-            reg = code[ip++];
-            currentRegister = reg;
-
-            // See OP_SETCURVAR
-            prevField = NULL;
-            prevObject = NULL;
-            curObject = NULL;
-            {
-                  const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-                  if (localVal.getType() == ConsoleValueType::cvFloat ||
-                        localVal.getType() == ConsoleValueType::cvInteger)
-                  {
-                        //fast fetch
-                        stack[_STK + 1] = localVal;
-                  }
-                  else
-                  {
-                        // fallback
-                        val = Script::gEvalState.getLocalStringVariable(reg);
-                        stack[_STK + 1].setString(val);
-                  }
-            }
-            _STK++;
-            break;
-
-      // orig:
-      // case OP_LOAD_LOCAL_VAR_STR:
-      //    reg = code[ip++];
-      //    currentRegister = reg;
-      //
-      //    // See OP_SETCURVAR
-      //    prevField = NULL;
-      //    prevObject = NULL;
-      //    curObject = NULL;
-      //
-      //    val = Script::gEvalState.getLocalStringVariable(reg);
-      //    stack[_STK + 1].setString(val);
-      //    _STK++;
-      //    break;
-
-
-
-
-      case OP_SAVE_LOCAL_VAR_UINT:
-         reg = code[ip++];
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
-         break;
-
-      case OP_SAVE_LOCAL_VAR_FLT:
-         reg = code[ip++];
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
-         break;
-
-      case OP_SAVE_LOCAL_VAR_STR:
-         reg = code[ip++];
-         val = stack[_STK].getString();
-         currentRegister = reg;
-
-         // See OP_SETCURVAR
-         prevField = NULL;
-         prevObject = NULL;
-         curObject = NULL;
-
-         Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
-         break;
-
-      case OP_SETCUROBJECT:
-            //ElfScript XXTH found the holy grail for ?!
-            prevObject = curObject;
-            curObject = Sim::findObject(stack[_STK]);
-            break;
-
-
-            // orig lame duck:
-
-            // // Save the previous object for parsing vector fields.
-            // prevObject = curObject;
-            // val = stack[_STK].getString();
-            //
-            // // Sim::findObject will sometimes find valid objects from
-            // // multi-component strings. This makes sure that doesn't
-            // // happen.
-            // for (const char* check = val; *check; check++)
-            // {
-            //    if (*check == ' ')
-            //    {
-            //       val = "";
-            //       break;
-            //    }
-            // }
-            // curObject = Sim::findObject(val);
-            // break;
-
-      case OP_SETCUROBJECT_INTERNAL:
-         ++ip; // To skip the recurse flag if the object wasnt found
-         if (curObject)
-         {
-            SimSet* set = dynamic_cast<SimSet*>(curObject);
-            if (set)
-            {
-               StringTableEntry intName = StringTable->insert(stack[_STK].getString());
-               bool recurse = code[ip - 1];
-               SimObject* obj = set->findObjectByInternalName(intName, recurse);
-               stack[_STK].setInt(obj ? obj->getId() : 0);
-            }
-            else
-            {
-               Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use -> on non-set %s of class %s.", getFileLine(ip - 2), curObject->getName(), curObject->getClassName());
-               stack[_STK].setInt(0);
-            }
-         }
-         else
-         {
-            Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use ->, but the group object wasn't found.", getFileLine(ip - 2));
-            stack[_STK].setInt(0);
-         }
-         break;
-
-      case OP_SETCUROBJECT_NEW:
-         curObject = currentNewObject;
-         break;
-
-      case OP_SETCURFIELD:
-         // Save the previous field for parsing vector fields.
-         prevField = curField;
-         dStrcpy(prevFieldArray, curFieldArray, 256);
-         curField = CodeToSTE(code, ip);
-         curFieldArray[0] = 0;
-         ip += 2;
-         break;
-
-      case OP_SETCURFIELD_ARRAY:
-         dStrcpy(curFieldArray, stack[_STK].getString(), 256);
-         break;
-
-      case OP_SETCURFIELD_TYPE:
-         if(curObject)
-            curObject->setDataFieldType(code[ip], curField, curFieldArray);
-         ip++;
-         break;
-
-// #ifdef ELFSCRIPT_FASTPATH_FLD
-//       //XXTH FastPath HACK:
-//       case OP_LOADFIELD_UINT:
-//             if (curObject)
-//             {
-//                   bool fastPath = false;
-//                   const AbstractClassRep::Field *fld = curObject->findField(curField);
-//
-//                   if (fld)
-//                   {
-//                         const char* array = (const char*) curFieldArray;
-//                         S32 array1 = PARSE_ARRAY_INDEX(array);
-//
-//                         // Fastpath safety check for unmanaged, standard C++ fields
-//                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-//                               && fld->setDataFn == &defaultProtectedSetFn)
-//                         {
-//                               F64 val = 0.0;
-//                               if (curObject->getDataField(fld, val))
-//                               {
-//                                     // Convert the F64 from our fastpath directly to an integer on the stack
-//                                     // Note: Adjust .setInt() to your stack's actual integer/uint method if needed
-//                                     stack[_STK + 1].setInt((S64)val);
-//                                     fastPath = true;
-//                               }
-//                         }
-//                   }
-//
-//                   if (!fastPath)
-//                   {
-//                         // Fallback for dynamic fields or fields with custom C++ logic
-//                         stack[_STK + 1].setInt(dAtoi(curObject->getDataField(curField, curFieldArray)));
-//                   }
-//             }
-//             else
-//             {
-//                   // The field is not being retrieved from an object. Maybe it's
-//                   // a special accessor?
-//                   char buff[FieldBufferSizeNumeric];
-//                   memset(buff, 0, sizeof(buff));
-//                   getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-//                   stack[_STK + 1].setInt(dAtoi(buff));
-//             }
-//             _STK++;
-//             break;
-// #else
-//       case OP_LOADFIELD_UINT:
-//          if (curObject)
-//             stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
-//          else
+// handle_FALLBACK_SWITCH:
+// {
+//    // U32 instruction = code[ip++];
+//    U32 instruction = code[ip -1];
+//  // to For or not to for that is the question: for (;;) {
+//    breakContinue:
+//       switch (instruction)
+//       {
+//       case OP_FUNC_DECL:
+//       {
+//          //NOTE XXTH we have noCalls but we want to load the functions!
+//             // NOTE rolled back cause memory leak!!
+//          //orig: if (!noCalls)
 //          {
-//             // The field is not being retrieved from an object. Maybe it's
-//             // a special accessor?
-//             char buff[FieldBufferSizeNumeric];
-//             memset(buff, 0, sizeof(buff));
-//             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-//             stack[_STK + 1].setInt(dAtol(buff));
+//             fnName = CodeToSTE(code, ip);
+//             fnNamespace = CodeToSTE(code, ip + 2);
+//             fnPackage = CodeToSTE(code, ip + 4);
+//             bool hasBody = (code[ip + 6] & 0x01) != 0;
+//
+//             Namespace::unlinkPackages();
+//             if (fnNamespace == NULL && fnPackage == NULL)
+//                ns = Namespace::global();
+//             else
+//                ns = Namespace::find(fnNamespace, fnPackage);
+//
+//             ns->addFunction(fnName, this, hasBody ? ip : 0);
+//
+//             if (curNSDocBlock)
+//             {
+//                if (fnNamespace == StringTable->lookup(nsDocBlockClass))
+//                {
+//                   char* usageStr = dStrdup(curNSDocBlock);
+//                   usageStr[dStrlen(usageStr)] = '\0';
+//                   ns->mUsage = usageStr;
+//                   ns->mCleanUpUsage = true;
+//                   curNSDocBlock = NULL;
+//                }
+//             }
+//
+//             const U32 fnArgc = code[ip + 8];
+//
+//             Namespace::Entry* temp = ns->lookup(fnName);
+//             temp->mArgFlags.setSize(fnArgc);
+//             temp->mDefaultOffsets.setSize(fnArgc);
+//
+//             // Arg flags: ip + 10 + fnArgc
+//             // Codelet IPs: ip + 10 + 2*fnArgc
+//             const U32 flagBase = ip + 10 + fnArgc;
+//             const U32 offsetBase = ip + 10 + 2 * fnArgc;
+//
+//             for (U32 fa = 0; fa < fnArgc; ++fa)
+//             {
+//                temp->mArgFlags[fa] = code[flagBase + fa];
+//                temp->mDefaultOffsets[fa] = code[offsetBase + fa];
+//             }
+//
+//             // No stack pops: mDefaultValues is gone.
+//
+//             Namespace::relinkPackages();
+//             curFNDocBlock = NULL;
 //          }
-//          _STK++;
+//
+//          // Jump past header + body + codelets.  endIp is at code[ip + 7].
+//          ip = code[ip + 7];
 //          break;
-// #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
+//       }
 //
-// #ifdef ELFSCRIPT_FASTPATH_FLD
-//          //XXTH Fastpath HACK
-//       case OP_LOADFIELD_FLT:
-//             if (curObject)
-//             {
-//                   bool fastPath = false;
-//                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+//       case OP_DEFAULT_END:
+//       {
+//          returnValue = stack[_STK];
+//          POP_STK();
 //
-//                   if (fld)
-//                   {
-//                         const char* array = (const char*) curFieldArray;
-//                         S32 array1 = PARSE_ARRAY_INDEX(array);
+//          while (iterDepth > 0)
+//          {
+//             iterStack[--_ITER].mIsStringIter = false;
+//             --iterDepth;
+//             POP_STK();
+//          }
 //
-//                         // Fastpath safety check for unmanaged, standard C++ fields
-//                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-//                               && fld->setDataFn == &defaultProtectedSetFn)
-//                         {
-//                               F64 val = 0.0;
-//                               if (curObject->getDataField(fld, val))
-//                               {
-//                                     stack[_STK + 1].setFloat(val);
-//                                     fastPath = true;
-//                               }
-//                         }
-//                   }
+//          goto execFinished;
+//       }
 //
-//                   if (!fastPath)
-//                   {
-//                         // Fallback for dynamic fields or fields with custom C++ logic
-//                         stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
-//                   }
-//             }
-//             else
-//             {
-//                   // The field is not being retrieved from an object. Maybe it's
-//                   // a special accessor?
-//                   char buff[FieldBufferSizeNumeric];
-//                   memset(buff, 0, sizeof(buff));
-//                   getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-//                   stack[_STK + 1].setFloat(dAtod(buff));
-//             }
-//             _STK++;
+//       case OP_CREATE_OBJECT:
+//       {
+//          // Read some useful info.
+//          objParent = CodeToSTE(code, ip);
+//          // bool isDataBlock = code[ip + 2];
+//          bool isInternal = code[ip + 3];
+//          bool isSingleton = code[ip + 4];
+//          U32  lineNumber = code[ip + 5];
+//          failJump = code[ip + 6];
+//
+//          // If we don't allow calls, we certainly don't allow creating objects!
+//          // Moved this to after failJump is set. Engine was crashing when
+//          // noCalls = true and an object was being created at the beginning of
+//          // a file. ADL.
+//          if (noCalls)
+//          {
+//             ip = failJump;
 //             break;
-// #else //#ifdef ELFSCRIPT_FASTPATH_FLD
-//       case OP_LOADFIELD_FLT:
-//          if (curObject)
-//             stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+//          }
+//
+//          // Push the old info to the stack
+//          //Assert( objectCreationStackIndex < objectCreationStackSize );
+//          objectCreationStack[objectCreationStackIndex].newObject = currentNewObject;
+//          objectCreationStack[objectCreationStackIndex++].failJump = failJump;
+//
+//          // Get the constructor information off the stack.
+//          gCallStack.argvc(NULL, callArgc, &callArgv);
+//          AssertFatal(callArgc - 3 >= 0, avar("Call Arg needs at least 3, only has %d", callArgc));
+//          const char* objectName = callArgv[2].getString();
+//
+//          // Con::printf("Creating object...");
+//
+//          // objectName = argv[1]...
+//          currentNewObject = NULL;
+//
+//          // Are we creating a datablock? If so, deal with case where we override
+//          // an old one.
+//    /*      if (isDataBlock)
+//          {
+//             // Con::printf("  - is a datablock");
+//
+//             // Find the old one if any.
+//             SimObject* db = Sim::getDataBlockGroup()->findObject(objectName);
+//
+//             // Make sure we're not changing types on ourselves...
+//             if (db && dStricmp(db->getClassName(), callArgv[1].getString()))
+//             {
+//                Con::errorf(ConsoleLogEntry::General, "Cannot re-declare data block %s with a different class.", objectName);
+//                ip = failJump;
+//                gCallStack.popFrame();
+//                break;
+//             }
+//
+//             // If there was one, set the currentNewObject and move on.
+//             if (db)
+//                currentNewObject = db;
+//          }
+//          else */if (!isInternal)
+//          {
+//             AbstractClassRep* rep = AbstractClassRep::findClassRep(objectName);
+//             if (rep != NULL)
+//             {
+//                Con::errorf(ConsoleLogEntry::General, "%s: Cannot name object [%s] the same name as a script class.",
+//                   getFileLine(ip), objectName);
+//                ip = failJump;
+//                gCallStack.popFrame();
+//                break;
+//             }
+//
+//             SimObject* obj = Sim::findObject((const char*)objectName);
+//             if (obj)
+//             {
+//                if (isSingleton)
+//                {
+//                   // Make sure we're not trying to change types
+//                   if (dStricmp(obj->getClassName(), callArgv[1].getString()) != 0)
+//                   {
+//                      Con::errorf(ConsoleLogEntry::General, "%s: Cannot re-declare object [%s] with a different class [%s] - was [%s].",
+//                         getFileLine(ip), objectName, callArgv[1].getString(), obj->getClassName());
+//                      ip = failJump;
+//                      gCallStack.popFrame();
+//                      break;
+//                   }
+//
+//                   // We're creating a singleton, so use the found object instead of creating a new object.
+//                   currentNewObject = obj;
+//                   Con::warnf("%s: Singleton Object was already created with name %s. Using existing object.",
+//                      getFileLine(ip), objectName);
+//                }
+//             }
+//          }
+//
+//          gCallStack.popFrame();
+//
+//          if (!currentNewObject)
+//          {
+//             // Well, looks like we have to create a new object.
+//             ConsoleObject* object = ConsoleObject::create(callArgv[1].getString());
+//
+//             // Deal with failure!
+//             if (!object)
+//             {
+//                Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-conobject class %s.", getFileLine(ip - 1), callArgv[1].getString());
+//                ip = failJump;
+//                break;
+//             }
+//
+//             // Do special datablock init if appropros
+//             // if (isDataBlock)
+//             // {
+//             //    SimDataBlock* dataBlock = dynamic_cast<SimDataBlock*>(object);
+//             //    if (dataBlock)
+//             //    {
+//             //       dataBlock->assignId();
+//             //    }
+//             //    else
+//             //    {
+//             //       // They tried to make a non-datablock with a datablock keyword!
+//             //       Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-datablock class %s.", getFileLine(ip - 1), callArgv[1].getString());
+//             //
+//             //       // Clean up...
+//             //       delete object;
+//             //       currentNewObject = NULL;
+//             //       ip = failJump;
+//             //       break;
+//             //    }
+//             // }
+//
+//             // Finally, set currentNewObject to point to the new one.
+//             currentNewObject = dynamic_cast<SimObject*>(object);
+//
+//             // Deal with the case of a non-SimObject.
+//             if (!currentNewObject)
+//             {
+//                Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip - 1), callArgv[1].getString());
+//                delete object;
+//                ip = failJump;
+//                break;
+//             }
+//
+//             // Set the declaration line
+//             currentNewObject->setDeclarationLine(lineNumber);
+//
+//             // Set the file that this object was created in
+//             currentNewObject->setFilename(this->name);
+//
+//             // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
+//             if (*objParent)
+//             {
+//                // Find it!
+//                SimObject* parent;
+//                if (Sim::findObject(objParent, parent))
+//                {
+//                   // Con::printf(" - Parent object found: %s", parent->getClassName());
+//
+//                   currentNewObject->setCopySource(parent);
+//                   currentNewObject->assignFieldsFrom(parent);
+//
+//                   // copy any substitution statements
+//                   // SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+//                   // if (parent_db)
+//                   // {
+//                   //    SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
+//                   //    if (currentNewObject_db)
+//                   //       currentNewObject_db->copySubstitutionsFrom(parent_db);
+//                   // }
+//                }
+//                else
+//                {
+//                   if (Con::gObjectCopyFailures == -1)
+//                      Con::errorf(ConsoleLogEntry::General, "%s: Unable to find parent object %s for %s.", getFileLine(ip - 1), objParent, callArgv[1].getString());
+//                   ++Con::gObjectCopyFailures;
+//
+//                   delete object;
+//                   currentNewObject = NULL;
+//                   ip = failJump;
+//                   break;
+//                }
+//             }
+//
+//             // If a name was passed, assign it.
+//             if (objectName[0])
+//             {
+//                if (!isInternal)
+//                   currentNewObject->assignName(objectName);
+//                else
+//                   currentNewObject->setInternalName(objectName);
+//
+//                // Set the original name
+//                currentNewObject->setOriginalName( objectName );
+//             }
+//
+//             // Do the constructor parameters.
+//             if (!currentNewObject->processArguments(callArgc - 3, callArgv + 3))
+//             {
+//                delete currentNewObject;
+//                currentNewObject = NULL;
+//                ip = failJump;
+//                break;
+//             }
+//
+//             // If it's not a datablock, allow people to modify bits of it.
+//             // if (!isDataBlock)
+//             // {
+//             //    currentNewObject->setModStaticFields(true);
+//             //    currentNewObject->setModDynamicFields(true);
+//             // }
+//          }
 //          else
 //          {
-//             // The field is not being retrieved from an object. Maybe it's
-//             // a special accessor?
-//             char buff[FieldBufferSizeNumeric];
-//             memset(buff, 0, sizeof(buff));
-//             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-//             stack[_STK + 1].setFloat(dAtod(buff));
+//             currentNewObject->reloadReset(); // AFX (reload-reset)
+//
+//             // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
+//             if (*objParent)
+//             {
+//                // Find it!
+//                SimObject* parent;
+//                if (Sim::findObject(objParent, parent))
+//                {
+//                   // Con::printf(" - Parent object found: %s", parent->getClassName());
+//
+//                   // temporarily block name change
+//                   SimObject::preventNameChanging = true;
+//                   currentNewObject->setCopySource(parent);
+//                   currentNewObject->assignFieldsFrom(parent);
+//                   // restore name changing
+//                   SimObject::preventNameChanging = false;
+//
+//                   // copy any substitution statements
+//                   // SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+//                   // if (parent_db)
+//                   // {
+//                   //    SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
+//                   //    if (currentNewObject_db)
+//                   //       currentNewObject_db->copySubstitutionsFrom(parent_db);
+//                   // }
+//                }
+//                else
+//                {
+//                   Con::errorf(ConsoleLogEntry::General, "%d: Unable to find parent object %s for %s.", lineNumber, objParent, callArgv[1].getString());
+//                }
+//             }
 //          }
-//          _STK++;
+//
+//          // Advance the IP past the create info...
+//          ip += 7;
+//          break;
+//       }
+//
+//       case OP_ADD_OBJECT:
+//       {
+//          // See OP_SETCURVAR for why we do this.
+//          curFNDocBlock = NULL;
+//          curNSDocBlock = NULL;
+//
+//          // Do we place this object at the root?
+//          bool placeAtRoot = code[ip++];
+//
+//          // Con::printf("Adding object %s", currentNewObject->getName());
+//
+//          // Make sure it wasn't already added, then add it.
+//          if (currentNewObject == NULL)
+//          {
+//             break;
+//          }
+//
+//          bool isMessage = dynamic_cast<Message*>(currentNewObject) != NULL;
+//
+//          if (currentNewObject->isProperlyAdded() == false)
+//          {
+//             bool ret = false;
+//             if (isMessage)
+//             {
+//                SimObjectId id = Message::getNextMessageID();
+//                if (id != 0xffffffff)
+//                   ret = currentNewObject->registerObject(id);
+//                else
+//                   Con::errorf("%s: No more object IDs available for messages", getFileLine(ip));
+//             }
+//             else
+//                ret = currentNewObject->registerObject();
+//
+//             if (!ret)
+//             {
+//                // This error is usually caused by failing to call Parent::initPersistFields in the class' initPersistFields().
+//                Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip - 2), currentNewObject->getName(), currentNewObject->getClassName());
+//                ++Con::gObjectCopyFailures;
+//                delete currentNewObject;
+//                currentNewObject = NULL;
+//                ip = failJump;
+//                break;
+//             }
+//          }
+//
+//          // Are we dealing with a datablock?
+//          // SimDataBlock* dataBlock = dynamic_cast<SimDataBlock*>(currentNewObject);
+//          // String errorStr;
+//          //
+//          // // If so, preload it.
+//          // if (dataBlock && !dataBlock->preload(true, errorStr))
+//          // {
+//          //    Con::errorf(ConsoleLogEntry::General, "%s: preload failed for %s: %s.", getFileLine(ip - 2),
+//          //       currentNewObject->getName(), errorStr.c_str());
+//          //    ++Con::gObjectCopyFailures;
+//          //    dataBlock->deleteObject();
+//          //    currentNewObject = NULL;
+//          //    ip = failJump;
+//          //    break;
+//          // }
+//
+//          // What group will we be added to, if any?
+//          U32 groupAddId = (U32)stack[_STK].getInt();
+//          SimGroup* grp = NULL;
+//          SimSet* set = NULL;
+//
+//          if (!placeAtRoot || !currentNewObject->getGroup())
+//          {
+//             if (!isMessage)
+//             {
+//                if (!placeAtRoot)
+//                {
+//                   // Otherwise just add to the requested group or set.
+//                   if (!Sim::findObject(groupAddId, grp))
+//                      Sim::findObject(groupAddId, set);
+//                }
+//
+//                if (placeAtRoot)
+//                {
+//                   // Deal with the instantGroup if we're being put at the root or we're adding to a component.
+//                   if (Con::gInstantGroup.isEmpty() || !Sim::findObject(Con::gInstantGroup, grp))
+//                      grp = Sim::getRootGroup();
+//                }
+//             }
+//
+//             // If we didn't get a group, then make sure we have a pointer to
+//             // the rootgroup.
+//             if (!grp)
+//                grp = Sim::getRootGroup();
+//
+//             // add to the parent group
+//             grp->addObject(currentNewObject);
+//
+//             // If for some reason the add failed, add the object to the
+//             // root group so it won't leak.
+//             if (currentNewObject->getGroup() == NULL)
+//                Sim::getRootGroup()->addObject(currentNewObject);
+//
+//             // add to any set we might be in
+//             if (set)
+//                set->addObject(currentNewObject);
+//          }
+//
+//          // store the new object's ID on the stack (overwriting the group/set
+//          // id, if one was given, otherwise getting pushed)
+//          S32 id = currentNewObject->getId();
+//          if (placeAtRoot)
+//             stack[_STK].setInt(id);
+//          else
+//             stack[++_STK].setInt(id);
+//
+//          break;
+//       }
+//
+//       case OP_END_OBJECT:
+//       {
+//          // If we're not to be placed at the root, make sure we clean up
+//          // our group reference.
+//          bool placeAtRoot = code[ip++];
+//          if (!placeAtRoot)
+//             POP_STK();
+//          break;
+//       }
+//
+//       case OP_FINISH_OBJECT:
+//       {
+//          if (currentNewObject)
+//             currentNewObject->onPostAdd();
+//
+//          AssertFatal( objectCreationStackIndex >= 0, "Object Stack is empty." );
+//          // Restore the object info from the stack [7/9/2007 Black]
+//          currentNewObject = objectCreationStack[--objectCreationStackIndex].newObject;
+//          failJump = objectCreationStack[objectCreationStackIndex].failJump;
+//          break;
+//       }
+//
+//       case OP_JMPIFFNOT:
+//          if (stack[_STK--].getFloat())
+//          {
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMPIFNOT:
+//          if (stack[_STK--].getInt())
+//          {
+//             ip++;
+//             break;
+//          }
+//
+//          ip = code[ip];
+//          break;
+//       case OP_JMPNOTSTRING:
+//          if (stack[_STK--].getBool())
+//          {
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMPIFF:
+//          if (!stack[_STK--].getFloat())
+//          {
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMPIF:
+//          if (!stack[_STK--].getFloat())
+//          {
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMPIFNOT_NP:
+//          if (stack[_STK].getInt())
+//          {
+//             POP_STK();
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMPIF_NP:
+//          if (!stack[_STK].getInt())
+//          {
+//             POP_STK();
+//             ip++;
+//             break;
+//          }
+//          ip = code[ip];
+//          break;
+//       case OP_JMP:
+//          ip = code[ip];
+//          break;
+//
+//       case OP_RETURN_VOID:
+//       {
+//          if (iterDepth > 0)
+//          {
+//             // Clear iterator state.
+//             while (iterDepth > 0)
+//             {
+//                iterStack[--_ITER].mIsStringIter = false;
+//                --iterDepth;
+//
+//                POP_STK();     // this is a pop from foreach()
+//             }
+//          }
+//
+//          returnValue.setEmptyString();
+//
+//          goto execFinished;
+//       }
+//
+//       case OP_RETURN:
+//       {
+//          returnValue = (stack[_STK]);
+//          POP_STK();
+//
+//          // Clear iterator state.
+//          while (iterDepth > 0)
+//          {
+//             iterStack[--_ITER].mIsStringIter = false;
+//             --iterDepth;
+//
+//             POP_STK();
+//          }
+//
+//          goto execFinished;
+//       }
+//       case OP_RETURN_FLT:
+//          returnValue.setFloat(stack[_STK].getFloat());
+//          POP_STK();
+//
+//          // Clear iterator state.
+//          while (iterDepth > 0)
+//          {
+//             iterStack[--_ITER].mIsStringIter = false;
+//             --iterDepth;
+//
+//             POP_STK();
+//          }
+//
+//          goto execFinished;
+//
+//       case OP_RETURN_UINT:
+//          returnValue.setInt(stack[_STK].getInt());
+//          POP_STK();
+//
+//          // Clear iterator state.
+//          while (iterDepth > 0)
+//          {
+//             iterStack[--_ITER].mIsStringIter = false;
+//             --iterDepth;
+//
+//             POP_STK();
+//          }
+//
+//          goto execFinished;
+//
+//       case OP_CMPEQ:
+//          doFloatMathOperation<FloatOperation::EQ>();
+//          break;
+//
+//       case OP_CMPGR:
+//          doFloatMathOperation<FloatOperation::GR>();
+//          break;
+//
+//       case OP_CMPGE:
+//          doFloatMathOperation<FloatOperation::GE>();
+//          break;
+//
+//       case OP_CMPLT:
+//          doFloatMathOperation<FloatOperation::LT>();
+//          break;
+//
+//       case OP_CMPLE:
+//          doFloatMathOperation<FloatOperation::LE>();
+//          break;
+//
+//       case OP_CMPNE:
+//          doFloatMathOperation<FloatOperation::NE>();
+//          break;
+//
+//       case OP_XOR:
+//          doIntOperation<IntegerOperation::Xor>();
+//          break;
+//
+//       case OP_BITAND:
+//          doIntOperation<IntegerOperation::BitAnd>();
+//          break;
+//
+//       case OP_BITOR:
+//          doIntOperation<IntegerOperation::BitOr>();
+//          break;
+//
+//       case OP_NOT:
+//          stack[_STK].setBool(!stack[_STK].getInt());
+//          break;
+//
+//       case OP_NOTF:
+//          stack[_STK].setInt(!stack[_STK].getFloat());
+//          break;
+//
+//       case OP_ONESCOMPLEMENT:
+//          stack[_STK].setInt(~stack[_STK].getInt());
+//          break;
+//
+//       case OP_SHR:
+//          doIntOperation<IntegerOperation::RShift>();
+//          break;
+//
+//       case OP_SHL:
+//          doIntOperation<IntegerOperation::LShift>();
+//          break;
+//
+//       case OP_AND:
+//          doIntOperation<IntegerOperation::LogicalAnd>();
+//          break;
+//
+//       case OP_OR:
+//          doIntOperation<IntegerOperation::LogicalOr>();
+//          break;
+//
+//       case OP_ADD:
+//          doFloatMathOperation<FloatOperation::Add>();
+//          break;
+//
+//       case OP_SUB:
+//          doFloatMathOperation<FloatOperation::Sub>();
+//          break;
+//
+//       case OP_MUL:
+//          doFloatMathOperation<FloatOperation::Mul>();
+//          break;
+//
+//       case OP_DIV:
+//          doFloatMathOperation<FloatOperation::Div>();
+//          break;
+//
+//       case OP_MOD:
+//       {
+//          S64 divisor = stack[_STK - 1].getInt();
+//          if (divisor != 0)
+//             stack[_STK - 1].setInt(stack[_STK].getInt() % divisor);
+//          else
+//             stack[_STK - 1].setInt(0);
+//          POP_STK();
+//          break;
+//       }
+//
+//       case OP_NEG:
+//          stack[_STK].setFloat(-stack[_STK].getFloat());
+//          break;
+//
+//       case OP_INC:
+//          reg = code[ip++];
+//          currentRegister = reg;
+//          Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+//          break;
+//
+// #ifdef ELFSCRIPT_INT_HACK
+//       case OP_INC_UINT: // ElfScript
+//          reg = code[ip++];
+//          currentRegister = reg;
+//          Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1);
 //          break;
 // #endif
-
-      case OP_LOADFIELD_STR:
-         if (curObject)
-         {
-            curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
-
-            // orig:
-            // val = curObject->getDataField(curField, curFieldArray);
-            // stack[_STK + 1].setString(val);
-         }
-         else
-         {
-            // The field is not being retrieved from an object. Maybe it's
-            // a special accessor?
-            char buff[FieldBufferSizeString];
-            memset(buff, 0, sizeof(buff));
-            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-            stack[_STK + 1].setString(buff);
-         }
-         _STK++;
-         break;
-
-// #ifdef ELFSCRIPT_FASTPATH_FLD
-//       //XXTH fastPath :
-//       case OP_SAVEFIELD_UINT:
-//             if (curObject)
+//       case OP_SETCURVAR:
+//          var = CodeToSTE(code, ip);
+//          ip += 2;
+//
+//          // If a variable is set, then these must be NULL. It is necessary
+//          // to set this here so that the vector parser can appropriately
+//          // identify whether it's dealing with a vector.
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          // Used for local variable caching of what is active...when we
+//          // set a global, we aren't active
+//          currentRegister = -1;
+//
+//          Script::gEvalState.setCurVarName(var);
+//
+//          // In order to let docblocks work properly with variables, we have
+//          // clear the current docblock when we do an assign. This way it
+//          // won't inappropriately carry forward to following function decls.
+//          curFNDocBlock = NULL;
+//          curNSDocBlock = NULL;
+//          break;
+//
+//       case OP_SETCURVAR_CREATE:
+//          var = CodeToSTE(code, ip);
+//          ip += 2;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          // Used for local variable caching of what is active...when we
+//          // set a global, we aren't active
+//          currentRegister = -1;
+//
+//          Script::gEvalState.setCurVarNameCreate(var);
+//
+//          // See OP_SETCURVAR for why we do this.
+//          curFNDocBlock = NULL;
+//          curNSDocBlock = NULL;
+//          break;
+//
+//       case OP_SETCURVAR_ARRAY:
+//          var = StringTable->insert(stack[_STK].getString());
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          // Used for local variable caching of what is active...when we
+//          // set a global, we aren't active
+//          currentRegister = -1;
+//
+//          Script::gEvalState.setCurVarName(var);
+//
+//          // See OP_SETCURVAR for why we do this.
+//          curFNDocBlock = NULL;
+//          curNSDocBlock = NULL;
+//          break;
+//
+//       case OP_SETCURVAR_ARRAY_CREATE:
+//          var = StringTable->insert(stack[_STK].getString());
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          // Used for local variable caching of what is active...when we
+//          // set a global, we aren't active
+//          currentRegister = -1;
+//
+//          Script::gEvalState.setCurVarNameCreate(var);
+//
+//          // See OP_SETCURVAR for why we do this.
+//          curFNDocBlock = NULL;
+//          curNSDocBlock = NULL;
+//          break;
+//
+//       case OP_LOADVAR_UINT:
+//          currentRegister = -1;
+//          stack[_STK + 1].setInt(Script::gEvalState.getIntVariable());
+//          _STK++;
+//          break;
+//
+//       case OP_LOADVAR_FLT:
+//          currentRegister = -1;
+//          stack[_STK + 1].setFloat(Script::gEvalState.getFloatVariable());
+//          _STK++;
+//          break;
+//
+//
+//       // ElfScript Optimization
+//       case OP_LOADVAR_STR:
+//       currentRegister = -1;
+//       {
+//             // i check the type first!
+//             const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
+//
+//             bool fastPath = false;
+//             if (varEntry) {
+//                   static S32 valueType = 0;
+//                   valueType = varEntry->value.getType();
+//                   fastPath =  valueType == ConsoleValueType::cvFloat ||
+//                               valueType == ConsoleValueType::cvInteger;
+//             }
+//             if (fastPath)
 //             {
-//                   bool fastPath = false;
-//                   const AbstractClassRep::Field *fld = curObject->findField(curField);
-//
-//                   if (fld)
-//                   {
-//                         const char* array = (const char*) curFieldArray;
-//                         S32 array1 = PARSE_ARRAY_INDEX(array);
-//
-//                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-//                               && fld->setDataFn == &defaultProtectedSetFn
-//                               && fld->flag == 0
-//                         ) {
-//                               fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
-//                         }
-//                   }
-//
-//                   if (!fastPath)
-//                   {
-//                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-//                   }
+//                   // Fastpath
+//                   stack[_STK + 1] = varEntry->value;
 //             }
 //             else
 //             {
-//                   // The field is not being set on an object. Maybe it's a special accessor?
-//                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-//                   prevObject = NULL;
+//                   // Slowpath: Fallback
+//                   stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
 //             }
+//       }
+//       _STK++;
+//       break;
+//
+//
+//       // orig:
+//       // case OP_LOADVAR_STR:
+//       //    currentRegister = -1;
+//       //    stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+//       //    _STK++;
+//       //    break;
+//
+//       case OP_SAVEVAR_UINT:
+//          Script::gEvalState.setIntVariable(stack[_STK].getInt());
+//          break;
+//
+//       case OP_SAVEVAR_FLT:
+//          Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+//          break;
+//
+//       case OP_SAVEVAR_STR:
+//             // ElfScript 0.4c rocket change !
+//             // XXTH inlining drives me crazy here -- using kdevelop
+//             // i go for speed not for most beautiful code :P
+//             if (stack[_STK].type == cvInteger) {
+//                   Script::gEvalState.setIntVariable(stack[_STK].getInt());
+//                   break;
+//             }
+//
+//             if (stack[_STK].type == cvFloat) {
+//                   Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+//                   break;
+//             }
+//
+//          Script::gEvalState.setStringVariable(stack[_STK].getString());
+//          break;
+//
+//       case OP_LOAD_LOCAL_VAR_UINT:
+//          reg = code[ip++];
+//          currentRegister = reg;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          stack[_STK + 1].setInt(Script::gEvalState.getLocalIntVariable(reg));
+//          _STK++;
+//          break;
+//
+//       case OP_LOAD_LOCAL_VAR_FLT:
+//          reg = code[ip++];
+//          currentRegister = reg;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          stack[_STK + 1].setFloat(Script::gEvalState.getLocalFloatVariable(reg));
+//          _STK++;
+//          break;
+//
+//          // ElfScript Optimization:
+//       case OP_LOAD_LOCAL_VAR_STR:
+//             reg = code[ip++];
+//             currentRegister = reg;
+//
+//             // See OP_SETCURVAR
+//             prevField = NULL;
+//             prevObject = NULL;
+//             curObject = NULL;
+//             {
+//                   const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+//                   if (localVal.getType() == ConsoleValueType::cvFloat ||
+//                         localVal.getType() == ConsoleValueType::cvInteger)
+//                   {
+//                         //fast fetch
+//                         stack[_STK + 1] = localVal;
+//                   }
+//                   else
+//                   {
+//                         // fallback
+//                         val = Script::gEvalState.getLocalStringVariable(reg);
+//                         stack[_STK + 1].setString(val);
+//                   }
+//             }
+//             _STK++;
 //             break;
 //
-//       case OP_SAVEFIELD_FLT:
+//       // orig:
+//       // case OP_LOAD_LOCAL_VAR_STR:
+//       //    reg = code[ip++];
+//       //    currentRegister = reg;
+//       //
+//       //    // See OP_SETCURVAR
+//       //    prevField = NULL;
+//       //    prevObject = NULL;
+//       //    curObject = NULL;
+//       //
+//       //    val = Script::gEvalState.getLocalStringVariable(reg);
+//       //    stack[_STK + 1].setString(val);
+//       //    _STK++;
+//       //    break;
+//
+//
+//
+//
+//       case OP_SAVE_LOCAL_VAR_UINT:
+//          reg = code[ip++];
+//          currentRegister = reg;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+//          break;
+//
+//       case OP_SAVE_LOCAL_VAR_FLT:
+//          reg = code[ip++];
+//          currentRegister = reg;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+//          break;
+//
+//       case OP_SAVE_LOCAL_VAR_STR:
+//          reg = code[ip++];
+//          val = stack[_STK].getString();
+//          currentRegister = reg;
+//
+//          // See OP_SETCURVAR
+//          prevField = NULL;
+//          prevObject = NULL;
+//          curObject = NULL;
+//
+//          Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
+//          break;
+//
+//       case OP_SETCUROBJECT:
+//             //ElfScript XXTH found the holy grail for ?!
+//             prevObject = curObject;
+//             curObject = Sim::findObject(stack[_STK]);
+//             break;
+//
+//
+//             // orig lame duck:
+//
+//             // // Save the previous object for parsing vector fields.
+//             // prevObject = curObject;
+//             // val = stack[_STK].getString();
+//             //
+//             // // Sim::findObject will sometimes find valid objects from
+//             // // multi-component strings. This makes sure that doesn't
+//             // // happen.
+//             // for (const char* check = val; *check; check++)
+//             // {
+//             //    if (*check == ' ')
+//             //    {
+//             //       val = "";
+//             //       break;
+//             //    }
+//             // }
+//             // curObject = Sim::findObject(val);
+//             // break;
+//
+//       case OP_SETCUROBJECT_INTERNAL:
+//          ++ip; // To skip the recurse flag if the object wasnt found
+//          if (curObject)
+//          {
+//             SimSet* set = dynamic_cast<SimSet*>(curObject);
+//             if (set)
+//             {
+//                StringTableEntry intName = StringTable->insert(stack[_STK].getString());
+//                bool recurse = code[ip - 1];
+//                SimObject* obj = set->findObjectByInternalName(intName, recurse);
+//                stack[_STK].setInt(obj ? obj->getId() : 0);
+//             }
+//             else
+//             {
+//                Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use -> on non-set %s of class %s.", getFileLine(ip - 2), curObject->getName(), curObject->getClassName());
+//                stack[_STK].setInt(0);
+//             }
+//          }
+//          else
+//          {
+//             Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use ->, but the group object wasn't found.", getFileLine(ip - 2));
+//             stack[_STK].setInt(0);
+//          }
+//          break;
+//
+//       case OP_SETCUROBJECT_NEW:
+//          curObject = currentNewObject;
+//          break;
+//
+//       case OP_SETCURFIELD:
+//          // Save the previous field for parsing vector fields.
+//          prevField = curField;
+//          dStrcpy(prevFieldArray, curFieldArray, 256);
+//          curField = CodeToSTE(code, ip);
+//          curFieldArray[0] = 0;
+//          ip += 2;
+//          break;
+//
+//       case OP_SETCURFIELD_ARRAY:
+//          dStrcpy(curFieldArray, stack[_STK].getString(), 256);
+//          break;
+//
+//       case OP_SETCURFIELD_TYPE:
+//          if(curObject)
+//             curObject->setDataFieldType(code[ip], curField, curFieldArray);
+//          ip++;
+//          break;
+//
+// // #ifdef ELFSCRIPT_FASTPATH_FLD
+// //       //XXTH FastPath HACK:
+// //       case OP_LOADFIELD_UINT:
+// //             if (curObject)
+// //             {
+// //                   bool fastPath = false;
+// //                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+// //
+// //                   if (fld)
+// //                   {
+// //                         const char* array = (const char*) curFieldArray;
+// //                         S32 array1 = PARSE_ARRAY_INDEX(array);
+// //
+// //                         // Fastpath safety check for unmanaged, standard C++ fields
+// //                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+// //                               && fld->setDataFn == &defaultProtectedSetFn)
+// //                         {
+// //                               F64 val = 0.0;
+// //                               if (curObject->getDataField(fld, val))
+// //                               {
+// //                                     // Convert the F64 from our fastpath directly to an integer on the stack
+// //                                     // Note: Adjust .setInt() to your stack's actual integer/uint method if needed
+// //                                     stack[_STK + 1].setInt((S64)val);
+// //                                     fastPath = true;
+// //                               }
+// //                         }
+// //                   }
+// //
+// //                   if (!fastPath)
+// //                   {
+// //                         // Fallback for dynamic fields or fields with custom C++ logic
+// //                         stack[_STK + 1].setInt(dAtoi(curObject->getDataField(curField, curFieldArray)));
+// //                   }
+// //             }
+// //             else
+// //             {
+// //                   // The field is not being retrieved from an object. Maybe it's
+// //                   // a special accessor?
+// //                   char buff[FieldBufferSizeNumeric];
+// //                   memset(buff, 0, sizeof(buff));
+// //                   getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+// //                   stack[_STK + 1].setInt(dAtoi(buff));
+// //             }
+// //             _STK++;
+// //             break;
+// // #else
+// //       case OP_LOADFIELD_UINT:
+// //          if (curObject)
+// //             stack[_STK + 1].setInt(dAtol(curObject->getDataField(curField, curFieldArray)));
+// //          else
+// //          {
+// //             // The field is not being retrieved from an object. Maybe it's
+// //             // a special accessor?
+// //             char buff[FieldBufferSizeNumeric];
+// //             memset(buff, 0, sizeof(buff));
+// //             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+// //             stack[_STK + 1].setInt(dAtol(buff));
+// //          }
+// //          _STK++;
+// //          break;
+// // #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
+// //
+// // #ifdef ELFSCRIPT_FASTPATH_FLD
+// //          //XXTH Fastpath HACK
+// //       case OP_LOADFIELD_FLT:
+// //             if (curObject)
+// //             {
+// //                   bool fastPath = false;
+// //                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+// //
+// //                   if (fld)
+// //                   {
+// //                         const char* array = (const char*) curFieldArray;
+// //                         S32 array1 = PARSE_ARRAY_INDEX(array);
+// //
+// //                         // Fastpath safety check for unmanaged, standard C++ fields
+// //                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+// //                               && fld->setDataFn == &defaultProtectedSetFn)
+// //                         {
+// //                               F64 val = 0.0;
+// //                               if (curObject->getDataField(fld, val))
+// //                               {
+// //                                     stack[_STK + 1].setFloat(val);
+// //                                     fastPath = true;
+// //                               }
+// //                         }
+// //                   }
+// //
+// //                   if (!fastPath)
+// //                   {
+// //                         // Fallback for dynamic fields or fields with custom C++ logic
+// //                         stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+// //                   }
+// //             }
+// //             else
+// //             {
+// //                   // The field is not being retrieved from an object. Maybe it's
+// //                   // a special accessor?
+// //                   char buff[FieldBufferSizeNumeric];
+// //                   memset(buff, 0, sizeof(buff));
+// //                   getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+// //                   stack[_STK + 1].setFloat(dAtod(buff));
+// //             }
+// //             _STK++;
+// //             break;
+// // #else //#ifdef ELFSCRIPT_FASTPATH_FLD
+// //       case OP_LOADFIELD_FLT:
+// //          if (curObject)
+// //             stack[_STK + 1].setFloat(dAtod(curObject->getDataField(curField, curFieldArray)));
+// //          else
+// //          {
+// //             // The field is not being retrieved from an object. Maybe it's
+// //             // a special accessor?
+// //             char buff[FieldBufferSizeNumeric];
+// //             memset(buff, 0, sizeof(buff));
+// //             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+// //             stack[_STK + 1].setFloat(dAtod(buff));
+// //          }
+// //          _STK++;
+// //          break;
+// // #endif
+//
+//       case OP_LOADFIELD_STR:
+//          if (curObject)
+//          {
+//             curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
+//
+//             // orig:
+//             // val = curObject->getDataField(curField, curFieldArray);
+//             // stack[_STK + 1].setString(val);
+//          }
+//          else
+//          {
+//             // The field is not being retrieved from an object. Maybe it's
+//             // a special accessor?
+//             char buff[FieldBufferSizeString];
+//             memset(buff, 0, sizeof(buff));
+//             getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+//             stack[_STK + 1].setString(buff);
+//          }
+//          _STK++;
+//          break;
+//
+// // #ifdef ELFSCRIPT_FASTPATH_FLD
+// //       //XXTH fastPath :
+// //       case OP_SAVEFIELD_UINT:
+// //             if (curObject)
+// //             {
+// //                   bool fastPath = false;
+// //                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+// //
+// //                   if (fld)
+// //                   {
+// //                         const char* array = (const char*) curFieldArray;
+// //                         S32 array1 = PARSE_ARRAY_INDEX(array);
+// //
+// //                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+// //                               && fld->setDataFn == &defaultProtectedSetFn
+// //                               && fld->flag == 0
+// //                         ) {
+// //                               fastPath = curObject->setDataField(fld, (F64)stack[_STK].getInt());
+// //                         }
+// //                   }
+// //
+// //                   if (!fastPath)
+// //                   {
+// //                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+// //                   }
+// //             }
+// //             else
+// //             {
+// //                   // The field is not being set on an object. Maybe it's a special accessor?
+// //                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+// //                   prevObject = NULL;
+// //             }
+// //             break;
+// //
+// //       case OP_SAVEFIELD_FLT:
+// //             if (curObject) {
+// //                   //XXTH Fastpath:
+// //                   bool fastPath  = false;
+// //                   const AbstractClassRep::Field *fld = curObject->findField(curField);
+// //                   if (fld) {
+// //                         const char* array = (const char*) curFieldArray;
+// //                         S32 array1 = PARSE_ARRAY_INDEX(array);
+// //
+// //                         if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+// //                               && fld->setDataFn == &defaultProtectedSetFn
+// //                               && fld->flag == 0
+// //                         ) {
+// //                               fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+// //                         }
+// //
+// //                   }
+// //                   if (!fastPath) {
+// //                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+// //                   }
+// //
+// //             } else {
+// //                   // The field is not being set on an object. Maybe it's a special accessor?
+// //                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+// //                   prevObject = NULL;
+// //             }
+// //             break;
+// // #else //#ifdef ELFSCRIPT_FASTPATH_FLD
+// //       case OP_SAVEFIELD_UINT:
+// //          if (curObject)
+// //             curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+// //          else
+// //          {
+// //             // The field is not being set on an object. Maybe it's a special accessor?
+// //             setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+// //             prevObject = NULL;
+// //          }
+// //          break;
+// //
+// //       case OP_SAVEFIELD_FLT:
+// //             if (curObject) {
+// //               curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+// //             } else {
+// //                   // The field is not being set on an object. Maybe it's a special accessor?
+// //                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+// //                   prevObject = NULL;
+// //             }
+// //             break;
+// // #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
+//
+//       // ElfScript we try to get the fieldtype!!!
+//       case OP_SAVEFIELD_FASTPATH:
+//
 //             if (curObject) {
 //                   //XXTH Fastpath:
 //                   bool fastPath  = false;
 //                   const AbstractClassRep::Field *fld = curObject->findField(curField);
-//                   if (fld) {
+//
+//                   if (fld && (
+//                         fld->type == TypeF32
+//                         || fld->type == TypeS32
+//                         || fld->type == TypeBool
+//                         || fld->type == TypeU32
+//                         || fld->type == TypeS64
+//                         || fld->type == TypeU64
+//                         || fld->type == TypeF64
+//                         || fld->type == TypeS8
+//                         || fld->type == TypeU8
+//                         || fld->type == TypeS16
+//                   ))
+//                   {
 //                         const char* array = (const char*) curFieldArray;
 //                         S32 array1 = PARSE_ARRAY_INDEX(array);
 //
@@ -2663,10 +3953,38 @@ handle_FALLBACK_SWITCH:
 //                               && fld->setDataFn == &defaultProtectedSetFn
 //                               && fld->flag == 0
 //                         ) {
-//                               fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+//                               if (fld->type == TypeF32 || fld->type == TypeF64)
+//                                     fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
+//                               else
+//                                     fastPath = curObject->setDataField(fld,stack[_STK].getInt() );
 //                         }
 //
 //                   }
+//
+// #ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
+// else if (fld && fld->type != TypeString && fld->type != TypeName){
+//
+//       if ( stack[_STK].type == cvVector) {
+//             Con::warnf("We got a  stack[_STK].type = cvVector !!! values are: %g,%g,%g,%g ", stack[_STK].v[0], stack[_STK].v[1], stack[_STK].v[2], stack[_STK].v[3]);
+//       }
+//
+//       // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
+//       ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
+//
+//       if (conType) {
+//             const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
+//
+//             Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d)",
+//                         curField,
+//                         fld->type, stack[_STK].getString()
+//                         ,  conType->getTypeName()
+//                         , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
+//             );
+//       }
+// }
+// #endif
+//
+//
 //                   if (!fastPath) {
 //                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
 //                   }
@@ -2677,8 +3995,34 @@ handle_FALLBACK_SWITCH:
 //                   prevObject = NULL;
 //             }
 //             break;
-// #else //#ifdef ELFSCRIPT_FASTPATH_FLD
-//       case OP_SAVEFIELD_UINT:
+//
+//       break;
+//
+//       // ----------------------- ELFSCRIPT ---------------------------------
+// #ifdef ELFSCRIPT_INT_HACK
+//       case OP_CMPLT_UINT:
+//             doIntOperation<IntegerOperation::LT>();
+//             break;
+//       case OP_CMPGR_UINT:
+//             doIntOperation<IntegerOperation::GT>();
+//             break;
+//       case OP_CMPLE_UINT:
+//             doIntOperation<IntegerOperation::LE>();
+//             break;
+//       case OP_CMPGE_UINT:
+//             doIntOperation<IntegerOperation::GE>();
+//             break;
+//       case OP_CMPEQ_UINT:
+//             doIntOperation<IntegerOperation::EQ>();
+//             break;
+//       case OP_CMPNE_UINT:
+//             doIntOperation<IntegerOperation::NE>();
+//             break;
+// #endif
+//       // ----------------------- ELFSCRIPT ---------------------------------
+//
+//
+//       case OP_SAVEFIELD_STR:
 //          if (curObject)
 //             curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
 //          else
@@ -2689,486 +4033,326 @@ handle_FALLBACK_SWITCH:
 //          }
 //          break;
 //
-//       case OP_SAVEFIELD_FLT:
-//             if (curObject) {
-//               curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-//             } else {
-//                   // The field is not being set on an object. Maybe it's a special accessor?
-//                   setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-//                   prevObject = NULL;
+//       case OP_POP_STK:
+//          POP_STK();
+//          break;
+//
+//       case OP_LOADIMMED_UINT:
+//          stack[_STK + 1].setInt(code[ip++]);
+//          _STK++;
+//          break;
+//
+//       case OP_LOADIMMED_FLT:
+//          stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+//          _STK++;
+//          break;
+//
+//       case OP_TAG_TO_STR:
+//          code[ip - 1] = OP_LOADIMMED_STR;
+//          // it's possible the string has already been converted
+//          Con::errorf("Tagged string not supported in ElfScript or FIXME (%s:%d)", __FILE__, __LINE__);
+//          // if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
+//          // {
+//          //    U32 id = GameAddTaggedString(curStringTable + code[ip]);
+//          //    dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
+//          //    *(curStringTable + code[ip]) = StringTagPrefixByte;
+//          // }
+//          TORQUE_CASE_FALLTHROUGH;
+//
+//       case OP_LOADIMMED_STR:
+//          stack[_STK + 1].setString(curStringTable + code[ip++]);
+//          _STK ++;
+//          break;
+//
+//       case OP_DOCBLOCK_STR:
+//       {
+//          // If the first word of the doc is '\class' or '@class', then this
+//          // is a namespace doc block, otherwise it is a function doc block.
+//          const char* docblock = curStringTable + code[ip++];
+//
+//          const char* sansClass = dStrstr(docblock, "@class");
+//          if (!sansClass)
+//             sansClass = dStrstr(docblock, "\\class");
+//
+//          if (sansClass)
+//          {
+//             // Don't save the class declaration. Scan past the 'class'
+//             // keyword and up to the first whitespace.
+//             sansClass += 7;
+//             S32 index = 0;
+//             while ((*sansClass != ' ') && (*sansClass != '\n') && *sansClass && (index < (nsDocLength - 1)))
+//             {
+//                nsDocBlockClass[index++] = *sansClass;
+//                sansClass++;
 //             }
+//             nsDocBlockClass[index] = '\0';
+//
+//             curNSDocBlock = sansClass + 1;
+//          }
+//          else
+//             curFNDocBlock = docblock;
+//       }
+//
+//       break;
+//
+//       case OP_LOADIMMED_IDENT:
+//          stack[_STK + 1].setStringTableEntry(CodeToSTE(code, ip));
+//          _STK++;
+//          ip += 2;
+//          break;
+//
+//       case OP_CALLFUNC:
+//       {
+//          // This routingId is set when we query the object as to whether
+//          // it handles this method.  It is set to an enum from the table
+//          // above indicating whether it handles it on a component it owns
+//          // or just on the object.
+//          fnName = CodeToSTE(code, ip);
+//          fnNamespace = CodeToSTE(code, ip + 2);
+//          U32 callType = code[ip + 4];
+//
+//          //if this is called from inside a function, append the ip and codeptr
+//          if (!Script::gEvalState.stack.empty())
+//          {
+//             Script::gEvalState.getCurrentFrame().module = this;
+//             Script::gEvalState.getCurrentFrame().ip = ip - 1;
+//          }
+//
+//          ip += 5;
+//          gCallStack.argvc(fnName, callArgc, &callArgv);
+//
+//          if (callType == FuncCallExprNode::FunctionCall)
+//          {
+//             // Note: This works even if the function was in a package. Reason being is when
+//             // activatePackage() is called, it swaps the namespaceEntry into the global namespace
+//             // (and reverts it when deactivatePackage is called). Method or Static related ones work
+//             // as expected, as the namespace is resolved on the fly.
+//             nsEntry = Namespace::global()->lookup(fnName);
+//             if (!nsEntry)
+//             {
+//                Con::warnf(ConsoleLogEntry::General,
+//                   "%s: Unable to find function %s",
+//                   getFileLine(ip - 4), fnName);
+//
+//                gCallStack.popFrame();
+//                stack[_STK + 1].setEmptyString();
+//                _STK++;
+//                break;
+//             }
+//          }
+//          else if (callType == FuncCallExprNode::StaticCall)
+//          {
+//             // Try to look it up.
+//             ns = Namespace::find(fnNamespace);
+//             nsEntry = ns->lookup(fnName);
+//             if (!nsEntry)
+//             {
+//                Con::warnf(ConsoleLogEntry::General,
+//                   "%s: Unable to find function %s%s%s",
+//                   getFileLine(ip - 4), fnNamespace ? fnNamespace : "",
+//                   fnNamespace ? "::" : "", fnName);
+//
+//                gCallStack.popFrame();
+//                stack[_STK + 1].setEmptyString();
+//                _STK++;
+//                break;
+//             }
+//          }
+//          else if (callType == FuncCallExprNode::MethodCall)
+//          {
+//             ConsoleValue& simObjectLookupValue = callArgv[1];
+//             thisObject = getThisObject(simObjectLookupValue);
+//
+//             if (thisObject == NULL)
+//             {
+//                Con::warnf(
+//                   ConsoleLogEntry::General,
+//                   "%s: Unable to find object: '%s' attempting to call function '%s'",
+//                   getFileLine(ip - 6),
+//                   simObjectLookupValue.getString(),
+//                   fnName
+//                );
+//
+//                gCallStack.popFrame();
+//                stack[_STK + 1].setEmptyString();
+//                _STK++;
+//                break;
+//             }
+//
+//             ns = thisObject->getNamespace();
+//             if (ns)
+//                nsEntry = ns->lookup(fnName);
+//             else
+//                nsEntry = NULL;
+//          }
+//          else // it's a ParentCall
+//          {
+//             ConsoleValue& simObjectLookupValue = callArgv[1];
+//             thisObject = getThisObject(simObjectLookupValue);
+//
+//             if (thisObject == NULL)
+//             {
+//                Con::warnf(
+//                   ConsoleLogEntry::General,
+//                   "%s: Unable to find object: '%s' attempting to call function '%s'",
+//                   getFileLine(ip - 6),
+//                   simObjectLookupValue.getString(),
+//                   fnName
+//                );
+//
+//                gCallStack.popFrame();
+//                stack[_STK + 1].setEmptyString();
+//                _STK++;
+//                break;
+//             }
+//
+//             if (thisNamespace)
+//             {
+//                ns = thisNamespace->mParent;
+//                if (ns)
+//                   nsEntry = ns->lookup(fnName);
+//                else
+//                   nsEntry = NULL;
+//             }
+//             else
+//             {
+//                ns = NULL;
+//                nsEntry = NULL;
+//             }
+//          }
+//
+//          if (!nsEntry || noCalls)
+//          {
+//             if (!noCalls)
+//             {
+//                Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", getFileLine(ip - 4), fnName);
+//                if (callType == FuncCallExprNode::MethodCall)
+//                {
+//                   Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
+//                      thisObject->getName() ? thisObject->getName() : "",
+//                      thisObject->getId(), Con::getNamespaceList(ns));
+//                }
+//             }
+//             gCallStack.popFrame();
+//             stack[_STK + 1].setEmptyString();
+//             _STK++;
 //             break;
-// #endif //#ifdef ELFSCRIPT_FASTPATH_FLD
-
-      // ElfScript we try to get the fieldtype!!!
-      case OP_SAVEFIELD_FASTPATH:
-
-            if (curObject) {
-                  //XXTH Fastpath:
-                  bool fastPath  = false;
-                  const AbstractClassRep::Field *fld = curObject->findField(curField);
-
-                  if (fld && (
-                        fld->type == TypeF32
-                        || fld->type == TypeS32
-                        || fld->type == TypeBool
-                        || fld->type == TypeU32
-                        || fld->type == TypeS64
-                        || fld->type == TypeU64
-                        || fld->type == TypeF64
-                        || fld->type == TypeS8
-                        || fld->type == TypeU8
-                        || fld->type == TypeS16
-                  ))
-                  {
-                        const char* array = (const char*) curFieldArray;
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
-
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-                              && fld->setDataFn == &defaultProtectedSetFn
-                              && fld->flag == 0
-                        ) {
-                              if (fld->type == TypeF32 || fld->type == TypeF64)
-                                    fastPath = curObject->setDataField(fld,stack[_STK].getFloat() );
-                              else
-                                    fastPath = curObject->setDataField(fld,stack[_STK].getInt() );
-                        }
-
-                  }
-
-#ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
-else if (fld && fld->type != TypeString && fld->type != TypeName){
-
-      if ( stack[_STK].type == cvVector) {
-            Con::warnf("We got a  stack[_STK].type = cvVector !!! values are: %g,%g,%g,%g ", stack[_STK].v[0], stack[_STK].v[1], stack[_STK].v[2], stack[_STK].v[3]);
-      }
-
-      // lot's of 20 which is DefineUnmappedConsoleType( TypeString, const char * ) // plain UTF-8 strings are not supported in new interop
-      ConsoleBaseType* conType = ConsoleBaseType::getType( fld->type );
-
-      if (conType) {
-            const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
-
-            Con::printf("%-16s :: type %2u, %20s, %s, TypeKind: %d (struct:%d)",
-                        curField,
-                        fld->type, stack[_STK].getString()
-                        ,  conType->getTypeName()
-                        , typeInfo ? typeInfo->getTypeKind() : -1 ,  typeInfo ? typeInfo->isStruct() : -1
-            );
-      }
-}
-#endif
-
-
-                  if (!fastPath) {
-                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-                  }
-
-            } else {
-                  // The field is not being set on an object. Maybe it's a special accessor?
-                  setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-                  prevObject = NULL;
-            }
-            break;
-
-      break;
-
-      // ----------------------- ELFSCRIPT ---------------------------------
-#ifdef ELFSCRIPT_INT_HACK
-      case OP_CMPLT_UINT:
-            doIntOperation<IntegerOperation::LT>();
-            break;
-      case OP_CMPGR_UINT:
-            doIntOperation<IntegerOperation::GT>();
-            break;
-      case OP_CMPLE_UINT:
-            doIntOperation<IntegerOperation::LE>();
-            break;
-      case OP_CMPGE_UINT:
-            doIntOperation<IntegerOperation::GE>();
-            break;
-      case OP_CMPEQ_UINT:
-            doIntOperation<IntegerOperation::EQ>();
-            break;
-      case OP_CMPNE_UINT:
-            doIntOperation<IntegerOperation::NE>();
-            break;
-#endif
-      // ----------------------- ELFSCRIPT ---------------------------------
-
-
-      case OP_SAVEFIELD_STR:
-         if (curObject)
-            curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
-         else
-         {
-            // The field is not being set on an object. Maybe it's a special accessor?
-            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-            prevObject = NULL;
-         }
-         break;
-
-      case OP_POP_STK:
-         POP_STK();
-         break;
-
-      case OP_LOADIMMED_UINT:
-         stack[_STK + 1].setInt(code[ip++]);
-         _STK++;
-         break;
-
-      case OP_LOADIMMED_FLT:
-         stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
-         _STK++;
-         break;
-
-      case OP_TAG_TO_STR:
-         code[ip - 1] = OP_LOADIMMED_STR;
-         // it's possible the string has already been converted
-         Con::errorf("Tagged string not supported in ElfScript or FIXME (%s:%d)", __FILE__, __LINE__);
-         // if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
-         // {
-         //    U32 id = GameAddTaggedString(curStringTable + code[ip]);
-         //    dSprintf(curStringTable + code[ip] + 1, 7, "%d", id);
-         //    *(curStringTable + code[ip]) = StringTagPrefixByte;
-         // }
-         TORQUE_CASE_FALLTHROUGH;
-
-      case OP_LOADIMMED_STR:
-         stack[_STK + 1].setString(curStringTable + code[ip++]);
-         _STK ++;
-         break;
-
-      case OP_DOCBLOCK_STR:
-      {
-         // If the first word of the doc is '\class' or '@class', then this
-         // is a namespace doc block, otherwise it is a function doc block.
-         const char* docblock = curStringTable + code[ip++];
-
-         const char* sansClass = dStrstr(docblock, "@class");
-         if (!sansClass)
-            sansClass = dStrstr(docblock, "\\class");
-
-         if (sansClass)
-         {
-            // Don't save the class declaration. Scan past the 'class'
-            // keyword and up to the first whitespace.
-            sansClass += 7;
-            S32 index = 0;
-            while ((*sansClass != ' ') && (*sansClass != '\n') && *sansClass && (index < (nsDocLength - 1)))
-            {
-               nsDocBlockClass[index++] = *sansClass;
-               sansClass++;
-            }
-            nsDocBlockClass[index] = '\0';
-
-            curNSDocBlock = sansClass + 1;
-         }
-         else
-            curFNDocBlock = docblock;
-      }
-
-      break;
-
-      case OP_LOADIMMED_IDENT:
-         stack[_STK + 1].setStringTableEntry(CodeToSTE(code, ip));
-         _STK++;
-         ip += 2;
-         break;
-
-      case OP_CALLFUNC:
-      {
-         // This routingId is set when we query the object as to whether
-         // it handles this method.  It is set to an enum from the table
-         // above indicating whether it handles it on a component it owns
-         // or just on the object.
-         fnName = CodeToSTE(code, ip);
-         fnNamespace = CodeToSTE(code, ip + 2);
-         U32 callType = code[ip + 4];
-
-         //if this is called from inside a function, append the ip and codeptr
-         if (!Script::gEvalState.stack.empty())
-         {
-            Script::gEvalState.getCurrentFrame().module = this;
-            Script::gEvalState.getCurrentFrame().ip = ip - 1;
-         }
-
-         ip += 5;
-         gCallStack.argvc(fnName, callArgc, &callArgv);
-
-         if (callType == FuncCallExprNode::FunctionCall)
-         {
-            // Note: This works even if the function was in a package. Reason being is when
-            // activatePackage() is called, it swaps the namespaceEntry into the global namespace
-            // (and reverts it when deactivatePackage is called). Method or Static related ones work
-            // as expected, as the namespace is resolved on the fly.
-            nsEntry = Namespace::global()->lookup(fnName);
-            if (!nsEntry)
-            {
-               Con::warnf(ConsoleLogEntry::General,
-                  "%s: Unable to find function %s",
-                  getFileLine(ip - 4), fnName);
-
-               gCallStack.popFrame();
-               stack[_STK + 1].setEmptyString();
-               _STK++;
-               break;
-            }
-         }
-         else if (callType == FuncCallExprNode::StaticCall)
-         {
-            // Try to look it up.
-            ns = Namespace::find(fnNamespace);
-            nsEntry = ns->lookup(fnName);
-            if (!nsEntry)
-            {
-               Con::warnf(ConsoleLogEntry::General,
-                  "%s: Unable to find function %s%s%s",
-                  getFileLine(ip - 4), fnNamespace ? fnNamespace : "",
-                  fnNamespace ? "::" : "", fnName);
-
-               gCallStack.popFrame();
-               stack[_STK + 1].setEmptyString();
-               _STK++;
-               break;
-            }
-         }
-         else if (callType == FuncCallExprNode::MethodCall)
-         {
-            ConsoleValue& simObjectLookupValue = callArgv[1];
-            thisObject = getThisObject(simObjectLookupValue);
-
-            if (thisObject == NULL)
-            {
-               Con::warnf(
-                  ConsoleLogEntry::General,
-                  "%s: Unable to find object: '%s' attempting to call function '%s'",
-                  getFileLine(ip - 6),
-                  simObjectLookupValue.getString(),
-                  fnName
-               );
-
-               gCallStack.popFrame();
-               stack[_STK + 1].setEmptyString();
-               _STK++;
-               break;
-            }
-
-            ns = thisObject->getNamespace();
-            if (ns)
-               nsEntry = ns->lookup(fnName);
-            else
-               nsEntry = NULL;
-         }
-         else // it's a ParentCall
-         {
-            ConsoleValue& simObjectLookupValue = callArgv[1];
-            thisObject = getThisObject(simObjectLookupValue);
-
-            if (thisObject == NULL)
-            {
-               Con::warnf(
-                  ConsoleLogEntry::General,
-                  "%s: Unable to find object: '%s' attempting to call function '%s'",
-                  getFileLine(ip - 6),
-                  simObjectLookupValue.getString(),
-                  fnName
-               );
-
-               gCallStack.popFrame();
-               stack[_STK + 1].setEmptyString();
-               _STK++;
-               break;
-            }
-
-            if (thisNamespace)
-            {
-               ns = thisNamespace->mParent;
-               if (ns)
-                  nsEntry = ns->lookup(fnName);
-               else
-                  nsEntry = NULL;
-            }
-            else
-            {
-               ns = NULL;
-               nsEntry = NULL;
-            }
-         }
-
-         if (!nsEntry || noCalls)
-         {
-            if (!noCalls)
-            {
-               Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", getFileLine(ip - 4), fnName);
-               if (callType == FuncCallExprNode::MethodCall)
-               {
-                  Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
-                     thisObject->getName() ? thisObject->getName() : "",
-                     thisObject->getId(), Con::getNamespaceList(ns));
-               }
-            }
-            gCallStack.popFrame();
-            stack[_STK + 1].setEmptyString();
-            _STK++;
-            break;
-         }
-         if (nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
-         {
-            if (nsEntry->mFunctionOffset)
-            {
-               ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
-               stack[_STK + 1] = (returnFromFn);
-            }
-            else // no body
-               stack[_STK + 1].setEmptyString();
-            _STK++;
-
-            gCallStack.popFrame();
-         }
-         else
-         {
-            if ((nsEntry->mMinArgs && S32(callArgc) < nsEntry->mMinArgs) || (nsEntry->mMaxArgs && S32(callArgc) > nsEntry->mMaxArgs))
-            {
-               const char* nsName = ns ? ns->mName : "";
-               Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments. got %d, expected %d to %d", getFileLine(ip - 4), nsName, fnName, S32(callArgc), nsEntry->mMinArgs, nsEntry->mMaxArgs);
-               // ElfScript:
-               Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s%s", getFileLine(ip - 4), nsEntry->mFunctionName,  nsEntry->getArgumentsString().c_str());
-               if (strlen(nsEntry->mUsage)>0) Con::warnf(ConsoleLogEntry::Script, "%s: docu: %s", getFileLine(ip - 4), nsEntry->mUsage);
-               gCallStack.popFrame();
-               stack[_STK + 1].setEmptyString();
-               _STK++;
-            }
-            else
-            {
-               switch (nsEntry->mType)
-               {
-               case Namespace::Entry::StringCallbackType:
-               {
-                  const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
-                  gCallStack.popFrame();
-                  stack[_STK + 1].setString(result);
-                  _STK++;
-                  break;
-               }
-               case Namespace::Entry::IntCallbackType:
-               {
-                  S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
-                  gCallStack.popFrame();
-
-                  if (code[ip] == OP_POP_STK)
-                  {
-                     ip++;
-                     break;
-                  }
-
-                  stack[_STK + 1].setInt(result);
-                  _STK++;
-                  break;
-               }
-               case Namespace::Entry::FloatCallbackType:
-               {
-                  F64 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
-                  gCallStack.popFrame();
-
-                  if (code[ip] == OP_POP_STK)
-                  {
-                     ip++;
-                     break;
-                  }
-
-                  stack[_STK + 1].setFloat(result);
-                  _STK++;
-                  break;
-               }
-               case Namespace::Entry::VoidCallbackType:
-               {
-                  nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
-                  gCallStack.popFrame();
-
-                  if (code[ip] == OP_POP_STK)
-                  {
-                     ip++;
-                     break;
-                  }
-
-                  if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
-                  {
-                     Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
-                  }
-
-                  stack[_STK + 1].setEmptyString();
-                  _STK++;
-
-                  break;
-               }
-               case Namespace::Entry::BoolCallbackType:
-               {
-                  bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
-                  gCallStack.popFrame();
-
-                  if (code[ip] == OP_POP_STK)
-                  {
-                     ip++;
-                     break;
-                  }
-
-                  stack[_STK + 1].setBool(result);
-                  _STK++;
-
-                  break;
-               }
-               } // switch (nsEntry->mType)
-            }
-         }
-         break;
-      } //OP_CALLFUNC
-
-      // ===========================================================================================
-// PoD !! :D only kosmetic max 16 elements
-case OP_BUILD_VECTOR_STRING: {
-
-      // read the count
-      U32 count = code[ip++];
-
-      const U32 MAX_ELEMENTS = 16;
-      const char* stringValues[MAX_ELEMENTS];
-
-      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
-
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
-      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
-#endif
-      // get values from stack
-      for (S32 i = count - 1; i >= 0; i--) {
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-            if (matchVectorFields) v[i] = stack[_STK].getFloat();
-#endif
-
-            stringValues[i] = stack[_STK].getString();
-            _STK--;
-      }
-
-      // i have to translate it to a string again :(
-      char buffer[1024];
-      int offset = 0;
-      buffer[0] = '\0';
-
-      for (U32 i = 0; i < count; i++) {
-            // offset += dSprintf(buffer + offset
-            // , sizeof(buffer) - offset
-            // , (i == 0) ? "%s" : " %s", stringValues[i]);
-            S32 remaining = sizeof(buffer) - offset;
-            if (remaining <= 1) break;
-
-            offset += dSprintf(buffer + offset, remaining, (i == 0) ? "%s" : " %s", stringValues[i]);
-
-      }
-
-      _STK++;
-      stack[_STK].setString(buffer);
-
+//          }
+//          if (nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
+//          {
+//             if (nsEntry->mFunctionOffset)
+//             {
+//                ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+//                stack[_STK + 1] = (returnFromFn);
+//             }
+//             else // no body
+//                stack[_STK + 1].setEmptyString();
+//             _STK++;
+//
+//             gCallStack.popFrame();
+//          }
+//          else
+//          {
+//             if ((nsEntry->mMinArgs && S32(callArgc) < nsEntry->mMinArgs) || (nsEntry->mMaxArgs && S32(callArgc) > nsEntry->mMaxArgs))
+//             {
+//                const char* nsName = ns ? ns->mName : "";
+//                Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments. got %d, expected %d to %d", getFileLine(ip - 4), nsName, fnName, S32(callArgc), nsEntry->mMinArgs, nsEntry->mMaxArgs);
+//                // ElfScript:
+//                Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s%s", getFileLine(ip - 4), nsEntry->mFunctionName,  nsEntry->getArgumentsString().c_str());
+//                if (strlen(nsEntry->mUsage)>0) Con::warnf(ConsoleLogEntry::Script, "%s: docu: %s", getFileLine(ip - 4), nsEntry->mUsage);
+//                gCallStack.popFrame();
+//                stack[_STK + 1].setEmptyString();
+//                _STK++;
+//             }
+//             else
+//             {
+//                switch (nsEntry->mType)
+//                {
+//                case Namespace::Entry::StringCallbackType:
+//                {
+//                   const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
+//                   gCallStack.popFrame();
+//                   stack[_STK + 1].setString(result);
+//                   _STK++;
+//                   break;
+//                }
+//                case Namespace::Entry::IntCallbackType:
+//                {
+//                   S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
+//                   gCallStack.popFrame();
+//
+//                   if (code[ip] == OP_POP_STK)
+//                   {
+//                      ip++;
+//                      break;
+//                   }
+//
+//                   stack[_STK + 1].setInt(result);
+//                   _STK++;
+//                   break;
+//                }
+//                case Namespace::Entry::FloatCallbackType:
+//                {
+//                   F64 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
+//                   gCallStack.popFrame();
+//
+//                   if (code[ip] == OP_POP_STK)
+//                   {
+//                      ip++;
+//                      break;
+//                   }
+//
+//                   stack[_STK + 1].setFloat(result);
+//                   _STK++;
+//                   break;
+//                }
+//                case Namespace::Entry::VoidCallbackType:
+//                {
+//                   nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
+//                   gCallStack.popFrame();
+//
+//                   if (code[ip] == OP_POP_STK)
+//                   {
+//                      ip++;
+//                      break;
+//                   }
+//
+//                   if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
+//                   {
+//                      Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
+//                   }
+//
+//                   stack[_STK + 1].setEmptyString();
+//                   _STK++;
+//
+//                   break;
+//                }
+//                case Namespace::Entry::BoolCallbackType:
+//                {
+//                   bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
+//                   gCallStack.popFrame();
+//
+//                   if (code[ip] == OP_POP_STK)
+//                   {
+//                      ip++;
+//                      break;
+//                   }
+//
+//                   stack[_STK + 1].setBool(result);
+//                   _STK++;
+//
+//                   break;
+//                }
+//                } // switch (nsEntry->mType)
+//             }
+//          }
+//          break;
+//       } //OP_CALLFUNC
+//
+//       // ===========================================================================================
+// // PoD !! :D only kosmetic max 16 elements
+// case OP_BUILD_VECTOR_STRING: {
+//
 //       // read the count
 //       U32 count = code[ip++];
 //
@@ -3192,289 +4376,330 @@ case OP_BUILD_VECTOR_STRING: {
 //       }
 //
 //       // i have to translate it to a string again :(
-//       char buffer[256];
+//       char buffer[1024];
 //       int offset = 0;
 //       buffer[0] = '\0';
 //
 //       for (U32 i = 0; i < count; i++) {
-//             offset += dSprintf(buffer + offset
-//             , sizeof(buffer) - offset
-//             , (i == 0) ? "%s" : " %s", stringValues[i]);
+//             // offset += dSprintf(buffer + offset
+//             // , sizeof(buffer) - offset
+//             // , (i == 0) ? "%s" : " %s", stringValues[i]);
+//             S32 remaining = sizeof(buffer) - offset;
+//             if (remaining <= 1) break;
+//
+//             offset += dSprintf(buffer + offset, remaining, (i == 0) ? "%s" : " %s", stringValues[i]);
+//
 //       }
 //
 //       _STK++;
 //       stack[_STK].setString(buffer);
-
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      // after setString!!
-      if (matchVectorFields) {
-            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
-            // this break:
-            // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
-            // {
-            //       Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
-            // }
-            // not sure why because i return the string which is filled above
-            // but i only added a small part where  type is used so why knows .....
-
-
-            stack[_STK].type = cvVector;
-            // copy all to 0.f old values
-            for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
-                   stack[_STK].v[i] = v[i];
-            }
-      }
-#endif
-
-
-      break;
-}
-
-      // ===========================================================================================
-      case OP_ADVANCE_STR_APPENDCHAR:
-      {
-         char buff[2];
-         buff[0] = (char)code[ip++];
-         buff[1] = '\0';
-
-         S32 len;
-         const char* concat = tsconcat(stack[_STK].getString(), buff, len);
-
-         stack[_STK].setStringRef(concat, len);
-         break;
-      }
-
-      case OP_REWIND_STR:
-         TORQUE_CASE_FALLTHROUGH;
-      case OP_TERMINATE_REWIND_STR:
-      {
-         S32 len;
-         const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
-
-         stack[_STK - 1].setStringRef(concat, len);
-         POP_STK();
-         break;
-      }
-
-      case OP_COMPARE_STR:
-         stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
-         POP_STK();
-         break;
-
-      case OP_PUSH:
-         gCallStack.push((stack[_STK--]));
-         break;
-
-      case OP_PUSH_FRAME:
-         gCallStack.pushFrame(code[ip++]);
-         break;
-
-      case OP_ASSERT:
-      {
-         if (!stack[_STK--].getBool())
-         {
-            const char* message = curStringTable + code[ip];
-
-            U32 breakLine, inst;
-            findBreakLine(ip - 1, breakLine, inst);
-
-            if (PlatformAssert::processAssert(PlatformAssert::Fatal,
-               name ? name : "eval",
-               breakLine,
-               message))
-            {
-               // if (TelDebugger && TelDebugger->isConnected() && breakLine > 0)
-               // {
-               //    TelDebugger->breakProcess();
-               // }
-               // else
-                  Platform::debugBreak();
-            }
-         }
-
-         ip++;
-         break;
-      }
-
-      case OP_BREAK:
-      {
-         //append the ip and codeptr before managing the breakpoint!
-         AssertFatal(!Script::gEvalState.stack.empty(), "Empty eval stack on break!");
-         Script::gEvalState.getCurrentFrame().module = this;
-         Script::gEvalState.getCurrentFrame().ip = ip - 1;
-
-         U32 breakLine;
-         findBreakLine(ip - 1, breakLine, instruction);
-         if (!breakLine)
-            goto breakContinue;
-         // TelDebugger->executionStopped(this, breakLine);
-
-         goto breakContinue;
-      }
-
-      case OP_ITER_BEGIN_STR:
-      {
-         iterStack[_ITER].mIsStringIter = true;
-         TORQUE_CASE_FALLTHROUGH;
-      }
-
-      case OP_ITER_BEGIN:
-      {
-         bool isGlobal = code[ip];
-
-         U32 failIp = code[ip + (isGlobal ? 3 : 2)];
-
-         IterStackRecord& iter = iterStack[_ITER];
-         iter.mIsGlobalVariable = isGlobal;
-
-         if (isGlobal)
-         {
-            StringTableEntry varName = CodeToSTE(code, ip + 1);
-            iter.mVar.mVariable = Con::gGlobalVars.add(varName);
-         }
-         else
-         {
-            iter.mVar.mRegister = code[ip + 1];
-         }
-
-         if (iter.mIsStringIter)
-         {
-            iter.mData.mStr.mString = stack[_STK].getString();
-            iter.mData.mStr.mIndex = 0;
-         }
-         else
-         {
-            // Look up the object.
-
-            SimSet* set;
-            if (!Sim::findObject(stack[_STK].getString(), set))
-            {
-               Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
-               Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
-               ip = failIp;
-               // Pop the iterated value
-               POP_STK();
-               //  XXTH continue;
-               DISPATCH();
-            }
-
-            // Set up.
-
-            iter.mData.mObj.mSet = set;
-            iter.mData.mObj.mIndex = 0;
-         }
-
-         _ITER++;
-         iterDepth++;
-
-         ip += isGlobal ? 4 : 3;
-         break;
-      }
-
-      case OP_ITER:
-      {
-         U32 breakIp = code[ip];
-         IterStackRecord& iter = iterStack[_ITER - 1];
-
-         if (iter.mIsStringIter)
-         {
-            const char* str = iter.mData.mStr.mString;
-
-            U32 startIndex = iter.mData.mStr.mIndex;
-            U32 endIndex = startIndex;
-
-            // Break if at end.
-
-            if (!str[startIndex])
-            {
-               ip = breakIp;
-               //  XXTH continue;
-               DISPATCH();
-            }
-
-            // Find right end of current component.
-
-            if (!dIsspace(str[endIndex]))
-               do ++endIndex;
-            while (str[endIndex] && !dIsspace(str[endIndex]));
-
-            // Extract component.
-
-            if (endIndex != startIndex)
-            {
-               char savedChar = str[endIndex];
-               const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
-
-               if (iter.mIsGlobalVariable)
-                  iter.mVar.mVariable->setStringValue(&str[startIndex]);
-               else
-                  Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
-
-               const_cast<char*>(str)[endIndex] = savedChar;
-            }
-            else
-            {
-               if (iter.mIsGlobalVariable)
-                  iter.mVar.mVariable->setStringValue("");
-               else
-                  Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
-            }
-
-            // Skip separator.
-            if (str[endIndex] != '\0')
-               ++endIndex;
-
-            iter.mData.mStr.mIndex = endIndex;
-         }
-         else
-         {
-            U32 index = iter.mData.mObj.mIndex;
-            SimSet* set = iter.mData.mObj.mSet;
-
-            if (index >= set->size())
-            {
-               ip = breakIp;
-               //XXTH continue;
-               DISPATCH();
-            }
-
-            SimObjectId id = set->at(index)->getId();
-
-            if (iter.mIsGlobalVariable)
-               iter.mVar.mVariable->setIntValue(id);
-            else
-               Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
-
-            iter.mData.mObj.mIndex = index + 1;
-         }
-
-         ++ip;
-         break;
-      }
-
-      case OP_ITER_END:
-      {
-         --_ITER;
-         --iterDepth;
-
-         POP_STK();
-
-         iterStack[_ITER].mIsStringIter = false;
-         break;
-      }
-
-      case OP_INVALID:
-         TORQUE_CASE_FALLTHROUGH;
-      default:
-         // error!
-         AssertISV(false, "Invalid OPCode Processed!");
-         goto execFinished;
-      } // ~~~~~~~~~~~~~~~~~~ END OF THE SWITCH ~~~~~~~~~~~~~~~~~~
-
-      DISPATCH();
-
-   // } //welcome back for loop
-} //  handle_FALLBACK_SWITCH:
+//
+// //       // read the count
+// //       U32 count = code[ip++];
+// //
+// //       const U32 MAX_ELEMENTS = 16;
+// //       const char* stringValues[MAX_ELEMENTS];
+// //
+// //       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+// //
+// // #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// //       bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
+// //       F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
+// // #endif
+// //       // get values from stack
+// //       for (S32 i = count - 1; i >= 0; i--) {
+// // #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// //             if (matchVectorFields) v[i] = stack[_STK].getFloat();
+// // #endif
+// //
+// //             stringValues[i] = stack[_STK].getString();
+// //             _STK--;
+// //       }
+// //
+// //       // i have to translate it to a string again :(
+// //       char buffer[256];
+// //       int offset = 0;
+// //       buffer[0] = '\0';
+// //
+// //       for (U32 i = 0; i < count; i++) {
+// //             offset += dSprintf(buffer + offset
+// //             , sizeof(buffer) - offset
+// //             , (i == 0) ? "%s" : " %s", stringValues[i]);
+// //       }
+// //
+// //       _STK++;
+// //       stack[_STK].setString(buffer);
+//
+// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+//       // after setString!!
+//       if (matchVectorFields) {
+//             // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+//             // this break:
+//             // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
+//             // {
+//             //       Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
+//             // }
+//             // not sure why because i return the string which is filled above
+//             // but i only added a small part where  type is used so why knows .....
+//
+//
+//             stack[_STK].type = cvVector;
+//             // copy all to 0.f old values
+//             for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
+//                    stack[_STK].v[i] = v[i];
+//             }
+//       }
+// #endif
+//
+//
+//       break;
+// }
+//
+//       // ===========================================================================================
+//       case OP_ADVANCE_STR_APPENDCHAR:
+//       {
+//          char buff[2];
+//          buff[0] = (char)code[ip++];
+//          buff[1] = '\0';
+//
+//          S32 len;
+//          const char* concat = tsconcat(stack[_STK].getString(), buff, len);
+//
+//          stack[_STK].setStringRef(concat, len);
+//          break;
+//       }
+//
+//       case OP_REWIND_STR:
+//          TORQUE_CASE_FALLTHROUGH;
+//       case OP_TERMINATE_REWIND_STR:
+//       {
+//          S32 len;
+//          const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
+//
+//          stack[_STK - 1].setStringRef(concat, len);
+//          POP_STK();
+//          break;
+//       }
+//
+//       case OP_COMPARE_STR:
+//          stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
+//          POP_STK();
+//          break;
+//
+//       case OP_PUSH:
+//          gCallStack.push((stack[_STK--]));
+//          break;
+//
+//       case OP_PUSH_FRAME:
+//          gCallStack.pushFrame(code[ip++]);
+//          break;
+//
+//       case OP_ASSERT:
+//       {
+//          if (!stack[_STK--].getBool())
+//          {
+//             const char* message = curStringTable + code[ip];
+//
+//             U32 breakLine, inst;
+//             findBreakLine(ip - 1, breakLine, inst);
+//
+//             if (PlatformAssert::processAssert(PlatformAssert::Fatal,
+//                name ? name : "eval",
+//                breakLine,
+//                message))
+//             {
+//                // if (TelDebugger && TelDebugger->isConnected() && breakLine > 0)
+//                // {
+//                //    TelDebugger->breakProcess();
+//                // }
+//                // else
+//                   Platform::debugBreak();
+//             }
+//          }
+//
+//          ip++;
+//          break;
+//       }
+//
+//       case OP_BREAK:
+//       {
+//          //append the ip and codeptr before managing the breakpoint!
+//          AssertFatal(!Script::gEvalState.stack.empty(), "Empty eval stack on break!");
+//          Script::gEvalState.getCurrentFrame().module = this;
+//          Script::gEvalState.getCurrentFrame().ip = ip - 1;
+//
+//          U32 breakLine;
+//          findBreakLine(ip - 1, breakLine, instruction);
+//          if (!breakLine)
+//             goto breakContinue;
+//          // TelDebugger->executionStopped(this, breakLine);
+//
+//          goto breakContinue;
+//       }
+//
+//       case OP_ITER_BEGIN_STR:
+//       {
+//          iterStack[_ITER].mIsStringIter = true;
+//          TORQUE_CASE_FALLTHROUGH;
+//       }
+//
+//       case OP_ITER_BEGIN:
+//       {
+//          bool isGlobal = code[ip];
+//
+//          U32 failIp = code[ip + (isGlobal ? 3 : 2)];
+//
+//          IterStackRecord& iter = iterStack[_ITER];
+//          iter.mIsGlobalVariable = isGlobal;
+//
+//          if (isGlobal)
+//          {
+//             StringTableEntry varName = CodeToSTE(code, ip + 1);
+//             iter.mVar.mVariable = Con::gGlobalVars.add(varName);
+//          }
+//          else
+//          {
+//             iter.mVar.mRegister = code[ip + 1];
+//          }
+//
+//          if (iter.mIsStringIter)
+//          {
+//             iter.mData.mStr.mString = stack[_STK].getString();
+//             iter.mData.mStr.mIndex = 0;
+//          }
+//          else
+//          {
+//             // Look up the object.
+//
+//             SimSet* set;
+//             if (!Sim::findObject(stack[_STK].getString(), set))
+//             {
+//                Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
+//                Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
+//                ip = failIp;
+//                // Pop the iterated value
+//                POP_STK();
+//                //  XXTH continue;
+//                DISPATCH();
+//             }
+//
+//             // Set up.
+//
+//             iter.mData.mObj.mSet = set;
+//             iter.mData.mObj.mIndex = 0;
+//          }
+//
+//          _ITER++;
+//          iterDepth++;
+//
+//          ip += isGlobal ? 4 : 3;
+//          break;
+//       }
+//
+//       case OP_ITER:
+//       {
+//          U32 breakIp = code[ip];
+//          IterStackRecord& iter = iterStack[_ITER - 1];
+//
+//          if (iter.mIsStringIter)
+//          {
+//             const char* str = iter.mData.mStr.mString;
+//
+//             U32 startIndex = iter.mData.mStr.mIndex;
+//             U32 endIndex = startIndex;
+//
+//             // Break if at end.
+//
+//             if (!str[startIndex])
+//             {
+//                ip = breakIp;
+//                //  XXTH continue;
+//                DISPATCH();
+//             }
+//
+//             // Find right end of current component.
+//
+//             if (!dIsspace(str[endIndex]))
+//                do ++endIndex;
+//             while (str[endIndex] && !dIsspace(str[endIndex]));
+//
+//             // Extract component.
+//
+//             if (endIndex != startIndex)
+//             {
+//                char savedChar = str[endIndex];
+//                const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+//
+//                if (iter.mIsGlobalVariable)
+//                   iter.mVar.mVariable->setStringValue(&str[startIndex]);
+//                else
+//                   Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
+//
+//                const_cast<char*>(str)[endIndex] = savedChar;
+//             }
+//             else
+//             {
+//                if (iter.mIsGlobalVariable)
+//                   iter.mVar.mVariable->setStringValue("");
+//                else
+//                   Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
+//             }
+//
+//             // Skip separator.
+//             if (str[endIndex] != '\0')
+//                ++endIndex;
+//
+//             iter.mData.mStr.mIndex = endIndex;
+//          }
+//          else
+//          {
+//             U32 index = iter.mData.mObj.mIndex;
+//             SimSet* set = iter.mData.mObj.mSet;
+//
+//             if (index >= set->size())
+//             {
+//                ip = breakIp;
+//                //XXTH continue;
+//                DISPATCH();
+//             }
+//
+//             SimObjectId id = set->at(index)->getId();
+//
+//             if (iter.mIsGlobalVariable)
+//                iter.mVar.mVariable->setIntValue(id);
+//             else
+//                Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
+//
+//             iter.mData.mObj.mIndex = index + 1;
+//          }
+//
+//          ++ip;
+//          break;
+//       }
+//
+//       case OP_ITER_END:
+//       {
+//          --_ITER;
+//          --iterDepth;
+//
+//          POP_STK();
+//
+//          iterStack[_ITER].mIsStringIter = false;
+//          break;
+//       }
+//
+//       case OP_INVALID:
+//          TORQUE_CASE_FALLTHROUGH;
+//       default:
+//          // error!
+//          AssertISV(false, "Invalid OPCode Processed!");
+//          goto execFinished;
+//       } // ~~~~~~~~~~~~~~~~~~ END OF THE SWITCH ~~~~~~~~~~~~~~~~~~
+//
+//       DISPATCH();
+//
+//    // } //welcome back for loop
+// } //  handle_FALLBACK_SWITCH:
    // ==========================================================================
    // ==========================================================================
    // ==========================================================================
