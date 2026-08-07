@@ -5,7 +5,18 @@ static fields are many times faster than in in the vanilla torquescript. With 0.
 it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
 to change this.
 
-OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
+### Testenviorment: 
+
+- ThinkPad T570
+- DE: Xfce4 4.20
+- WM: Xfwm4 (X11)
+- CPU: Intel(R) Core(TM) i5-7200U (4) @ 3.10 GHz
+- GPU: Intel HD Graphics 620 @ 1.00 GHz [Integrated]
+- Memory: 1.04 GiB / 7.49 GiB (14%)
+
+    
+
+***OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest***
 
 
 ## Local variable:
@@ -13,7 +24,9 @@ OGE3D: time ./OhmtalGame_Linux.bin -dedicated -game speedtest
 - Version 0.4a (RelWithDebug) : 15.913u 0.198s 0:16.16 99.6%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 5.199u 0.000s 0:05.20 99.8%     0+0k 0+0io 0pf+0w
-- Version 0.4f 🚀 (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.4f🚀 (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.4g🚀 (RelWithDebug) : 4.753u 0.006s 0:04.77 99.5%     0+0k 0+0io 0pf+0w
+
 
 **for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
 
@@ -60,6 +73,8 @@ echo("---------------------");
 - OGE3D (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 6.622u 0.013s 0:06.64 99.8%     0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 6.345u 0.003s 0:06.35 99.8%     0+0k 0+0io 0pf+0w
+- Version 0.4g🚀 (RelWithDebug) : 6.618u 0.009s 0:06.63 99.6%     0+0k 0+0io 0pf+0w
+
 ```
 #define JLOOPS 25
 #define ILOOPS 1000000
@@ -104,7 +119,7 @@ echo("---------------------");
 - Version 0.4c 🚀 (RelWithDebug) : 31.224u 0.193s 0:31.45 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 21.784u 0.009s 0:21.82 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 21.170u 0.003s 0:21.20 99.8%    0+0k 0+0io 0pf+0w
-
+- Version 0.4g 🚀 (RelWithDebug) : 21.010u 0.009s 0:21.06 99.7%    0+0k 0+0io 0pf+0w
 
 
 Here 0.4c is slower than 0.4a (no idea why) - but 0.4b was at the same speed so rocket
@@ -160,6 +175,8 @@ echo("---------------------");
 - Version 0.4c 🚀 (RelWithDebug) : 24.884u 0.202s 0:25.12 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 13.967u 0.003s 0:13.99 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 14.015u 0.009s 0:14.04 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4g 🚀 (RelWithDebug) : 14.773u 0.006s 0:14.80 99.7%    0+0k 0+0io 0pf+0w
+
 
 
 ### So why is this slower (same with a global var):
@@ -285,6 +302,8 @@ echo("---------------------");
 - Version 0.4d 🚀 (RelWithDebug) : 124.605u 1.840s 2:06.71 99.7%   0+0k 0+0io 0pf+0w
 - Version 0.4e 🚀 (RelWithDebug) : 114.157u 1.692s 1:56.06 99.8%   0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 22.012u 0.000s 0:22.04 99.8%    0+0k 0+0io 0pf+0w
+- Version 0.4g 🚀 (RelWithDebug) : 22.104u 0.000s 0:22.12 99.9%    0+0k 0+0io 0pf+0w
+
 
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
