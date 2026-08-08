@@ -24,6 +24,9 @@ function foo(%name, %age, %gender, %active = false) {
 foo("lisa", "30", "f");
 ```
 
+
+
+
 ## Objects
 
 - Objects are used a lot to organize the code and to speed up execution. Like you 
@@ -34,7 +37,7 @@ create an Object in C++ to represent a Sprite with all it's Properties and metho
 - Initial parameters can be set when constucted. 
 - Every Object have a **onAdd** and **onRemove** callback to initalize and cleanup.
 - Some function/method calls require a ObjectId - when we use a named object we 
-must add the .getId() method => MyObject.get(). return the ObjectId
+must add the .getId() method => MyObject.getId(). return the ObjectId
 
 - In my example i create a SimGroup called GameGroup add some objects and cleanup 
 again. 
@@ -61,10 +64,10 @@ function GameGroup::onRemove(%this) {
 }
 
 new SimGroup(GameGroup) { class = "GroupClassForAll";};
-GameGroup.add( new SimObject() { foo = 1; });
-GameGroup.add( new SimObject() { foo = 2; });
-GameGroup.add( new SimObject() { foo = 3; });
-GameGroup.add( new SimObject() { foo = 4; });
+GameGroup.add( new SimObject() { TypeS32 foo = 1; });
+GameGroup.add( new SimObject() { TypeS32 foo = 2; });
+GameGroup.add( new SimObject() { TypeS32 foo = 3; });
+GameGroup.add( new SimObject() { TypeS32 foo = 4; });
 /* List the group in console */
 GameGroup.listObjects();
 /* iterate */
@@ -88,5 +91,7 @@ GameGroup.delete();
 
 echo("Object exits:" SPC isObject($saveID));
 ```
+
+[Optimize for Speed](./Optimize.md) 
 
 [Back to Main](./Main.md)

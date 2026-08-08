@@ -1354,13 +1354,9 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
 
       if(mFlags.test(ModStaticFields))
       {
-
-
-
             const AbstractClassRep::Field *fld = findField(slotName);
             if(fld)
             {
-
                   // Skip the special field types as they are not data.
                   if ( fld->type >= AbstractClassRep::ARCFirstCustomField )
                         return true;

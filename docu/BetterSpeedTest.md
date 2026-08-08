@@ -5,6 +5,10 @@ static fields are many times faster than in in the vanilla torquescript. With 0.
 it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
 to change this.
 
+
+### current: Version 0.4h🚀 (RelWithDebug) : Direct Threading finished ... let see - compiled with -O2.
+
+
 ### Testenviorment: 
 
 - ThinkPad T570
@@ -26,7 +30,7 @@ to change this.
 - Version 0.4d 🚀 (RelWithDebug) : 5.199u 0.000s 0:05.20 99.8%     0+0k 0+0io 0pf+0w
 - Version 0.4f🚀 (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
 - Version 0.4g🚀 (RelWithDebug) : 4.753u 0.006s 0:04.77 99.5%     0+0k 0+0io 0pf+0w
-
+- Version 0.4h🚀 (RelWithDebug) : 4.345u 0.004s 0:04.36 99.5%     0+0k 0+0io 0pf+0w
 
 **for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
 
@@ -74,6 +78,8 @@ echo("---------------------");
 - Version 0.4d 🚀 (RelWithDebug) : 6.622u 0.013s 0:06.64 99.8%     0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 6.345u 0.003s 0:06.35 99.8%     0+0k 0+0io 0pf+0w
 - Version 0.4g🚀 (RelWithDebug) : 6.618u 0.009s 0:06.63 99.6%     0+0k 0+0io 0pf+0w
+- Version 0.4h🚀 (RelWithDebug) : 6.059u 0.003s 0:06.08 99.5%     0+0k 8+0io 0pf+0w
+
 
 ```
 #define JLOOPS 25
@@ -120,6 +126,7 @@ echo("---------------------");
 - Version 0.4d 🚀 (RelWithDebug) : 21.784u 0.009s 0:21.82 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 21.170u 0.003s 0:21.20 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4g 🚀 (RelWithDebug) : 21.010u 0.009s 0:21.06 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4h🚀 (RelWithDebug) : 19.916u 0.002s 0:19.97 99.6%    0+0k 8+0io 0pf+0w
 
 
 Here 0.4c is slower than 0.4a (no idea why) - but 0.4b was at the same speed so rocket
@@ -176,6 +183,7 @@ echo("---------------------");
 - Version 0.4d 🚀 (RelWithDebug) : 13.967u 0.003s 0:13.99 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 14.015u 0.009s 0:14.04 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4g 🚀 (RelWithDebug) : 14.773u 0.006s 0:14.80 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.4h🚀 (RelWithDebug) : 13.582u 0.002s 0:13.62 99.7%    0+0k 0+0io 0pf+0w
 
 
 
@@ -303,8 +311,15 @@ echo("---------------------");
 - Version 0.4e 🚀 (RelWithDebug) : 114.157u 1.692s 1:56.06 99.8%   0+0k 0+0io 0pf+0w
 - Version 0.4f 🚀 (RelWithDebug) : 22.012u 0.000s 0:22.04 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4g 🚀 (RelWithDebug) : 22.104u 0.000s 0:22.12 99.9%    0+0k 0+0io 0pf+0w
+- Version 0.4h🚀 (RelWithDebug) : 21.901u 0.005s 0:21.97 99.6%    0+0k 8+0io 0pf+0w
 
 
+---
+### same test but using local var (docu/speedtest/elf/test_dynamic_fields_localvar.elf)
+- Version 0.4h🚀 (RelWithDebug) : 14.863u 0.001s 0:14.90 99.7%    0+0k 0+0io 0pf+0w
+
+Note: dynX must have TypeF32 set, else it fall back to string.
+---
 
 **OGE3D here nearly on same speed, since ElfScript have no Dyanmic Field optimations**
 
@@ -435,7 +450,9 @@ or instad of value a ConsoleValue object ?! << this would make sense or not ?
 #define JLOOPS 25
 #define ILOOPS 1000000
 
-new PointStorageObject(sto);
+%sto = new PointStorageObject(){
+    TypeF32 DynX = 0; // here is the beef!
+};
 
 sto.DynX = 0;
 for (%j = 0; %j < JLOOPS; %j++) {

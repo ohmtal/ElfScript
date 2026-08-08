@@ -1599,6 +1599,10 @@ class  PointStorageObject : public SimObject {
     * @return bool
     */
       function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
    /*!
     */
    float x;
@@ -4984,6 +4988,11 @@ namespace Global {
     * @return S32
     */
       function SDL_CreateWindow( string title, int width, int height, U64 window_flags );
+   /** --- bool SDL_SetWindowIcon ---
+    * Set a Window Icon from Surface
+    * @return bool
+    */
+      function SDL_SetWindowIcon( int WindowID, int SurfaceID );
    /** --- S32 SDL_CreatePopupWindow ---
     * This create a SDL_Window and SDL_Renderer
     * @return S32 WindowID
@@ -5048,6 +5057,12 @@ namespace Global {
     * @return bool
     */
       function SDL_SetTextureBlendMode( int textureID, uint blendMode=SDL_BLENDMODE_NONE );
+   /** --- bool SDL_SetRenderLogicalPresentation ---
+    * Set SDL_SetRenderLogicalPresentation which does scale the screen.
+    * Warning: ImGui windows (like console) looks a bit strange than!
+    * @return bool
+    */
+      function SDL_SetRenderLogicalPresentation( int RendererID, int logicalWidth, int logicalHeight, int mode=(S32)SDL_LOGICAL_PRESENTATION_STRETCH );
    /** --- bool SDL_SetRenderScale ---
     * set the render scale - default 1.f
     * @return bool
@@ -5083,6 +5098,11 @@ namespace Global {
     * @return bool
     */
       function SDL_RenderFillRect( int rendererID, RectF rect );
+   /** --- bool SDL_RenderRectF ---
+    * render a Rect  with float parameters and filled or not (not nativ SDL3)
+    * @return bool
+    */
+      function SDL_RenderRectF( int rendererID, float x, float y, float w, float h, bool filled=true );
    /** --- bool SDL_RenderTexture ---
     * render texture from src Rect to dstRect
     * @return bool
@@ -5108,13 +5128,23 @@ namespace Global {
     * @return bool
     */
       function SDL_DestroyRenderer( int rendererID );
+   /** --- bool SDL_SetRenderVSync ---
+    * set vertical sync on/off
+    * @return bool
+    */
+      function SDL_SetRenderVSync( int rendererID, int value );
+   /** --- S32 SDL_GetRenderVSync ---
+    * get vertical sync is on/off
+    * @return S32
+    */
+      function SDL_GetRenderVSync( int rendererID );
    /** --- bool SDL_RenderDebugText ---
     * called all the rendering(drawing) is done
     * @return bool
     */
       function SDL_RenderDebugText( int rendererID, float x, float y, string str );
    /** --- bool SDL_PointInRect ---
-    * Check a point is in rect
+    * Check a point is in rect --- Integer Rect !! --
     * @return bool
     */
       function SDL_PointInRect( Point2I p, RectI rect );
@@ -5159,11 +5189,10 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  TEX_SIZE = 16
-  BOUNCY = 6.66
   DummySize = "200 200"
   RadarBg = "0.1 0.1 0.1 0.8"
   PLAYER_SIZE = "16 16"
+  STAR_COUNT = 420
   SCENE_PATH = "pref:/"
   BACKGROUND_COLOR = { 176, 233, 252 }
   SCENE_FILE = "pref:/aquarium.elfscene"
@@ -5214,7 +5243,6 @@ namespace Global {
   SDL_SCANCODE_KP_MEMADD = 211
   SDL_SCANCODE_KP_MEMCLEAR = 210
   SDL_SCANCODE_KP_MEMRECALL = 209
-  BORDER = 60
   SDL_SCANCODE_KP_MEMSTORE = 208
   SDL_SCANCODE_KP_SPACE = 205
   SDL_SCANCODE_KP_COLON = 203
@@ -5494,7 +5522,6 @@ namespace Global {
   SDL_WINDOW_BORDERLESS = 16
   ImGuiKey_Escape = 526
   BLUE = "0 121 241 255"
-  MAG_DIR_VALUE = 15
   SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR = 4
   SDL_SCALEMODE_PIXELART = 2
   SDL_KMOD_CAPS = 8192
@@ -5634,7 +5661,6 @@ namespace Global {
   ImGuiStyleVar_ItemInnerSpacing = 15
   ImGuiStyleVar_ScrollbarSize = 18
   ImGuiStyleVar_ScrollbarRounding = 19
-  LOGO_SPAWN_RATE = 50
   ImGuiStyleVar_GrabMinSize = 21
   ImGuiCol_ButtonActive = 23
   WHITEBLEND = "255 255 255 254"
@@ -5711,7 +5737,6 @@ namespace Global {
   ImGuiMod_Super = 32768
   SDL_PROPERTY_TYPE_FLOAT = 4
   ImGuiKey_A = 546
-  MAG_MAX = 5000
   ImGuiKey_C = 548
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiKey_E = 550
@@ -5727,7 +5752,6 @@ namespace Global {
   ImGuiKey_J = 555
   ImGuiKey_PageUp = 517
   ImGuiKey_0 = 536
-  LOGO_SIZE = 32
   SDL_SCANCODE_KP_LEFTPAREN = 182
   SDL_SCANCODE_D = 7
   ImGuiKey_M = 558
@@ -5884,11 +5908,10 @@ namespace Global {
   SDL_SCANCODE_KP_7 = 95
   SDL_SCANCODE_KP_8 = 96
   SDL_SCANCODE_NONUSBACKSLASH = 100
-  LOGO_START_SPEED = 100
   SDL_SCANCODE_KP_EQUALS = 103
   SDL_SCANCODE_7 = 36
   SDL_SCANCODE_F15 = 106
   SDL_KMOD_RSHIFT = 2
   SDL_SCANCODE_F16 = 107
---- End of Dump (731 items) ---
+--- End of Dump (724 items) ---
 */

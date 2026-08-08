@@ -7,6 +7,8 @@ Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
 
 ## Notable changes:
+- 🚀 **ElfScript:** Byte Code handling replaced the for/case monster in compiledEval with direct threading.
+- 🚀 **ElfScript:** Dynamic Fields can be int, float or string which give a very good performace boost. Also if you setup them with TypeF32 for example. The type is really set to float and not only cosmetic. 
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before. (ELFSCRIPT_FASTPATH_FLD)
 - 🚀 **ElfScript:** Variable FastPath: OP_LOADVAR_STR and OP_LOAD_LOCAL_VAR_STR lookup the variable type to return not always string which make the previous setting to float/int useless. 
 - 🚀 **ElfScript (V0.4c):** Second rocket stage ignited: OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR. When i started with ElfScript (V0.0) the starfield demo in raylib-elfscript perfomed at 60fps. I optimzed the script as good as possible and got 75 fps. In Version 0.3 it was raised to about 500fps. After this last rocket change - which was quite easy - it's now raised from 550 to 900 fps (you should know i work on a 9 years old thinkpad with intel gpu) in BaseElf Starfield - did not check raylib so far. Holy cow ! 

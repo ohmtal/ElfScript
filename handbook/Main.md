@@ -24,11 +24,13 @@ $a = "This is a statement";
 
 
 
-1.) [Variables and Fields](./Variables.md) 
+1. [Variables and Fields](./Variables.md) 
 
-2.) [Operators and Control Statements](./Operators.md) 
+2. [Operators and Control Statements](./Operators.md) 
 
-3.) [Objects and Functions](./Objects.md) 
+3. [Objects and Functions](./Objects.md) 
+
+4. [Optimize for Speed](./Optimize.md) 
 
 
 ### After writing all this, I still only scratched the surface. 
