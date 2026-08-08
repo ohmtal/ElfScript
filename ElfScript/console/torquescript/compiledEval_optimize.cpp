@@ -97,9 +97,10 @@ struct IterStackRecord
 
    struct RangePos
    {
-      S32  mStart;
-      S32  mEnd;
-      S32  mInc;
+      S32  mStart; // first number (included)
+      S32  mEnd;  // last number (included)
+      S32  mInc;  // -1, +1 maybe we can add STEP :)
+      S32  mStop; //we stop at ...
    };
 
    union
@@ -2512,20 +2513,9 @@ handle_OP_ITER_BEGIN:
             {
                   iter.mData.mRange.mStart = stack[_STK-1].getInt();
                   iter.mData.mRange.mEnd   = stack[_STK].getInt();
-
-                  // allow == !!
-                  // if (iter.mData.mRange.mStart == iter.mData.mRange.mEnd) {
-                  //       Con::warnf(ConsoleLogEntry::General, "Foreach Range: End and Start equal %d..%d",
-                  //                   iter.mData.mRange.mStart,
-                  //                   iter.mData.mRange.mEnd
-                  //       );
-                  //       ip = failIp;
-                  //       POP_STK();
-                  //       DISPATCH();
-                  // }
-                  // else
                   if (iter.mData.mRange.mStart > iter.mData.mRange.mEnd) iter.mData.mRange.mInc = -1;
                   else iter.mData.mRange.mInc = 1;
+                  iter.mData.mRange.mStop = iter.mData.mRange.mEnd + iter.mData.mRange.mInc;
 
                   //FIXME
                   // Con::infof("FIXME :D range %d..%d inc:%d",
@@ -2672,13 +2662,8 @@ handle_OP_ITER:
             {
 
                   S32 i = iter.mData.mRange.mStart;
-                  // not >= it's foreach so i include the last one!
 
-                  bool done = iter.mData.mRange.mInc > 0
-                        ? i > iter.mData.mRange.mEnd
-                        : i < iter.mData.mRange.mEnd;
-
-                  if ( done ) {
+                  if (i == iter.mData.mRange.mStop) {
                         ip = breakIp;
                         DISPATCH();
                   }
