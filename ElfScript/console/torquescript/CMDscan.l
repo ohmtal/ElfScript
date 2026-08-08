@@ -14,17 +14,17 @@
 #include "console/dynamicTypes.h"
 #include "core/strings/stringFunctions.h"
 
-// ElfScript was double defined!! =>
-// template< typename T >
-// struct Token
-// {
-//    T value;
-//    S32 lineNumber;
-// };
+// ElfScript was double defined!!, but i need it :/ =>
+template< typename T >
+struct Token
+{
+   T value;
+   S32 lineNumber;
+};
 
 // Can't have ctors in structs used in unions, so we have this.
 template< typename T >
-inline Token< T > MakeToken( T value, U32 lineNumber )
+inline Token< T > MakeToken( T value, S32 lineNumber )
 {
    Token< T > result;
    result.value = value;
@@ -175,6 +175,7 @@ HEXDIGIT [a-fA-F0-9]
 ">>="   { CMDlval.i = MakeToken<int>(opSRASN,       yylineno); return opSRASN;       }
 "->"    { CMDlval.i = MakeToken<int>(opINTNAME,     yylineno); return opINTNAME;     }
 "-->"   { CMDlval.i = MakeToken<int>(opINTNAMER,    yylineno); return opINTNAMER;    }
+".."    { CMDlval.i = MakeToken<int>(opDOTDOT,      yylineno); return opDOTDOT;      }
 %{
 // String concatenation operators.  All four return the '@' token; the
 // distinguishing data is the separator character stored in the token value.

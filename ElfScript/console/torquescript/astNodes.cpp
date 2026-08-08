@@ -350,12 +350,29 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
    codeStream.pushFixScope(true);
 
    bool isGlobal = varName[0] == '$';
-   TypeReq varType = isStringIter ? TypeReqString : TypeReqUInt;
+   // TypeReq varType = isStringIter ? TypeReqString : TypeReqUInt;
+   TypeReq varType = (mode==1) ? TypeReqString : TypeReqUInt;
 
    const U32 startIp = ip;
-   containerExpr->compile(codeStream, startIp, TypeReqString);
+   // startExpr->compile(codeStream, startIp, TypeReqString);
+   // if (endExpr) endExpr->compile(codeStream, startIp, TypeReqString);
 
-   codeStream.emit(isStringIter ? OP_ITER_BEGIN_STR : OP_ITER_BEGIN);
+   switch (mode) {
+         case 1:
+               startExpr->compile(codeStream, startIp, TypeReqString);
+               codeStream.emit(OP_ITER_BEGIN_STR);
+         break;
+         case 2:
+               startExpr->compile(codeStream, startIp, TypeReqUInt);
+               endExpr->compile(codeStream, startIp, TypeReqString);
+               codeStream.emit(OP_ITER_BEGIN_RANGE);
+         break;
+         default:
+               startExpr->compile(codeStream, startIp, TypeReqString);
+               codeStream.emit(OP_ITER_BEGIN);
+        break;
+   }
+   // codeStream.emit(isStringIter ? OP_ITER_BEGIN_STR : OP_ITER_BEGIN);
    codeStream.emit(isGlobal);
    if (isGlobal)
       codeStream.emitSTE(varName);

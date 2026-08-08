@@ -60,7 +60,7 @@ enum EvalConstants
 struct IterStackRecord
 {
    /// If true, this is a foreach$ loop; if not, it's a foreach loop.
-   bool mIsStringIter;
+   S32 mMode; //1=string, 2=range, 0(default) = SimObject
 
    /// True if the variable referenced is a global
    bool mIsGlobalVariable;
@@ -94,10 +94,19 @@ struct IterStackRecord
       /// Current parsing position.
       U32 mIndex;
    };
+
+   struct RangePos
+   {
+      S32  mStart;
+      S32  mEnd;
+      S32  mInc;
+   };
+
    union
    {
       ObjectPos mObj;
       StringPos mStr;
+      RangePos  mRange;
    } mData;
 };
 
@@ -999,6 +1008,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
          &&handle_OP_DEC,
 
+         &&handle_OP_ITER_BEGIN_RANGE,
+
          &&handle_OP_INVALID
    };
 
@@ -1078,7 +1089,7 @@ handle_OP_DEFAULT_END:
 
       while (iterDepth > 0)
       {
-            iterStack[--_ITER].mIsStringIter = false;
+            iterStack[--_ITER].mMode = 0;
             --iterDepth;
             POP_STK();
       }
@@ -1475,7 +1486,7 @@ handle_OP_RETURN:
       // Clear iterator state.
       while (iterDepth > 0)
       {
-            iterStack[--_ITER].mIsStringIter = false;
+            iterStack[--_ITER].mMode = 0;
             --iterDepth;
             POP_STK();
       }
@@ -1488,7 +1499,7 @@ handle_OP_RETURN_VOID:
             // Clear iterator state.
             while (iterDepth > 0)
             {
-               iterStack[--_ITER].mIsStringIter = false;
+               iterStack[--_ITER].mMode = 0;
                --iterDepth;
 
                POP_STK();
@@ -1503,7 +1514,7 @@ handle_OP_RETURN_FLT:
       // Clear iterator state.
       while (iterDepth > 0)
       {
-            iterStack[--_ITER].mIsStringIter = false;
+            iterStack[--_ITER].mMode = 0;
             --iterDepth;
 
             POP_STK();
@@ -1516,7 +1527,7 @@ handle_OP_RETURN_UINT:
       // Clear iterator state.
       while (iterDepth > 0)
       {
-            iterStack[--_ITER].mIsStringIter = false;
+            iterStack[--_ITER].mMode = 0;
             --iterDepth;
             POP_STK();
       }
@@ -2488,31 +2499,91 @@ handle_OP_ITER_BEGIN:
             iter.mVar.mRegister = code[ip + 1];
       }
 
-      if (iter.mIsStringIter)
-      {
-            iter.mData.mStr.mString = stack[_STK].getString();
-            iter.mData.mStr.mIndex = 0;
-      }
-      else
-      {
-            // Look up the object.
 
-            SimSet* set;
-            if (!Sim::findObject(stack[_STK].getString(), set))
+      switch (iter.mMode) {
+            case 1: // string
             {
-                  Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
-                  Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
-                  ip = failIp;
-                  // Pop the iterated value
-                  POP_STK();
-                  DISPATCH(); // continue;
+                  iter.mData.mStr.mString = stack[_STK].getString();
+                  iter.mData.mStr.mIndex = 0;
             }
+            break;
 
-            // Set up.
+            case 2: // Range a..b
+            {
+                  iter.mData.mRange.mStart = stack[_STK-1].getInt();
+                  iter.mData.mRange.mEnd   = stack[_STK].getInt();
 
-            iter.mData.mObj.mSet = set;
-            iter.mData.mObj.mIndex = 0;
+                  // allow == !!
+                  // if (iter.mData.mRange.mStart == iter.mData.mRange.mEnd) {
+                  //       Con::warnf(ConsoleLogEntry::General, "Foreach Range: End and Start equal %d..%d",
+                  //                   iter.mData.mRange.mStart,
+                  //                   iter.mData.mRange.mEnd
+                  //       );
+                  //       ip = failIp;
+                  //       POP_STK();
+                  //       DISPATCH();
+                  // }
+                  // else
+                  if (iter.mData.mRange.mStart > iter.mData.mRange.mEnd) iter.mData.mRange.mInc = -1;
+                  else iter.mData.mRange.mInc = 1;
+
+                  //FIXME
+                  // Con::infof("FIXME :D range %d..%d inc:%d",
+                  //       iter.mData.mRange.mStart,
+                  //       iter.mData.mRange.mEnd,
+                  //       iter.mData.mRange.mInc
+                  // );
+            }
+            break;
+
+            default: //0/default => SimObject
+            {
+                  // Look up the object.
+
+                  SimSet* set;
+                  if (!Sim::findObject(stack[_STK].getString(), set))
+                  {
+                        Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
+                        Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
+                        ip = failIp;
+                        // Pop the iterated value
+                        POP_STK();
+                        DISPATCH(); // continue;
+                  }
+
+                  // Set up.
+
+                  iter.mData.mObj.mSet = set;
+                  iter.mData.mObj.mIndex = 0;
+
+            }
+            break;
       }
+      // if (iter.mIsStringIter)
+      // {
+      //       iter.mData.mStr.mString = stack[_STK].getString();
+      //       iter.mData.mStr.mIndex = 0;
+      // }
+      // else
+      // {
+      //       // Look up the object.
+      //
+      //       SimSet* set;
+      //       if (!Sim::findObject(stack[_STK].getString(), set))
+      //       {
+      //             Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
+      //             Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
+      //             ip = failIp;
+      //             // Pop the iterated value
+      //             POP_STK();
+      //             DISPATCH(); // continue;
+      //       }
+      //
+      //       // Set up.
+      //
+      //       iter.mData.mObj.mSet = set;
+      //       iter.mData.mObj.mIndex = 0;
+      // }
 
       _ITER++;
       iterDepth++;
@@ -2521,12 +2592,16 @@ handle_OP_ITER_BEGIN:
       DISPATCH();
 }
 
+handle_OP_ITER_BEGIN_RANGE:
+{
+      iterStack[_ITER].mMode = 2; // Range
+      goto handle_OP_ITER_BEGIN;
+}
 
 handle_OP_ITER_BEGIN_STR:
 {
-      iterStack[_ITER].mIsStringIter = true;
-      //NOTE was before handle_OP_ITER_BEGIN
-      //          TORQUE_CASE_FALLTHROUGH;
+      iterStack[_ITER].mMode = 1; // STRING
+      // iterStack[_ITER].mIsStringIter = true;
       goto handle_OP_ITER_BEGIN;
 }
 
@@ -2535,80 +2610,191 @@ handle_OP_ITER:
       U32 breakIp = code[ip];
       IterStackRecord& iter = iterStack[_ITER - 1];
 
-      if (iter.mIsStringIter)
-      {
-            const char* str = iter.mData.mStr.mString;
-
-            U32 startIndex = iter.mData.mStr.mIndex;
-            U32 endIndex = startIndex;
-
-            // Break if at end.
-
-            if (!str[startIndex])
+      switch (iter.mMode) {
+            case 1: // String
             {
-                  ip = breakIp;
-                  DISPATCH(); // continue;
-            }
+                  const char* str = iter.mData.mStr.mString;
 
-            // Find right end of current component.
+                  U32 startIndex = iter.mData.mStr.mIndex;
+                  U32 endIndex = startIndex;
 
-            if (!dIsspace(str[endIndex])) {
-                  while (str[endIndex] && !dIsspace(str[endIndex])) {
-                        ++endIndex;
+                  // Break if at end.
+
+                  if (!str[startIndex])
+                  {
+                        ip = breakIp;
+                        DISPATCH(); // continue;
                   }
-                  // do ++endIndex;
-                  // while (str[endIndex] && !dIsspace(str[endIndex]));
-            }
+
+                  // Find right end of current component.
+
+                  if (!dIsspace(str[endIndex])) {
+                        while (str[endIndex] && !dIsspace(str[endIndex])) {
+                              ++endIndex;
+                        }
+                        // do ++endIndex;
+                        // while (str[endIndex] && !dIsspace(str[endIndex]));
+                  }
 
 
-            // Extract component.
+                  // Extract component.
 
-            if (endIndex != startIndex)
+                  if (endIndex != startIndex)
+                  {
+                        char savedChar = str[endIndex];
+                        const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+
+                        if (iter.mIsGlobalVariable)
+                              iter.mVar.mVariable->setStringValue(&str[startIndex]);
+                        else
+                              Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
+
+                        const_cast<char*>(str)[endIndex] = savedChar;
+                  }
+                  else
+                  {
+                        if (iter.mIsGlobalVariable)
+                              iter.mVar.mVariable->setStringValue("");
+                        else
+                              Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
+                  }
+
+                  // Skip separator.
+                  if (str[endIndex] != '\0')
+                        ++endIndex;
+
+                  iter.mData.mStr.mIndex = endIndex;
+
+            } //string end
+            break;
+
+            case 2: //RANGE inludine first and last one
             {
-                  char savedChar = str[endIndex];
-                  const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+
+                  S32 i = iter.mData.mRange.mStart;
+                  // not >= it's foreach so i include the last one!
+
+                  bool done = iter.mData.mRange.mInc > 0
+                        ? i > iter.mData.mRange.mEnd
+                        : i < iter.mData.mRange.mEnd;
+
+                  if ( done ) {
+                        ip = breakIp;
+                        DISPATCH();
+                  }
+
 
                   if (iter.mIsGlobalVariable)
-                        iter.mVar.mVariable->setStringValue(&str[startIndex]);
+                        iter.mVar.mVariable->setIntValue(i);
                   else
-                        Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
+                        Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, i);
 
-                  const_cast<char*>(str)[endIndex] = savedChar;
-            }
-            else
+
+                  iter.mData.mRange.mStart += iter.mData.mRange.mInc;
+
+
+            } //RANGE
+            break;
+
+            default: //SimSet 0 or any other
             {
+                  U32 index = iter.mData.mObj.mIndex;
+                  SimSet* set = iter.mData.mObj.mSet;
+
+                  if (index >= set->size())
+                  {
+                        ip = breakIp;
+                        DISPATCH(); // continue;
+                  }
+
+                  SimObjectId id = set->at(index)->getId();
+
                   if (iter.mIsGlobalVariable)
-                        iter.mVar.mVariable->setStringValue("");
+                        iter.mVar.mVariable->setIntValue(id);
                   else
-                        Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
-            }
+                        Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
 
-            // Skip separator.
-            if (str[endIndex] != '\0')
-                  ++endIndex;
+                  iter.mData.mObj.mIndex = index + 1;
+            }//SIMSET
+            break;
 
-            iter.mData.mStr.mIndex = endIndex;
       }
-      else
-      {
-            U32 index = iter.mData.mObj.mIndex;
-            SimSet* set = iter.mData.mObj.mSet;
 
-            if (index >= set->size())
-            {
-                  ip = breakIp;
-                  DISPATCH(); // continue;
-            }
 
-            SimObjectId id = set->at(index)->getId();
-
-            if (iter.mIsGlobalVariable)
-                  iter.mVar.mVariable->setIntValue(id);
-            else
-                  Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
-
-            iter.mData.mObj.mIndex = index + 1;
-      }
+      // if (iter.mIsStringIter)
+      // {
+      //       const char* str = iter.mData.mStr.mString;
+      //
+      //       U32 startIndex = iter.mData.mStr.mIndex;
+      //       U32 endIndex = startIndex;
+      //
+      //       // Break if at end.
+      //
+      //       if (!str[startIndex])
+      //       {
+      //             ip = breakIp;
+      //             DISPATCH(); // continue;
+      //       }
+      //
+      //       // Find right end of current component.
+      //
+      //       if (!dIsspace(str[endIndex])) {
+      //             while (str[endIndex] && !dIsspace(str[endIndex])) {
+      //                   ++endIndex;
+      //             }
+      //             // do ++endIndex;
+      //             // while (str[endIndex] && !dIsspace(str[endIndex]));
+      //       }
+      //
+      //
+      //       // Extract component.
+      //
+      //       if (endIndex != startIndex)
+      //       {
+      //             char savedChar = str[endIndex];
+      //             const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+      //
+      //             if (iter.mIsGlobalVariable)
+      //                   iter.mVar.mVariable->setStringValue(&str[startIndex]);
+      //             else
+      //                   Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, &str[startIndex], endIndex - startIndex);
+      //
+      //             const_cast<char*>(str)[endIndex] = savedChar;
+      //       }
+      //       else
+      //       {
+      //             if (iter.mIsGlobalVariable)
+      //                   iter.mVar.mVariable->setStringValue("");
+      //             else
+      //                   Script::gEvalState.setLocalStringVariable(iter.mVar.mRegister, "", 0);
+      //       }
+      //
+      //       // Skip separator.
+      //       if (str[endIndex] != '\0')
+      //             ++endIndex;
+      //
+      //       iter.mData.mStr.mIndex = endIndex;
+      // }
+      // else
+      // {
+      //       U32 index = iter.mData.mObj.mIndex;
+      //       SimSet* set = iter.mData.mObj.mSet;
+      //
+      //       if (index >= set->size())
+      //       {
+      //             ip = breakIp;
+      //             DISPATCH(); // continue;
+      //       }
+      //
+      //       SimObjectId id = set->at(index)->getId();
+      //
+      //       if (iter.mIsGlobalVariable)
+      //             iter.mVar.mVariable->setIntValue(id);
+      //       else
+      //             Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, id);
+      //
+      //       iter.mData.mObj.mIndex = index + 1;
+      // }
 
       ++ip;
       DISPATCH();
@@ -2619,9 +2805,10 @@ handle_OP_ITER_END:
       --_ITER;
       --iterDepth;
 
-      POP_STK(); //XXTH memfix attempt orig: _STK--;
+      POP_STK();
 
-      iterStack[_ITER].mIsStringIter = false;
+      iterStack[_ITER].mMode = 0;
+      // iterStack[_ITER].mIsStringIter = false;
       DISPATCH();;
 }
 

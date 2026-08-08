@@ -110,8 +110,13 @@ while ( %i < 20 ) {
 }
 ```
 
-*foreach* it special. It's designed for SimSet's and SimGroup's to loop it's members
-which is very usefull. But *foreach$* can be used for words.
+*foreach* (fastest): 
+
+1. It's designed for SimSet's and SimGroup's to loop it's members
+2. foreach$ can be used for words like "A B C".
+3. ElfScript 0.5: it now can be used also for integers: `foreach(%i in 1..3) {}`. 
+**Importent** it gives you all numbers: 1,2,3 like pascal: `For i:=1 to 3 do ...`
+This is the fastest Iteration you can use in ElfScript :)
 
 SimSet Example with named Object  and cleanup:
 ``` 
@@ -137,7 +142,17 @@ foreach$(%word in %MyString) {
 }
 echo("Drei mal ganz schnell hintereinander...");
 ```
----
+
+Integer Examples:
+
+```
+foreach( %i  in 1..3) { print(%i); } /* print: 1 2 3 */
+foreach( %i  in 3..1) { print(%i); } /* print: 3 2 1 */
+foreach( %i  in 0..0) { print(%i); } /* print:  */
+```
+
+
+
 
 [Objects and Functions](./Objects.md) 
 

@@ -1,0 +1,37 @@
+// foreach include the first and last so i have to decrease LOOPS by ONE
+// or start at 1
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+// new PointStorageObject(sto);
+
+%localX = 0;
+foreach(%j in 1..JLOOPS)  {
+    foreach(%i in 1..ILOOPS)  {
+        %localX ++;
+    }
+    echo("SUM (++) IS:" SPC %localX);
+    foreach(%i in 1..ILOOPS)  {
+        %localX --;
+    }
+    echo("SUM (--) IS:" SPC %localX);
+    %localX = 66.0;
+    echo("set Sum to 66 == " SPC %localX);
+    foreach(%i in 1..ILOOPS)  {
+        %localX *= %i;
+        %localX /= %i;
+    }
+    echo("SUM (*/ %i+1) IS:" SPC %localX);
+    foreach(%i in 1 .. ILOOPS / 2)  {
+        %ran = getRandomF(%i);
+        %localX -= %ran;
+        %localX += %ran;
+    }
+    echo("SUM (rand +-) IS:" SPC %localX);
+}
+%localX -= 66.0 ;
+echo("---------------------");
+echo("---------------------");
+echo("Final sum should be 0 == ", %localX);
+echo("---------------------");
+echo("---------------------");

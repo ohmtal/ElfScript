@@ -82,16 +82,19 @@ LoopStmtNode* LoopStmtNode::alloc(S32 lineNumber, ExprNode* initExpr, ExprNode* 
    return ret;
 }
 
-IterStmtNode* IterStmtNode::alloc(S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter)
+// IterStmtNode* IterStmtNode::alloc(S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter)
+IterStmtNode* IterStmtNode::alloc(S32 lineNumber, StringTableEntry varName, ExprNode* startExpr,ExprNode* endExpr, StmtNode* body, S32 mode)
 {
    IterStmtNode* ret = (IterStmtNode*)consoleAlloc(sizeof(IterStmtNode));
    constructInPlace(ret);
 
    ret->dbgLineNumber = lineNumber;
    ret->varName = varName;
-   ret->containerExpr = containerExpr;
+   // ret->containerExpr = containerExpr;
+   ret->startExpr = startExpr;
+   ret->endExpr = endExpr;
    ret->body = body;
-   ret->isStringIter = isStringIter;
+   ret->mode = mode;
 
    return ret;
 }

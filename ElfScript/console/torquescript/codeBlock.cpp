@@ -1415,6 +1415,34 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
+      case OP_ITER_BEGIN_RANGE:
+      {
+            bool isGlobal = code[ip];
+            if (isGlobal)
+            {
+                  StringTableEntry varName = CodeToSTE(code, ip + 1);
+                  U32 failIp = code[ip + 3];
+
+                  Con::printf("%i: OP_ITER_BEGIN_RANGE stk=0 varName=%s failIp=%i isGlobal=%s", ip - 1, varName, failIp, "true");
+                  Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
+
+                  ip += 4;
+            }
+            else
+            {
+                  S32 reg = code[ip + 1];
+                  U32 failIp = code[ip + 2];
+
+                  Con::printf("%i: OP_ITER_BEGIN_RANGE stk=0 varRegister=%d failIp=%i isGlobal=%s", ip - 1, reg, failIp, "false");
+                  Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
+
+                  ip += 3;
+            }
+
+            break;
+      }
+
+
       case OP_ITER_BEGIN_STR:
       {
          bool isGlobal = code[ip];

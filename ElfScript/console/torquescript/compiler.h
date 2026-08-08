@@ -184,6 +184,8 @@ namespace Compiler
 
       OP_DEC,
 
+      OP_ITER_BEGIN_RANGE,
+
       OP_INVALID,   //
 
       MAX_OP_CODELEN ///< The amount of op codes.

@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -186,18 +187,23 @@ struct IterStmtNode : StmtNode
    StringTableEntry varName;
 
    /// Expression evaluating to a SimSet object.
-   ExprNode* containerExpr;
+  // ORIG ExprNode* containerExpr;
+
+   // Elfscript:
+   ExprNode* startExpr;
+   ExprNode* endExpr;
 
    /// The statement body.
    StmtNode* body;
 
    /// If true, this is a 'foreach$'.
-   bool isStringIter;
+   S32 mode; //0 = SimSet, 1 = String, 2 = integer loop
 
    /// Bytecode size of body statement.  Set by precompileStmt.
    U32 bodySize;
 
-   static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter);
+   static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName, ExprNode* startExpr,ExprNode* endExpr, StmtNode* body, S32 mode);
+   // static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter);
 
    U32 compileStmt(CodeStream& codeStream, U32 ip) override;
 };

@@ -60,6 +60,8 @@ struct Token
 %token <i> rwCASEOR rwPACKAGE
 %token <i> rwASSERT
 %token ILLEGAL_TOKEN
+//NOTE: ElfScript using DOTDOT for foreach in str ...
+
 // NOTE: rwNAMESPACE and rwCLASS were declared here previously but had no
 // lexer rules and appeared in no grammar productions.  They have been
 // removed.  If namespace/class syntax is added in future, add both the
@@ -104,6 +106,8 @@ struct Token
 %token <i> opSTREQ opSTRNE
 
 %token <i> opCOLONCOLON
+
+%token <i> opDOTDOT
 
 %union {
    Token< char >           c;
@@ -442,11 +446,19 @@ for_stmt
       { $$ = LoopStmtNode::alloc($1.lineNumber, NULL, NULL, NULL, $6, false); }
    ;
 
+// foreach_stmt
+//    : rwFOREACH '(' VAR rwIN expr ')' stmt_block
+//       { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, $7, false ); }
+//    | rwFOREACHSTR '(' VAR rwIN expr ')' stmt_block
+//       { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, $7, true ); }
+//    ;
 foreach_stmt
    : rwFOREACH '(' VAR rwIN expr ')' stmt_block
-      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, $7, false ); }
+      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL, $7, 0 ); }
    | rwFOREACHSTR '(' VAR rwIN expr ')' stmt_block
-      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, $7, true ); }
+      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL, $7, 1 ); }
+   | rwFOREACH '(' VAR rwIN expr opDOTDOT expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, $9, 2 ); }
    ;
 
 expression_stmt
