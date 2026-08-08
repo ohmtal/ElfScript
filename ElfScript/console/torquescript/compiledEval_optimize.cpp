@@ -996,6 +996,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_INC_UINT,
 #endif
 
+         &&handle_OP_DEC,
+
          &&handle_OP_INVALID
    };
 
@@ -1610,11 +1612,39 @@ handle_OP_NEG:
       DISPATCH();
 
 
-handle_OP_INC:
+// handle_OP_INC:
+//       reg = code[ip++];
+//       currentRegister = reg;
+//       Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+//       DISPATCH();
+
+handle_OP_INC: {
       reg = code[ip++];
       currentRegister = reg;
-      Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
+
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      if ( stackRef.type == ConsoleValueType::cvFloat)
+            stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
+      else
+            stackRef.setFloat(stackRef.getFloat() + 1.0);
+
+      // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
       DISPATCH();
+}
+
+handle_OP_DEC: {
+      reg = code[ip++];
+      currentRegister = reg;
+
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      if ( stackRef.type == ConsoleValueType::cvFloat)
+            stackRef.setFastFloat(stackRef.getFastFloat() - 1.0);
+      else
+            stackRef.setFloat(stackRef.getFloat() - 1.0);
+
+      // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) - 1.0);
+      DISPATCH();
+}
 
 // ~~~~~~~~~~~~~~~~~ CURVAR
 handle_OP_SETCURVAR:
@@ -2646,6 +2676,13 @@ handle_OP_CMPEQ_UINT:
 handle_OP_CMPNE_UINT:
       doIntOperation<IntegerOperation::NE>();
       DISPATCH();
+
+handle_OP_INC_UINT:
+      reg = code[ip++];
+      currentRegister = reg;
+      Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1.0);
+      DISPATCH();
+
 #endif
 
 // ~~~~~~~~~~~~~~~~~ INVALID

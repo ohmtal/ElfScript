@@ -181,6 +181,9 @@ namespace Compiler
 
       OP_INC_UINT,
 #endif
+
+      OP_DEC,
+
       OP_INVALID,   //
 
       MAX_OP_CODELEN ///< The amount of op codes.

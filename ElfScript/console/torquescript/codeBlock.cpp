@@ -1069,7 +1069,12 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          ++ip;
          break;
       }
-
+      case OP_DEC:
+      {
+            Con::printf("%i: OP_DEC stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip;
+            break;
+      }
       case OP_SETCURVAR:
       {
          StringTableEntry var = CodeToSTE(code, ip);

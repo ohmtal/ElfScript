@@ -204,6 +204,7 @@ maybe faster. Did not test it so far.
 
 [The full StarField Script (BaseElf Version)](https://github.com/ohmtal/ElfScript/blob/main/BaseElf/assets/modules/StarField.elf) 
 
+[SpeedTest i did to optimize the code](https://github.com/ohmtal/ElfScript/blob/main/docu/BetterSpeedTest.md)
 
 ---
 

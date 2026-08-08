@@ -1,5 +1,11 @@
 # FIXME 
 
+- [ ] Test fastFloat on OP_INC if type is float
+- [ ] Like OP_INC  shortpath for "--" OP_DEC
+
+
+# DONE:
+
 ## Field dynamic arrays does not longer work !!!
 
 invaderGame.Keys[%actionString] => make a invaderGame.Keys==
@@ -35,7 +41,6 @@ But
 
 
 
-# DONE:
 
 ## 0.4c OP_SAVE_LOCAL_VAR_STR and OP_SAVEVAR_STR
 
