@@ -1006,11 +1006,7 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
       }
 
 
-      if (!array) {
-            Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
-            return false;
-      }
-      bool arrayEmpty = array[0] == '\0';
+      bool arrayEmpty = (!array || array[0] == '\0');
 
       // ~~~~~~~~~ STATIC FIELDS ~~~~~~~~~~
       if(mFlags.test(ModStaticFields))
@@ -1113,11 +1109,8 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
 // String version for setDatafield
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
-   if (!array) {
-      Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
-      return;
-   }
-   bool arrayEmpty = array[0] == '\0';
+
+   bool arrayEmpty = (!array || array[0] == '\0');
 
    // first search the static fields if enabled
    if(mFlags.test(ModStaticFields))
@@ -1357,11 +1350,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 //ElfScript replacement for getDataField to set to right type directly into stack
 bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
 
-      if (!array) {
-            Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
-            return false;
-      }
-      bool arrayEmpty = array[0] == '\0';
+      bool arrayEmpty = (!array || array[0] == '\0');
 
       if(mFlags.test(ModStaticFields))
       {
