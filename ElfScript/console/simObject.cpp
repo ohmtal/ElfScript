@@ -1005,8 +1005,12 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
             return false;
       }
 
-      // REMOVE THIS!!
-      // Con::printf("SimObject::pushDataField: %s", slotName);
+
+      if (!array) {
+            Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
+            return false;
+      }
+      bool arrayEmpty = array[0] == '\0';
 
       // ~~~~~~~~~ STATIC FIELDS ~~~~~~~~~~
       if(mFlags.test(ModStaticFields))
@@ -1026,9 +1030,11 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
                         || fld->type == TypeU8
                         || fld->type == TypeS16
                   ) {
-                        S32 array1 = PARSE_ARRAY_INDEX(array);
+                        // - Static fields can only have an integer Index
+                        // - we only do fastpath at the moment when no array is used.
+                        // - so we check array1 is null or empty
 
-                        if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                        if (arrayEmpty && fld->writeDataFn == &defaultProtectedWriteFn
                               && fld->setDataFn == &defaultProtectedSetFn
                               && fld->flag == 0
                         ) {
@@ -1060,8 +1066,8 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
       {
             StringTableEntry dynamicFieldName = nullptr;
 
-            S32 array1 = PARSE_ARRAY_INDEX(array);
-            if(array1 == 0) {
+
+            if(arrayEmpty) {
                   dynamicFieldName = slotName;
             } else {
                   char buf[256];
@@ -1097,34 +1103,6 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
                         break;
             }
 
-
-            // switch (stackP->getType()) {
-            //       case ConsoleValueType::cvInteger:
-            //             // entry->mValue.setFastInt(stackP->getFastInt());
-            //             entry->mValue.setInt(stackP->getInt());
-            //             break;
-            //       case ConsoleValueType::cvFloat:
-            //             // entry->mValue.setFastFloat(stackP->getFastFloat());
-            //             entry->mValue.setFloat(stackP->getFloat());
-            //             break;
-            //       default: {
-            //             switch (entry->mValue.type)  {
-            //                   case ConsoleValueType::cvInteger:
-            //                        entry->mValue.setInt( stackP->getInt());
-            //                        // entry->mValue.setFastInt( stackP->getInt());
-            //                         break;
-            //                   case ConsoleValueType::cvFloat:
-            //                         entry->mValue.setFloat(stackP->getFloat());
-            //                         // entry->mValue.setFastFloat(stackP->getFloat());
-            //                         break;
-            //                   default:
-            //                         entry->mValue.setString(stackP->getString());
-            //                         break;
-            //             }
-            //
-            //             break;
-            //       }
-            // }
             return true;
       }
 }
@@ -1135,6 +1113,12 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
 // String version for setDatafield
 void SimObject::setDataField(StringTableEntry slotName, const char *array, const char *value)
 {
+   if (!array) {
+      Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
+      return;
+   }
+   bool arrayEmpty = array[0] == '\0';
+
    // first search the static fields if enabled
    if(mFlags.test(ModStaticFields))
    {
@@ -1147,11 +1131,35 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             return;
 
 
+         //NOTE  Elfscript much better check for static fields!!!!!
+         // >>>>>>>>>>>>>>>>>
+         // nullptr and empty  must be checked before!
+         S32 array1;
+         if (arrayEmpty) {
+               array1 = 0;
+         }
+         else if ((static_cast<unsigned char>(array[0]) - '0') < 10) {
+               array1 = dAtoi(array);
+         }
+         else {
+               Con::warnf("Static field %s : array '%s' index invalid! value not set!", slotName, array);
+               return;
+         }
 
-         S32 array1 = PARSE_ARRAY_INDEX(array);
+         if (static_cast<U32>(array1) >= static_cast<U32>(fld->elementCount)) {
+               Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+               return;
+         }
+         if (array1 >= fld->elementCount || fld->elementCount <= 0 ) {
+               Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+               return;
+         }
+         // <<<<<<<<<
+
+
 // #ifdef ELFSCRIPT_FASTPATH_FLD
          // XXTH  --------------------------------------- >
-        if (array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
+        // obsolete checked before ! if (array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
         {
             if (fld->writeDataFn == &defaultProtectedWriteFn
                && fld->setDataFn == &defaultProtectedSetFn
@@ -1193,7 +1201,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
                         //XXTH we have default handler and no array this should work!
                         // but it does not speed up ... or i testing wrong
-                        Con::setData(fld->type, (void *) (((const char *)this) + fld->offset), array1, 1, &value, fld->table);
+                        Con::setData(fld->type, (void *) (((const char *)this) + fld->offset), array1 , 1, &value, fld->table);
                         handled = true;
                   }
 
@@ -1208,10 +1216,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
          }
 // #endif
 
-         //XXTH NOTE: the following is a real handbreak. And no matter which type the
-         // field is a "=" call this if fastpath failed or the field is not native
-
-         if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
+         // obsolete checked before ! if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
             // If the set data notify callback returns true, then go ahead and
             // set the data, otherwise, assume the set notify callback has either
@@ -1247,10 +1252,10 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
             return;
          }
 
-         if(fld->validator)
-            fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
-
-         onStaticModified( slotName, value );
+         // if(fld->validator)
+         //    fld->validator->validateType(this, fld->pFieldname, (void *) (((const char *)this) + fld->offset));
+         //
+         // onStaticModified( slotName, value );
          return;
       }
    }
@@ -1260,10 +1265,9 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
       if(!mFieldDictionary)
          mFieldDictionary = new SimFieldDictionary;
 
-      // ElfScript 0.4e
-      S32 array1 = PARSE_ARRAY_INDEX(array);
+      // ElfScript 0.4h
       //orig:  if(!array)
-      if(array1 == 0)
+      if(arrayEmpty)
       {
          mFieldDictionary->setFieldValue(slotName, value);
          onDynamicModified( slotName, value );
@@ -1352,17 +1356,53 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 //-----------------------------------------------------------------------------
 //ElfScript replacement for getDataField to set to right type directly into stack
 bool SimObject::stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP) {
-      S32 array1 = PARSE_ARRAY_INDEX(array);
+
+      if (!array) {
+            Con::errorf("Invalid array pointer when setting field %s - sorry i'am out here.", slotName);
+            return false;
+      }
+      bool arrayEmpty = array[0] == '\0';
+
       if(mFlags.test(ModStaticFields))
       {
+
+
+
             const AbstractClassRep::Field *fld = findField(slotName);
             if(fld)
             {
+
                   // Skip the special field types as they are not data.
                   if ( fld->type >= AbstractClassRep::ARCFirstCustomField )
                         return true;
 
-                  if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
+                  //NOTE  Elfscript much better check for static fields!!!!!
+                  // >>>>>>>>>>>>>>>>>
+                  // nullptr and empty  must be checked before!
+                  S32 array1;
+                  if (arrayEmpty) {
+                        array1 = 0;
+                  }
+                  else if ((static_cast<unsigned char>(array[0]) - '0') < 10) {
+                        array1 = dAtoi(array);
+                  }
+                  else {
+                        Con::warnf("Static field %s : array '%s' index invalid! value not set!", slotName, array);
+                        return false;
+                  }
+
+                  if (static_cast<U32>(array1) >= static_cast<U32>(fld->elementCount)) {
+                        Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+                        return false;
+                  }
+                  if (array1 >= fld->elementCount || fld->elementCount <= 0 ) {
+                        Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+                        return false;
+                  }
+                  // <<<<<<<<<
+
+                  // FIXME array1 could by also in the fast path ... maybe
+                  if (arrayEmpty && fld->writeDataFn == &defaultProtectedWriteFn
                               && fld->setDataFn == &defaultProtectedSetFn) {
 
                         F64 floatValue = 0.f;
@@ -1380,46 +1420,12 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                   return true;
             }
       }
-      //       S32 array1 = PARSE_ARRAY_INDEX_RETURN_MINUSONE(array);
-      //       const AbstractClassRep::Field *fld = findField(slotName);
-      //
-      //       if(fld)
-      //       {
-      //             if(array1 == -1 && fld->elementCount == 1) {
-      //                   stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), 0, fld->table, fld->flag) ));
-      //                   return true;
-      //             }
-      //             if(array1 >= 0 && array1 < fld->elementCount) {
-      //
-      //                   //FastPath skip convert to string and back >>>>
-      //                   if (array1 == 0 && fld->writeDataFn == &defaultProtectedWriteFn
-      //                         && fld->setDataFn == &defaultProtectedSetFn) {
-      //
-      //                         F64 floatValue = 0.f;
-      //                         if (getDataField(fld, floatValue)) {
-      //                               if (fld->type == TypeF64 || fld->type == TypeF32) {
-      //                                     stackP->setFastFloat(floatValue);
-      //                               } else {
-      //                                     stackP->setFastInt((S64)floatValue);
-      //                               }
-      //                               return true;
-      //                         }
-      //                   } //Fastpath <<<
-      //
-      //                   stackP->setString((*fld->getDataFn)( this, Con::getData(fld->type, (void *) (((const char *)this) + fld->offset), array1, fld->table, fld->flag) ));
-      //                   return true;
-      //             }
-      //              stackP->setString(""); //???
-      //              return true;
-      //       }
-      // }
 
       // ~~~~~~~~~ DYNAMIC FIELDS ~~~~~~~~~~
       if(mFlags.test(ModDynamicFields))
       {
             StringTableEntry dynamicFieldName = nullptr;
-            // S32 array1 = PARSE_ARRAY_INDEX(array);
-            if(array1 == 0) {
+            if(arrayEmpty) {
                   dynamicFieldName = slotName;
             } else {
                   char buf[256];
@@ -1455,20 +1461,6 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                                           if (str) stackP->setString(str);
                                           else stackP->setString("");
 
-                                          // bullshit stackP want string
-                                          // switch (entry->mValue.type)  {
-                                          //       case ConsoleValueType::cvInteger:
-                                          //             stackP->setInt(entry->mValue.getInt());
-                                          //             // stackP->setInt(entry->mValue.getFastInt());
-                                          //             break;
-                                          //       case ConsoleValueType::cvFloat:
-                                          //             stackP->setFloat(entry->mValue.getFloat());
-                                          //             // stackP->setFloat(entry->mValue.getFastFloat());
-                                          //             break;
-                                          //       default:
-                                          //             stackP->setString(entry->mValue.getString());
-                                          //             break;
-                                          // }
 
                                           break;
                                     }
@@ -1479,49 +1471,7 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
       }
 
 
-      // if(mFlags.test(ModDynamicFields))
-      // {
-      //       if(!mFieldDictionary) {
-      //             stackP->setString("");
-      //             return true;
-      //       }
-      //
-      //       //Elfscript 0.4d:
-      //       // orig if(!array)
-      //       S32 array1 = PARSE_ARRAY_INDEX(array);
-      //       if (array1 == 0 )
-      //       {
-      //             if (const char* val = mFieldDictionary->getFieldValue(slotName)) {
-      //                   stackP->setString(val);
-      //                   return true;
-      //             }
-      //       }
-      //       else
-      //       {
-      //             static char buf[256];
-      //             dStrcpy(buf, slotName, 256);
-      //             dStrcat(buf, array, 256);
-      //
-      //
-      //             SimFieldDictionary::Entry* entry = mFieldDictionary->findDynamicField(StringTable->insert(buf));
-      //             if (entry) {
-      //                   // NOT! this is slower !!!!!!!!!!!!!
-      //                   // the type on dynamic fields is nonsense :/
-      //                   // U32 type = (entry->type) ? entry->type->getTypeID() : TypeString;
-      //                   // if (type == TypeF32) {
-      //                   //       stackP->setFastFloat((F64)dAtof(entry->value));
-      //                   //       return true;
-      //                   // }
-      //                   // if (type == TypeS32) {
-      //                   //       stackP->setFastInt((S64)dAtoi(entry->value));
-      //                   //       return true;
-      //                   // }
-      //                   stackP->setString(entry->mValue.getString());
-      //                   // stackP->setString(entry->value);
-      //                   return true;
-      //             }
-      //       }
-      // }
+
 
       stackP->setString("");
       return true;

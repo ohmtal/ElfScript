@@ -1101,13 +1101,18 @@ protected:
 
 
 // Elfscript (0.4b) fast Array count check
-// orig is: S32 array1 = array ? dAtoi(array) : 0;
-// replacement: S32 array1 = PARSE_ARRAY_INDEX(array);
-#define PARSE_ARRAY_INDEX(str) \
-((str) && (str)[0] == '0' && (str)[1] == '\0' ? 0 : \
-((str) && (str)[0] != '\0' ? dAtoi(str) : 0))
 
-// second one:
+// #define PARSE_ARRAY_EMPTY(array) \
+// (!array || array[0]=='\0');
+//
+//
+// // orig is: S32 array1 = array ? dAtoi(array) : 0;
+// // replacement: S32 array1 = PARSE_ARRAY_INDEX(array);
+// #define PARSE_ARRAY_INDEX(str) \
+// ((str) && (str)[0] == '0' && (str)[1] == '\0' ? 0 : \
+// ((str) && (str)[0] != '\0' ? dAtoi(str) : 0))
+//
+// // second one:
 // orig: S32 array1 = array ? dAtoi(array) : -1;
 #define PARSE_ARRAY_INDEX_RETURN_MINUSONE(str) \
 (!(str) ? -1 : \
