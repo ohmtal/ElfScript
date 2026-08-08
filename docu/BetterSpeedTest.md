@@ -11,6 +11,8 @@ to change this.
 - OP_SAVE_LOCAL_VAR_FLT/OP_SAVE_LOCAL_VAR_UINT speed up
 - removed cleanupdata when int/float is set (good idea?) ==> No memleak!
 
+### Version 0.5c (RelWithDebug) : 
+- added foreach(%i in first..last) and foreach( %i in range start..stop) => 2.69! 
 
 ### Version 0.4h🚀 (RelWithDebug) : Direct Threading finished ... let see - compiled with -O2.
 
@@ -41,6 +43,8 @@ to change this.
     - 3.988u 0.010s 0:04.02 99.2%     0+0k 0+0io 0pf+0w
     - 3.664u 0.002s 0:03.68 99.4%     0+0k 0+0io 0pf+0w
     - Invalid ::: 3.252u 0.004s 0:03.27 99.3%     0+0k 0+0io 0pf+0w
+- Version 0.5c (using foreach range)): 2.696u 0.003s 0:02.70 99.6%     0+0k 0+0io 0pf+0w
+
 
 
 **Mission impossible: Lua 5.5: 1.215u 0.002s 0:01.22 99.1%     0+0k 24+0io 1pf+0w**

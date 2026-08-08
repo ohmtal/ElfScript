@@ -3,7 +3,8 @@
 %define api.header.include {"CMDgram.h"}
 %{
 
-// bison --defines=cmdgram.h --verbose -o cmdgram.cpp -p CMD CMDgram.y
+// bison -d -v -p CMD -o CMDgram.cpp -HCMDgram.h CMDgram.y
+// OLD: bison --defines=cmdgram.h --verbose -o cmdgram.cpp -p CMD CMDgram.y
 
 // Make sure we don't get gram.h twice.
 #define _CMDGRAM_H_
@@ -107,7 +108,7 @@ struct Token
 
 %token <i> opCOLONCOLON
 
-%token <i> opDOTDOT
+%token <i> opDOTDOT rwRANGE
 
 %union {
    Token< char >           c;
@@ -459,6 +460,8 @@ foreach_stmt
       { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL, $7, 1 ); }
    | rwFOREACH '(' VAR rwIN expr opDOTDOT expr ')' stmt_block
       { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, $9, 2 ); }
+   | rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, $10, -2 ); }
    ;
 
 expression_stmt

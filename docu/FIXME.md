@@ -1,8 +1,12 @@
 # FIXME 
 
+- [ ] modulo does integers so it should also work with integers.
+
+# DONE:
+
 - [X] Test fastFloat on OP_INC if type is float (without func call ;))
 - [X] Like OP_INC  shortpath for "--" OP_DEC
-- [ ] Analyse local_var test:
+- [X] Analyse local_var test:
   complete is time : 3.8
   for loops only : 1.4 << too much i think  - and while loop is even slower 
 
@@ -48,7 +52,6 @@
 
         
         
-# DONE:
 
 ## Field dynamic arrays does not longer work !!!
 

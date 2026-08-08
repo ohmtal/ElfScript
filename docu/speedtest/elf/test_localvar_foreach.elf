@@ -6,23 +6,23 @@
 // new PointStorageObject(sto);
 
 %localX = 0;
-foreach(%j in 1..JLOOPS)  {
-    foreach(%i in 1..ILOOPS)  {
+foreach(%j in range 0..JLOOPS)  {
+    foreach(%i in range 0..ILOOPS)  {
         %localX ++;
     }
     echo("SUM (++) IS:" SPC %localX);
-    foreach(%i in 1..ILOOPS)  {
+    foreach(%i in range 0..ILOOPS)  {
         %localX --;
     }
     echo("SUM (--) IS:" SPC %localX);
     %localX = 66.0;
     echo("set Sum to 66 == " SPC %localX);
-    foreach(%i in 1..ILOOPS)  {
-        %localX *= %i;
-        %localX /= %i;
+    foreach(%i in range 0..ILOOPS)  {
+        %localX *= %i + 1;
+        %localX /= %i + 1;
     }
     echo("SUM (*/ %i+1) IS:" SPC %localX);
-    foreach(%i in 1 .. ILOOPS / 2)  {
+    foreach(%i in range 0 .. ILOOPS / 2)  {
         %ran = getRandomF(%i);
         %localX -= %ran;
         %localX += %ran;

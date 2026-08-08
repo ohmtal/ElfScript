@@ -8,6 +8,8 @@
 //
 // using PointStorageObject (since ElfScript 0.4e) rocket mode (Rectangle)
 // RelWithDebInfo > ~900 fps ... with 4200 stars still 120fps yay, 9000 stats 60fps
+//
+// NOTE foreach does not make a difference here ?! :/
 // -----------------------------------------------------------------------------
 
 // orig 420
@@ -53,7 +55,7 @@ function StarField::OnAdd(%this) {
 
 
     // for ( %i = 0; %i < STAR_COUNT; %i++)
-    foreach(%i in 0 .. STAR_COUNT -1 )
+    foreach(%i in range 0 .. STAR_COUNT)
     {
         $pointStorage.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
@@ -113,7 +115,7 @@ function StarField::Render(%this) {
 
 
     // for ( %i = 0; %i < STAR_COUNT; %i++)
-    foreach(%i in 0 .. STAR_COUNT -1 )
+    foreach(%i in range 0 .. STAR_COUNT )
     {
         %LocalPointStorage.popPoint(%i); // This writes from the point storage to .x,.y,.z
 

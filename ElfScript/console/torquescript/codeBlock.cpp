@@ -1415,6 +1415,9 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
+      case OP_ITER_BEGIN_INT:
+            Con::printf("%i: OP_ITER_BEGIN_INT MODE", ip - 1);
+            TORQUE_CASE_FALLTHROUGH;
       case OP_ITER_BEGIN_RANGE:
       {
             bool isGlobal = code[ip];

@@ -184,6 +184,7 @@ namespace Compiler
 
       OP_DEC,
 
+      OP_ITER_BEGIN_INT,
       OP_ITER_BEGIN_RANGE,
 
       OP_INVALID,   //

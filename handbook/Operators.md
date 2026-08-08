@@ -116,7 +116,8 @@ while ( %i < 20 ) {
 2. foreach$ can be used for words like "A B C".
 3. ElfScript 0.5: it now can be used also for integers: `foreach(%i in 1..3) {}`. 
 **Importent** it gives you all numbers: 1,2,3 like pascal: `For i:=1 to 3 do ...`
-This is the fastest Iteration you can use in ElfScript :)
+4. If you want to interate from 1 to 3 and set the maxium you an use `foreach(%i in range 1..3) {}`
+
 
 SimSet Example with named Object  and cleanup:
 ``` 
@@ -145,10 +146,17 @@ echo("Drei mal ganz schnell hintereinander...");
 
 Integer Examples:
 
+Two available usages : 
+- foreach( %i in first..last )
+- foreach( %i in range start..stop )
+
 ```
 foreach( %i  in 1..3) { print(%i); } /* print: 1 2 3 */
+foreach( %i  in range 1..3) { print(%i); } /* print: 1 2 */
 foreach( %i  in 3..1) { print(%i); } /* print: 3 2 1 */
-foreach( %i  in 0..0) { print(%i); } /* print:  */
+foreach( %i  in range 3..1) { print(%i); } /* print: 3 2*/
+foreach( %i  in 0..0) { print(%i); } /* print: 0 */
+foreach( %i  in range 0..0) { print(%i); } /* no output*/
 ```
 
 

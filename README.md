@@ -7,7 +7,7 @@ Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
 
 ## Notable changes:
-- 🚀 **ElfScript:** ***Lighting fast*** foreach for integers: `foreach(%i in 1..3)` iterate from 1 to 3 (including the 1 and the 3 like pascal `for 1 to 3`)
+- 🚀 **ElfScript:** Foreach for integers: `foreach(%i in 1..3)` iterate from 1 to 3 (including the 1 and the 3 like pascal `for 1 to 3`), also added `foreach(%i in range 1..3)` iterate from 1..2
 - 🚀 **ElfScript:** Byte Code handling replaced the for/case monster in compiledEval with direct threading.
 - 🚀 **ElfScript:** Dynamic Fields can be int, float or string which give a very good performace boost. Also if you setup them with TypeF32 for example. The type is really set to float and not only cosmetic. 
 - 🚀 **ElfScript:** Added fastpath for static float fields setDataField which is 28 times faster than before. (ELFSCRIPT_FASTPATH_FLD)

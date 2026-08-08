@@ -362,10 +362,15 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
                startExpr->compile(codeStream, startIp, TypeReqString);
                codeStream.emit(OP_ITER_BEGIN_STR);
          break;
+         case -2:
+               startExpr->compile(codeStream, startIp, TypeReqUInt);
+               endExpr->compile(codeStream, startIp, TypeReqUInt);
+               codeStream.emit(OP_ITER_BEGIN_RANGE);
+         break;
          case 2:
                startExpr->compile(codeStream, startIp, TypeReqUInt);
-               endExpr->compile(codeStream, startIp, TypeReqString);
-               codeStream.emit(OP_ITER_BEGIN_RANGE);
+               endExpr->compile(codeStream, startIp, TypeReqUInt);
+               codeStream.emit(OP_ITER_BEGIN_INT);
          break;
          default:
                startExpr->compile(codeStream, startIp, TypeReqString);

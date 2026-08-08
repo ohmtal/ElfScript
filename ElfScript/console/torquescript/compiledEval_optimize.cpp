@@ -118,6 +118,27 @@ StringStack STR;
 IterStackRecord iterStack[MaxStackSize];
 U32 _ITER = 0;    ///< Stack pointer for iterStack.
 
+#define POP_ITER() { \
+--_ITER;                \
+--iterDepth;            \
+POP_STK();              \
+if (iterStack[_ITER].mMode == 2) { \
+      POP_STK();        \
+}                       \
+iterStack[_ITER].mMode = 0;   \
+} \
+
+#define CLEAR_ITER_STATE() \
+do { \
+      while (iterDepth > 0) \
+      { \
+            POP_ITER(); \
+      } \
+} while(0)
+
+
+
+
 ConsoleValue stack[MaxStackSize];
 S32 _STK = 0;
 
@@ -1009,6 +1030,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
          &&handle_OP_DEC,
 
+         &&handle_OP_ITER_BEGIN_INT,
          &&handle_OP_ITER_BEGIN_RANGE,
 
          &&handle_OP_INVALID
@@ -1088,12 +1110,8 @@ handle_OP_DEFAULT_END:
       returnValue = stack[_STK];
       POP_STK();
 
-      while (iterDepth > 0)
-      {
-            iterStack[--_ITER].mMode = 0;
-            --iterDepth;
-            POP_STK();
-      }
+      CLEAR_ITER_STATE();
+
 
       goto execFinished;
 }
@@ -1485,27 +1503,15 @@ handle_OP_RETURN:
       POP_STK();
 
       // Clear iterator state.
-      while (iterDepth > 0)
-      {
-            iterStack[--_ITER].mMode = 0;
-            --iterDepth;
-            POP_STK();
-      }
+      CLEAR_ITER_STATE();
+
       goto execFinished;
 }
 
 handle_OP_RETURN_VOID:
-         if (iterDepth > 0)
-         {
-            // Clear iterator state.
-            while (iterDepth > 0)
-            {
-               iterStack[--_ITER].mMode = 0;
-               --iterDepth;
 
-               POP_STK();
-            }
-         }
+         CLEAR_ITER_STATE();
+
          returnValue.setEmptyString();
          goto execFinished;
 
@@ -1513,25 +1519,16 @@ handle_OP_RETURN_FLT:
       returnValue.setFloat(stack[_STK].getFloat());
       POP_STK();
       // Clear iterator state.
-      while (iterDepth > 0)
-      {
-            iterStack[--_ITER].mMode = 0;
-            --iterDepth;
+      CLEAR_ITER_STATE();
 
-            POP_STK();
-      }
       goto execFinished;
 
 handle_OP_RETURN_UINT:
       returnValue.setInt(stack[_STK].getInt());
       POP_STK();
       // Clear iterator state.
-      while (iterDepth > 0)
-      {
-            iterStack[--_ITER].mMode = 0;
-            --iterDepth;
-            POP_STK();
-      }
+      CLEAR_ITER_STATE();
+
       goto execFinished;
 
 
@@ -2509,15 +2506,21 @@ handle_OP_ITER_BEGIN:
             }
             break;
 
+            case -2:
+                  TORQUE_CASE_FALLTHROUGH;
             case 2: // Range a..b
             {
                   iter.mData.mRange.mStart = stack[_STK-1].getInt();
                   iter.mData.mRange.mEnd   = stack[_STK].getInt();
                   if (iter.mData.mRange.mStart > iter.mData.mRange.mEnd) iter.mData.mRange.mInc = -1;
                   else iter.mData.mRange.mInc = 1;
-                  iter.mData.mRange.mStop = iter.mData.mRange.mEnd + iter.mData.mRange.mInc;
+                  if ( iter.mMode == -2 ) {
+                        iter.mData.mRange.mStop = iter.mData.mRange.mEnd;
+                        iter.mMode = 2;
+                  } else {
+                        iter.mData.mRange.mStop = iter.mData.mRange.mEnd + iter.mData.mRange.mInc;
 
-                  //FIXME
+                  }
                   // Con::infof("FIXME :D range %d..%d inc:%d",
                   //       iter.mData.mRange.mStart,
                   //       iter.mData.mRange.mEnd,
@@ -2582,9 +2585,14 @@ handle_OP_ITER_BEGIN:
       DISPATCH();
 }
 
+handle_OP_ITER_BEGIN_INT:
+{
+      iterStack[_ITER].mMode = 2; // INT
+      goto handle_OP_ITER_BEGIN;
+}
 handle_OP_ITER_BEGIN_RANGE:
 {
-      iterStack[_ITER].mMode = 2; // Range
+      iterStack[_ITER].mMode = -2; // Range will be resetted to INT
       goto handle_OP_ITER_BEGIN;
 }
 
@@ -2671,8 +2679,26 @@ handle_OP_ITER:
 
                   if (iter.mIsGlobalVariable)
                         iter.mVar.mVariable->setIntValue(i);
-                  else
-                        Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, i);
+                  else {
+                        // faster ?
+                        ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[iter.mVar.mRegister];
+                        if ( stackRef.type == ConsoleValueType::cvInteger) {
+                              stackRef.i = i;
+                        } else {
+                              stackRef.setFastInt(i);
+                        }
+
+                        // default:
+                        // Script::gEvalState.setLocalIntVariable(iter.mVar.mRegister, i);
+
+                        // float better ?
+                        // ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[iter.mVar.mRegister];
+                        // if ( stackRef.type == ConsoleValueType::cvFloat) {
+                        //       stackRef.f = static_cast<F64>(i);
+                        // } else {
+                        //       stackRef.setFastFloat(static_cast<F64>(i));
+                        // }
+                  }
 
 
                   iter.mData.mRange.mStart += iter.mData.mRange.mInc;
@@ -2787,14 +2813,19 @@ handle_OP_ITER:
 
 handle_OP_ITER_END:
 {
-      --_ITER;
-      --iterDepth;
 
-      POP_STK();
-      if (iterStack[_ITER].mMode == 2) POP_STK();
+      POP_ITER();
+//       --_ITER;
+//
+//       --iterDepth;
+//
+//       POP_STK();
+//       if (iterStack[_ITER].mMode == 2) {
+//             POP_STK();
+//       }
+//
+//       iterStack[_ITER].mMode = 0;
 
-      iterStack[_ITER].mMode = 0;
-      // iterStack[_ITER].mIsStringIter = false;
       DISPATCH();;
 }
 
