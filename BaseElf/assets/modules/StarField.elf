@@ -51,11 +51,11 @@ function StarField::OnAdd(%this) {
     };
     %this.add( $pointStorage  );
 
-    $starPoints = starPoints.getId();
 
-    for ( %i = 0; %i < STAR_COUNT; %i++)
+    // for ( %i = 0; %i < STAR_COUNT; %i++)
+    foreach(%i in 0 .. STAR_COUNT -1 )
     {
-        $starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
+        $pointStorage.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
 
 
@@ -112,7 +112,8 @@ function StarField::Render(%this) {
     %LocalPointStorage = $pointStorage; // slightly faster
 
 
-    for ( %i = 0; %i < STAR_COUNT; %i++)
+    // for ( %i = 0; %i < STAR_COUNT; %i++)
+    foreach(%i in 0 .. STAR_COUNT -1 )
     {
         %LocalPointStorage.popPoint(%i); // This writes from the point storage to .x,.y,.z
 

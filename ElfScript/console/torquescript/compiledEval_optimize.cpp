@@ -2791,6 +2791,7 @@ handle_OP_ITER_END:
       --iterDepth;
 
       POP_STK();
+      if (iterStack[_ITER].mMode == 2) POP_STK();
 
       iterStack[_ITER].mMode = 0;
       // iterStack[_ITER].mIsStringIter = false;
