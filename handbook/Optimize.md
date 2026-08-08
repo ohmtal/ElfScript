@@ -76,6 +76,54 @@ You can also use `$posObj.setFieldType("m0", "TypeF32");` but then the field
 m0 must exists. Example: `$posObj.m0=0; $posObj.setFieldType("m0", "TypeF32");`.
 
 
+## foreach
+
+foreach is faster than while or for. 
+
+Foreach on SimSets: 
+
+```
+    // for "slow" style
+    %count = %mySimSet.getCount();
+    for (%i = 0; %i < %count; %i++ ) { 
+        %obj = %mySimSet.getObject(%i);
+        echo(%obj.getId());
+    }
+    // fast foreach:
+    foreach(%obj in %mySimSet) {
+        echo(%obj.getId());
+    }
+```
+
+Foreach on space separated strings (words):
+
+```
+    // for "slow" style
+    %myString = "one two three";
+    echo("WORD LOOP on ", %myString);
+    %count = getWordCount(%myString);
+    for (%i = 0; %i < %count; %i++ ) {
+        %word = getword( %myString, %i);
+        echo("Word is: ", %word);
+    }
+    
+    // fast foreach:
+    foreach$(%word in %myString) echo("foreach Word is: ", %word);
+```
+
+foreach on integer:
+
+```
+    // for "slow" style
+    for (%i = 0; %i < 5; %i++ ) {
+        echo("i is: ", %i);
+    }
+
+    // fast foreach:
+    foreach (%i in range 0..5)  echo("foreach: i is: ", %i);
+```
+
+
 ## PointStorageObject
 
 Since we have no real structs in ElfScript. I added an object where you can work 
