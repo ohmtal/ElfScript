@@ -6,7 +6,13 @@ it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
 to change this.
 
 
-### current: Version 0.4h🚀 (RelWithDebug) : Direct Threading finished ... let see - compiled with -O2.
+### Version 0.5a (RelWithDebug) : 
+- opMinusMinus also got direct register write like opPlusPlus
+- OP_SAVE_LOCAL_VAR_FLT/OP_SAVE_LOCAL_VAR_UINT speed up
+- removed cleanupdata when int/float is set (good idea?) ==> No memleak!
+
+
+### Version 0.4h🚀 (RelWithDebug) : Direct Threading finished ... let see - compiled with -O2.
 
 
 ### Testenviorment: 
@@ -28,11 +34,20 @@ to change this.
 - Version 0.4a (RelWithDebug) : 15.913u 0.198s 0:16.16 99.6%    0+0k 0+0io 0pf+0w
 - OGE3D (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 - Version 0.4d 🚀 (RelWithDebug) : 5.199u 0.000s 0:05.20 99.8%     0+0k 0+0io 0pf+0w
-- Version 0.4f🚀 (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
-- Version 0.4g🚀 (RelWithDebug) : 4.753u 0.006s 0:04.77 99.5%     0+0k 0+0io 0pf+0w
-- Version 0.4h🚀 (RelWithDebug) : 4.345u 0.004s 0:04.36 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.4f (RelWithDebug) : 4.509u 0.003s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.4g (RelWithDebug) : 4.753u 0.006s 0:04.77 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.4h (RelWithDebug) : 4.345u 0.004s 0:04.36 99.5%     0+0k 0+0io 0pf+0w
+- Version 0.5a (RelWithDebug) : 
+    - 3.988u 0.010s 0:04.02 99.2%     0+0k 0+0io 0pf+0w
+    - 3.664u 0.002s 0:03.68 99.4%     0+0k 0+0io 0pf+0w
+    - Invalid ::: 3.252u 0.004s 0:03.27 99.3%     0+0k 0+0io 0pf+0w
+
+
+**Mission impossible: Lua 5.5: 1.215u 0.002s 0:01.22 99.1%     0+0k 24+0io 1pf+0w**
 
 **for OGE3D i had to replace the #define's with global variables!, 200 ms get lost at startup (console)**
+
+
 
 ```
 #define JLOOPS 25

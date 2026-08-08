@@ -461,6 +461,7 @@ TORQUE_FORCEINLINE inline void doFloatMathOperation()
 
    if (fastIf)
    {
+      // ElfScript 0.5a restored .. without func calls is not really faster
       // Arithmetic
       if constexpr (Op == FloatOperation::Add)
          stack[_STK - 1].setFastFloat(a.getFastFloat() + b.getFastFloat());
@@ -1612,36 +1613,35 @@ handle_OP_NEG:
       DISPATCH();
 
 
-// handle_OP_INC:
-//       reg = code[ip++];
-//       currentRegister = reg;
-//       Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
-//       DISPATCH();
-
 handle_OP_INC: {
       reg = code[ip++];
       currentRegister = reg;
 
       ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
-      if ( stackRef.type == ConsoleValueType::cvFloat)
-            stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
-      else
-            stackRef.setFloat(stackRef.getFloat() + 1.0);
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            // stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
+            stackRef.f += 1.0f;
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() + 1.0f);
+            // stackRef.setFloat(stackRef.getFloat() + 1.0f);
+      }
 
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
       DISPATCH();
 }
 
-handle_OP_DEC: {
+handle_OP_DEC: { // 0.5a OP_DEC fast path
       reg = code[ip++];
       currentRegister = reg;
 
       ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
-      if ( stackRef.type == ConsoleValueType::cvFloat)
-            stackRef.setFastFloat(stackRef.getFastFloat() - 1.0);
-      else
-            stackRef.setFloat(stackRef.getFloat() - 1.0);
-
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            // stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
+            stackRef.f -= 1.0f;
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() - 1.0f);
+            // stackRef.setFloat(stackRef.getFloat() - 1.0f);
+      }
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) - 1.0);
       DISPATCH();
 }
@@ -1840,7 +1840,7 @@ handle_OP_LOAD_LOCAL_VAR_STR:
       DISPATCH();
 
 
-handle_OP_SAVE_LOCAL_VAR_UINT:
+handle_OP_SAVE_LOCAL_VAR_UINT: {
          reg = code[ip++];
          currentRegister = reg;
 
@@ -1848,10 +1848,23 @@ handle_OP_SAVE_LOCAL_VAR_UINT:
          prevObject = NULL;
          curObject = NULL;
 
-         Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
-         DISPATCH();
+         // 0.5a
+         ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+         if ( stackRef.type == ConsoleValueType::cvInteger) {
+               if (stack[_STK].type == ConsoleValueType::cvInteger)
+                  stackRef.i = stack[_STK].i;
+               else
+                  stackRef.i = stack[_STK].getInt();
+         } else {
+               stackRef.setInt(stack[_STK].getInt());
+         }
 
-handle_OP_SAVE_LOCAL_VAR_FLT:
+
+         // Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+         DISPATCH();
+}
+
+handle_OP_SAVE_LOCAL_VAR_FLT: {
           reg = code[ip++];
          currentRegister = reg;
 
@@ -1859,9 +1872,21 @@ handle_OP_SAVE_LOCAL_VAR_FLT:
          prevObject = NULL;
          curObject = NULL;
 
-         Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+         // 0.5a
+         ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+         if ( stackRef.type == ConsoleValueType::cvFloat) {
+               if (stack[_STK].type == ConsoleValueType::cvFloat)
+                     stackRef.f = stack[_STK].f;
+               else
+                     stackRef.f = stack[_STK].getFloat();
+         } else {
+               stackRef.setFloat(stack[_STK].getFloat());
+         }
+
+         // Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
 
          DISPATCH();
+}
 
 handle_OP_SAVE_LOCAL_VAR_STR:
          reg = code[ip++];
@@ -2030,12 +2055,26 @@ handle_OP_POP_STK:
 // ~~~~~~~~~~~~~~~~~ IMMED
 
 handle_OP_LOADIMMED_UINT:
+         // 0.5a << NOT this is slower !
+         // if (stack[_STK + 1].type == ConsoleValueType::cvInteger)
+         //    stack[_STK + 1].i = code[ip++];
+         // else
+         //    stack[_STK + 1].setInt(code[ip++]);
+
          stack[_STK + 1].setInt(code[ip++]);
+
          _STK++;
       DISPATCH();
 
 handle_OP_LOADIMMED_FLT:
+         // 0.5a << NOT this is slower !
+//          if (stack[_STK + 1].type == ConsoleValueType::cvFloat)
+//                stack[_STK + 1].f = curFloatTable[code[ip++]];
+//          else
+//             stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+//
          stack[_STK + 1].setFloat(curFloatTable[code[ip++]]);
+
          _STK++;
       DISPATCH();
 

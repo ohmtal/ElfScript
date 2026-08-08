@@ -1,7 +1,7 @@
 # FIXME 
 
-- [ ] Test fastFloat on OP_INC if type is float
-- [ ] Like OP_INC  shortpath for "--" OP_DEC
+- [X] Test fastFloat on OP_INC if type is float (without func call ;))
+- [X] Like OP_INC  shortpath for "--" OP_DEC
 
 
 # DONE:

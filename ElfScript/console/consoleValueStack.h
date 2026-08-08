@@ -98,20 +98,7 @@ public:
       stack.push_back(frame);
    }
 
-   //XXTH memleak
-   // TORQUE_FORCEINLINE void popFrame()
-   // {
-   //    AssertISV(stack.size() > 0, "Stack Underflow");
-   //
-   //    Frame& frame = stack.last();
-   //    for (S32 i = 0; i < frame.count; ++i)
-   //    {
-   //       frame.values[i].cleanupData();
-   //    }
-   //
-   //    deAlloc(frame.count);
-   //    stack.pop_back();
-   // }
+
    // orig:
    TORQUE_FORCEINLINE void popFrame()
    {

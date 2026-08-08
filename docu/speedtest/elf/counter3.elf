@@ -1,0 +1,4 @@
+echo ("ElfScript: Hundered Million but float + 0.1f and a while loop");
+%i = 0;
+while (%i < 100000000.0) %i += 0.1;
+echo(%i);
