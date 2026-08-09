@@ -111,6 +111,7 @@ struct Token
 // ElfScript foreach
 %token <i> opDOTDOT rwRANGE rwSTEP
 
+
 %union {
    Token< char >           c;
    Token< int >            i;

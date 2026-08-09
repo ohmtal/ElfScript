@@ -384,7 +384,7 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
    }
 
    codeStream.emit(OP_ITER_BEGIN);
-   codeStream.emit(mode);
+   codeStream.emit(mode); //instead of different OP_ codes i emmit the mode
 
    codeStream.emit(isGlobal);
    if (isGlobal)
