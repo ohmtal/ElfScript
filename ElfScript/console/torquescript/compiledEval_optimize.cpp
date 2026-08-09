@@ -2359,11 +2359,13 @@ handle_OP_CALLFUNC:
                                     break;
                               }
 
-                              if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
-                              {
+                              #ifdef TORQUE_DEBUG //ElfScript on debug only but then always :P
                                     Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
-                              }
-
+                              // if (Con::getBoolVariable("$Con::warnVoidAssignment", true))
+                              // {
+                              //       Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 4), fnName, functionName);
+                              // }
+                              #endif
                               stack[_STK + 1].setEmptyString();
                               _STK++;
 

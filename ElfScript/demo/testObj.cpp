@@ -1,6 +1,97 @@
 #include "console/engineAPI.h"
 #include <console/consoleTypes.h>
+#include <console/consoleInternal.h>
+#include <console/torquescript/ast.h>
 
+///////////////////////////////////////////////////////
+// some testfunction .......
+
+DefineEngineFunction(Test_FindObject, S32, (const char* objectname), , "")
+{
+    // only named and by ID (as string) work here ?!!?!?!!
+    // fixed $ now also works ... !!!
+    SimObject* obj =  Sim::findObject(objectname);
+   if (obj) return obj->getId();
+   return 0;
+}
+DefineEngineFunction(Test_FindObjectByVariable, S32, (const char* VariableName), , "")
+{
+    // new ElfScript  function
+    SimObject* obj =  Con::getObjectByNameWithToken(VariableName);
+    if (obj) return obj->getId();
+    return 0;
+}
+
+DefineEngineFunction(setFloatVariable, void, (const char* VariableName, F32 value), , "")
+{
+    // ok i only fixed $ objects now also work but nothing else ....
+    // maybe later i started and cancled
+    Con::setFloatVariable(VariableName, value);
+}
+
+DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32 value, S32 pushVar), , "")
+{
+    if (VariableName[0] != '%') {
+        Con::errorf("must be a local Variable!");
+    }
+
+    // so next idea:
+    // ExprEvalState ==> Vector< ConsoleValueFrame > localStack
+
+    // mStackDepth
+    Dictionary::Entry* ent = nullptr;
+    StringTableEntry nameP = StringTable->insert(VariableName);
+    if (!Script::gEvalState.localStack.empty())
+    {
+       for (S32 i = 0; i < Script::gEvalState.localStack.size();  i++ ) {
+
+           // HAHA i get the data but whats the register ?
+           // ok value in stack is 4 << not what iam looking for ;)
+           //
+           // this is also wrong .. but where are the values ???
+           // ,,, values is a array ? ... but where is the count
+           Con::printf(" stack:%d, value:%s ", i, Script::gEvalState.localStack[i].values->getString());
+       }
+    }
+
+    // Dictionary::Entry* ent = nullptr;
+    // StringTableEntry nameP = StringTable->insert(VariableName);
+    // if (!Con::gFrameStack.empty())
+    // {
+    //     for (S32 i = 0; i < Con::gFrameStack.size(); i++ ) {
+    //         if (!Con::gFrameStack[i]) {
+    //             Con::errorf("Invalid STACK!");
+    //             continue;
+    //         }
+    //         ent = Con::gFrameStack[i]->lookup(nameP);
+    //         if (ent) {
+    //             Con::warnf("FOUND IT!!!!! value is: %f", ent->getFloatValue());
+    //         } else {
+    //             Con::printf("nothing in stack %d", i);
+    //         }
+    //     }
+    // }
+
+// it's not on current!
+    //     Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(VariableName));
+    //
+    //     if (ent) {
+    //         ent->setFloatValue(value);
+    //          Con::errorf("found %s :D set %f", VariableName, value);
+    //     } else {
+    //        // ent =  Con::getCurrentStackFrame()->addVariable(VariableName, TypeF32, )
+    //        ent =  Con::getCurrentStackFrame()->add(VariableName);
+    //        if (ent) ent->setFloatValue(value);
+    //        else Con::errorf("Failed to add variable! %s", VariableName);
+    //     }
+    // } else {
+    //     Con::errorf("F R A M E  STACK empty ...");
+    // }
+}
+
+
+
+///////////////////////////////////////////////////////
     // class EmptyObject : public SimObject
     // {
     //     typedef SimObject Parent;

@@ -1,5 +1,28 @@
 # FIXME 
 
+- [X] added global variables to Sim::findObject
+- [X] check getObjectTokenField this seams to be suboptimal way to get data for Con::getInt/Bool/Float 
+  - [X] added Con::getObjectByNameWithToken(VariableName);
+  - [.]  now i can go on with settter/getter ...const AbstractClassRep::Field *fld = findField(slotName);
+         Cancled! for now. ....
+- [ ] getting mad ;) => writing to registers by reference (for local var) like foreach does ...  
+    - with fields and gobal vars i can do set (used in ImGui)=>  Con::setBoolVariable(valueVarName, value);
+    - unfortually this Con::set function convert the value to string and call setDataField or setIntValue
+    - this looks interesting:
+    ```
+    if (c == '%')
+    {
+      if (!Con::getFrameStack().empty())
+      {
+          Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(name));
+
+          if (ent)
+            return Sim::findObject(ent->getIntValue());
+      }
+    }
+   ```
+    
+    
 - [ ] modulo does integers so it should also work with integers.
 
 # DONE:
@@ -23,15 +46,12 @@
    ***IterStmtNode expand so it know start and expr from  DOTDOT***
     
   - [X] IterStmtNode modify for new range ...
-  - [.] OP_ITER_BEGIN_RANGE
+  - [X] OP_ITER_BEGIN_RANGE
   - [X] IterStackRecord for using mode 
-  - [.] modify handle_OP_ITER_BEGIN
-  - [.] modify handle_OP_ITER
-  - [.] handle_OP_ITER_END (mode)
-    
-    
-    
-    
+  - [X] modify handle_OP_ITER_BEGIN
+  - [X] modify handle_OP_ITER
+  - [X] handle_OP_ITER_END (mode)
+ 
   ***Bison (Yacc):***
 
     - maybe at Operator token definitions:

@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -306,6 +307,7 @@ static void shutdownRoot()
    SAFE_DELETE(gIdDictionary);
 }
 
+
 //---------------------------------------------------------------------------
 
 SimObject* findObject(const char* fileName, S32 declarationLine)
@@ -329,11 +331,24 @@ SimObject* findObject(const char* name)
    // PROFILE_SCOPE(SimFindObject);
 
    // Play nice with bad code - JDD
+   // <<< XXTH lol ...
    if( !name )
       return NULL;
 
    SimObject *obj;
    char c = *name;
+
+   //ElfScript 0.5 why not looking for "$" ??? can't imagine a reason why not
+   if (c == '$') {
+
+         Dictionary::Entry* ent = Con::gGlobalVars.lookup(StringTable->insert(name));
+
+         if (ent)
+               return Sim::findObject(ent->getIntValue());
+         else
+               return NULL;
+
+   }
 
    if (c == '%')
    {
@@ -343,9 +358,11 @@ SimObject* findObject(const char* name)
 
          if (ent)
             return Sim::findObject(ent->getIntValue());
+         else
+            return NULL; //XXTH added, why do we continue here
       }
    }
-   if(c == '/')
+   if(c == '/') //XXTH what is this ? never saw a '/' as variable pre.
       return gRootGroup->findObject(name + 1 );
    if(c >= '0' && c <= '9')
    {
@@ -367,6 +384,9 @@ SimObject* findObject(const char* name)
             return NULL;
       }
    }
+
+   // XXTH i guess this for globals ('$') <<NOT and or named :
+
    S32 len;
 
    for(len = 0; name[len] != 0 && name[len] != '/'; len++)

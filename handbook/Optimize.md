@@ -83,16 +83,20 @@ foreach is faster than while or for.
 Foreach on SimSets: 
 
 ```
+    // dummy simgroup : 
+    %mySimGroup  = new SimSet();
+    foreach (%i in range 0..5) %mySimGroup.add( new SimObject());
+
     // for "slow" style
-    %count = %mySimSet.getCount();
-    for (%i = 0; %i < %count; %i++ ) { 
-        %obj = %mySimSet.getObject(%i);
-        echo(%obj.getId());
+    %count = %mySimGroup.getCount();
+    for (%i = 0; %i < %count; %i++ ) {
+        %obj = %mySimGroup.getObject(%i);
+        echo("for id:" SPC %obj.getId());
     }
     // fast foreach:
-    foreach(%obj in %mySimSet) {
-        echo(%obj.getId());
-    }
+    foreach(%obj in %mySimGroup)  echo("foreach id:" SPC %obj.getId());
+
+    %mySimGroup.delete();
 ```
 
 Foreach on space separated strings (words):

@@ -803,13 +803,15 @@ void debugf(const char* fmt,...)
       _printf(ConsoleLogEntry::Debug, ConsoleLogEntry::General, fmt, argptr);
       va_end(argptr);
 }
+
 //---------------------------------------------------------------------------
 
 bool getVariableObjectField(const char *name, SimObject **object, const char **field)
 {
    // get the field info from the object..
    const char *dot = dStrchr(name, '.');
-   if(name[0] != '$' && dot)
+   // XXTH Why NOT "$" ?!
+   if(/*name[0] != '$' &&*/ dot)
    {
       U64 len = dStrlen(name);
       AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - name too long");
@@ -872,6 +874,77 @@ Dictionary::Entry *getAddVariableEntry(const char *name)
    return entry;
 }
 
+
+//---------------------------------------------------------------------------
+// ElfScript 0.5 added to find object by fullname with token
+SimObject* getObjectByNameWithToken(const char* name) {
+
+      if (!name) NULL;
+
+      const char *dot = dStrchr(name, '.');
+      if(dot)
+      {
+            U64 len = dStrlen(name);
+            AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getObjectByNameWithToken - object name too long");
+            dMemcpy(scratchBuffer, name, len+1);
+
+            char * token = dStrtok(scratchBuffer, ".");
+            SimObject * obj = Sim::findObject(token);
+            return obj;
+      }
+      return nullptr;
+}
+//---------------------------------------------------------------------------
+// HELPER function :D
+//---------------------------------------------------------------------------
+// ElfScript 0.5 (should i also return the object ? SimObject **object,)
+bool getObjectAndFieldByVariableName(const char* name, SimObject **object, const AbstractClassRep::Field **field ) {
+      // get the field info from the object..
+      const char *dot = dStrchr(name, '.');
+      if(dot)
+      {
+            U64 len = dStrlen(name);
+            AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - name too long");
+            dMemcpy(scratchBuffer, name, len+1);
+
+            char * token = dStrtok(scratchBuffer, ".");
+            SimObject * obj = Sim::findObject(token);
+            if(!obj)
+                  return false;
+
+            token = dStrtok(0, ".\0");
+            if(!token)
+                  return false;
+
+            while(token != NULL)
+            {
+                  const char * val = obj->getDataField(StringTable->insert(token), 0);
+                  if(!val)
+                        return false;
+
+                  char *fieldToken = token;
+                  token = dStrtok(0, ".\0");
+                  if(token)
+                  {
+                        obj = Sim::findObject(token);
+                        if(!obj)
+                              return false;
+                  }
+                  else
+                  {
+                        *object = obj;
+                        *field = *field = obj->findField(fieldToken);
+                        if (!field) return false;
+                        return true;
+                  }
+            }
+      }
+
+      return false;
+}
+//---------------------------------------------------------------------------
+
+
 void setVariable(const char *name, const char *value)
 {
    SimObject *obj = NULL;
@@ -901,7 +974,8 @@ void setBoolVariable(const char *varName, bool value)
    {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
-     entry->setStringValue(value ? "1" : "0");
+      // ElfScript 0.5!! why string ? entry->setStringValue(value ? "1" : "0");
+      entry->setIntValue(static_cast<S32>(value));
    }
 }
 
@@ -923,6 +997,35 @@ void setIntVariable(const char *varName, S32 value)
       entry->setIntValue(value);
    }
 }
+
+//---------------------------------------------------------------------------
+// test object with wrong name first!
+// OK it also set the field if it does not exits ... I cancel here !!!
+// bool setFloatVariable(const char *varName, F32 value)
+// {
+//       SimObject *obj = NULL;
+//       const AbstractClassRep::Field *field;
+//       bool foundBoth = getObjectAndFieldByVariableName(varName, &obj, &field);
+//
+//
+//       if (obj)
+//       {
+//             if (!foundBoth) return false;
+//             if (obj->)
+//             field->setFloatValue(value);
+//             char varBuffer[32];
+//             dSprintf(varBuffer, sizeof(varBuffer), "%g", value);
+//             obj->setDataField(StringTable->insert(objField), 0, varBuffer);
+//       }
+//       else
+//       {
+//             varName = prependDollar(varName);
+//             Dictionary::Entry *entry = getAddVariableEntry(varName);
+//             entry->setFloatValue(value);
+//             return true;
+//       }
+//       return false;
+// }
 
 void setFloatVariable(const char *varName, F32 value)
 {
@@ -991,9 +1094,14 @@ void stripColorChars(char* line)
    }
 }
 
+
+
+
 //
 const char *getObjectTokenField(const char *name)
 {
+   if (!name) NULL;
+
    const char *dot = dStrchr(name, '.');
    if(name[0] != '$' && dot)
    {
@@ -1062,8 +1170,12 @@ bool getBoolVariable(const char *varName, bool def)
    else
    {
       Dictionary::Entry *entry = getVariableEntry(varName);
-      objField = entry ? entry->getStringValue() : "";
-      return *objField ? dAtob(objField) : def;
+
+      if (!entry) return def;
+      return static_cast<bool>(entry->getIntValue());
+      // ElfScript orig was:
+      // objField = entry ? entry->getStringValue() : "";
+      // return *objField ? dAtob(objField) : def;
    }
 }
 

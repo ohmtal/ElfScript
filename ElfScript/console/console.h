@@ -645,7 +645,9 @@ namespace Con
       /// 10/07/17 - JTH - 48->49 Added opcode for function pointers and revamp of interpreter 
       ///                         from switch to function calls.
       /// 09/04/21 - JTH - 49->50 Rewrite of interpreter
-      DSOVersion = 50,
+      /// 08/06/26 - XXTH - 50->2605 ElfScript Version 0.5
+            // =>69 ="E" + 05 for version 0.5 (foreach range, pod nodes {}, ...)
+      DSOVersion = 6905,
 
       MaxLineLength = 512,  ///< Maximum length of a line of console input.
       MaxDataTypes = 256    ///< Maximum number of registered data types.
@@ -875,6 +877,13 @@ namespace Con
 
    /// @name Global Variable Accessors
    /// @{
+   /// get Object by Name with token like used in setVariable*
+   /// initial written as helper for set/get Variable rewrite
+   /// @since ElfScript 0.5
+   /// @param name   Global console variable name where we fetch out the object if any
+   SimObject*  getObjectByNameWithToken(const char *name);
+
+
    /// Assign a string value to a global console variable
    /// @param name   Global console variable name to set
    /// @param value  String value to assign to this variable.
