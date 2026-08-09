@@ -192,6 +192,7 @@ struct IterStmtNode : StmtNode
    // Elfscript:
    ExprNode* startExpr;
    ExprNode* endExpr;
+   ExprNode* stepExpr;
 
    /// The statement body.
    StmtNode* body;
@@ -202,7 +203,9 @@ struct IterStmtNode : StmtNode
    /// Bytecode size of body statement.  Set by precompileStmt.
    U32 bodySize;
 
-   static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName, ExprNode* startExpr,ExprNode* endExpr, StmtNode* body, S32 mode);
+   static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName
+      , ExprNode* startExpr,ExprNode* endExpr, ExprNode* stepExpr
+      , StmtNode* body, S32 mode);
    // static IterStmtNode* alloc(S32 lineNumber, StringTableEntry varName, ExprNode* containerExpr, StmtNode* body, bool isStringIter);
 
    U32 compileStmt(CodeStream& codeStream, U32 ip) override;

@@ -95,6 +95,13 @@ for (%i = 0; %i < 10; %i ++) {
 }
 ```
 
+Example *for with range(fast)*:
+```
+for (%i in range 10) {
+    echo("%i is:" SPC %i);
+}
+```
+
 Example *while* with skip (continue) and stop loop (break). Dont forget to increment
 before continue ;) 
 ```

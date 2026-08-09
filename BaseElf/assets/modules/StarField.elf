@@ -55,7 +55,7 @@ function StarField::OnAdd(%this) {
 
 
     // for ( %i = 0; %i < STAR_COUNT; %i++)
-    foreach(%i in range 0 .. STAR_COUNT)
+    for(%i in range STAR_COUNT)
     {
         starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
@@ -95,7 +95,7 @@ function StarField::Render(%this) {
     %lStarPoints = starPoints.getId(); // slightly faster
 
     // using local vars maximum attempt:
-    foreach( %i in range 0 .. STAR_COUNT )
+    for( %i in range STAR_COUNT )
     {
         // one call more but maybe faster because we have only one funtion call
         %lStarPoints.popPoint(%i);

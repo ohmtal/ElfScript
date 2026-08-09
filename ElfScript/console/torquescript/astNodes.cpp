@@ -335,7 +335,7 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 {
    // Instruction sequence:
    //
-   //   containerExpr
+   //   Expr (one or more)
    //   OP_ITER_BEGIN varName .fail
    // .continue:
    //   OP_ITER .break
@@ -354,30 +354,38 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
    TypeReq varType = (mode==1) ? TypeReqString : TypeReqUInt;
 
    const U32 startIp = ip;
-   // startExpr->compile(codeStream, startIp, TypeReqString);
-   // if (endExpr) endExpr->compile(codeStream, startIp, TypeReqString);
 
    switch (mode) {
          case 1:
-               startExpr->compile(codeStream, startIp, TypeReqString);
-               codeStream.emit(OP_ITER_BEGIN_STR);
-         break;
-         case -2:
-               startExpr->compile(codeStream, startIp, TypeReqUInt);
-               endExpr->compile(codeStream, startIp, TypeReqUInt);
-               codeStream.emit(OP_ITER_BEGIN_RANGE);
-         break;
-         case 2:
-               startExpr->compile(codeStream, startIp, TypeReqUInt);
-               endExpr->compile(codeStream, startIp, TypeReqUInt);
-               codeStream.emit(OP_ITER_BEGIN_INT);
-         break;
+            startExpr->compile(codeStream, startIp, TypeReqString);
+            break;
+         case 102: //same as 2 but  for %i in range START..STOP
+            TORQUE_CASE_FALLTHROUGH;
+         case 2: // for i in FIRST..LAST
+            startExpr->compile(codeStream, startIp, TypeReqUInt);
+            endExpr->compile(codeStream, startIp, TypeReqUInt);
+            break;
+         case 103: //same as 3 but  for %i in range START..STOP
+            TORQUE_CASE_FALLTHROUGH;
+         case 3: // for i in FIRST..LAST STEP
+            startExpr->compile(codeStream, startIp, TypeReqUInt);
+            endExpr->compile(codeStream, startIp, TypeReqUInt);
+            stepExpr->compile(codeStream, startIp, TypeReqUInt);
+            break;
+
+         // 4 does not exits!
+         case 104: // for i in range 10 (only one parameter)
+            startExpr->compile(codeStream, startIp, TypeReqUInt);
+            break;
+
          default:
-               startExpr->compile(codeStream, startIp, TypeReqString);
-               codeStream.emit(OP_ITER_BEGIN);
-        break;
+            startExpr->compile(codeStream, startIp, TypeReqString);
+            break;
    }
-   // codeStream.emit(isStringIter ? OP_ITER_BEGIN_STR : OP_ITER_BEGIN);
+
+   codeStream.emit(OP_ITER_BEGIN);
+   codeStream.emit(mode);
+
    codeStream.emit(isGlobal);
    if (isGlobal)
       codeStream.emitSTE(varName);

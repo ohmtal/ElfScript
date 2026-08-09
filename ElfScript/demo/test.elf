@@ -49,18 +49,22 @@ sto.dumpFields();
 // sto.Hello();
 
 echo("------------ FOREACH -------------");
+echo ("ABC....");
 foreach$( %str in "A B C") { echo (%str); }
+
+echo("simset .....");
 new SimSet(mySet);
 mySet.add( new SimObject());
 mySet.add( new SimObject());
 mySet.add( new SimObject());
 foreach( %obj in mySet) { echo (%obj.getId()); }
 
+echo("i in ...");
 // spannung :D
-foreach( %i  in 17..27) { echo (%i); }
-foreach( %i  in 27..17) { echo (%i); }
-foreach( %i  in 0..0) { echo (%i); }
-
+for( %i  in 17..27) { echo (%i); }
+for( %i  in 27..17) { echo (%i); }
+for( %i  in 0..0) { echo (%i); }
+echo("....................");
 
 
 // -------------
@@ -97,7 +101,7 @@ for (%i = 0; %i < 5; %i++ ) {
 }
 
 // fast foreach:
-foreach (%i in range 0..5)  echo("foreach: i is: ", %i);
+for(%i in range 0..5)  echo("for range: i is: ", %i);
 
 
 echo("------------------------ SET TEST ---------------------");
@@ -114,12 +118,33 @@ echo("setfloat did: $object.dynX ==" SPC $object.dynX);
 setFloatVariable("$foo", 13);
 echo("setfloat did: $foo ==" SPC $foo);
 
-%localX = 5.0;
-setLocalFloatVariable("%localX", 666, %localX);
-echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
+// %localX = 5.0;
+// setLocalFloatVariable("%localX", 666, %localX);
+// echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
+//
+// setFloatVariable("%localX", 666);
+// echo("setFloatVariable set 666?: %localX ==" SPC %localX);
 
-setFloatVariable("%localX", 666);
-echo("setFloatVariable set 666?: %localX ==" SPC %localX);
+echo("------------------------ Foreach STEP ---------------------");
+for( %i in 0..10 STEP 2) echo("test step2 = ", %i);
+for( %i in 0..10 STEP -2) echo("test invalid step -2 = ", %i);
+// parse error OK foreach( %i in 0..10 STEP ) echo("test missing expr step = ", %i);
+for( %i in 10..0 STEP -3) echo("test step -3 = ", %i);
+
+print("*** Contunue break test ==>");
+for (%i in 0..10) {
+    if (%i == 1) {
+        echo("==> 1 skip");
+        continue;
+    }
+    if (%i == 9) {
+        echo("==> 9 break");
+        break;
+    }
+    echo(%i);
+}
+
+
 
 
 $Debug::DumpByteCode=1;

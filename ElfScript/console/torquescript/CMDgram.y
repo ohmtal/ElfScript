@@ -108,7 +108,8 @@ struct Token
 
 %token <i> opCOLONCOLON
 
-%token <i> opDOTDOT rwRANGE
+// ElfScript foreach
+%token <i> opDOTDOT rwRANGE rwSTEP
 
 %union {
    Token< char >           c;
@@ -445,6 +446,22 @@ for_stmt
       { $$ = LoopStmtNode::alloc($1.lineNumber, NULL, NULL, $5, $7, false); }
    | rwFOR '('      ';'      ';'      ')' stmt_block
       { $$ = LoopStmtNode::alloc($1.lineNumber, NULL, NULL, NULL, $6, false); }
+
+   // ElfScript copied my new stuff from foreach makes more sense here !!!!
+   | rwFOR '(' VAR rwIN expr opDOTDOT expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, NULL, $9, 2 ); }
+
+   | rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, NULL, $10, 102 ); }
+
+   | rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, $9, $11, 3 ); }
+
+   | rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, $10, $12, 103 ); }
+
+   | rwFOR '(' VAR rwIN rwRANGE expr')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, NULL, NULL, $8, 104 ); }
    ;
 
 // foreach_stmt
@@ -455,13 +472,25 @@ for_stmt
 //    ;
 foreach_stmt
    : rwFOREACH '(' VAR rwIN expr ')' stmt_block
-      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL, $7, 0 ); }
+      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL,NULL, $7, 0 ); }
+
    | rwFOREACHSTR '(' VAR rwIN expr ')' stmt_block
-      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL, $7, 1 ); }
+      { $$ = IterStmtNode::alloc( $1.lineNumber, $3.value, $5, NULL,NULL, $7, 1 ); }
+
    | rwFOREACH '(' VAR rwIN expr opDOTDOT expr ')' stmt_block
-      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, $9, 2 ); }
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, NULL, $9, 2 ); }
+
    | rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block
-      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, $10, -2 ); }
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, NULL, $10, 102 ); }
+
+   | rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $5, $7, $9, $11, 3 ); }
+
+   | rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, $8, $10, $12, 103 ); }
+
+   | rwFOREACH '(' VAR rwIN rwRANGE expr')' stmt_block
+      { $$ = IterStmtNode::alloc($1.lineNumber, $3.value, $6, NULL, NULL, $8, 104 ); }
    ;
 
 expression_stmt

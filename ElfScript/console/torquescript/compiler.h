@@ -163,7 +163,6 @@ namespace Compiler
       OP_BREAK,
 
       OP_ITER_BEGIN,       ///< Prepare foreach iterator.
-      OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
       OP_ITER,             ///< Enter foreach loop.
       OP_ITER_END,         ///< End foreach loop.
 
@@ -183,9 +182,6 @@ namespace Compiler
 #endif
 
       OP_DEC,
-
-      OP_ITER_BEGIN_INT,
-      OP_ITER_BEGIN_RANGE,
 
       OP_INVALID,   //
 
