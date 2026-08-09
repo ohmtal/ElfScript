@@ -1,0 +1,29 @@
+function createBlank(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "Blank";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function Blank::onAdd(%this) {
+
+    return true;
+}
+//----------------------------------------------------------------------
+function Blank::OnRemove(%this) { }
+//----------------------------------------------------------------------
+function Blank::Render(%this) {
+    if (!%this.renderer) return;
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_RenderDebugText(%this.renderer, 10, 10, " Module Template");
+}
+//----------------------------------------------------------------------
+function  Blank::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  Blank::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  Blank::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+

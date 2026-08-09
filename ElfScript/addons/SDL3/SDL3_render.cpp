@@ -233,7 +233,20 @@ DefineEngineFunction( SDL_CreateWindow, S32,
 }
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowTitle(SDL_Window *window, const char *title);
+DefineEngineFunction( SDL_SetWindowTitle, bool, (S32 WindowID, const char* title ), ,"Set a Window Title") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return false;
+
+    return SDL_SetWindowTitle(window, title);
+}
+
 // extern SDL_DECLSPEC const char * SDLCALL SDL_GetWindowTitle(SDL_Window *window);
+DefineEngineFunction( SDL_GetWindowTitle, String, (S32 WindowID), ,"Get a Window Title") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_GetWindowTitle(window);
+}
 
 // SDL_video: extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowIcon(SDL_Window *window, SDL_Surface *icon);
 DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,"Set a Window Icon from Surface") {
@@ -246,6 +259,8 @@ DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,
     }
     return SDL_SetWindowIcon(window, surface);
 }
+
+
 
 // SDL_Video!! FIXME add SDL3_video!!
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowPosition(SDL_Window *window, int x, int y);

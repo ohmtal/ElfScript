@@ -1,0 +1,129 @@
+function createNativSDL(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "NativSDL";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function NativSDL::onAdd(%this) {
+
+    %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
+    %surface = SDL_LoadSurface("assets/texture/icon_32.png");
+    if (%surface > 0) {
+        // create texture
+        %this.TexLogo = SDL_CreateTextureFromSurface(%this.renderer, %surface);
+        %this.TextLogoSrcRect = SDL_GetTextureRect(%this.TexLogo);
+
+        SDL_DestroySurface(%surface);
+    }
+
+    return true;
+}
+//----------------------------------------------------------------------
+function NativSDL::OnRemove(%this) {
+
+    SDL_DestroyTexture(%this.TexLogo);
+    Audio_UnLoadWav(%this.SndBlop);
+}
+//----------------------------------------------------------------------
+function NativSDL::Render(%this) {
+    if (!%this.renderer) return;
+
+
+    // a white filled rectangle
+    SDL_SetRenderDrawColor(%this.renderer, 5,55,55);
+    SDL_RenderRectF(%this.renderer, 10,10, 300, 180, true);
+    // SDL_RenderFillRect(%this.renderer, { 10,10, 300, 180});
+
+    // Write scaled text with a top and bottom line
+    SDL_SetRenderDrawColor(%this.renderer, 128,20,255);
+    SDL_RenderLine(%this.renderer, 25, 35, 280, 35);
+    SDL_SetRenderScale(%this.renderer, 2.0, 2.0);
+    SDL_RenderDebugText(%this.renderer, 25 / 2.0, 40 / 2.0, " Hello CrazyElf!");
+    SDL_SetRenderScale(%this.renderer); //reset
+    SDL_RenderLine(%this.renderer, 25, 60, 280, 60);
+
+    // a blended dark rect
+    SDL_SetRenderDrawColor(%this.renderer, 10,10,10, 160);
+    SDL_SetRenderDrawBlendMode(%this.renderer, SDL_BLENDMODE_MUL);
+
+
+    if ( SDL_PointInRectFloat({SDL_GetMouseX(), SDL_GetMouseY()},{ 55,80, 90, 90}) ) {
+        SDL_SetTextureColorMod(%this.TexLogo, 255,255,0);
+        if (!%this.EnteredLogo) {
+            Audio_Play(%this.SndBlop);
+            %this.EnteredLogo = true;
+        }
+    } else {
+
+        %this.EnteredLogo = false;
+    }
+    // set a invalid srcRect is set as nullptr. SDL3 uses the rect nullptr as fullsize
+    SDL_RenderTexture(%this.renderer, %this.TexLogo, { 0,0,0,0}, { 55,80, 90, 90});
+
+    // i fetch the size on load:
+    SDL_SetTextureColorMod(%this.TexLogo, 0,128,255);
+    // not sure where GetGameTime - i guess BaseElf
+    SDL_RenderTextureRotated(%this.renderer, %this.TexLogo
+        , %this.TextLogoSrcRect , { 175,80, 90, 90}
+        , mFMod(SDL_GetTicks() * 0.1, 360.0)
+        , {45.0, 45.0}
+        , SDL_FLIP_NONE
+    );
+
+
+    SDL_SetTextureColorMod(%this.TexLogo); //reset
+
+    // SDL_RenderFillRect(%this.renderer, { 50,75, 220, 100});
+    SDL_RenderRectF(%this.renderer, 50,75, 220, 100, true);
+    SDL_SetRenderDrawBlendMode(%this.renderer, SDL_BLENDMODE_NONE);
+
+    // a silver border
+    SDL_SetRenderDrawColor(%this.renderer, 128,128,128);
+    // SDL_RenderRect(%this.renderer, { 10,10, 300, 180});
+    SDL_RenderRectF(%this.renderer, 10,10, 300, 180, false);
+
+
+    // SDL_RenderDebugText(%this.renderer, 15,15, FormatString("%.4f sec. Mouse: %.0f,%.0f", GetFrameTime(), SDL_GetMouseX(), SDL_GetMouseY()) );
+
+
+
+}
+//----------------------------------------------------------------------
+function NativSDL::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+    if (!%isDown) return;
+
+    if (%scancode == SDL_SCANCODE_ESCAPE) {
+        echo("Bye Bye");
+        $running = false;
+    }
+}
+function NativSDL::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function NativSDL::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+
+
+
+// ------ PoD Test
+function p() {
+    if (isObject(pObj)) pObj.delete();
+    new PoDObject(pObj);
+    echo("pObj created");
+
+
+    echo("---------------- Point2F ");
+    pObj.p2F= { 5.1, 6.2};
+    echo("---------------- Point2I ");
+    pObj.p2I= { 200, 100};
+    echo("---------------- Color ");
+    pObj.color= { 200, 200, 200, 100};
+    echo("---------------- Color4F ");
+    pObj.colorF= { 1,1,1,1 };
+}
+// ---------------
+
+
+
