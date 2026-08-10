@@ -264,20 +264,68 @@ DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,
 
 // SDL_Video!! FIXME add SDL3_video!!
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowPosition(SDL_Window *window, int x, int y);
+DefineEngineFunction( SDL_SetWindowPosition, bool, (S32 WindowID, S32 x, S32 y), ,"Set the Window position") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowPosition(window, x, y);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowPosition(SDL_Window *window, int *x, int *y);
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowSize(SDL_Window *window, int w, int h);
+DefineEngineFunction( SDL_SetWindowSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window Size") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowSize(window, width, height);
+}
+
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSize(SDL_Window *window, int *w, int *h);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSafeArea(SDL_Window *window, SDL_Rect *rect);
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAspectRatio(SDL_Window *window, float min_aspect, float max_aspect);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowAspectRatio(SDL_Window *window, float *min_aspect, float *max_aspect);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowBordersSize(SDL_Window *window, int *top, int *left, int *bottom, int *right);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSizeInPixels(SDL_Window *window, int *w, int *h);
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMinimumSize(SDL_Window *window, int min_w, int min_h);
+DefineEngineFunction( SDL_SetWindowMinimumSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window minimum Size") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowMinimumSize(window, width, height);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMinimumSize(SDL_Window *window, int *w, int *h);
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMaximumSize(SDL_Window *window, int max_w, int max_h);
+DefineEngineFunction( SDL_SetWindowMaximumSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window maximum Size") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowMaximumSize(window, width, height);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMaximumSize(SDL_Window *window, int *w, int *h);
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowBordered(SDL_Window *window, bool bordered);
+DefineEngineFunction( SDL_SetWindowBordered, bool, (S32 WindowID, bool bordered), ,"Set bordered") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowBordered(window, bordered);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowResizable(SDL_Window *window, bool resizable);
+DefineEngineFunction( SDL_SetWindowResizable, bool, (S32 WindowID, bool resizable), ,"Set resizable") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowResizable(window, resizable);
+}
+
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAlwaysOnTop(SDL_Window *window, bool on_top);
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFillDocument(SDL_Window *window, bool fill);
 // extern SDL_DECLSPEC bool SDLCALL SDL_ShowWindow(SDL_Window *window);

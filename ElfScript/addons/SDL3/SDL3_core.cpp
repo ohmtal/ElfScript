@@ -45,17 +45,35 @@ DefineEngineFunction(SDL_GetTicks, U64, (),,"Get the number of milliseconds that
 
 
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetTicksNS(void);
+DefineEngineFunction(SDL_GetTicksNS, U64, (),,"Get the number of nanoseconds that have elapsed since the SDL library") {
+    return SDL_GetTicksNS();
+}
+
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetPerformanceCounter(void);
+DefineEngineFunction(SDL_GetPerformanceCounter, U64, (),,"Get the current value of the high resolution counter.") {
+    return SDL_GetPerformanceCounter();
+}
+
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetPerformanceFrequency(void);
+DefineEngineFunction(SDL_GetPerformanceFrequency, U64, (),,"Get the count per second of the high resolution counter.") {
+    return SDL_GetPerformanceFrequency();
+}
+
+
 // extern SDL_DECLSPEC void SDLCALL SDL_Delay(Uint32 ms);
 DefineEngineFunction(SDL_Delay, void, (U32 ms),,"Wait a specified number of milliseconds before returning.") {
     SDL_Delay(ms);
 }
 
 // extern SDL_DECLSPEC void SDLCALL SDL_DelayNS(Uint64 ns);
+DefineEngineFunction(SDL_DelayNS, void, (U64 ns),,"Wait a specified number of nanoseconds before returning.") {
+    SDL_Delay(ns);
+}
+
 // extern SDL_DECLSPEC void SDLCALL SDL_DelayPrecise(Uint64 ns);
-
-
+DefineEngineFunction(SDL_DelayPrecise, void, (U64 ns),,"Wait a specified number of nanoseconds before returning.") {
+    SDL_DelayPrecise(ns);
+}
 
 
 

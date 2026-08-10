@@ -2816,7 +2816,7 @@ handle_OP_BUILD_VECTOR_STRING: {
 #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
       // after setString!!
       if (matchVectorFields) {
-            Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
 
             //TODO
             stack[_STK].type = cvVector;

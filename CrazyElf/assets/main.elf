@@ -1,4 +1,4 @@
-$MODULES = "NativSDL blank";
+$MODULES = "NativSDL blank StarField";
 
 //------------------------------------------------------------------------------
 function Main::init(%this) {
@@ -96,7 +96,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 //------------------------------------------------------------------------------
 function Main::DrawText(%this, %x, %y, %text, %scale=1.0, %colorStr, %shadow, %shadowColorStr ) {
 
-    %scale = 0.7;
+    // %scale = 0.7;
     SDL_SetRenderScale(%this.renderer, %scale, %scale);
     SDL_RenderDebugText(%this.renderer, %x /%scale , %y/%scale, %text );
     SDL_SetRenderScale(%this.renderer, 1.0, 1.0);
@@ -128,6 +128,8 @@ function Main::Render(%this) {
 
 
 
+    // %this.DrawText(2,2, { $Global::FPS , "FPS", $Global::FrameTime}, 0.8);
+    %this.DrawText(2,2, { $Global::FPS , "FPS" }, 0.8);
 
     // %this.DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module.", 1.5,  "200 200 180", true, SLATEGRAY);
     //
@@ -205,6 +207,7 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
 // -----------------------------------------------------------------------------
 // reload helper
 function rl() {
+    Main.delete();
     exec("assets/main.elf");
 }
 
@@ -237,11 +240,42 @@ $running = onInit();
 
 echo("************** %main: ", %main, " RUNNUNG: ", $running);
 
+// hardcode variable test ^^
+%performanceFrequency = SDL_GetPerformanceFrequency();
+%lastTick = SDL_GetPerformanceCounter();
+
+%fpsTimer = 0.0;
+%frameCounter = 0;
+$Global::FPS = 60; //initial
+
+// we only need to push the renderer if we scaled the screen....
+%mainLoopParam = %main.scaledScreen ? %main.renderer : 0;
+
 while ($running) {
+
+    %tickCount = SDL_GetPerformanceCounter();
+
+    //lol all 64bit .. let see what we get
+    $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
+
+
     %main.Render();
-    if (!SDL_MainLoop(%main.scaledScreen ? %main.renderer : 0)) {
+    // Main::Render(%main); //not really >>Fast call we are in a critical loop
+    if (!SDL_MainLoop(%mainLoopParam)) {
         echo("quit by SDL_MainLoop");
         break;
     }
+
+    %fpsTimer += $Global::FrameTime;
+    %frameCounter++;
+
+    if (%fpsTimer >= 1.0) { // Every 1 second
+        $Global::FPS = %frameCounter;
+        %frameCounter = 0;
+        %fpsTimer  -= 1.0; // not 100%
+    }
+
+    // gGameTime += gFrameTime;
+    %lastTick  = %tickCount;
 }
 Main.delete();
