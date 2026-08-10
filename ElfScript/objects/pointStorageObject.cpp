@@ -45,7 +45,7 @@
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
 #include "ext/tinyexpr.h"
-
+// #include "console/localVar.h"
 
 struct InternalVector4{
     F32 x = 0;
@@ -267,6 +267,15 @@ public:
 
         return true;
     }
+
+    // // // // **** direct local var access !!!! - i ignore fails here ...***
+    // // // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+    // // //     ElfScript::setLocalFloat(varX, mX);
+    // // //     ElfScript::setLocalFloat(varY, mY);
+    // // //     if (varZ) ElfScript::setLocalFloat(varZ, mZ);
+    // // //     if (varW) ElfScript::setLocalFloat(varW, mW);
+    // // // }
+
 };
 
 IMPLEMENT_CONOBJECT(PointStorageObject);
@@ -280,6 +289,13 @@ DefineEngineMethod(PointStorageObject, getPosVec, String, (), , "get the positio
 DefineEngineMethod(PointStorageObject, setPosVec, void, (String strVector), , "set the position by Vector (String)") {
       dSscanf(strVector.c_str(), "%g %g %g %g",&object->mX, &object->mY, &object->mZ, &object->mW);
 }
+
+// // // DefineEngineMethod(PointStorageObject, getPosByRef, void,
+// // //                    (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+// // //                    , "set the position by Vector (String)") {
+// // //     object->getPosByReference(varX, varY, varZ, varW);
+// // // }
+
 
 // ---------- set Pos by float's ----------
 DefineEngineMethod(PointStorageObject, setPos, void, (F32 x, F32 y, F32 z, F32 w),(0.f,0.f) ,

@@ -164,6 +164,11 @@ foreach( %i  in 3..1) { print(%i); } /* print: 3 2 1 */
 foreach( %i  in range 3..1) { print(%i); } /* print: 3 2*/
 foreach( %i  in 0..0) { print(%i); } /* print: 0 */
 foreach( %i  in range 0..0) { print(%i); } /* no output*/
+
+// all the previous also work with for:
+for( %i in range 3) { print(%i); } /* print: 1 2 */
+for( %i in range 0..5 step 3) { print(%i); } /* print: 0 3 */
+
 ```
 
 

@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -182,6 +183,15 @@ S32 FuncVars::assign(StringTableEntry var, TypeReq currentType, S32 lineNumber, 
    return id;
 }
 
+// -----------------------------------------------------------------------------
+//Elfscript for direkt variable access
+S32 FuncVars::lookupExising(StringTableEntry var) {
+      std::unordered_map<StringTableEntry, Var>::iterator found = vars.find(var);
+      if (found == vars.end()) return -1;
+      return found->second.reg;
+}
+
+
 S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
 {
    std::unordered_map<StringTableEntry, Var>::iterator found = vars.find(var);
@@ -205,6 +215,7 @@ S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
 
    return found->second.reg;
 }
+// -----------------------------------------------------------------------------
 
 TypeReq FuncVars::lookupType(StringTableEntry var, S32 lineNumber)
 {

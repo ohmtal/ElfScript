@@ -101,7 +101,7 @@ for (%i = 0; %i < 5; %i++ ) {
 }
 
 // fast foreach:
-for(%i in range 0..5)  echo("for range: i is: ", %i);
+for(%i in range 5)  echo("for range: i is: ", %i);
 
 
 echo("------------------------ SET TEST ---------------------");
@@ -118,18 +118,15 @@ echo("setfloat did: $object.dynX ==" SPC $object.dynX);
 setFloatVariable("$foo", 13);
 echo("setfloat did: $foo ==" SPC $foo);
 
-// %localX = 5.0;
-// setLocalFloatVariable("%localX", 666, %localX);
-// echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
-//
+
 // setFloatVariable("%localX", 666);
 // echo("setFloatVariable set 666?: %localX ==" SPC %localX);
 
-echo("------------------------ Foreach STEP ---------------------");
-for( %i in 0..10 STEP 2) echo("test step2 = ", %i);
-for( %i in 0..10 STEP -2) echo("test invalid step -2 = ", %i);
-// parse error OK foreach( %i in 0..10 STEP ) echo("test missing expr step = ", %i);
-for( %i in 10..0 STEP -3) echo("test step -3 = ", %i);
+echo("------------------------ Foreach step ---------------------");
+for( %i in 0..10 step 2) echo("test step2 = ", %i);
+for( %i in 0..10 step -2) echo("test invalid step -2 = ", %i);
+// parse error OK foreach( %i in 0..10 step ) echo("test missing expr step = ", %i);
+for( %i in 10..0 step -3) echo("test step -3 = ", %i);
 
 print("*** Contunue break test ==>");
 for (%i in 0..10) {
@@ -144,6 +141,23 @@ for (%i in 0..10) {
     echo(%i);
 }
 
+
+echo("------------------------ LocalVar ---------------------");
+%localX = 5.0;
+setLocalFloatVariable("%localX", 666);
+echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
+varDump("%localX");
+varDump("%i");
+
+function localPoints( ) {
+error("Rejoicing too soon << does not work in function");
+    sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
+    %pointX = %pointY = %pointZ = 0.0;
+    sto.getPosByRef( "%pointX", "%pointY", "%pointZ");
+    print("POINTS:" SPC %pointX SPC %pointY SPC %pointZ);
+
+}
+localPoints();
 
 
 

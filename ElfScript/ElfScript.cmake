@@ -116,11 +116,11 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.h
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.cpp
 
-    # some neat objects to work with
-    ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
+    # local var tools
+    # // Rejoicing too soon << does not work in function // ${CMAKE_CURRENT_LIST_DIR}/console/localVar.cpp
 
 
-    # new monster:
+    # new monster with direct threading:
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp
 
 )
@@ -185,6 +185,13 @@ set(PLATFORM_SRC
 
 )
 
+set ( OBJECTS_SRC
+    # some neat objects to work with
+    ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
+
+)
+
+
 set(POSIX_SRC
    ${CMAKE_CURRENT_LIST_DIR}/platform/posix/posixVolume.cpp
 
@@ -222,6 +229,7 @@ set(ELFSCRIPT_SRC
     ${CORE_SRC}
     ${PLATFORM_SRC}
     ${MATH_SRC}
+    ${OBJECTS_SRC}
     ${EXT_SRC}
 )
 

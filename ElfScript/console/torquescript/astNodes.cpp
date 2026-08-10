@@ -760,7 +760,7 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    if (type == TypeReqNone)
       return codeStream.tell();
 
-   precompileIdent(varName);
+   precompileIdent(varName); // <<< add varName to gGlobalStringTable
 
    bool oldVariables = arrayIndex || varName[0] == '$';
 

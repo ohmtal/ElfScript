@@ -1846,8 +1846,8 @@ handle_OP_LOAD_LOCAL_VAR_STR:
             else
             {
                   // fallback
-                  val = Script::gEvalState.getLocalStringVariable(reg);
-                  stack[_STK + 1].setString(val);
+                  // val = Script::gEvalState.getLocalStringVariable(reg);
+                  stack[_STK + 1].setString(localVal.getString());
             }
       }
       PUSH_STK();

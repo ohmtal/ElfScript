@@ -2,6 +2,8 @@
 #include <console/consoleTypes.h>
 #include <console/consoleInternal.h>
 #include <console/torquescript/ast.h>
+#include <console/torquescript/compiler.h>
+// #include <console/localVar.h>
 
 ///////////////////////////////////////////////////////
 // some testfunction .......
@@ -29,64 +31,62 @@ DefineEngineFunction(setFloatVariable, void, (const char* VariableName, F32 valu
     Con::setFloatVariable(VariableName, value);
 }
 
-DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32 value, S32 pushVar), , "")
+extern  FuncVars* getFuncVars(S32 lineNumber);
+
+const char* getConsoleValueTypeName(S32 type) {
+    switch (type) {
+        case ConsoleValueType::cvFloat:   return "F64";
+        case ConsoleValueType::cvInteger: return "S64";
+        case ConsoleValueType::cvString:  return "String";
+        case ConsoleValueType::cvSTEntry: return "Empty";
+        default: return "other";
+    }
+}
+
+
+DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump, you cant use this on console!")
+{
+    Con::printSeparator();
+    if (variableName[0] != '%') {
+        Con::errorf("must be a local Variable!");
+        return;
+    }
+
+    S32 reg = getFuncVars(0)->lookupExising(StringTable->insert(variableName));
+    if (reg < 0) {
+        Con::printf("%s not found.", variableName);
+        return ;
+    }
+
+    ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+    Con::printf("Variable: %10s [reg:%2d] [type:%8s] [value:%20s]"
+        , variableName, reg, getConsoleValueTypeName(localVal.type), localVal.getString());
+}
+
+DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32 value), , "local float test!")
 {
     if (VariableName[0] != '%') {
         Con::errorf("must be a local Variable!");
+        return;
     }
 
-    // so next idea:
-    // ExprEvalState ==> Vector< ConsoleValueFrame > localStack
+    S32 reg = getFuncVars(0)->lookupExising(StringTable->insert(VariableName));
 
-    // mStackDepth
-    Dictionary::Entry* ent = nullptr;
-    StringTableEntry nameP = StringTable->insert(VariableName);
-    if (!Script::gEvalState.localStack.empty())
-    {
-       for (S32 i = 0; i < Script::gEvalState.localStack.size();  i++ ) {
-
-           // HAHA i get the data but whats the register ?
-           // ok value in stack is 4 << not what iam looking for ;)
-           //
-           // this is also wrong .. but where are the values ???
-           // ,,, values is a array ? ... but where is the count
-           Con::printf(" stack:%d, value:%s ", i, Script::gEvalState.localStack[i].values->getString());
-       }
+    if (reg < 0) {
+        Con::errorf("I can only set the value on a existing local variable!");
+        return ;
     }
 
-    // Dictionary::Entry* ent = nullptr;
-    // StringTableEntry nameP = StringTable->insert(VariableName);
-    // if (!Con::gFrameStack.empty())
-    // {
-    //     for (S32 i = 0; i < Con::gFrameStack.size(); i++ ) {
-    //         if (!Con::gFrameStack[i]) {
-    //             Con::errorf("Invalid STACK!");
-    //             continue;
-    //         }
-    //         ent = Con::gFrameStack[i]->lookup(nameP);
-    //         if (ent) {
-    //             Con::warnf("FOUND IT!!!!! value is: %f", ent->getFloatValue());
-    //         } else {
-    //             Con::printf("nothing in stack %d", i);
-    //         }
-    //     }
-    // }
+    Con::printf("Found register %d for %s", reg, VariableName);
 
-// it's not on current!
-    //     Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(VariableName));
-    //
-    //     if (ent) {
-    //         ent->setFloatValue(value);
-    //          Con::errorf("found %s :D set %f", VariableName, value);
-    //     } else {
-    //        // ent =  Con::getCurrentStackFrame()->addVariable(VariableName, TypeF32, )
-    //        ent =  Con::getCurrentStackFrame()->add(VariableName);
-    //        if (ent) ent->setFloatValue(value);
-    //        else Con::errorf("Failed to add variable! %s", VariableName);
-    //     }
-    // } else {
-    //     Con::errorf("F R A M E  STACK empty ...");
-    // }
+    // is 0 valid ??
+    if (reg > 0 ) {
+        ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+        Con::printf("%s type is %d %s", VariableName, localVal.type, getConsoleValueTypeName(localVal.type));
+        localVal.setFloat(value);
+        Con::printf("type after setFloat: %d %s", localVal.type, getConsoleValueTypeName(localVal.type));
+    }
+
 }
 
 

@@ -135,6 +135,9 @@ enum ConsoleValueType
    cvConsoleValueType =  0    ///< First valid engine console type ID
 };
 
+
+
+
 class ConsoleValue
 {
 public:
