@@ -6,7 +6,6 @@
 #pragma once
 
 // ----------------------------------------------------------------------------
-// cancled #define TEST_STRUCT_FAST_PATH
 // ----------------------------------------------------------------------------
 // enable #define in torque script
 #define ELFSCRIPT_PREPROCESSOR
@@ -16,16 +15,14 @@
 
 
 // ============================================================================
-// Experimental stuff - not recommended:
+// Special:
 // ============================================================================
-// make slots type save but same slotname always have the same type
-// #define ELFSCRIPT_STRICT_SLOT_TYPE
+// Testing PoD Struct Console Value
+#define TEST_STRUCT_FAST_PATH
 
 // Autodelete objects on shutdown - this can slowdown delete on many objects
 // #define ELFSCRIPT_GARBAGECOLLECTION
 
-// cache function calls WARNING: inconsitent
-// #define ELFSCRIPT_CALLFUNC_CACHED
 // ============================================================================
 
 

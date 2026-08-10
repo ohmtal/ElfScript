@@ -104,7 +104,7 @@ echo("---------------------");
 - Version 0.4f 🚀 (RelWithDebug) : 6.345u 0.003s 0:06.35 99.8%     0+0k 0+0io 0pf+0w
 - Version 0.4g🚀 (RelWithDebug) : 6.618u 0.009s 0:06.63 99.6%     0+0k 0+0io 0pf+0w
 - Version 0.4h🚀 (RelWithDebug) : 6.059u 0.003s 0:06.08 99.5%     0+0k 8+0io 0pf+0w
-
+- Version 0.5d (using for range): 4.350u 0.004s 0:04.37 99.5%     0+0k 0+0io 0pf+0w
 
 ```
 #define JLOOPS 25
@@ -209,6 +209,7 @@ echo("---------------------");
 - Version 0.4f 🚀 (RelWithDebug) : 14.015u 0.009s 0:14.04 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4g 🚀 (RelWithDebug) : 14.773u 0.006s 0:14.80 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4h🚀 (RelWithDebug) : 13.582u 0.002s 0:13.62 99.7%    0+0k 0+0io 0pf+0w
+- Version 0.5d (using for range): 12.359u 0.007s 0:12.40 99.5%    0+0k 0+0io 0pf+0w
 
 
 

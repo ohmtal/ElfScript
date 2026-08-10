@@ -465,8 +465,23 @@ TORQUE_NOINLINE void doSlowMathOp()
       stack[_STK - 1].setFloat(a.getFloat() + b.getFloat());
    else if constexpr (Op == FloatOperation::Sub)
       stack[_STK - 1].setFloat(a.getFloat() - b.getFloat());
-   else if constexpr (Op == FloatOperation::Mul)
+   else if constexpr (Op == FloatOperation::Mul) {
+#ifndef TEST_STRUCT_FAST_PATH
+         // TESTING b cast as a float :P
+         // ok get parse error and *= is not here so i keep it but it's
+         // never called.
+      if ( b.type == ConsoleValueType::cvVector) {
+            F64 aFloat = a.getFloat();
+            for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT)
+                  b.v[i] *= aFloat;
+            // But i cant see it since i use it as string  which is not updated here^^
+            Con::printf("test setting scale on vector: %f,%f,%f,%f",
+                        b.v[0], b.v[1], b.v[2], b.v[3]);
+      }
+      else
+#endif
       stack[_STK - 1].setFloat(a.getFloat() * b.getFloat());
+   }
    else if constexpr (Op == FloatOperation::Div)
       stack[_STK - 1].setFloat(a.getFloat() / b.getFloat());
 
@@ -2770,15 +2785,15 @@ handle_OP_BUILD_VECTOR_STRING: {
 
       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
 
-      #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
       bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
       F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
-      #endif
+#endif
       // get values from stack
       for (S32 i = count - 1; i >= 0; i--) {
-            #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
             if (matchVectorFields) v[i] = stack[_STK].getFloat();
-            #endif
+#endif
 
             stringValues[i] = stack[_STK].getString();
             POP_STK();
@@ -2798,10 +2813,14 @@ handle_OP_BUILD_VECTOR_STRING: {
       PUSH_STK();
       stack[_STK].setString(buffer);
 
-      #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
       // after setString!!
       if (matchVectorFields) {
-            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+            Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
+
+            //TODO
+            stack[_STK].type = cvVector;
+
             // this break:
             // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
             // {
@@ -2810,17 +2829,11 @@ handle_OP_BUILD_VECTOR_STRING: {
             // not sure why because i return the string which is filled above
             // but i only added a small part where  type is used so why knows .....
 
-
-            // FIXME stack[_STK].type = cvVector;
-
-            // copy all to 0.f old values
-            // for( S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++ ) {
-            //        stack[_STK].v[i] = v[i];
-            // }
-            // SPEED
+            // copy v to stack
             dMemcpy(stack[_STK].v, v, sizeof(v));
+
       }
-      #endif
+#endif
 
 
       DISPATCH();

@@ -1437,19 +1437,17 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                                     default: stackP->setInt(entry->mValue.getInt()); break;
                               }
                               break;
-                                    case ConsoleValueType::cvFloat:
-                                          stackP->setFloat(entry->mValue.getFloat());
-                                          // stackP->setFastFloat(entry->mValue.getFloat());
-                                          break;
-                                    default: {
-                                          const char* str = entry->mValue.getString();
-                                          if (str) stackP->setString(str);
-                                          else stackP->setString("");
-
-
-                                          break;
-                                    }
+                              case ConsoleValueType::cvFloat:
+                                    stackP->setFloat(entry->mValue.getFloat());
+                                    // stackP->setFastFloat(entry->mValue.getFloat());
                                     break;
+                              default: {
+                                    const char* str = entry->mValue.getString();
+                                    if (str) stackP->setString(str);
+                                    else stackP->setString("");
+                                    break;
+                              }
+                              break;
                   }
                   return true;
             }

@@ -1,0 +1,35 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+// new PointStorageObject(sto);
+
+$globalX = 0;
+for (%j in range JLOOPS) {
+    for (%i  in range ILOOPS) {
+        $globalX ++;
+    }
+    echo("SUM (++) IS:" SPC $globalX);
+    for (%i  in range ILOOPS) {
+        $globalX --;
+    }
+    echo("SUM (--) IS:" SPC $globalX);
+    $globalX = 66;
+    echo("set Sum to 66 == " SPC $globalX * 1);
+    for (%i  in range ILOOPS) {
+        $globalX *= %i + 1;
+        $globalX /= %i + 1;
+    }
+    echo("SUM (*/ %i+1) IS:" SPC $globalX);
+    for (%i in range ILOOPS / 2.0) {
+        %ran = getRandomF(%i);
+        $globalX -= %ran;
+        $globalX += %ran;
+    }
+    echo("SUM (rand +-) IS:" SPC $globalX);
+}
+$globalX -= 66.0 ;
+echo("---------------------");
+echo("---------------------");
+echo("Final sum should be 0 == ", $globalX);
+echo("---------------------");
+echo("---------------------");

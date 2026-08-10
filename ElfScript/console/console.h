@@ -149,17 +149,8 @@ public:
       {
          F64   f;
          S64   i;
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
-#endif
          char* s;
       };
-// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-//       } scalar;
-//          F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
-// #else
-//      };
-// #endif
 
       struct
       {
@@ -167,6 +158,9 @@ public:
          EnumTable* enumTable;
       };
    };
+#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
+#endif
 #pragma warning(pop)
 
    S32 type;
@@ -183,7 +177,12 @@ public:
       // Only cvString strings are heap-allocated and owned by this value.
       // cvSTEntry points into the StringTable (managed externally).
       // Numeric types use the f/i union fields — s is not valid for them.
+
+#ifndef TEST_STRUCT_FAST_PATH
       if (type == ConsoleValueType::cvString && bufferLen > 0)
+#else
+      if ((type == ConsoleValueType::cvString || type == ConsoleValueType::cvVector)  && bufferLen > 0)
+#endif
       {
          dFree(s);
          bufferLen = 0;
@@ -221,16 +220,12 @@ public:
 
    ConsoleValue& operator=(const ConsoleValue& other)
    {
-      //XXTH memleak
       if (this != &other)
       {
-            cleanupData(); // clean old data!
+            cleanupData();
             copyFrom(other);
       }
 
-      // orig:
-      // if (this != &other)
-      //    copyFrom(other);
       return *this;
    }
 
@@ -266,6 +261,10 @@ public:
          return static_cast<F64>(i);
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
+
+#ifdef  TEST_STRUCT_FAST_PATH //TEST
+      case ConsoleValueType::cvVector:
+#endif
       case ConsoleValueType::cvString:
          return (s[0] == '\0') ? 0.0 : dAtof(s);
       case ConsoleValueType::cvNULL:
@@ -285,6 +284,9 @@ public:
          return static_cast<S64>(f);
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
+#ifdef  TEST_STRUCT_FAST_PATH //TEST
+      case ConsoleValueType::cvVector:
+#endif
       case ConsoleValueType::cvString:
          return (s[0] == '\0') ? S64(0) : static_cast<S64>(dAtoi(s));
       case ConsoleValueType::cvNULL:
@@ -317,7 +319,7 @@ public:
    {
       switch (type)
       {
-#ifdef  TEST_STRUCT_FAST_PATH  //NOTE this is WRONG but i need it for testing
+#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
       case ConsoleValueType::cvVector:
 #endif
       case ConsoleValueType::cvSTEntry:
@@ -466,6 +468,11 @@ private:
   /// cleaned up or is freshly constructed).
    void copyFrom(const ConsoleValue& other)
    {
+
+#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+      bool wasVector = false;
+#endif
+
       switch (other.type)
       {
       case ConsoleValueType::cvNULL:
@@ -488,6 +495,11 @@ private:
          setStringTableEntry(other.s);
          break;
 
+
+#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+      case ConsoleValueType::cvVector:
+            wasVector = true;
+#endif
       case ConsoleValueType::cvString:
       {
          // bufferLen == allocation size (len+1), so string length == bufferLen-1.
@@ -497,6 +509,14 @@ private:
             ? static_cast<S32>(other.bufferLen) - 1
             : static_cast<S32>(dStrlen(other.s));
          setString(other.s, strLen);
+
+#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+         if (wasVector) {
+                 dMemcpy(v, other.v, sizeof(v));
+                 type = ConsoleValueType::cvVector;
+         }
+#endif
+
          break;
       }
 
@@ -520,6 +540,10 @@ private:
       case ConsoleValueType::cvInteger:
          i = other.i;
          break;
+#ifdef  TEST_STRUCT_FAST_PATH
+      case ConsoleValueType::cvVector:
+          dMemcpy(v, other.v, sizeof(v));
+#endif
       case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:
       case ConsoleValueType::cvNULL:
