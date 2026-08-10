@@ -144,7 +144,7 @@ function StarField::Render(%this) {
         }
         else
         {
-            %radius = mLerp(3.0, 1.0, %pointZ);
+            %radius = mLerp(4.0, 0.5, %pointZ);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
@@ -153,8 +153,8 @@ function StarField::Render(%this) {
 
 
 
-    // using fields
-    // foreach(%i in range 0 .. STAR_COUNT )
+    // // using fields
+    // for(%i in range STAR_COUNT )
     // {
     //     %lStarPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
     //

@@ -6,13 +6,18 @@ it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
 to change this.
 
 
+### Version 0.5d (RelWithDebug) : 
+- 0.5d is slightly slower than 0.5c - i added step to for in range which cause a different stop statement which is safer anyway
+
+
+### Version 0.5c (RelWithDebug) : 
+- added foreach(%i in first..last) and foreach( %i in range start..stop) => 2.69! 
+
 ### Version 0.5a (RelWithDebug) : 
 - opMinusMinus also got direct register write like opPlusPlus
 - OP_SAVE_LOCAL_VAR_FLT/OP_SAVE_LOCAL_VAR_UINT speed up
 - removed cleanupdata when int/float is set (good idea?) ==> No memleak!
 
-### Version 0.5c (RelWithDebug) : 
-- added foreach(%i in first..last) and foreach( %i in range start..stop) => 2.69! 
 
 ### Version 0.4h🚀 (RelWithDebug) : Direct Threading finished ... let see - compiled with -O2.
 
@@ -44,6 +49,7 @@ to change this.
     - 3.664u 0.002s 0:03.68 99.4%     0+0k 0+0io 0pf+0w
     - Invalid ::: 3.252u 0.004s 0:03.27 99.3%     0+0k 0+0io 0pf+0w
 - Version 0.5c (using foreach range)): 2.696u 0.003s 0:02.70 99.6%     0+0k 0+0io 0pf+0w
+- Version 0.5d (using for range)): 2.876u 0.002s 0:02.89 99.3%     0+0k 0+0io 0pf+0w
 
 
 

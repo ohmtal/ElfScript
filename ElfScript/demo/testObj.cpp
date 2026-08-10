@@ -31,6 +31,8 @@ DefineEngineFunction(setFloatVariable, void, (const char* VariableName, F32 valu
     Con::setFloatVariable(VariableName, value);
 }
 
+#ifdef TORQUE_DEBUG
+
 extern  FuncVars* getFuncVars(S32 lineNumber);
 
 const char* getConsoleValueTypeName(S32 type) {
@@ -89,7 +91,7 @@ DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32
 
 }
 
-
+#endif
 
 ///////////////////////////////////////////////////////
     // class EmptyObject : public SimObject

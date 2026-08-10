@@ -15,23 +15,29 @@ option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
 set(IPO_DEFAULT OFF)
 set(BUILD_WITH_IPO ${IPO_DEFAULT} CACHE BOOL "Build Application with speed profile LTO (-O3)")
 
-# --- Speed Optimization (LTO) ---
+# --- Speed Optimization (LTO) --- NOTE: not faster than -02
 if (BUILD_WITH_IPO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT ipo_supported)
+
+    # gcc is faster ?!
+    # set(CMAKE_C_COMPILER "clang")
+    # set(CMAKE_CXX_COMPILER "clang++")
+
     if(ipo_supported AND NOT ANDROID)
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
     endif()
+
 
     add_library(flux_speed_profile INTERFACE)
     target_compile_options(flux_speed_profile INTERFACE
         $<$<CONFIG:Release>:
             $<$<CXX_COMPILER_ID:MSVC>:/O2 /Oi /Ot>
-            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-O3 -fno-strict-aliasing -g
+            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-O3 -fno-strict-aliasing
                 $<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<NOT:$<BOOL:${ANDROID}>>>:-march=native>>
         >
     )
-    # FIXME -g !!
+    #  -g  if you need
 endif()
 # -----------------------------------------------------------------------------
 set(SANITIZE_DEFAULT OFF)

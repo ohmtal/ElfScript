@@ -205,7 +205,7 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
 // -----------------------------------------------------------------------------
 // reload helper
 function rl() {
-    exec("assets/semain.elf");
+    exec("assets/main.elf");
 }
 
 function updateDocu() {
@@ -237,7 +237,7 @@ $running = onInit();
 
 echo("************** %main: ", %main, " RUNNUNG: ", $running);
 
-while ( $running ) {
+while ($running) {
     %main.Render();
     if (!SDL_MainLoop(%main.scaledScreen ? %main.renderer : 0)) {
         echo("quit by SDL_MainLoop");
