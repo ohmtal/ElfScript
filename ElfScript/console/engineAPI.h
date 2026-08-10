@@ -1303,7 +1303,7 @@ public:
 
 
 //------------------------------------------------------------------------------
-// XXTH TGE Compat! but better
+// XXTH TGE Compat! only here to allow faster porting but:
 // NOTE: better use: DefineEngineMethod
 #define ConsoleMethod(className, name, returnType, minArgs, maxArgs, usage) \
       DefineEngineStringlyVariadicMethod(className, name,returnType,minArgs,maxArgs,usage)

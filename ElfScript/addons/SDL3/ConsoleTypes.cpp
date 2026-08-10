@@ -20,6 +20,7 @@ FIELD( a, alpha, 1, "Alpha channel value." )
 
 END_IMPLEMENT_STRUCT;
 
+
 ConsoleType(Color, TypeColor, Color, "")
 ImplementConsoleTypeCasters( TypeColor, Color )
 
@@ -274,6 +275,8 @@ IMPLEMENT_STRUCT( Point2F,
 FIELD( x, x, 1, "X coordinate." )
 FIELD( y, y, 1, "Y coordinate." )
 END_IMPLEMENT_STRUCT;
+
+
 //-----------------------------------------------------------------------------
 // TypePoint2F
 //-----------------------------------------------------------------------------

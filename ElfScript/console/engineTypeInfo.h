@@ -54,6 +54,7 @@ enum EngineTypeFlags
    EngineTypeDisposable    = BIT( 2 ),    ///< Instances can be disposed by the engine.
    EngineTypeSingleton     = BIT( 3 ),    ///< Class type with only a single instance.
    EngineTypeVariadic      = BIT( 4 ),    ///< Variadic function type.
+   EngineTypeNativSetterGetter = BIT( 5 ), /// ElfScript prepare for nativ setter getter
 };
 
 

@@ -466,20 +466,20 @@ TORQUE_NOINLINE void doSlowMathOp()
    else if constexpr (Op == FloatOperation::Sub)
       stack[_STK - 1].setFloat(a.getFloat() - b.getFloat());
    else if constexpr (Op == FloatOperation::Mul) {
-#ifndef TEST_STRUCT_FAST_PATH
-         // TESTING b cast as a float :P
-         // ok get parse error and *= is not here so i keep it but it's
-         // never called.
-      if ( b.type == ConsoleValueType::cvVector) {
-            F64 aFloat = a.getFloat();
-            for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT)
-                  b.v[i] *= aFloat;
-            // But i cant see it since i use it as string  which is not updated here^^
-            Con::printf("test setting scale on vector: %f,%f,%f,%f",
-                        b.v[0], b.v[1], b.v[2], b.v[3]);
-      }
-      else
-#endif
+// #ifndef TEST_STRUCT_FAST_PATH
+//          // TESTING b cast as a float :P
+//          // ok get parse error and *= is not here so i keep it but it's
+//          // never called.
+//       if ( b.type == ConsoleValueType::cvVector) {
+//             F64 aFloat = a.getFloat();
+//             for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT)
+//                   b.v[i] *= aFloat;
+//             // But i cant see it since i use it as string  which is not updated here^^
+//             Con::printf("test setting scale on vector: %f,%f,%f,%f",
+//                         b.v[0], b.v[1], b.v[2], b.v[3]);
+//       }
+//       else
+// #endif
       stack[_STK - 1].setFloat(a.getFloat() * b.getFloat());
    }
    else if constexpr (Op == FloatOperation::Div)

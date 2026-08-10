@@ -1,7 +1,21 @@
 # Structs
 
+### i guess since i need to change so many parts it's not worth to do it.
+
+A difftent solution would be better than tweaking all OP codes. 
+
+I may define most common PoD types back again, which i can easy use directly 
+when setting / getting data. 
+The downside is every bound software must use them to take
+advantage.
+
+
+---
+
 After i implemented the parser for PoD Stucts: { 1, 2, 3} i also want to get 
 a benefit out of it. 
+
+
 
 The first idea was to expand ConsoleValue to also store at least a struct with 
 four (or more) float values. But the engineType did not deliver enough informations
@@ -18,16 +32,30 @@ Get on echo(): handle_OP_LOADFIELD_STR => SimObject::stackDataField* => Con::get
 
 I need a someting in the field which tells me: Hey i have a nativ setter / getter.
 
+***ideas*** EngineTypeInfo::mTypeFlags new flag: enum EngineTypeFlags 
 
+### EngineTypeNativSetterGetter
+      - mTypeFlags.set( EngineTypeNativSetterGetter );
+
+Functions defined with **ImplementConsoleTypeCasters** ==> **EngineMarshallData**
+      
+      
 But first i want to have to cvVector Type with ConsoleValue in place. While
 implementing it should be handled as string to the others so i work like 
 expected.
 
-Next is to do something like :
-%foo = { 1.0, 2.0}; 
-%echo(%foo.x); // instead of parsing the string it should return the first field 
+```
+testing .. but failed because protected ... 
+void Point2FTest() {
 
-
+    ConsoleBaseType* conType = ConsoleBaseType::getType( TypePoint2F );
+    if (conType) {
+        const EngineTypeInfo* typeInfo =  conType->getTypeInfo();
+        if (typeInfo)
+   **protected**         typeInfo.mTypeFlags.set(EngineTypeNativSetterGetter);
+    }
+}
+```
 
 
 
