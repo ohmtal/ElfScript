@@ -42,6 +42,7 @@
 //-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
 #include "console/consoleTypes.h"
+#include "console/simFieldDictionary.h"
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
 #include "ext/tinyexpr.h"
@@ -107,11 +108,18 @@ public:
     // math (tinyexpr) operation direct access:
     F64 mtX, mtY, mtZ, mtW;
 
+    // -------------------------------------------------------------------------
     PointStorageObject() {
         mX = mY = mZ = mW = 0.f;
         mtX =  mtY = mtZ =  mtW = 0.f;
     }
 
+    // -------------------------------------------------------------------------
+    bool onAdd() override {
+        populate();
+        return Parent::onAdd();
+    }
+    // -------------------------------------------------------------------------
 
     void setStorageSize(U32 size) {
         if ( size <= 1000000) {
@@ -143,6 +151,7 @@ public:
         return Con::getIntArg(object->mPoints.size());
     }
 
+    // -------------------------------------------------------------------------
 
     static void initPersistFields()
     {
@@ -159,6 +168,7 @@ public:
 
     }
 
+    // -------------------------------------------------------------------------
     void setPos(F32 x, F32 y, F32 z, F32 w) {
         mX = x;
         mY = y;
@@ -166,6 +176,7 @@ public:
         mW = w;
     }
 
+    // -------------------------------------------------------------------------
     void setPos(const InternalVector4& vec4) {
         this->mX = vec4.x;
         this->mY = vec4.y;
@@ -174,6 +185,7 @@ public:
     }
 
 
+    // -------------------------------------------------------------------------
     /*
      * applyMathOnPoints
      * - Using tinyexpr
@@ -268,6 +280,8 @@ public:
         return true;
     }
 
+
+    // -------------------------------------------------------------------------
     // // // // **** direct local var access !!!! - i ignore fails here ...***
     // // // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
     // // //     ElfScript::setLocalFloat(varX, mX);
@@ -275,6 +289,120 @@ public:
     // // //     if (varZ) ElfScript::setLocalFloat(varZ, mZ);
     // // //     if (varW) ElfScript::setLocalFloat(varW, mW);
     // // // }
+
+    // -------------------------------------------------------------------------
+    void write(Stream &stream, U32 tabStop, U32 flags) override {
+        // Parent::write >>>>>>>>>>>>>>>>>>>>>>>>>>
+        if( !getCanSave() && !( flags & IgnoreCanSave ) )
+            return;
+
+        // Only output selected objects if they want that.
+        if((flags & SelectedOnly) && !isSelected())
+            return;
+
+        stream.writeTabs(tabStop);
+        char buffer[1024];
+        dSprintf(buffer, sizeof(buffer), "new %s(%s) {\r\n", getClassName(), getName() && !(flags & NoName) ? getName() : "");
+        stream.write(dStrlen(buffer), buffer);
+        writeFields(stream, tabStop + 1);
+
+        // <<<<<<<<<<<<<<<<<<<<<<<< Parent::write
+// mhhhh
+
+        S32 count = this->mPoints.size();
+        dSprintf(buffer, sizeof(buffer), "TypeS32 _populate = %d;\r\n", count); //magic populate ^^
+        stream.writeTabs(tabStop);
+        stream.write(dStrlen(buffer), buffer);
+        for (S32 i = 0; i < count; i++) {
+            InternalVector4 vec4 = this->mPoints[i];
+            dSprintf(buffer, sizeof(buffer), "_p[%d] = { %g, %g, %g, %g};\r\n",i, vec4.x, vec4.y, vec4.z, vec4.w );
+            stream.writeTabs(tabStop);
+            stream.write(dStrlen(buffer), buffer);
+        }
+
+        stream.writeTabs(tabStop);
+        stream.write(4, "};\r\n");
+    }
+
+    // -------------------------------------------------------------------------
+    // set the point in the Point Storage at index by Vector (String)
+    bool setPointVec( U32 index, String strVector ) {
+        if ( index >= this->mPoints.size()) return false;
+        InternalVector4 vec4;
+        dSscanf(strVector.c_str(), "%g %g %g %g",&vec4.x, &vec4.y, &vec4.z, &vec4.w);
+        this->mPoints[index] = vec4;
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // onAdd we check if we need to populate ....
+    void populate() {
+        bool test = false;
+
+        if (test) {
+            Con::printSeparator();
+            Con::printf(" populate [id:%d] >>>>", this->getId());
+        }
+
+        if (this->mPoints.size() == 0) {
+            if (test) Con::warnf("populate with a empty pointStorage!");
+            return;
+        }
+
+        SimFieldDictionary* dict = getFieldDictionary();
+        if (!dict) {
+            if (test) Con::infof(" populate [id:%d] no SimFieldDictionary found...", this->getId());
+            return; //nothing here
+        }
+
+        S32 count =0;
+        StringTableEntry fieldName = nullptr;
+        SimFieldDictionary::Entry* entry = nullptr;
+        fieldName = StringTable->insert( "_populate" );
+        entry = dict->findDynamicField(fieldName);
+        if (!entry) {
+             if (test) Con::printf(" populate [id:%d] no _populate field found!", this->getId());
+            // we have no populate exit here
+            return;
+        }
+        count = entry->mValue.getInt();
+        if (count != this->mPoints.size()) {
+            Con::errorf("Populate [id:%d] failed size missmatch! (%d!=%d)", this->getId(), count, this->mPoints.size());
+            return;
+        }
+        if (test) Con::printf("Populate says we should store %d points.", count);
+        if (!test) dict->setFieldValue(fieldName, nullptr); //pop _populate
+
+        char buffer[128];
+        String vec;
+
+        for (S32 index = 0; index < count; index++) {
+            dSprintf(buffer, sizeof(buffer), "_p%d", index);
+            fieldName = StringTable->insert( buffer ) ;
+            entry = dict->findDynamicField(fieldName);
+            if (!entry) {
+                Con::errorf("populate [id:%d] : No point found at %d", this->getId(), index);
+            } else {
+                vec = entry->mValue.getString();
+                if (test) Con::printf("populate [id:%d] : _p%d = %s", this->getId(), index, vec.c_str());
+                this->setPointVec(index, vec);
+                if (!test) dict->setFieldValue(fieldName, nullptr); // pop _pXX
+            }
+        }
+
+        // getFieldDictionary()->findDynamicField( strFieldName )
+        // if (!isField("_populate", ))
+
+
+        if (test) {
+            Con::printf(" <<<< populate");
+            Con::printf(" <<<< populate [id:%d]", this->getId());
+            Con::printSeparator();
+        }
+    }
+    // -------------------------------------------------------------------------
+
+
 
 };
 

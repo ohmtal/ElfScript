@@ -1,3 +1,11 @@
+
+// FIXME
+//
+function Save() { Pixels.save("test.sto"); }
+function Load() { $_LOADING = true; Pixels.delete(); schedule(0,0,postLoad); }
+function postLoad() { exec("test.sto"); $main.module = Pixels.getId(); $_LOADING = false; }
+//
+
 /*
  � �* Color Sort:
  Pixel Puzzle Color Sort is a relaxing yet challenging logic puzzle game where your goal is to restore order to a corrupted grid of colors. The pixels have been scrambled, and only you can heal the canvas by recreating a perfect color gradient.
@@ -42,18 +50,19 @@ function createPixels(%renderer, %window) {
         TypeColor BottomRight   = {255,150,  0}; //orange
 
         // status
-        TypeS32 BlockSize      = 16; //32 ; //42; //8 .. 42
-        TypeBool  easyColors   = false;
+        TypeS32 BlockSize      = 16; //16; //32 ; //42; //8 .. 42
+        TypeBool  cheatMode   = false; // difficult to see
         TypeS32   shuffleDelay = 2000;
 
         TypeBool  gameWon    = false;
         TypeS32   clickCount = 0;
     };
+    $_LOADING = false;
     return %obj;
 }
 //----------------------------------------------------------------------
 function Pixels::newGame(%this) {
-      %this.gameWon = false;
+      // %this.gameWon = false;
       %this.clickCount = 0;
 
        %this.resetGrid();
@@ -78,7 +87,8 @@ function Pixels::getGridIndexFromMouse(%this, %mouseX, %mouseY) {
 }
 //----------------------------------------------------------------------
 function Pixels::shuffleGrid(%this) {
-    %storage = %this.storage;
+    %this.gameWon = false;
+    %storage = Storage.getId();
     %count = %this.pixelCount;
 
     print("shuffleGrid......");
@@ -108,20 +118,20 @@ function Pixels::shuffleGrid(%this) {
 
 //----------------------------------------------------------------------
 function Pixels::dumpStorage(%this) {
-    for(%i in range %this.Storage.storageSize) {
-        print(formatString("%d: %s", %i, %this.Storage.getPointVec(%i)));
+    for(%i in range Storage.storageSize) {
+        print(formatString("%d: %s", %i, Storage.getPointVec(%i)));
     }
 }
 //----------------------------------------------------------------------
 function Pixels::generateBorderColors(%this) {
 
-    if (%this.easyColors) {
-        %this.TopLeft       = {255, 50,100}; //pink
-        %this.TopRight      = {  0,200,255}; //cyan
-        %this.BottomLeft    = { 80,  0,150}; //violett
-        %this.BottomRight   = {255,150,  0}; //orange
-        return;
-    }
+    // if (%this.easyColors) {
+    //     %this.TopLeft       = {255, 50,100}; //pink
+    //     %this.TopRight      = {  0,200,255}; //cyan
+    //     %this.BottomLeft    = { 80,  0,150}; //violett
+    //     %this.BottomRight   = {255,150,  0}; //orange
+    //     return;
+    // }
 
     %rTL = 200 + getRandom(55);
     %gTL = getRandom(80);
@@ -186,6 +196,9 @@ function Pixels::resetGrid(%this) {
 
     %this.generateBorderColors();
 
+    %storage    = Storage.getId();
+    %solvedStorage    = SolvedStorage.getId();
+
     %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
     %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
     %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
@@ -216,14 +229,17 @@ function Pixels::resetGrid(%this) {
                 %isCorner = 1.0;
             }
 
-            %this.storage.x = %finalR;
-            %this.storage.y = %finalG;
-            %this.storage.z = %finalB;
-            %this.storage.w = %isCorner;
+            %storage.x = %finalR;
+            %storage.y = %finalG;
+            %storage.z = %finalB;
+            %storage.w = %isCorner;
 
-            %this.storage.storePoint(%index);
+            %storage.storePoint(%index);
             %index++;
         }
+    }
+    foreach(%index in range %storage.storageSize) {
+        %solvedStorage.setPointVec(%index, %storage.getPointVec(%index));
     }
 }
 //----------------------------------------------------------------------
@@ -245,15 +261,23 @@ function Pixels::onAdd(%this) {
 
     print("Add: ", %this.pixelCount, " pixels to storage. (Cols: ", %this.cols, ", Rows: ", %this.rows, ")");
 
-    %this.Storage = new PointStorageObject() {
-        storageSize = %this.pixelCount;
-    };
-    %this.add(%this.storage);
-
     %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
 
 
-    %this.newGame();
+    if (! $_LOADING ) {
+
+        %this.add (new PointStorageObject(Storage) {
+            storageSize = %this.pixelCount;
+        });
+
+        %this.add(new PointStorageObject(SolvedStorage) {
+            storageSize = %this.pixelCount;
+        });
+
+        %this.newGame();
+    } else {
+        print(".... skip object create we did load a game ....");
+    }
 
     return true;
 }
@@ -269,7 +293,10 @@ function Pixels::Render(%this) {
     %r = %this.renderer;
     %blockSize  = %this.BlockSize;
     %border     = %this.Border;
-    %storage    = %this.storage;
+    if(!isObject(Storage)) return;
+    %storage    = Storage.getId();
+    %solvedStorage    = SolvedStorage.getId();
+
 
     SDL_SetRenderDrawColor(%r, 125, 125, 145);
     SDL_RenderClear(%r);
@@ -290,23 +317,37 @@ function Pixels::Render(%this) {
 
             %storage.fetchPoint(%index);
 
-            SDL_SetRenderDrawColor(%r, %storage.x, %storage.y, %storage.z);
+
+            if (%index == %this.selectedFirstIndex) {
+                SDL_SetRenderDrawColor(%r, 20, 20, 20);
+            } else {
+                SDL_SetRenderDrawColor(%r, %storage.x, %storage.y, %storage.z);
+            }
             SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, true);
 
-            if (%storage.w == 1.0) {
-                SDL_SetRenderDrawColor(%r, 180, 180, 180);
+            if (%storage.w == 1.0 || %solvedStorage.getPointVec(%index) $= %storage.getPointVec(%index)) {
+                SDL_SetRenderDrawColor(%r, 160,160,160);
                 SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, false);
             } else {
-                if (%index == %this.selectedFirstIndex) {
-                    SDL_SetRenderDrawColor(%r, 0, 255, 0);
-                } else {
-                    SDL_SetRenderDrawColor(%r, 20, 20, 20);
-                }
+
+                    if (%this.cheatMode) {
+                        %solvedStorage.fetchPoint(%index);
+                        SDL_SetRenderDrawColor(%r,%solvedStorage.x, %solvedStorage.y, %solvedStorage.z);
+                    }
+                    else SDL_SetRenderDrawColor(%r, 20, 20, 20);
+
+
                 SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, false);
             }
 
             %index++;
         }
+    }
+
+    if ( %this.selectedFirstIndex >= 0) {
+        %selPo = %storage.getPointVec( %this.selectedFirstIndex);
+        SDL_SetRenderDrawColor(%r, %selPo.x, %selPo.y, %selPo.z);
+        SDL_RenderRectF(%r, SDL_GetMouseX() - %blockSize / 2, SDL_GetMouseY() - %blockSize / 2, %blockSize, %blockSize, true);
     }
 
     SDL_SetRenderDrawColor(%r, 128, 128, 128);
@@ -340,57 +381,70 @@ function Pixels::checkWinCondition(%this) {
 
     %this.clickCount++;
 
-    %storage = %this.storage;
-
-
-    %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
-    %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
-    %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
-    %rBR = %this.BottomRight.r;%gBR = %this.BottomRight.g; %bBR = %this.BottomRight.b;
-
-    %index = 0;
-
-    for (%gridY = 0; %gridY < %this.rows; %gridY++) {
-        %pctY = %gridY / (%this.rows - 1);
-
-        for (%gridX = 0; %gridX < %this.cols; %gridX++) {
-            %pctX = %gridX / (%this.cols - 1);
-
-            %rTop = %rTL + (%rTR - %rTL) * %pctX;
-            %gTop = %gTL + (%gTR - %gTL) * %pctX;
-            %bTop = %bTL + (%bTR - %bTL) * %pctX;
-
-            %rBot = %rBL + (%rBR - %rBL) * %pctX;
-            %gBot = %gBL + (%gBR - %gBL) * %pctX;
-            %bBot = %bBL + (%bBR - %bBL) * %pctX;
-
-            %targetR = mFloor(%rTop + (%rBot - %rTop) * %pctY);
-            %targetG = mFloor(%gTop + (%gBot - %gTop) * %pctY);
-            %targetB = mFloor(%bTop + (%bBot - %bTop) * %pctY);
-
-            %storage.fetchPoint(%index);
-
-            if (%storage.x != %targetR || %storage.y != %targetG || %storage.z != %targetB) {
-                return false;
-            }
-
-            %index++;
-        }
+    %storage = Storage.getId();
+    %solvedStorage    = SolvedStorage.getId();
+    foreach(%index in range %storage.storageSize) {
+        // string compare good idea ?
+        if (%solvedStorage.getPointVec(%index) !$= %storage.getPointVec(%index))
+            return false;
     }
-
-    print("FIXME we did it :)");
     return true;
+
+    // %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
+    // %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
+    // %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
+    // %rBR = %this.BottomRight.r;%gBR = %this.BottomRight.g; %bBR = %this.BottomRight.b;
+    //
+    // %index = 0;
+    //
+    // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+    //     %pctY = %gridY / (%this.rows - 1);
+    //
+    //     for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+    //         %pctX = %gridX / (%this.cols - 1);
+    //
+    //         %rTop = %rTL + (%rTR - %rTL) * %pctX;
+    //         %gTop = %gTL + (%gTR - %gTL) * %pctX;
+    //         %bTop = %bTL + (%bTR - %bTL) * %pctX;
+    //
+    //         %rBot = %rBL + (%rBR - %rBL) * %pctX;
+    //         %gBot = %gBL + (%gBR - %gBL) * %pctX;
+    //         %bBot = %bBL + (%bBR - %bBL) * %pctX;
+    //
+    //         %targetR = mFloor(%rTop + (%rBot - %rTop) * %pctY);
+    //         %targetG = mFloor(%gTop + (%gBot - %gTop) * %pctY);
+    //         %targetB = mFloor(%bTop + (%bBot - %bTop) * %pctY);
+    //
+    //         %storage.fetchPoint(%index);
+    //
+    //         if (%storage.x != %targetR || %storage.y != %targetG || %storage.z != %targetB) {
+    //             return false;
+    //         }
+    //
+    //         %index++;
+    //     }
+    // }
+    //
+    // print("FIXME we did it :)");
+    // return true;
 }
 
 //----------------------------------------------------------------------
 function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
     if (!%isDown) return ;
     switch (%scancode) {
-        case SDL_SCANCODE_SPACE: if (%this.gameWon) %this.newGame(); break;
+        case SDL_SCANCODE_SPACE: if (%this.gameWon) %this.newGame();
     }
 }
 function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (!%isDown) return ;
+
+
+    if (%button == SDL_BUTTON_RIGHT) {
+        %this.selectedFirstIndex = -1;
+        return;
+    }
+    if (%button != SDL_BUTTON_LEFT) return;
 
     if (%this.gameWon) return;
 
@@ -398,9 +452,9 @@ function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (%clickedIndex == -1) return;
 
 
-    %this.storage.fetchPoint(%clickedIndex);
-    if (%this.storage.w == 1.0) {
-        // FIXME fail SOUND
+    %storage = Storage.getId();
+    %solvedStorage = SolvedStorage.getId();
+    if (%storage.getPointW(%clickedIndex) == 1.0) {
         return;
     }
 
@@ -411,22 +465,25 @@ function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
         %idxA = %this.selectedFirstIndex;
         %idxB = %clickedIndex;
 
-        if (%idxA != %idxB) {
-            %this.storage.fetchPoint(%idxA);
-            %rA = %this.storage.x; %gA = %this.storage.y; %bA = %this.storage.z;
-
-            %this.storage.fetchPoint(%idxB);
-            %rB = %this.storage.x; %gB = %this.storage.y; %bB = %this.storage.z;
-
-            %this.storage.x = %rB; %this.storage.y = %gB; %this.storage.z = %bB;
-            %this.storage.storePoint(%idxA);
-
-            %this.storage.x = %rA; %this.storage.y = %gA; %this.storage.z = %bA;
-            %this.storage.storePoint(%idxB);
-
-            // print("Pixel swap: ", %idxA, " with ", %idxB);
-        }
         %this.selectedFirstIndex = -1;
+
+
+
+        if (%idxA != %idxB) {
+            %bucket = %storage.getPointVec(%idxA);
+            %storage.setPointVec(%idxA, %storage.getPointVec(%idxB));
+            %storage.setPointVec(%idxB, %bucket);
+
+            if (
+                %storage.getPointVec(%idxA) $= %solvedStorage.getPointVec(%idxA)
+                || %storage.getPointVec(%idxB) $= %solvedStorage.getPointVec(%idxB)
+            ) {
+                Audio_Play(%this.SndBlop);
+            }
+            // print("Pixel swap: ", %idxA, " with ", %idxB);
+        }  else {
+           return;
+        }
 
         if (%this.checkWinCondition()) {
             Audio_Play(%this.SndBlop);schedule(500,0,Audio_Play,%this.SndBlop);schedule(300,0,Audio_Play,%this.SndBlop);
