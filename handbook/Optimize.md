@@ -165,8 +165,8 @@ There are multiple ways to work with it:
     - same for setPointX(Y/Z/W)(index,value)
 
 - Push / Pull 
-    - pushPoint(index) : copy the base x,y,z,w to storage at index
-    - popPoint(index) : set the base x,y,z,w from the data at storage index
+    - storePoint(index) : copy the base x,y,z,w to storage at index
+    - fetchPoint(index) : set the base x,y,z,w from the data at storage index
         
 From StarField Example ( "....." = other code) :
 
@@ -198,7 +198,7 @@ function StarField::Render(%this) {
     %LocalPointStorage = $pointStorage; // slightly faster
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        %LocalPointStorage.popPoint(%i); // This writes from the point storage to .x,.y,.z
+        %LocalPointStorage.fetchPoint(%i); // This writes from the point storage to .x,.y,.z
 
         // >>>>>>>>>>>>>>>> update point
          %LocalPointStorage.z -= %dt * %speed;
@@ -239,16 +239,16 @@ function StarField::Render(%this) {
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
-        %LocalPointStorage.pushPoint(%i); //this update the point storage from .x,.y,.z
+        %LocalPointStorage.storePoint(%i); //this update the point storage from .x,.y,.z
     }
 ......
 }
 
 ```
 
-In the Loop i do `%LocalPointStorage.popPoint(%i);` now i can work with the base
+In the Loop i do `%LocalPointStorage.fetchPoint(%i);` now i can work with the base
 fields of the PointStorage(*1) .x,.y.z. At the end i write it back to the
-index %i: `%LocalPointStorage.pushPoint(%i);`.
+index %i: `%LocalPointStorage.storePoint(%i);`.
 
 
 (*1) transfer to local variables with getX/Y/Z and a setPoint to writeback is 

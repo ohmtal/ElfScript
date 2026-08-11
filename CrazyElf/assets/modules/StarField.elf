@@ -62,36 +62,30 @@ function StarField::OnAdd(%this) {
     }
 
 
-    setWindowSize(800,450);
+    // setWindowSize(800,450);
     // SetTargetFPS(0);
-    setVSync(0);
+    // setVSync(0);
+    // SDL_SetRenderVSync(1,0);
 
     return true;
 }
 // -----------------------------------------------------------------------------
 function StarField::onRemove(%this) {
   // SetTargetFPS(60);
-    setVSync(1);
+    // setVSync(1);
 }
 
 // -----------------------------------------------------------------------------
 function StarField::Render(%this) {
 
-    // dont like that string compare here ^^
-    // nailed by main with scale
-    // if (%this.screenSize !$= GetScreenSize()) {
-    //     %this.updateSize();
-    // }
-
-     // %dt = GetFrameTime();
      %dt = $Global::FrameTime;
+    %renderer = $Main.renderer;
 
+     SDL_SetRenderDrawColor(%renderer, 20, 20, 60);
+     SDL_RenderClear(%renderer);
 
-
-    // %startDiv = 0.03125; // as constant START_DIV << 1.0 / 32.0;
     %drawLines = %this.drawLines;
 
-    %renderer = 1; //%this.renderer; - BaseElf using default == 1
     %speed = %this.speed;
     SDL_SetRenderDrawColor(%renderer, 255,255,255);
 
@@ -101,7 +95,7 @@ function StarField::Render(%this) {
     for( %i in range STAR_COUNT )
     {
         // one call more but maybe faster because we have only one funtion call
-        %lStarPoints.popPoint(%i);
+        %lStarPoints.fetchPoint(%i);
         %pointX = %lStarPoints.x;
         %pointY = %lStarPoints.y;
         // %pointZ = %lStarPoints.z; <<<< later
@@ -156,52 +150,6 @@ function StarField::Render(%this) {
     }
 
 
-
-    // // using fields
-    // for(%i in range STAR_COUNT )
-    // {
-    //     %lStarPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
-    //
-    //     // >>>>>>>>>>>>>>>> update point
-    //      %lStarPoints.z -= %dt * %speed;
-    //
-    //     // Calculate the screen position
-    //     %invZ = 1.0 /  %lStarPoints.z;
-    //     %screenPos_X = $hW + (%lStarPoints.x * %invZ);
-    //     %screenPos_Y = $hH + (%lStarPoints.y * %invZ);
-    //
-    //     if ( %lStarPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
-    //          || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
-    //     {
-    //
-    //         %lStarPoints.setPos(GetRandomF($minH, $maxH), GetRandomF($minH, $maxH), 1.0);
-    //         %screenPos_X = $hW +  %lStarPoints.x;
-    //         %screenPos_Y = $hH +  %lStarPoints.y;
-    //     }
-    //     // <<<<<<<<<<<<<<<<<<<<<
-    //     if (%drawLines)
-    //     {
-    //         %t = mClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
-    //
-    //         if ( (%t - %lStarPoints.z) > 1e-3)
-    //         {
-    //             %invT = 1.0 / %t;
-    //             %startX = $hW + ( %lStarPoints.x * %invT);
-    //             %startY = $hH + (  %lStarPoints.y * %invT);
-    //
-    //             // DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, RAYWHITE);
-    //             SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
-    //         }
-    //     }
-    //     else
-    //     {
-    //         %radius = mLerp(3.0, 1.0, %lStarPoints.z);
-    //         // DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
-    //         SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
-    //     }
-    //
-    //     %lStarPoints.pushPoint(%i); //this update the point storage from .x,.y,.z
-    // }
 
 
     %fontScale = 0.7;

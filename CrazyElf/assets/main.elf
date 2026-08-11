@@ -1,5 +1,16 @@
-$MODULES = "NativSDL blank StarField";
+$MODULES = "NativSDL blank StarField Pixels";
 
+//------------------------------------------------------------------------------
+$Global::ScreenSize = {320,200};
+$Global::FPS = 60; //initial - not a limit
+$Global::FrameTime = 0; //initial - not a limit
+$Global::FullScreen = 0; //initial
+$Global::VSync = 1; //initial
+//------------------------------------------------------------------------------
+function GetFrameTime() { return $Global::FrameTime; }
+function GetFPS() { return $Global::FPS; }
+function ToggleFullScreen() { $Global::FullScreen = !$Global::FullScreen; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
+function ToggleVSync() { $Global::VSync = !$Global::VSync; SDL_SetRenderVSync($Main.renderer, $Global::VSync); }
 //------------------------------------------------------------------------------
 function Main::init(%this) {
 
@@ -106,10 +117,10 @@ function Main::DrawText(%this, %x, %y, %text, %scale=1.0, %colorStr, %shadow, %s
 function Main::Render(%this) {
 
 
-    // set the background color
-    SDL_SetRenderDrawColor(%this.renderer, 15,15,30);
-    // clear the screen
-    SDL_RenderClear(%this.renderer);
+    // set the background color  <<< let the module do this!!!
+    // SDL_SetRenderDrawColor(%this.renderer, 15,15,30);
+    // // clear the screen
+    // SDL_RenderClear(%this.renderer);
 
 
     // we scale the screen (setScreenSize) so we have to use out ScreenSize not windowSize
@@ -129,7 +140,7 @@ function Main::Render(%this) {
 
 
     // %this.DrawText(2,2, { $Global::FPS , "FPS", $Global::FrameTime}, 0.8);
-    %this.DrawText(2,2, { $Global::FPS , "FPS" }, 0.8);
+    %this.DrawText(2,2, { $Global::FPS , "FPS" }, 0.5);
 
     // %this.DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module.", 1.5,  "200 200 180", true, SLATEGRAY);
     //
@@ -184,6 +195,10 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
     %shift =  (%modifiers & SDL_KMOD_SHIFT);
 
     if (%isDown) {
+        if (%scancode == SDL_SCANCODE_RETURN && %alt) ToggleFullScreen();
+
+        if (%scancode == SDL_SCANCODE_HOME) ToggleVSync();
+
         if (%scancode == SDL_SCANCODE_R && %ctrl) {
             echo("Shortcut detected! Reload");
             rl();
@@ -215,7 +230,7 @@ function updateDocu() {
     %file = "script_stub.elf";
     // exportConsoleDocu( String fileName, bool humanreadable=false, bool append=false, bool dumpScript=true, bool dumpEngine=true )
 
-    if (exportConsoleDocu(%file, true, false, false, true))
+    if (exportConsoleDocu(%file, false, false, false, true))
     {
         echo ("Docu exported to:" SPC %file);
         echo ("- In vim you can simple open it alongside the other file to use autocomplete");
@@ -231,7 +246,6 @@ function updateDocu() {
 // -----------------------------------------------------------------------------
 
 // scale to 320x200 ^^
-$Global::ScreenSize = {320,200};
 $WindowSize = {640,400};
 
 $running = onInit();
@@ -246,7 +260,7 @@ echo("************** %main: ", %main, " RUNNUNG: ", $running);
 
 %fpsTimer = 0.0;
 %frameCounter = 0;
-$Global::FPS = 60; //initial
+
 
 // we only need to push the renderer if we scaled the screen....
 %mainLoopParam = %main.scaledScreen ? %main.renderer : 0;

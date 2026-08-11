@@ -1,0 +1,428 @@
+/*
+ � �* Chroma Sort:
+ Pixel PuzzleChroma Sort is a relaxing yet challenging logic puzzle game where your goal is to restore order to a corrupted grid of colors. The pixels have been scrambled, and only you can heal the canvas by recreating a perfect color gradient.
+
+ 🕹️ ObjectiveRearrange the scrambled color pixels so they form a perfectly smooth, seamless transition (gradient) between the four fixed corner tiles.
+
+ 📖 How to Play
+
+ 1. Spot the Anchor Points (Fixed Corners)
+ - Look for the four corner pixels on the grid.
+ - These tiles are marked with a glowing white border ⬜.
+ - Important: These corners are permanently fixed in their correct positions. They cannot be clicked, moved, or swapped. Use them as your ultimate guide!
+
+ 2. Swap Pixels to Restore the CanvasLeft
+ - Click on any standard pixel to select it. It will be highlighted with a blue border 🟦.
+ - Left-Click on a second pixel to swap their positions and colors.Strategically move the colors closer to their matching corners (e.g., drag reddish pixels toward the pink corner, cyan pixels toward the blue corner).
+
+ 3. Win the Game
+ - The puzzle is solved the exact moment every single pixel is back in its mathematically correct position.
+ - Once the grid forms a flawlessly smooth color blanket, you win!
+
+ ⚙️ Difficulty Levels
+
+ You can adjust the difficulty of the puzzle by changing the Block Size:
+
+ - Easy Mode (Large Blocks): Perfect for a quick, relaxing session. The colors automatically shift into a soft, gentle pastel palette, making it easier on the eyes and faster to solve.
+ - Hard Mode (Small Blocks): The ultimate challenge. A massive grid filled with high-contrast, vibrant colors that will truly test your perception of color nuances.
+ */
+//----------------------------------------------------------------------
+function createPixels(%renderer, %window) {
+    %obj = new ScriptGroup(Pixels) {
+        TypeS32 renderer    = %renderer;
+        TypeS32 window      = %window;
+
+        TypeS32 CanvasW     = $Global::ScreenSize.x - 32;
+        TypeS32 CanvasH     = $Global::ScreenSize.y - 32;
+        TypeS32 Border      = 32;
+        TypeS32 selectedFirstIndex = -1;
+        TypeColor TopLeft       = {255, 50,100}; //pink
+        TypeColor TopRight      = {  0,200,255}; //cyan
+        TypeColor BottomLeft    = { 80,  0,150}; //violett
+        TypeColor BottomRight   = {255,150,  0}; //orange
+
+        // status
+        TypeS32 BlockSize      = 42; //8 .. 42
+        TypeBool  easyColors   = false;
+        TypeS32   shuffleDelay = 2000;
+
+        TypeBool  gameWon    = false;
+        TypeS32   clickCount = 0;
+    };
+    return %obj;
+}
+//----------------------------------------------------------------------
+function Pixels::newGame(%this) {
+      %this.gameWon = false;
+      %this.clickCount = 0;
+
+       %this.resetGrid();
+
+      %this.schedule(%this.shuffleDelay,shuffleGrid);
+}
+//----------------------------------------------------------------------
+function Pixels::getGridIndexFromMouse(%this, %mouseX, %mouseY) {
+    %border = %this.Border;
+    %blockSize = %this.BlockSize;
+
+    if (%mouseX < %border || %mouseX >= %this.CanvasW) return -1;
+    if (%mouseY < %border || %mouseY >= %this.CanvasH) return -1;
+
+    %gridX = mFloor((%mouseX - %border) / %blockSize);
+    %gridY = mFloor((%mouseY - %border) / %blockSize);
+
+    %cols = (%this.CanvasW - %border) / %blockSize;
+
+    %index = (%gridY * %cols) + %gridX;
+    return %index;
+}
+//----------------------------------------------------------------------
+function Pixels::shuffleGrid(%this) {
+    %storage = %this.storage;
+    %count = %this.pixelCount;
+
+    print("shuffleGrid......");
+
+    for (%i in %count - 1 .. 0 step -1) {
+        %storage.fetchPoint(%i);
+        if (%storage.w == 1.0) continue; // skip
+        %rA = %storage.x; %gA = %storage.y; %bA = %storage.z; %wA = %storage.w;
+
+        %j = getRandom(%i);
+
+        %storage.fetchPoint(%j);
+        if (%storage.w == 1.0) continue;
+
+        %rB = %storage.x; %gB = %storage.y; %bB = %storage.z; %wB = %storage.w;
+
+        %storage.x = %rB; %storage.y = %gB; %storage.z = %bB; %storage.w = %wB;
+        %storage.storePoint(%i);
+
+        %storage.x = %rA; %storage.y = %gA; %storage.z = %bA; %storage.w = %wA;
+        %storage.storePoint(%j);
+    }
+
+    Audio_Play(%this.SndBlop);
+    print("shuffle done");
+}
+
+//----------------------------------------------------------------------
+function Pixels::dumpStorage(%this) {
+    for(%i in range %this.Storage.storageSize) {
+        print(formatString("%d: %s", %i, %this.Storage.getPointVec(%i)));
+    }
+}
+//----------------------------------------------------------------------
+function Pixels::generateBorderColors(%this) {
+
+    if (%this.easyColors) {
+        %this.TopLeft       = {255, 50,100}; //pink
+        %this.TopRight      = {  0,200,255}; //cyan
+        %this.BottomLeft    = { 80,  0,150}; //violett
+        %this.BottomRight   = {255,150,  0}; //orange
+        return;
+    }
+
+    %rTL = 200 + getRandom(55);
+    %gTL = getRandom(80);
+    %bTL = getRandom(120);
+    %this.TopLeft = { %rTL, %gTL, %bTL };
+
+    %rTR = getRandom(80);
+    %gTR = 200 + getRandom(55);
+    %bTR = 100 + getRandom(155);
+    %this.TopRight = { %rTR, %gTR, %bTR };
+
+    %rBL = 50 + getRandom(100);
+    %gBL = getRandom(60);
+    %bBL = 200 + getRandom(55);
+    %this.BottomLeft = { %rBL, %gBL, %bBL };
+
+    %rBR = 200 + getRandom(55);
+    %gBR = 120 + getRandom(100);
+    %bBR = getRandom(60);
+    %this.BottomRight = { %rBR, %gBR, %bBR };
+
+
+    // %midR = 128; %midG = 128; %midB = 128;
+    //
+    // // %contrastFactor = 8 / %this.BlockSize;
+    // %contrastFactor = 32 / %this.BlockSize;
+    // echo("%contrastFactor is ", %contrastFactor);
+    // if (%contrastFactor > 1.0) %contrastFactor = 1.0;
+    //
+    //
+    //
+    // // top left
+    // %rTL = mFloor(%midR + (255 - %midR) * %contrastFactor);
+    // %gTL = mFloor(%midG + (50  - %midG) * %contrastFactor);
+    // %bTL = mFloor(%midB + (100 - %midB) * %contrastFactor);
+    //
+    // %this.TopLeft = { %rTL, %gTL, %bTL };
+    //
+    // // top right
+    // %rTR = mFloor(%midR + (0   - %midR) * %contrastFactor);
+    // %gTR = mFloor(%midG + (200 - %midG) * %contrastFactor);
+    // %bTR = mFloor(%midB + (255 - %midB) * %contrastFactor);
+    //
+    // %this.TopRight = { %rTR, %gTR, %bTR };
+    //
+    // // bottom left
+    // %rBL = mFloor(%midR + (80  - %midR) * %contrastFactor);
+    // %gBL = mFloor(%midG + (0   - %midG) * %contrastFactor);
+    // %bBL = mFloor(%midB + (150 - %midB) * %contrastFactor);
+    //
+    // %this.BottomLeft = { %rBL, %gBL, %bBL };
+    //
+    // // bottom right
+    // %rBR = mFloor(%midR + (255 - %midR) * %contrastFactor);
+    // %gBR = mFloor(%midG + (150 - %midG) * %contrastFactor);
+    // %bBR = mFloor(%midB + (0   - %midB) * %contrastFactor);
+    //
+    // %this.BottomRight = { %rBR, %gBR, %bBR };
+}
+//----------------------------------------------------------------------
+function Pixels::resetGrid(%this) {
+
+    %this.generateBorderColors();
+
+    %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
+    %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
+    %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
+    %rBR = %this.BottomRight.r;%gBR = %this.BottomRight.g; %bBR = %this.BottomRight.b;
+
+    %index = 0;
+
+    for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+        %pctY = %gridY / (%this.rows - 1);
+
+        for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+            %pctX = %gridX / (%this.cols - 1);
+
+            %rTop = %rTL + (%rTR - %rTL) * %pctX;
+            %gTop = %gTL + (%gTR - %gTL) * %pctX;
+            %bTop = %bTL + (%bTR - %bTL) * %pctX;
+
+            %rBot = %rBL + (%rBR - %rBL) * %pctX;
+            %gBot = %gBL + (%gBR - %gBL) * %pctX;
+            %bBot = %bBL + (%bBR - %bBL) * %pctX;
+
+            %finalR = mFloor(%rTop + (%rBot - %rTop) * %pctY);
+            %finalG = mFloor(%gTop + (%gBot - %gTop) * %pctY);
+            %finalB = mFloor(%bTop + (%bBot - %bTop) * %pctY);
+
+            %isCorner = 0.0;
+            if ((%gridX == 0 || %gridX == %this.cols - 1) && (%gridY == 0 || %gridY == %this.rows - 1)) {
+                %isCorner = 1.0;
+            }
+
+            %this.storage.x = %finalR;
+            %this.storage.y = %finalG;
+            %this.storage.z = %finalB;
+            %this.storage.w = %isCorner;
+
+            %this.storage.storePoint(%index);
+            %index++;
+        }
+    }
+}
+//----------------------------------------------------------------------
+function Pixels::onAdd(%this) {
+    %w = %this.CanvasW;
+    %h = %this.CanvasH;
+    %border = %this.Border;
+    %blockSize = %this.BlockSize;
+
+    %this.CanvasBackGroundRect = { %border - 2, %border - 2, %w - %border + 4, %h - %border + 4 };
+    %this.CanvasBordeRect = { %border - 1, %border - 1, %w - %border + 2, %h - %border + 2 };
+    %this.HeaderRect = { %border - 4, 0, %w - %border + 8, %border - 4 };
+
+    %this.cols = mFloor((%w - %border) / %blockSize);
+    %this.rows = mFloor((%h - %border) / %blockSize);
+    %this.pixelCount = %this.cols * %this.rows;
+
+    print("Add: ", %this.pixelCount, " pixels to storage. (Cols: ", %this.cols, ", Rows: ", %this.rows, ")");
+
+    %this.Storage = new PointStorageObject() {
+        storageSize = %this.pixelCount;
+    };
+    %this.add(%this.storage);
+
+    %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
+
+
+    %this.newGame();
+
+    return true;
+}
+
+//----------------------------------------------------------------------
+function Pixels::OnRemove(%this) {
+    Audio_UnLoadWav(%this.SndBlop);
+}
+//----------------------------------------------------------------------
+function Pixels::Render(%this) {
+    if (!%this.renderer) return;
+
+    %r = %this.renderer;
+    %blockSize  = %this.BlockSize;
+    %border     = %this.Border;
+    %storage    = %this.storage;
+
+    SDL_SetRenderDrawColor(%r, 125, 125, 145);
+    SDL_RenderClear(%r);
+
+    SDL_SetRenderDrawColor(%r, 60, 60, 60);
+    SDL_RenderFillRect(%r, %this.CanvasBackGroundRect);
+
+    %index = 0;
+    // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+    for ( %gridY in range  %this.rows) {
+        %y = %border + (%gridY * %blockSize);
+
+        // for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+        for (%gridX in range %this.cols) {
+            %x = %border + (%gridX * %blockSize);
+
+            %storage.fetchPoint(%index);
+
+            SDL_SetRenderDrawColor(%r, %storage.x, %storage.y, %storage.z);
+            SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, true);
+
+            if (%storage.w == 1.0) {
+                SDL_SetRenderDrawColor(%r, 180, 180, 180);
+                SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, false);
+            } else {
+                if (%index == %this.selectedFirstIndex) {
+                    SDL_SetRenderDrawColor(%r, 0, 255, 0);
+                } else {
+                    SDL_SetRenderDrawColor(%r, 20, 20, 20);
+                }
+                SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, false);
+            }
+
+            %index++;
+        }
+    }
+
+    SDL_SetRenderDrawColor(%r, 128, 128, 128);
+    SDL_RenderRect(%r, %this.CanvasBordeRect);
+
+
+
+    // Write scaled text with a top and bottom line
+    SDL_SetRenderDrawColor(%r, 28, 28, 28);
+    SDL_RenderFillRect(%r, %this.HeaderRect);
+    SDL_SetRenderDrawColor(%r, 128,20,255);
+    SDL_RenderLine(%r, %border, 2, $Global::ScreenSize.x - %border, 2);
+    %scale = 0.9;
+    SDL_SetRenderScale(%r, %scale, %scale);
+    SDL_RenderDebugText(%r, 30 / %scale, 10 / %scale, "Chroma Sort");
+    %scale = 0.6;
+    SDL_SetRenderDrawColor(%r, 128,20,255);
+    SDL_SetRenderScale(%r, %scale, %scale);
+    SDL_RenderDebugText(%r, 140 / %scale, 08 / %scale, "Clicks:" SPC %this.clickCount);
+    SDL_RenderDebugText(%r, 140 / %scale, 18 / %scale, "Size  :" SPC %this.blockSize);
+    SDL_RenderDebugText(%r, 220 / %scale, 13 / %scale, "WON*  :" SPC %this.gameWon);
+    SDL_SetRenderScale(%r); //reset
+    SDL_RenderLine(%r, %border, %border - 6 , $Global::ScreenSize.x - %border, %border -6 );
+
+    //----- reset color .......
+    SDL_SetRenderDrawColor(%r, 255, 255, 255);
+}
+
+//----------------------------------------------------------------------
+function Pixels::checkWinCondition(%this) {
+
+    %this.clickCount++;
+
+    %storage = %this.storage;
+
+
+    %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
+    %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
+    %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
+    %rBR = %this.BottomRight.r;%gBR = %this.BottomRight.g; %bBR = %this.BottomRight.b;
+
+    %index = 0;
+
+    for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+        %pctY = %gridY / (%this.rows - 1);
+
+        for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+            %pctX = %gridX / (%this.cols - 1);
+
+            %rTop = %rTL + (%rTR - %rTL) * %pctX;
+            %gTop = %gTL + (%gTR - %gTL) * %pctX;
+            %bTop = %bTL + (%bTR - %bTL) * %pctX;
+
+            %rBot = %rBL + (%rBR - %rBL) * %pctX;
+            %gBot = %gBL + (%gBR - %gBL) * %pctX;
+            %bBot = %bBL + (%bBR - %bBL) * %pctX;
+
+            %targetR = mFloor(%rTop + (%rBot - %rTop) * %pctY);
+            %targetG = mFloor(%gTop + (%gBot - %gTop) * %pctY);
+            %targetB = mFloor(%bTop + (%bBot - %bTop) * %pctY);
+
+            %storage.fetchPoint(%index);
+
+            if (%storage.x != %targetR || %storage.y != %targetG || %storage.z != %targetB) {
+                return false;
+            }
+
+            %index++;
+        }
+    }
+
+    print("FIXME we did it :)");
+    return true;
+}
+
+//----------------------------------------------------------------------
+function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
+    if (!%isDown) return ;
+
+    if (%this.gameWon) return;
+
+    %clickedIndex = %this.getGridIndexFromMouse(%x, %y);
+    if (%clickedIndex == -1) return;
+
+
+    %this.storage.fetchPoint(%clickedIndex);
+    if (%this.storage.w == 1.0) {
+        // FIXME fail SOUND
+        return;
+    }
+
+    if (%this.selectedFirstIndex == -1) {
+        %this.selectedFirstIndex = %clickedIndex;
+        // print("first pixel at index: ", %clickedIndex);
+    } else {
+        %idxA = %this.selectedFirstIndex;
+        %idxB = %clickedIndex;
+
+        if (%idxA != %idxB) {
+            %this.storage.fetchPoint(%idxA);
+            %rA = %this.storage.x; %gA = %this.storage.y; %bA = %this.storage.z;
+
+            %this.storage.fetchPoint(%idxB);
+            %rB = %this.storage.x; %gB = %this.storage.y; %bB = %this.storage.z;
+
+            %this.storage.x = %rB; %this.storage.y = %gB; %this.storage.z = %bB;
+            %this.storage.storePoint(%idxA);
+
+            %this.storage.x = %rA; %this.storage.y = %gA; %this.storage.z = %bA;
+            %this.storage.storePoint(%idxB);
+
+            // print("Pixel swap: ", %idxA, " with ", %idxB);
+        }
+        %this.selectedFirstIndex = -1;
+
+        if (%this.checkWinCondition()) {
+            Audio_Play(%this.SndBlop);schedule(500,0,Audio_Play,%this.SndBlop);schedule(300,0,Audio_Play,%this.SndBlop);
+            %this.gameWon = true;
+        }
+    }
+}
+function  Pixels::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

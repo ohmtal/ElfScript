@@ -208,7 +208,7 @@ function rl() {
 function updateDocu() {
     %file = "script_stub.elf";
 
-    if (exportConsoleDocu(%file, true, false, false, true))
+    if (exportConsoleDocu(%file, false, false, false, true))
     {
         echo ("Docu exported to:" SPC %file);
         echo ("- In vim you can simple open it alongside the other file to use autocomplete");

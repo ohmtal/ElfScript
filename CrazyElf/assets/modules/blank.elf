@@ -17,6 +17,8 @@ function Blank::OnRemove(%this) { }
 //----------------------------------------------------------------------
 function Blank::Render(%this) {
     if (!%this.renderer) return;
+    SDL_SetRenderDrawColor(%this.renderer, 60, 20, 60);
+    SDL_RenderClear(%this.renderer);
 
     SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
     SDL_RenderDebugText(%this.renderer, 10, 10, " Module Template");

@@ -23,7 +23,7 @@
 //     sto.setPointVec(0,{10,20,30,40});
 //     print(sto.getPointVec(0));
 // set the current x,y,z,w values from the storage at index 0
-//     sto.popPoint(0);
+//     sto.fetchPoint(0);
 //     sto.dumpFields();
 // modify y
 //     sto.y = 66.67;
@@ -37,7 +37,7 @@
 //     print(sto.getPointVec(1));
 // for (%i = 0; %i < 1000; %i++) { sto.setPoint(%i, getRandomF(1.0),getRandomF(1.0),getRandomF(1.0),getRandomF(1.0)); } echo("DONE!");
 // for (%i = 0; %i < 1000; %i++) { print("#",%i SPC sto.getPointVec(%i)); }
-// for (%i = 0; %i < 1000; %i++) { sto.popPoint(%i); echo("#",%i SPC sto.x SPC sto.y SPC sto.width SPC sto.height); }
+// for (%i = 0; %i < 1000; %i++) { sto.fetchPoint(%i); echo("#",%i SPC sto.x SPC sto.y SPC sto.width SPC sto.height); }
 // for (%i = 0; %i < 1000; %i++) { echo(sto.getPointx(%i) SPC sto.getPointy(%i) SPC sto.getPointz(%i) SPC sto.getPointw(%i)); }
 //-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
@@ -99,8 +99,8 @@ public:
      * property pointSize set/get the size of this vector to speed up access
      *          i fo not use push at mPoints this should be pretty fast
      * setPoint store x,y at a index in this vector
-     * pushPoint
-     * popPoint
+     * storePoint
+     * fetchPoint
      */
     Vector<InternalVector4> mPoints;
 
@@ -398,8 +398,8 @@ DefineEngineMethod(PointStorageObject, setPoint2Vec, bool, ( U32 index, String s
     return true;
 }
 // ---------- mPoints storage from/to objects position ----------
-DefineEngineMethod(PointStorageObject, pushPoint, bool, (U32 index), ,
-                   "push the current values x,y,z,w, to the point storage") {
+DefineEngineMethod(PointStorageObject, storePoint, bool, (U32 index), ,
+                   "store the current values x,y,z,w, to the point storage") {
     if ( index >= object->mPoints.size()) return false;
 
     object->mPoints[index] = { object->mX, object->mY, object->mZ, object->mW};
@@ -407,8 +407,8 @@ DefineEngineMethod(PointStorageObject, pushPoint, bool, (U32 index), ,
     return true;
 }
 
-DefineEngineMethod(PointStorageObject, popPoint, bool, (U32 index), ,
-                   "pop the point from the point storage at index to the current values x,y,z,w") {
+DefineEngineMethod(PointStorageObject, fetchPoint, bool, (U32 index), ,
+                   "fetch the point from the point storage at index to the current values x,y,z,w") {
     if ( index >= object->mPoints.size()) return false;
 
     object->setPos( object->mPoints[index] );

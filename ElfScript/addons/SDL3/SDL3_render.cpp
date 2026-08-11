@@ -334,7 +334,15 @@ DefineEngineFunction( SDL_SetWindowResizable, bool, (S32 WindowID, bool resizabl
 // extern SDL_DECLSPEC bool SDLCALL SDL_MaximizeWindow(SDL_Window *window);
 // extern SDL_DECLSPEC bool SDLCALL SDL_MinimizeWindow(SDL_Window *window);
 // extern SDL_DECLSPEC bool SDLCALL SDL_RestoreWindow(SDL_Window *window);
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFullscreen(SDL_Window *window, bool fullscreen);
+DefineEngineFunction( SDL_SetWindowFullscreen, bool, (S32 WindowID, bool fullscreen), ,"Set fullscreen") {
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return "";
+
+    return SDL_SetWindowFullscreen(window, fullscreen);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SyncWindow(SDL_Window *window);
 // extern SDL_DECLSPEC bool SDLCALL SDL_WindowHasSurface(SDL_Window *window);
 // extern SDL_DECLSPEC SDL_Surface * SDLCALL SDL_GetWindowSurface(SDL_Window *window);
@@ -629,7 +637,16 @@ DefineEngineFunction(SDL_RenderClear, bool , (S32 rendererID),
 
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderPoint(SDL_Renderer *renderer, float x, float y);
+DefineEngineFunction(SDL_RenderPoint, bool , (S32 rendererID, F32 x, F32 y),
+                     ,"render a Point") {
+    SDL_Renderer* renderer = getRendererByID(rendererID);
+    if (!renderer) return false;
+
+    return SDL_RenderPoint(renderer, x, y);
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderPoints(SDL_Renderer *renderer, const SDL_FPoint *points, int count);
+
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderLine(SDL_Renderer *renderer, float x1, float y1, float x2, float y2);
 DefineEngineFunction(SDL_RenderLine, bool , (S32 rendererID, F32 x1, F32 y1, F32 x2, F32 y2),

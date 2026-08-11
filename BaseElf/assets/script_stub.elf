@@ -359,6 +359,12 @@ class  SimObject {
     * @return const char*
     */
       function getField( int index );
+   /** --- ArrayObject* getDebugInfo ---
+    * Return some behind-the-scenes information on the object.
+    * @return An ArrayObject filled with internal information about the object.
+    * @return ArrayObject*
+    */
+      function getDebugInfo();
    /** --- void dumpFields ---
     * Dump a description of all fields defined on this object to the console.
     * @param detailed Whether to print detailed information about members.
@@ -438,6 +444,177 @@ class  SimObject {
    
     */
    pid persistentId;
+};
+class  SpriteBaseObject : public SimObject {
+  public:
+   /** --- void CenterCenterPoint ---
+    * center the centerPoint inside the dstRect
+    */
+      function CenterCenterPoint();
+   /** --- void colorFromHSV ---
+    * Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
+    */
+      function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+   Rect on Texture.
+   
+    */
+   RectF srcRect;
+   /*!
+    */
+   float srcX;
+   /*!
+    */
+   float srcY;
+   /*!
+    */
+   float srcWidth;
+   /*!
+    */
+   float srcHeight;
+   /*!
+   Rect on Render Target.
+   
+    */
+   RectF dstRect;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float width;
+   /*!
+    */
+   float height;
+   /*!
+   Rotation Angle on Render Target (degree)
+   
+    */
+   float angle;
+   /*!
+   The Centerpoit of the Rotation - when angle is set.
+   
+    */
+   Point2F centerPoint;
+   /*!
+   Flip mode on Render Target 0..3, see also SDL_FlipMode
+   
+    */
+   int flip;
+   /*!
+   Color in Byte representation default WHITE = 255 255 255 255
+   
+    */
+   Color color;
+   /*!
+    */
+   char r;
+   /*!
+    */
+   char g;
+   /*!
+    */
+   char b;
+   /*!
+    */
+   char a;
+   /*!
+   Flag for Rendering with SpriteGroup or manually checked.
+   
+    */
+   bool visible;
+   /*!
+   Translated rect when using camera translate
+   
+    */
+   RectF ScreenRect;
+   /*!
+   Translated point when using camera translate
+   
+    */
+   Point2F ScreenCenterPoint;
+};
+class  SpriteObject : public SpriteBaseObject {
+  public:
+   /** --- Point2F getCenter2F ---
+    * get the center point
+    * @return Point2F
+    */
+      function getCenter2F();
+   /** --- bool Draw ---
+    * Draw the Texture
+    * @return bool
+    */
+      function Draw( uint camera2DObjectId=0 );
+   /** --- void moveLinear ---
+    * Move Linear by velocity
+    */
+      function moveLinear( float dt=-1.f );
+   /** --- void moveGravity ---
+    * Move with gravity acceleration default: 0,9.81
+    */
+      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float dt=-1.f );
+   /** --- void moveOrbital ---
+    * Orbital Movement around ankerPoint
+    */
+      function moveOrbital( Point2F ankerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f, float dt=-1.f );
+   /** --- bool solveCollideLine ---
+    * check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)
+    * @return bool
+    */
+      function solveCollideLine( RectF linePoints, float bounceStrength=0.2f );
+   /** --- bool solveCollideRect ---
+    * Check collide and move out
+    * @return bool
+    */
+      function solveCollideRect( RectF otherRect, bool stopMovement=false );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+   velocity as point see also veloX veloY
+   
+    */
+   Point2F velocity;
+   /*!
+   X velocity
+   
+    */
+   float veloX;
+   /*!
+   Y velocity
+   
+    */
+   float veloY;
+   /*!
+   Layer of the Sprite. 
+   
+    */
+   uint layer;
+   /*!
+   SDL_BLENDMODE_ overwrite the Texture blendmode
+default SDL_BLENDMODE_INVALID => not overwritten
+   
+    */
+   uint blendMode;
+   /*!
+   Id of the Texture Object. Must be set after loading from file. The id is not persistent!
+   
+    */
+   uint textureObjectId;
+   /*!
+   optional Texturename
+   
+    */
+   string textureName;
 };
 /*!
 @brief A collection of SimObjects.
@@ -618,6 +795,141 @@ class  SimGroup : public SimSet {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  TextureObject : public SimGroup {
+  public:
+   /** --- bool load ---
+    * Load a Texture
+    * @return bool
+    */
+      function load( string fileName );
+   /** --- Point2I getSize ---
+    * get the width and height of the loaded texture
+    * @return Point2I
+    */
+      function getSize();
+   /** --- RectF getAtlasRect ---
+    * get the rectangle on a atlas texture for a given index
+    * @return RectF
+    */
+      function getAtlasRect( int colCount, int rowCount, int index );
+   /** --- bool DrawRotatedSrcDstRect ---
+    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawRect ---
+    * Draw a texture with source and destination rect
+    * @return bool
+    */
+      function DrawRect( RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawSrcDstRect ---
+    * Draw a the texture from srcRect to dstRect
+    * @return bool
+    */
+      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawCentered ---
+    * Draw the texture centered at the position
+    * @return bool
+    */
+      function DrawCentered( float x, float y, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool DrawRotatedCentered ---
+    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
+    * @return bool
+    */
+      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
+   /** --- bool SaveImage ---
+    * Save the current texture image as png or bmp.
+    * @return bool
+    */
+      function SaveImage( string fileName, bool asPNG=true );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   string fileName;
+   /*!
+    */
+   uint blendMode;
+};
+class  Camera2DObject : public SimObject {
+  public:
+   /** --- void Begin ---
+    * Refresh the Center position. Must be called on init and when screensize is changed
+    * This is called on add. If you do not changes the screen size you do not need to call it at all.
+    */
+      function Begin();
+   /** --- void Reset ---
+    * Refresh the position and Reset the cam to center postion and zoom 1
+    */
+      function Reset();
+   /** --- Point2F GetMousePosition ---
+    * Get the Mouse position in world Coordinates
+    * @return Point2F
+    */
+      function GetMousePosition();
+   /** --- Point2F ScreenToWorld ---
+    * get the world position by a screen position
+    * @return Point2F
+    */
+      function ScreenToWorld( Point2F position );
+   /** --- bool GetInsideSceen ---
+    * Check is a rect is inside the screen (frustum culling)
+    * @return bool
+    */
+      function GetInsideSceen( RectF rect );
+   /** --- RectF TranslateWorldRect ---
+    * Translate a world rect to screen / render rect 
+    * @return RectF
+    */
+      function TranslateWorldRect( RectF rect );
+   /** --- Point2F TranslateCenterPoint ---
+    * Translate a world rect to screen / render rect 
+    * @return Point2F
+    */
+      function TranslateCenterPoint( Point2F point );
+   /** --- bool TranslateSpriteBaseObject ---
+    * Translate to screenRect and screenCenterPoint of a SpriteBaseObject
+    * return false if out of view.
+    * @return bool
+    */
+      function TranslateSpriteBaseObject( int spriteBaseObjectId );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float zoom;
+};
+class  SpriteGroup : public SimGroup {
+  public:
+   /** --- void sortLayers ---
+    * Sort SpriteObject's by layer
+    */
+      function sortLayers();
+   /** --- bool drawBatch ---
+    * Draw all sprites in the group with option camera object
+    * @return bool
+    */
+      function drawBatch( int camera2DObjectId=0 );
+   /** --- bool drawAtlasBatch ---
+    * Draw all sprites in the group with option camera object
+    * @return bool
+    */
+      function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
 /*!
 @brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.
 @tsexample
@@ -756,312 +1068,6 @@ class  SettingsObject : public SimObject {
    /*!
     */
    Color clearColor;
-};
-class  SpriteBaseObject : public SimObject {
-  public:
-   /** --- void CenterCenterPoint ---
-    * center the centerPoint inside the dstRect
-    */
-      function CenterCenterPoint();
-   /** --- void colorFromHSV ---
-    * Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
-    */
-      function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-   Rect on Texture.
-   
-    */
-   RectF srcRect;
-   /*!
-    */
-   float srcX;
-   /*!
-    */
-   float srcY;
-   /*!
-    */
-   float srcWidth;
-   /*!
-    */
-   float srcHeight;
-   /*!
-   Rect on Render Target.
-   
-    */
-   RectF dstRect;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float width;
-   /*!
-    */
-   float height;
-   /*!
-   Rotation Angle on Render Target (degree)
-   
-    */
-   float angle;
-   /*!
-   The Centerpoit of the Rotation - when angle is set.
-   
-    */
-   Point2F centerPoint;
-   /*!
-   Flip mode on Render Target 0..3, see also SDL_FlipMode
-   
-    */
-   int flip;
-   /*!
-   Color in Byte representation default WHITE = 255 255 255 255
-   
-    */
-   Color color;
-   /*!
-    */
-   char r;
-   /*!
-    */
-   char g;
-   /*!
-    */
-   char b;
-   /*!
-    */
-   char a;
-   /*!
-   Flag for Rendering with SpriteGroup or manually checked.
-   
-    */
-   bool visible;
-   /*!
-   Translated rect when using camera translate
-   
-    */
-   RectF ScreenRect;
-   /*!
-   Translated point when using camera translate
-   
-    */
-   Point2F ScreenCenterPoint;
-};
-class  Camera2DObject : public SimObject {
-  public:
-   /** --- void Begin ---
-    * Refresh the Center position. Must be called on init and when screensize is changed
-    * This is called on add. If you do not changes the screen size you do not need to call it at all.
-    */
-      function Begin();
-   /** --- void Reset ---
-    * Refresh the position and Reset the cam to center postion and zoom 1
-    */
-      function Reset();
-   /** --- Point2F GetMousePosition ---
-    * Get the Mouse position in world Coordinates
-    * @return Point2F
-    */
-      function GetMousePosition();
-   /** --- Point2F ScreenToWorld ---
-    * get the world position by a screen position
-    * @return Point2F
-    */
-      function ScreenToWorld( Point2F position );
-   /** --- bool GetInsideSceen ---
-    * Check is a rect is inside the screen (frustum culling)
-    * @return bool
-    */
-      function GetInsideSceen( RectF rect );
-   /** --- RectF TranslateWorldRect ---
-    * Translate a world rect to screen / render rect 
-    * @return RectF
-    */
-      function TranslateWorldRect( RectF rect );
-   /** --- Point2F TranslateCenterPoint ---
-    * Translate a world rect to screen / render rect 
-    * @return Point2F
-    */
-      function TranslateCenterPoint( Point2F point );
-   /** --- bool TranslateSpriteBaseObject ---
-    * Translate to screenRect and screenCenterPoint of a SpriteBaseObject
-    * return false if out of view.
-    * @return bool
-    */
-      function TranslateSpriteBaseObject( int spriteBaseObjectId );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float zoom;
-};
-class  TextureObject : public SimGroup {
-  public:
-   /** --- bool load ---
-    * Load a Texture
-    * @return bool
-    */
-      function load( string fileName );
-   /** --- Point2I getSize ---
-    * get the width and height of the loaded texture
-    * @return Point2I
-    */
-      function getSize();
-   /** --- RectF getAtlasRect ---
-    * get the rectangle on a atlas texture for a given index
-    * @return RectF
-    */
-      function getAtlasRect( int colCount, int rowCount, int index );
-   /** --- bool DrawRotatedSrcDstRect ---
-    * Draw a rotated and optional flipped texture with source and destination rect.@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedSrcDstRect( RectF srcRect, RectF dstRect, float angle, Point2F centerPoint, int sdl_flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawRect ---
-    * Draw a texture with source and destination rect
-    * @return bool
-    */
-      function DrawRect( RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawSrcDstRect ---
-    * Draw a the texture from srcRect to dstRect
-    * @return bool
-    */
-      function DrawSrcDstRect( RectF srcRect, RectF dstRect, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawCentered ---
-    * Draw the texture centered at the position
-    * @return bool
-    */
-      function DrawCentered( float x, float y, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool DrawRotatedCentered ---
-    * Draw a centered rotated (optional flipped) texture at the position@flip: see also SDL_FLIP_ constants
-    * @return bool
-    */
-      function DrawRotatedCentered( float x, float y, float angle, int flip=0, Color color=WHITE, uint blendMode=(U32)SDL_BLENDMODE_INVALID );
-   /** --- bool SaveImage ---
-    * Save the current texture image as png or bmp.
-    * @return bool
-    */
-      function SaveImage( string fileName, bool asPNG=true );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   string fileName;
-   /*!
-    */
-   uint blendMode;
-};
-class  SpriteObject : public SpriteBaseObject {
-  public:
-   /** --- Point2F getCenter2F ---
-    * get the center point
-    * @return Point2F
-    */
-      function getCenter2F();
-   /** --- bool Draw ---
-    * Draw the Texture
-    * @return bool
-    */
-      function Draw( uint camera2DObjectId=0 );
-   /** --- void moveLinear ---
-    * Move Linear by velocity
-    */
-      function moveLinear( float dt=-1.f );
-   /** --- void moveGravity ---
-    * Move with gravity acceleration default: 0,9.81
-    */
-      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float dt=-1.f );
-   /** --- void moveOrbital ---
-    * Orbital Movement around ankerPoint
-    */
-      function moveOrbital( Point2F ankerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f, float dt=-1.f );
-   /** --- bool solveCollideLine ---
-    * check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)
-    * @return bool
-    */
-      function solveCollideLine( RectF linePoints, float bounceStrength=0.2f );
-   /** --- bool solveCollideRect ---
-    * Check collide and move out
-    * @return bool
-    */
-      function solveCollideRect( RectF otherRect, bool stopMovement=false );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-   velocity as point see also veloX veloY
-   
-    */
-   Point2F velocity;
-   /*!
-   X velocity
-   
-    */
-   float veloX;
-   /*!
-   Y velocity
-   
-    */
-   float veloY;
-   /*!
-   Layer of the Sprite. 
-   
-    */
-   uint layer;
-   /*!
-   SDL_BLENDMODE_ overwrite the Texture blendmode
-default SDL_BLENDMODE_INVALID => not overwritten
-   
-    */
-   uint blendMode;
-   /*!
-   Id of the Texture Object. Must be set after loading from file. The id is not persistent!
-   
-    */
-   uint textureObjectId;
-   /*!
-   optional Texturename
-   
-    */
-   string textureName;
-};
-class  SpriteGroup : public SimGroup {
-  public:
-   /** --- void sortLayers ---
-    * Sort SpriteObject's by layer
-    */
-      function sortLayers();
-   /** --- bool drawBatch ---
-    * Draw all sprites in the group with option camera object
-    * @return bool
-    */
-      function drawBatch( int camera2DObjectId=0 );
-   /** --- bool drawAtlasBatch ---
-    * Draw all sprites in the group with option camera object
-    * @return bool
-    */
-      function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
 };
 class  SoundObject : public SimObject {
   public:
@@ -1489,147 +1495,6 @@ class  SimPersistSet : public SimSet {
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
-};
-class  PointStorageObject : public SimObject {
-  public:
-   /** --- String getPosVec ---
-    * get the position as Vector (String)
-    * @return String
-    */
-      function getPosVec();
-   /** --- void setPosVec ---
-    * set the position by Vector (String)
-    */
-      function setPosVec( String strVector );
-   /** --- void setPos ---
-    * Set position by method 
-    */
-      function setPos( float x, float y, float z=0.f, float w=0.f );
-   /** --- void normalizeXZ ---
-    * normalize the current position
-    */
-      function normalizeXZ();
-   /** --- F32 getLen ---
-    * len of current position
-    * @return F32
-    */
-      function getLen();
-   /** --- bool setPoint ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
-   /** --- F32 getPointX ---
-    * get the point.x from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointX( uint index );
-   /** --- F32 getPointY ---
-    * get the point.x from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointY( uint index );
-   /** --- F32 getPointZ ---
-    * get the point.z from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointZ( uint index );
-   /** --- F32 getPointW ---
-    * get the point.w from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointW( uint index );
-   /** --- bool setPointX ---
-    * set the point.x from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointX( uint index, float value );
-   /** --- bool setPointY ---
-    * set the point.y from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointY( uint index, float value );
-   /** --- bool setPointZ ---
-    * set the point.z from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointZ( uint index, float value );
-   /** --- bool setPointW ---
-    * set the point.z from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointW( uint index, float value );
-   /** --- String getPointVec ---
-    * get the point from the point storage at index as Vector (String)
-    * @return String
-    */
-      function getPointVec( uint index );
-   /** --- bool setPointVec ---
-    * set the point in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPointVec( uint index, String strVector );
-   /** --- String getPoint2Vec ---
-    * get the point xy from the point storage at index as Vector (String)
-    * @return String
-    */
-      function getPoint2Vec( uint index );
-   /** --- bool setPoint2Vec ---
-    * set the point xy in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPoint2Vec( uint index, String strVector );
-   /** --- bool pushPoint ---
-    * push the current values x,y,z,w, to the point storage
-    * @return bool
-    */
-      function pushPoint( uint index );
-   /** --- bool popPoint ---
-    * pop the point from the point storage at index to the current values x,y,z,w
-    * @return bool
-    */
-      function popPoint( uint index );
-   /** --- bool applyMathOnPoints ---
-    * Apply a Math expression on point Storage.
-    * expected format: "x+5; y*2; z; w" separated by ';'
-    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
-    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
-    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
-    *   normalizeXY => applyMathOnPoints("normalizeXY()");
-    * @return bool
-    */
-      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float z;
-   /*!
-    */
-   float w;
-   /*!
-   alias for z
-   
-    */
-   float width;
-   /*!
-   alias for w - yes w.
-   
-    */
-   float height;
-   /*!
-   Set the storage size (how many points we can work with) Max:1000000.
-   
-    */
-   uint storageSize;
 };
 /*!
 @brief This class is responsible opening, reading, creating, and saving file contents.
@@ -2173,6 +2038,147 @@ function Message::onRemove(%this)
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
+};
+class  PointStorageObject : public SimObject {
+  public:
+   /** --- String getPosVec ---
+    * get the position as Vector (String)
+    * @return String
+    */
+      function getPosVec();
+   /** --- void setPosVec ---
+    * set the position by Vector (String)
+    */
+      function setPosVec( String strVector );
+   /** --- void setPos ---
+    * Set position by method 
+    */
+      function setPos( float x, float y, float z=0.f, float w=0.f );
+   /** --- void normalizeXZ ---
+    * normalize the current position
+    */
+      function normalizeXZ();
+   /** --- F32 getLen ---
+    * len of current position
+    * @return F32
+    */
+      function getLen();
+   /** --- bool setPoint ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
+   /** --- F32 getPointX ---
+    * get the point.x from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.x from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.z from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.w from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.x from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.y from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.z from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.z from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
+   /** --- String getPointVec ---
+    * get the point from the point storage at index as Vector (String)
+    * @return String
+    */
+      function getPointVec( uint index );
+   /** --- bool setPointVec ---
+    * set the point in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPointVec( uint index, String strVector );
+   /** --- String getPoint2Vec ---
+    * get the point xy from the point storage at index as Vector (String)
+    * @return String
+    */
+      function getPoint2Vec( uint index );
+   /** --- bool setPoint2Vec ---
+    * set the point xy in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPoint2Vec( uint index, String strVector );
+   /** --- bool storePoint ---
+    * store the current values x,y,z,w, to the point storage
+    * @return bool
+    */
+      function storePoint( uint index );
+   /** --- bool fetchPoint ---
+    * fetch the point from the point storage at index to the current values x,y,z,w
+    * @return bool
+    */
+      function fetchPoint( uint index );
+   /** --- bool applyMathOnPoints ---
+    * Apply a Math expression on point Storage.
+    * expected format: "x+5; y*2; z; w" separated by ';'
+    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
+    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
+    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
+    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+    * @return bool
+    */
+      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float z;
+   /*!
+    */
+   float w;
+   /*!
+   alias for z
+   
+    */
+   float width;
+   /*!
+   alias for w - yes w.
+   
+    */
+   float height;
+   /*!
+   Set the storage size (how many points we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
 };
 //------------------------------------------------------------------
 //                  F U N C T I O N S 
@@ -3896,6 +3902,12 @@ namespace Global {
     * @return bool
     */
       function dumpEngineDocs( string outputFile );
+   /** --- void debugDumpAllObjects ---
+    * @brief Dumps all current EngineObject instances to the console.
+    * @note This function is only available in debug builds.
+    * @ingroup Debugging
+    */
+      function debugDumpAllObjects();
    /** --- const char* expandFilename ---
     * @brief Grabs the full path of a specified file
     * @param filename Name of the local file to locate
@@ -3981,6 +3993,13 @@ namespace Global {
     * @return bool
     */
       function isValidObjectName( string name );
+   /** --- void debugEnumInstances ---
+    * Call the given function for each instance of the given class.
+    * @param className Name of the class for which to enumerate instances.
+    * @param functionName Name of function to call and pass each instance of the given class.
+    * @note This function is only available in debug builds and primarily meant as an aid in debugging.@ingroup Console
+    */
+      function debugEnumInstances( string className, string functionName );
    /** --- ArrayObject* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
@@ -4988,11 +5007,56 @@ namespace Global {
     * @return S32
     */
       function SDL_CreateWindow( string title, int width, int height, U64 window_flags );
+   /** --- bool SDL_SetWindowTitle ---
+    * Set a Window Title
+    * @return bool
+    */
+      function SDL_SetWindowTitle( int WindowID, string title );
+   /** --- String SDL_GetWindowTitle ---
+    * Get a Window Title
+    * @return String
+    */
+      function SDL_GetWindowTitle( int WindowID );
    /** --- bool SDL_SetWindowIcon ---
     * Set a Window Icon from Surface
     * @return bool
     */
       function SDL_SetWindowIcon( int WindowID, int SurfaceID );
+   /** --- bool SDL_SetWindowPosition ---
+    * Set the Window position
+    * @return bool
+    */
+      function SDL_SetWindowPosition( int WindowID, int x, int y );
+   /** --- bool SDL_SetWindowSize ---
+    * Set the Window Size
+    * @return bool
+    */
+      function SDL_SetWindowSize( int WindowID, int width, int height );
+   /** --- bool SDL_SetWindowMinimumSize ---
+    * Set the Window minimum Size
+    * @return bool
+    */
+      function SDL_SetWindowMinimumSize( int WindowID, int width, int height );
+   /** --- bool SDL_SetWindowMaximumSize ---
+    * Set the Window maximum Size
+    * @return bool
+    */
+      function SDL_SetWindowMaximumSize( int WindowID, int width, int height );
+   /** --- bool SDL_SetWindowBordered ---
+    * Set bordered
+    * @return bool
+    */
+      function SDL_SetWindowBordered( int WindowID, bool bordered );
+   /** --- bool SDL_SetWindowResizable ---
+    * Set resizable
+    * @return bool
+    */
+      function SDL_SetWindowResizable( int WindowID, bool resizable );
+   /** --- bool SDL_SetWindowFullscreen ---
+    * Set fullscreen
+    * @return bool
+    */
+      function SDL_SetWindowFullscreen( int WindowID, bool fullscreen );
    /** --- S32 SDL_CreatePopupWindow ---
     * This create a SDL_Window and SDL_Renderer
     * @return S32 WindowID
@@ -5083,6 +5147,11 @@ namespace Global {
     * @return bool
     */
       function SDL_RenderClear( int rendererID );
+   /** --- bool SDL_RenderPoint ---
+    * render a Point
+    * @return bool
+    */
+      function SDL_RenderPoint( int rendererID, float x, float y );
    /** --- bool SDL_RenderLine ---
     * render a Line
     * @return bool
@@ -5189,12 +5258,6 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  DummySize = "200 200"
-  RadarBg = "0.1 0.1 0.1 0.8"
-  PLAYER_SIZE = "16 16"
-  STAR_COUNT = 420
-  SCENE_PATH = "pref:/"
-  BACKGROUND_COLOR = { 176, 233, 252 }
   SCENE_FILE = "pref:/aquarium.elfscene"
   SDL_FOLDER_VIDEOS = 10
   SDL_FOLDER_SCREENSHOTS = 8
@@ -5237,7 +5300,6 @@ namespace Global {
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
-  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
@@ -5479,12 +5541,10 @@ namespace Global {
   SDL_PROPERTY_TYPE_STRING = 2
   SDL_WINDOW_INPUT_FOCUS = 512
   SDL_PIXELFORMAT_RGB24 = 386930691
-  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_DECIMALSEPARATOR = 179
   SDL_SCANCODE_F18 = 109
-  RadarGreen = "0.0 1.0 0.0 1.0"
   ImGuiCond_None = 0
   ImGuiTreeNodeFlags_Selected = 1
   SDL_FOLDER_COUNT = 11
@@ -5537,7 +5597,6 @@ namespace Global {
   ImGuiStyleVar_WindowTitleAlign = 6
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
-  MAX_SCALE = 1024
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiKey_Y = 570
   SDL_BLENDMODE_MOD = 4
@@ -5583,10 +5642,8 @@ namespace Global {
   GRAY = "130 130 130 255"
   ImGuiKey_3 = 539
   SDL_SCALEMODE_LINEAR = 1
-  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
-  SCALE_SNAP = 8
   SDL_WINDOW_VULKAN = 268435456
   ImGuiCol_PlotHistogram = 45
   cl_Slate = "0.180000 0.240000 0.310000 1.000000"
@@ -5597,7 +5654,6 @@ namespace Global {
   ImGuiCol_TableBorderLight = 49
   BEIGE = "211 176 131 255"
   ImGuiTableFlags_RowBg = 64
-  TextWhite = "1.0 1.0 1.0 1.0"
   SDL_COLORSPACE_HDR10 = 301999616
   SDL_BLENDFACTOR_DST_ALPHA = 9
   ImGuiCol_TextLink = 52
@@ -5676,7 +5732,6 @@ namespace Global {
   SDL_SCANCODE_V = 25
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
-  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiInputTextFlags_None = 0
   ImGuiInputTextFlags_CharsDecimal = 1
@@ -5723,7 +5778,6 @@ namespace Global {
   ImGuiTableFlags_Borders = 1920
   ImGuiStyleVar_SeparatorTextBorderSize = 37
   ImGuiTableColumnFlags_DefaultHide = 2
-  TargetRed = "1.0 0.0 0.0 1.0"
   PURPLE = "200 122 255 255"
   ImGuiTableColumnFlags_WidthStretch = 8
   SDL_SCANCODE_BACKSPACE = 42
@@ -5913,5 +5967,5 @@ namespace Global {
   SDL_SCANCODE_F15 = 106
   SDL_KMOD_RSHIFT = 2
   SDL_SCANCODE_F16 = 107
---- End of Dump (724 items) ---
+--- End of Dump (709 items) ---
 */
