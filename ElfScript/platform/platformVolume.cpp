@@ -30,7 +30,7 @@
 
 #include "platform/platformVolume.h"
 
-#define TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM //XXTH
+// // // #define TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM //XXTH
 #ifndef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM
 #include "core/util/zip/zipVolume.h"
 #endif

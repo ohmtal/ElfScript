@@ -2,6 +2,8 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
+option(ENABLE_ZIP "Enable the ElfScript ZIP Support" ON)
+
 # option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -191,6 +193,39 @@ set ( OBJECTS_SRC
 
 )
 
+set(ZIP_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/core/filterStream.cpp
+    # ----
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/adler32.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/compress.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/crc32.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/deflate.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/gzclose.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/gzlib.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/gzread.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/gzwrite.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/infback.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/inffast.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/inflate.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/inftrees.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/trees.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/uncompr.c
+    ${CMAKE_CURRENT_LIST_DIR}/ext/zlib/zutil.c
+    # adler32.c  compress.c  crc32.c  deflate.c  gzclose.c  gzlib.c  gzread.c  gzwrite.c
+    # infback.c  inffast.c  inflate.c  inftrees.c  trees.c  uncompr.c  zutil.c
+    # ----
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/centralDir.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/compressor.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/extraField.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/fileHeader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipArchive.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipCryptStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipSubStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipTempStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/util/zip/zipVolume.cpp
+
+)
 
 set(POSIX_SRC
    ${CMAKE_CURRENT_LIST_DIR}/platform/posix/posixVolume.cpp
@@ -233,3 +268,6 @@ set(ELFSCRIPT_SRC
     ${EXT_SRC}
 )
 
+if (ENABLE_ZIP)
+     list(APPEND ELFSCRIPT_SRC ${ZIP_SRC})
+ endif()

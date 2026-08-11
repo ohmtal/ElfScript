@@ -142,22 +142,22 @@ for (%i in 0..10) {
 }
 
 
-echo("------------------------ LocalVar ---------------------");
-%localX = 5.0;
-setLocalFloatVariable("%localX", 666);
-echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
-varDump("%localX");
-varDump("%i");
-
-function localPoints( ) {
-error("Rejoicing too soon << does not work in function");
-    sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
-    %pointX = %pointY = %pointZ = 0.0;
-    sto.getPosByRef( "%pointX", "%pointY", "%pointZ");
-    print("POINTS:" SPC %pointX SPC %pointY SPC %pointZ);
-
-}
-localPoints();
+// echo("------------------------ LocalVar ---------------------");
+// %localX = 5.0;
+// setLocalFloatVariable("%localX", 666);
+// echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
+// varDump("%localX");
+// varDump("%i");
+//
+// function localPoints( ) {
+// error("Rejoicing too soon << does not work in function");
+//     sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
+//     %pointX = %pointY = %pointZ = 0.0;
+//     sto.getPosByRef( "%pointX", "%pointY", "%pointZ");
+//     print("POINTS:" SPC %pointX SPC %pointY SPC %pointZ);
+//
+// }
+// localPoints();
 
 
 

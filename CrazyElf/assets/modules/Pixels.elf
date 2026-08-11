@@ -40,9 +40,10 @@ function createPixels(%renderer, %window) {
         TypeS32 renderer    = %renderer;
         TypeS32 window      = %window;
 
-        TypeS32 CanvasW     = $Global::ScreenSize.x - 32;
-        TypeS32 CanvasH     = $Global::ScreenSize.y - 32;
-        TypeS32 Border      = 32;
+        TypeS32 CanvasW     = $Global::ScreenSize.x - 8;
+        TypeS32 CanvasH     = $Global::ScreenSize.y - 8;
+        TypeS32 BorderTop   = 32;
+        TypeS32 BorderLeft  = 8;
         TypeS32 selectedFirstIndex = -1;
         TypeColor TopLeft       = {255, 50,100}; //pink
         TypeColor TopRight      = {  0,200,255}; //cyan
@@ -50,7 +51,7 @@ function createPixels(%renderer, %window) {
         TypeColor BottomRight   = {255,150,  0}; //orange
 
         // status
-        TypeS32 BlockSize      = 16; //16; //32 ; //42; //8 .. 42
+        TypeS32 BlockSize      = 24; // 16; //16; //32 ; //42; //8 .. 48
         TypeBool  cheatMode   = false; // difficult to see
         TypeS32   shuffleDelay = 2000;
 
@@ -69,22 +70,7 @@ function Pixels::newGame(%this) {
 
       %this.schedule(%this.shuffleDelay,shuffleGrid);
 }
-//----------------------------------------------------------------------
-function Pixels::getGridIndexFromMouse(%this, %mouseX, %mouseY) {
-    %border = %this.Border;
-    %blockSize = %this.BlockSize;
 
-    if (%mouseX < %border || %mouseX >= %this.CanvasW) return -1;
-    if (%mouseY < %border || %mouseY >= %this.CanvasH) return -1;
-
-    %gridX = mFloor((%mouseX - %border) / %blockSize);
-    %gridY = mFloor((%mouseY - %border) / %blockSize);
-
-    %cols = (%this.CanvasW - %border) / %blockSize;
-
-    %index = (%gridY * %cols) + %gridX;
-    return %index;
-}
 //----------------------------------------------------------------------
 function Pixels::shuffleGrid(%this) {
     %this.gameWon = false;
@@ -125,13 +111,6 @@ function Pixels::dumpStorage(%this) {
 //----------------------------------------------------------------------
 function Pixels::generateBorderColors(%this) {
 
-    // if (%this.easyColors) {
-    //     %this.TopLeft       = {255, 50,100}; //pink
-    //     %this.TopRight      = {  0,200,255}; //cyan
-    //     %this.BottomLeft    = { 80,  0,150}; //violett
-    //     %this.BottomRight   = {255,150,  0}; //orange
-    //     return;
-    // }
 
     %rTL = 200 + getRandom(55);
     %gTL = getRandom(80);
@@ -153,43 +132,6 @@ function Pixels::generateBorderColors(%this) {
     %bBR = getRandom(60);
     %this.BottomRight = { %rBR, %gBR, %bBR };
 
-
-    // %midR = 128; %midG = 128; %midB = 128;
-    //
-    // // %contrastFactor = 8 / %this.BlockSize;
-    // %contrastFactor = 32 / %this.BlockSize;
-    // echo("%contrastFactor is ", %contrastFactor);
-    // if (%contrastFactor > 1.0) %contrastFactor = 1.0;
-    //
-    //
-    //
-    // // top left
-    // %rTL = mFloor(%midR + (255 - %midR) * %contrastFactor);
-    // %gTL = mFloor(%midG + (50  - %midG) * %contrastFactor);
-    // %bTL = mFloor(%midB + (100 - %midB) * %contrastFactor);
-    //
-    // %this.TopLeft = { %rTL, %gTL, %bTL };
-    //
-    // // top right
-    // %rTR = mFloor(%midR + (0   - %midR) * %contrastFactor);
-    // %gTR = mFloor(%midG + (200 - %midG) * %contrastFactor);
-    // %bTR = mFloor(%midB + (255 - %midB) * %contrastFactor);
-    //
-    // %this.TopRight = { %rTR, %gTR, %bTR };
-    //
-    // // bottom left
-    // %rBL = mFloor(%midR + (80  - %midR) * %contrastFactor);
-    // %gBL = mFloor(%midG + (0   - %midG) * %contrastFactor);
-    // %bBL = mFloor(%midB + (150 - %midB) * %contrastFactor);
-    //
-    // %this.BottomLeft = { %rBL, %gBL, %bBL };
-    //
-    // // bottom right
-    // %rBR = mFloor(%midR + (255 - %midR) * %contrastFactor);
-    // %gBR = mFloor(%midG + (150 - %midG) * %contrastFactor);
-    // %bBR = mFloor(%midB + (0   - %midB) * %contrastFactor);
-    //
-    // %this.BottomRight = { %rBR, %gBR, %bBR };
 }
 //----------------------------------------------------------------------
 function Pixels::resetGrid(%this) {
@@ -246,17 +188,18 @@ function Pixels::resetGrid(%this) {
 function Pixels::onAdd(%this) {
     %w = %this.CanvasW;
     %h = %this.CanvasH;
-    %border = %this.Border;
-    %blockSize = %this.BlockSize;
+    %borderTop  = %this.BorderTop;
+    %borderLeft = %this.BorderLeft;
+    %blockSize  = %this.BlockSize;
 
-    %this.CanvasBackGroundRect = { %border - 2, %border - 2, %w - %border + 4, %h - %border + 4 };
-    %this.CanvasBordeRect = { %border - 1, %border - 1, %w - %border + 2, %h - %border + 2 };
+    %this.CanvasBackGroundRect = { %borderLeft - 2, %borderTop - 2, %w - %borderLeft + 4, %h - %borderTop + 4 };
+    %this.CanvasBordeRect = { %borderLeft - 1, %borderTop - 1, %w - %borderLeft + 2, %h - %borderTop + 2 };
     %this.HeaderRect = %this.CanvasBackGroundRect;
     %this.HeaderRect.y = 0;
-    %this.HeaderRect.height = %border - 4;
+    %this.HeaderRect.height = %borderTop - 4;
 
-    %this.cols = mFloor((%w - %border) / %blockSize);
-    %this.rows = mFloor((%h - %border) / %blockSize);
+    %this.cols = mFloor((%w - %borderLeft) / %blockSize);
+    %this.rows = mFloor((%h - %borderTop) / %blockSize);
     %this.pixelCount = %this.cols * %this.rows;
 
     print("Add: ", %this.pixelCount, " pixels to storage. (Cols: ", %this.cols, ", Rows: ", %this.rows, ")");
@@ -292,7 +235,8 @@ function Pixels::Render(%this) {
 
     %r = %this.renderer;
     %blockSize  = %this.BlockSize;
-    %border     = %this.Border;
+    %borderTop     = %this.BorderTop;
+    %borderLeft     = %this.BorderLeft;
     if(!isObject(Storage)) return;
     %storage    = Storage.getId();
     %solvedStorage    = SolvedStorage.getId();
@@ -309,11 +253,11 @@ function Pixels::Render(%this) {
     %index = 0;
     // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
     for ( %gridY in range  %this.rows) {
-        %y = %border + (%gridY * %blockSize);
+        %y = %borderTop + (%gridY * %blockSize);
 
         // for (%gridX = 0; %gridX < %this.cols; %gridX++) {
         for (%gridX in range %this.cols) {
-            %x = %border + (%gridX * %blockSize);
+            %x = %borderLeft + (%gridX * %blockSize);
 
             %storage.fetchPoint(%index);
 
@@ -323,6 +267,18 @@ function Pixels::Render(%this) {
             } else {
                 SDL_SetRenderDrawColor(%r, %storage.x, %storage.y, %storage.z);
             }
+
+            // Mouse:
+            if (!%this.gameWon) {
+                if (  SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)
+                    && SDL_PointInRectFloat(
+                        { SDL_GetMouseX(), SDL_GetMouseY() },
+                        { %x, %y, %blockSize, %blockSize })
+                    ) {
+                    %this.onPixelClicked(%index);
+                }
+            }
+
             SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, true);
 
             if (%storage.w == 1.0 || %solvedStorage.getPointVec(%index) $= %storage.getPointVec(%index)) {
@@ -388,45 +344,10 @@ function Pixels::checkWinCondition(%this) {
         if (%solvedStorage.getPointVec(%index) !$= %storage.getPointVec(%index))
             return false;
     }
+
+
     return true;
 
-    // %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
-    // %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
-    // %rBL = %this.BottomLeft.r; %gBL = %this.BottomLeft.g;  %bBL = %this.BottomLeft.b;
-    // %rBR = %this.BottomRight.r;%gBR = %this.BottomRight.g; %bBR = %this.BottomRight.b;
-    //
-    // %index = 0;
-    //
-    // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
-    //     %pctY = %gridY / (%this.rows - 1);
-    //
-    //     for (%gridX = 0; %gridX < %this.cols; %gridX++) {
-    //         %pctX = %gridX / (%this.cols - 1);
-    //
-    //         %rTop = %rTL + (%rTR - %rTL) * %pctX;
-    //         %gTop = %gTL + (%gTR - %gTL) * %pctX;
-    //         %bTop = %bTL + (%bTR - %bTL) * %pctX;
-    //
-    //         %rBot = %rBL + (%rBR - %rBL) * %pctX;
-    //         %gBot = %gBL + (%gBR - %gBL) * %pctX;
-    //         %bBot = %bBL + (%bBR - %bBL) * %pctX;
-    //
-    //         %targetR = mFloor(%rTop + (%rBot - %rTop) * %pctY);
-    //         %targetG = mFloor(%gTop + (%gBot - %gTop) * %pctY);
-    //         %targetB = mFloor(%bTop + (%bBot - %bTop) * %pctY);
-    //
-    //         %storage.fetchPoint(%index);
-    //
-    //         if (%storage.x != %targetR || %storage.y != %targetG || %storage.z != %targetB) {
-    //             return false;
-    //         }
-    //
-    //         %index++;
-    //     }
-    // }
-    //
-    // print("FIXME we did it :)");
-    // return true;
 }
 
 //----------------------------------------------------------------------
@@ -436,19 +357,12 @@ function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRe
         case SDL_SCANCODE_SPACE: if (%this.gameWon) %this.newGame();
     }
 }
-function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
-    if (!%isDown) return ;
+//----------------------------------------------------------------------
 
-
-    if (%button == SDL_BUTTON_RIGHT) {
-        %this.selectedFirstIndex = -1;
-        return;
-    }
-    if (%button != SDL_BUTTON_LEFT) return;
+function Pixels::onPixelClicked(%this, %clickedIndex) {
 
     if (%this.gameWon) return;
 
-    %clickedIndex = %this.getGridIndexFromMouse(%x, %y);
     if (%clickedIndex == -1) return;
 
 
@@ -460,7 +374,6 @@ function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
 
     if (%this.selectedFirstIndex == -1) {
         %this.selectedFirstIndex = %clickedIndex;
-        // print("first pixel at index: ", %clickedIndex);
     } else {
         %idxA = %this.selectedFirstIndex;
         %idxB = %clickedIndex;
@@ -490,5 +403,16 @@ function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
             %this.gameWon = true;
         }
     }
+}
+
+
+function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
+    if (!%isDown) return ;
+
+    if (%button == SDL_BUTTON_RIGHT) {
+        %this.selectedFirstIndex = -1;
+        return;
+    }
+
 }
 function  Pixels::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
