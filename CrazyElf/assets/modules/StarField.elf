@@ -171,10 +171,6 @@ function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %is
         case SDL_SCANCODE_SPACE:
             %this.drawLines = !%this.drawLines;
             echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
-        case SDL_SCANCODE_U:
-            setVSync(0);
-        case SDL_SCANCODE_R:
-            setVSync(1);
     }
 }
 function StarField::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}

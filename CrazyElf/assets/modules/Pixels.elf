@@ -1,6 +1,6 @@
 /*
- � �* Chroma Sort:
- Pixel PuzzleChroma Sort is a relaxing yet challenging logic puzzle game where your goal is to restore order to a corrupted grid of colors. The pixels have been scrambled, and only you can heal the canvas by recreating a perfect color gradient.
+ � �* Color Sort:
+ Pixel Puzzle Color Sort is a relaxing yet challenging logic puzzle game where your goal is to restore order to a corrupted grid of colors. The pixels have been scrambled, and only you can heal the canvas by recreating a perfect color gradient.
 
  🕹️ ObjectiveRearrange the scrambled color pixels so they form a perfectly smooth, seamless transition (gradient) between the four fixed corner tiles.
 
@@ -42,7 +42,7 @@ function createPixels(%renderer, %window) {
         TypeColor BottomRight   = {255,150,  0}; //orange
 
         // status
-        TypeS32 BlockSize      = 42; //8 .. 42
+        TypeS32 BlockSize      = 16; //32 ; //42; //8 .. 42
         TypeBool  easyColors   = false;
         TypeS32   shuffleDelay = 2000;
 
@@ -235,7 +235,9 @@ function Pixels::onAdd(%this) {
 
     %this.CanvasBackGroundRect = { %border - 2, %border - 2, %w - %border + 4, %h - %border + 4 };
     %this.CanvasBordeRect = { %border - 1, %border - 1, %w - %border + 2, %h - %border + 2 };
-    %this.HeaderRect = { %border - 4, 0, %w - %border + 8, %border - 4 };
+    %this.HeaderRect = %this.CanvasBackGroundRect;
+    %this.HeaderRect.y = 0;
+    %this.HeaderRect.height = %border - 4;
 
     %this.cols = mFloor((%w - %border) / %blockSize);
     %this.rows = mFloor((%h - %border) / %blockSize);
@@ -274,6 +276,8 @@ function Pixels::Render(%this) {
 
     SDL_SetRenderDrawColor(%r, 60, 60, 60);
     SDL_RenderFillRect(%r, %this.CanvasBackGroundRect);
+
+    // FIXME CACHE RENDERING !!!!
 
     %index = 0;
     // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
@@ -314,10 +318,10 @@ function Pixels::Render(%this) {
     SDL_SetRenderDrawColor(%r, 28, 28, 28);
     SDL_RenderFillRect(%r, %this.HeaderRect);
     SDL_SetRenderDrawColor(%r, 128,20,255);
-    SDL_RenderLine(%r, %border, 2, $Global::ScreenSize.x - %border, 2);
+    SDL_RenderLine(%r, %this.HeaderRect.x + 2, %this.HeaderRect.y + 2, %this.HeaderRect.x + %this.HeaderRect.width - 4 , %this.HeaderRect.y + 2);
     %scale = 0.9;
     SDL_SetRenderScale(%r, %scale, %scale);
-    SDL_RenderDebugText(%r, 30 / %scale, 10 / %scale, "Chroma Sort");
+    SDL_RenderDebugText(%r, 34 / %scale, 10 / %scale, "Color Sort");
     %scale = 0.6;
     SDL_SetRenderDrawColor(%r, 128,20,255);
     SDL_SetRenderScale(%r, %scale, %scale);
@@ -325,7 +329,7 @@ function Pixels::Render(%this) {
     SDL_RenderDebugText(%r, 140 / %scale, 18 / %scale, "Size  :" SPC %this.blockSize);
     SDL_RenderDebugText(%r, 220 / %scale, 13 / %scale, "WON*  :" SPC %this.gameWon);
     SDL_SetRenderScale(%r); //reset
-    SDL_RenderLine(%r, %border, %border - 6 , $Global::ScreenSize.x - %border, %border -6 );
+    SDL_RenderLine(%r, %this.HeaderRect.x + 2, %this.HeaderRect.height - 4, %this.HeaderRect.x + %this.HeaderRect.width - 4 , %this.HeaderRect.height - 4);
 
     //----- reset color .......
     SDL_SetRenderDrawColor(%r, 255, 255, 255);
@@ -379,7 +383,12 @@ function Pixels::checkWinCondition(%this) {
 }
 
 //----------------------------------------------------------------------
-function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+    if (!%isDown) return ;
+    switch (%scancode) {
+        case SDL_SCANCODE_SPACE: if (%this.gameWon) %this.newGame(); break;
+    }
+}
 function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (!%isDown) return ;
 
