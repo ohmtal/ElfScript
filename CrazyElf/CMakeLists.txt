@@ -46,7 +46,10 @@ if(NOT EXISTS ${ELF_CMAKE})
         "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
     )
 else()
+# defines  ${ELFSCRIPT_SRC}
  include(${ELF_CMAKE})
+# defines ${SDL3_ELFSCRIPT_SRC}
+ include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
 
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
@@ -54,13 +57,14 @@ else()
   # optinal doc exporter
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
 
-  # SDL3Elf
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_core.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_audio.cpp)
+  # # SDL3Elf
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_ElfScriptGlue.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_core.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_audio.cpp)
 
     if(UNIX)
       list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
@@ -75,6 +79,7 @@ endif()
 add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
+    ${SDL3_ELFSCRIPT_SRC}
 )
 
 

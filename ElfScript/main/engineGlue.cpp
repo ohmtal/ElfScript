@@ -13,6 +13,48 @@ namespace engineAPI
 }
 namespace engineGlue
 {
+
+
+    //-----------------------------------------------------------------------------
+    int argParser(int argc, char* argv[]) {
+
+        // pass to script in TGE/OGE3D  it is called Game::!,
+        Con::setIntVariable("Main::argc", argc);
+        for (S32 i = 0; i < argc; i++)
+            Con::setVariable(avar("Main::argv%d", i), argv[i]);
+
+        String argStr;
+        // argv[0] is program name
+        for (S32 i = 1; i < argc; ++i) {
+            if (!argv[i]) continue;
+            argStr = argv[i];
+
+            if (argStr.equal("--chdir")) {
+                if (i + 1 < argc) {
+                    ScriptDirectory= argv[++i];
+                    dPrintf("Custom Directory: %s\n", ScriptDirectory.c_str());
+                } else {
+                    dPrintf("--chdir but no file parameter usage: --chdir /where/my/assets/live\n");
+                    return 1;
+                }
+                continue;
+            }
+            // filename test
+            if (argStr.equal("--script")) {
+                if (i + 1 < argc) {
+                    ScriptFile= argv[++i];
+                    dPrintf("Custom Script File: %s\n", ScriptFile.c_str());
+                } else {
+                    dPrintf("--script but no file parameter usage: --script myFile.cs\n");
+                    return 1;
+                }
+                continue;
+            }
+
+
+        } //for ...
+        return 0;
+    }
     // -----------------------------------------------------------------------------
     void DefaultLogger(U32 level, const char *consoleLine)
     {
@@ -41,7 +83,8 @@ namespace engineGlue
         //NOT Platform::FS::MountDefaults();
 
         if (!workingDirectory || workingDirectory.isEmpty()) {
-            workingDirectory = Platform::getExecutablePath();
+            if (ScriptDirectory.isEmpty()) workingDirectory = Platform::getExecutablePath();
+            else workingDirectory = ScriptDirectory;
         }
 
         // sanity again:

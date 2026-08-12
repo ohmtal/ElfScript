@@ -4,6 +4,10 @@
 
 namespace engineGlue
 {
+    inline String ScriptDirectory = "";
+    inline String ScriptFile = "assets/main.elf";
+    // default argParser used to set --script and --dir combinded with
+    int argParser(int argc, char* argv[]);
 
     void DefaultLogger(U32 level, const char *consoleLine);
     static ConsumerCallback mLogger = DefaultLogger;
