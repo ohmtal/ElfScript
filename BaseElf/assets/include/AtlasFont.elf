@@ -141,7 +141,6 @@ function AtlasFont::DrawAnimatedText(%this, %x, %y, %text, %baseColor, %time, %a
 //     else if (%h < 300) { %r = %x; %g = 0;  %b = %c; }
 //     else               { %r = %c; %g = 0;  %b = %x; }
 //
-//     // Skalierung auf SDL_Color / U8 Wertebereich (0..255) mit kaufmaennischer Rundung
 //     %rU8 = mRound((%r + %m) * 255);
 //     %gU8 = mRound((%g + %m) * 255);
 //     %bU8 = mRound((%b + %m) * 255);

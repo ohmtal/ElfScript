@@ -157,9 +157,6 @@ int main(int argc, char* argv[]) {
     stdConsole->muteConMessage(true); //prevent double output
     #endif
 
-
-
-
     Con::printf("loading script %s", gScriptFile.c_str());
     Con::executeFile(gScriptFile);
 

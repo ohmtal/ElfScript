@@ -7,31 +7,35 @@ function postLoad() { exec("test.sto"); $main.module = Pixels.getId(); $_LOADING
 //
 
 /*
- � �* Color Sort:
+ Color Sort
+ ==========
  Pixel Puzzle Color Sort is a relaxing yet challenging logic puzzle game where your goal is to restore order to a corrupted grid of colors. The pixels have been scrambled, and only you can heal the canvas by recreating a perfect color gradient.
 
- 🕹️ ObjectiveRearrange the scrambled color pixels so they form a perfectly smooth, seamless transition (gradient) between the four fixed corner tiles.
+ Objective
+ Rearrange the scrambled color pixels so they form a perfectly smooth, seamless transition (gradient) between the four fixed corner tiles.
 
- 📖 How to Play
+ How to Play
 
  1. Spot the Anchor Points (Fixed Corners)
  - Look for the four corner pixels on the grid.
- - These tiles are marked with a glowing white border ⬜.
+ - These tiles are marked with a white border.
  - Important: These corners are permanently fixed in their correct positions. They cannot be clicked, moved, or swapped. Use them as your ultimate guide!
 
- 2. Swap Pixels to Restore the CanvasLeft
- - Click on any standard pixel to select it. It will be highlighted with a blue border 🟦.
- - Left-Click on a second pixel to swap their positions and colors.Strategically move the colors closer to their matching corners (e.g., drag reddish pixels toward the pink corner, cyan pixels toward the blue corner).
+ 2. Swap Pixels to Restore the Canvas
+ - Left-Click on any standard pixel to select it.
+ - Left-Click on a second pixel to swap their positions and colors.
+
+ Strategically move the colors closer to their matching corners (e.g., drag reddish pixels toward the pink corner, cyan pixels toward the blue corner).
 
  3. Win the Game
  - The puzzle is solved the exact moment every single pixel is back in its mathematically correct position.
  - Once the grid forms a flawlessly smooth color blanket, you win!
 
- ⚙️ Difficulty Levels
+ Difficulty Levels
 
  You can adjust the difficulty of the puzzle by changing the Block Size:
 
- - Easy Mode (Large Blocks): Perfect for a quick, relaxing session. The colors automatically shift into a soft, gentle pastel palette, making it easier on the eyes and faster to solve.
+ - Easy Mode (Large Blocks): Perfect for a quick, relaxing session.
  - Hard Mode (Small Blocks): The ultimate challenge. A massive grid filled with high-contrast, vibrant colors that will truly test your perception of color nuances.
  */
 //----------------------------------------------------------------------
@@ -51,7 +55,7 @@ function createPixels(%renderer, %window) {
         TypeColor BottomRight   = {255,150,  0}; //orange
 
         // status
-        TypeS32 BlockSize      = 48; //24; // 16; //16; //32 ; //42; //8 .. 48
+        TypeS32 BlockSize      = 24; //24; // 16; //16; //32 ; //42; //8 .. 48
         TypeBool  cheatMode   = false; // difficult to see
         TypeS32   shuffleDelay = 1400;
 
