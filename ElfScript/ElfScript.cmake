@@ -2,7 +2,8 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
-option(ENABLE_ZIP "Enable the ElfScript ZIP Support" ON)
+option(ENABLE_ZIP "Enable the ElfScript ZIP Support" OFF)
+option(ENABLE_TEST_VECTOR "Enable ElfScript's experimental Variable Vector Support" OFF)
 
 # option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
 
@@ -268,6 +269,13 @@ set(ELFSCRIPT_SRC
     ${EXT_SRC}
 )
 
+if (ENABLE_TEST_VECTOR)
+     add_compile_definitions(TEST_STRUCT_FAST_PATH)
+endif()
+
 if (ENABLE_ZIP)
      list(APPEND ELFSCRIPT_SRC ${ZIP_SRC})
- endif()
+     add_compile_definitions(TORQUE_LOWER_ZIPCASE)
+else()
+    add_compile_definitions(TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM)
+endif()

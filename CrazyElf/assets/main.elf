@@ -140,7 +140,7 @@ function Main::Render(%this) {
 
 
     // %this.DrawText(2,2, { $Global::FPS , "FPS", $Global::FrameTime}, 0.8);
-    %this.DrawText(2,2, { $Global::FPS , "FPS" }, 0.5);
+
 
     // %this.DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module.", 1.5,  "200 200 180", true, SLATEGRAY);
     //

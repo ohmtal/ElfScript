@@ -10,7 +10,7 @@
 // Special:
 // ============================================================================
 // Testing PoD Struct Console Value
-#define TEST_STRUCT_FAST_PATH
+// #define TEST_STRUCT_FAST_PATH
 
 // Autodelete objects on shutdown - this can slowdown delete on many objects
 // #define ELFSCRIPT_GARBAGECOLLECTION

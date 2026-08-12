@@ -41,15 +41,6 @@
 #endif
 
 
-//#define DEBUG_SPEW
-// extern bool ResolvePathCaseInsensitive(char* pathName, S32 pathNameSize, bool requiredAbsolute);
-//XXTH from posixFileIO (torque4preview)
-//------------------------------------------------------------------------------
-// munge the case of the specified pathName.  This means try to find the actual
-// filename in with case-insensitive matching on the specified pathName, and
-// store the actual found name.#
-
-//XXTH !!
 #ifndef PATH_MAX
 #include <sys/syslimits.h>
 #endif
@@ -146,24 +137,6 @@ static String buildFileName(const String& prefix,const Path& path)
    file = Path::Join(file,'.',path.getExtension());
    return file;
 }
-
-/*
-static bool isFile(const String& file)
-{
-   struct stat info;
-   if (stat(file.c_str(),&info) == 0)
-     return S_ISREG(info.st_mode);
-   return false;
-}
-
-static bool isDirectory(const String& file)
-{
-   struct stat info;
-   if (stat(file.c_str(),&info) == 0)
-     return S_ISDIR(info.st_mode);
-   return false;
-}
-*/
 
 //-----------------------------------------------------------------------------
 
@@ -671,10 +644,6 @@ Torque::FS::FileSystemRef  Platform::FS::createNativeFS( const String &volume )
 
 #endif
 
-// String   Platform::FS::getAssetDir()
-// {
-//    return Platform::getExecutablePath();
-// }
 
 /// Function invoked by the kernel layer to install OS specific
 /// file systems.
