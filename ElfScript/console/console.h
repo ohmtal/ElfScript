@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -120,11 +121,12 @@ struct ConsoleLogEntry
 
 typedef const char *StringTableEntry;
 
+//NOTE: do not change the 4 (FOUR) or you need to change a lot of code (cvVector)!
 #define CONSOLE_VALUE_VECTOR_FIELD_COUNT 4
 
 enum ConsoleValueType
 {
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+#ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
    cvVector  =          -6,
 #endif
    cvNULL =             -5,
@@ -135,8 +137,12 @@ enum ConsoleValueType
    cvConsoleValueType =  0    ///< First valid engine console type ID
 };
 
-
-
+#ifdef ENABLE_CONSOLE_VECTOR
+struct ConsoleVector {
+      //should i add a count ?!
+      F64   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
+};
+#endif
 
 class ConsoleValue
 {
@@ -158,8 +164,8 @@ public:
          EnumTable* enumTable;
       };
    };
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4 at the moment
+#ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
+  ConsoleVector v;
 #endif
 #pragma warning(pop)
 
@@ -178,7 +184,7 @@ public:
       // cvSTEntry points into the StringTable (managed externally).
       // Numeric types use the f/i union fields — s is not valid for them.
 
-#ifndef TEST_STRUCT_FAST_PATH
+#ifndef ENABLE_CONSOLE_VECTOR
       if (type == ConsoleValueType::cvString && bufferLen > 0)
 #else
       if ((type == ConsoleValueType::cvString || type == ConsoleValueType::cvVector)  && bufferLen > 0)
@@ -196,8 +202,8 @@ public:
       type = ConsoleValueType::cvSTEntry;
       s = const_cast<char*>(StringTable->EmptyString());
       bufferLen = 0;
-#ifdef TEST_STRUCT_FAST_PATH
-      for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v[i] = 0.f;
+#ifdef ENABLE_CONSOLE_VECTOR
+      for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
 #endif
    }
 
@@ -250,6 +256,38 @@ public:
    {
       setEmptyString();
    }
+#ifdef  ENABLE_CONSOLE_VECTOR
+
+   TORQUE_FORCEINLINE ConsoleVector getVector() const
+   {
+         ConsoleVector result = {0};
+         switch (type)
+         {
+               case ConsoleValueType::cvFloat: result.points[0] = f; break;
+               case ConsoleValueType::cvInteger: result.points[0] = static_cast<F64>(i); break;
+               // case ConsoleValueType::cvSTEntry:
+               //       return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
+               case ConsoleValueType::cvVector: return v;
+               case ConsoleValueType::cvString: {
+                     if (s[0] == '\0') break;
+                     // THIS FAIL!!!!   ==>
+                     // dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+
+                     //F64 not %g => %lg!!!!!!!
+                     dSscanf(s, "%lg %lg %lg %lg", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+
+
+                     break;
+               }
+
+               // case ConsoleValueType::cvNULL:
+               //       return 0.0;
+               // default:
+               //       return dAtof(getConsoleData());
+         }
+         return result;
+   }
+#endif
 
    TORQUE_FORCEINLINE F64 getFloat() const
    {
@@ -262,8 +300,9 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
 
-#ifdef  TEST_STRUCT_FAST_PATH //TEST
+#ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
+         return  (v.points[0]);
 #endif
       case ConsoleValueType::cvString:
          return (s[0] == '\0') ? 0.0 : dAtof(s);
@@ -284,8 +323,9 @@ public:
          return static_cast<S64>(f);
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
-#ifdef  TEST_STRUCT_FAST_PATH //TEST
+#ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
+         return  static_cast<S64>(v.points[0]);
 #endif
       case ConsoleValueType::cvString:
          return (s[0] == '\0') ? S64(0) : static_cast<S64>(dAtoi(s));
@@ -300,6 +340,10 @@ public:
    {
       switch (type)
       {
+#ifdef  ENABLE_CONSOLE_VECTOR
+      case ConsoleValueType::cvVector:
+         return (v.points[0] != 0.0f);
+#endif
       case ConsoleValueType::cvInteger:
          return (i != 0);
       case ConsoleValueType::cvFloat:
@@ -319,15 +363,18 @@ public:
    {
       switch (type)
       {
-#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
-      case ConsoleValueType::cvVector:
-#endif
       case ConsoleValueType::cvSTEntry:
+            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvString:
          return s;
       case ConsoleValueType::cvNULL:
          return StringTable->EmptyString();
+#ifdef  ENABLE_CONSOLE_VECTOR
+      case ConsoleValueType::cvVector:
+            TORQUE_CASE_FALLTHROUGH;
+#endif
       case ConsoleValueType::cvFloat:
+            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvInteger:
          return convertToBuffer();
       default:
@@ -337,6 +384,14 @@ public:
 
    TORQUE_FORCEINLINE operator const char* () const { return getString(); }
 
+#ifdef ENABLE_CONSOLE_VECTOR
+   TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
+   {
+         cleanupData();
+         type =  ConsoleValueType::cvVector;
+         v = vec;
+   }
+#endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
       cleanupData();
@@ -469,7 +524,7 @@ private:
    void copyFrom(const ConsoleValue& other)
    {
 
-#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+#ifdef  ENABLE_CONSOLE_VECTOR
       bool wasVector = false;
 #endif
 
@@ -496,7 +551,7 @@ private:
          break;
 
 
-#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+#ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
             wasVector = true;
 #endif
@@ -510,9 +565,9 @@ private:
             : static_cast<S32>(dStrlen(other.s));
          setString(other.s, strLen);
 
-#ifdef  TEST_STRUCT_FAST_PATH  //NOTE while testing i return the string i also set
+#ifdef  ENABLE_CONSOLE_VECTOR
          if (wasVector) {
-                 dMemcpy(v, other.v, sizeof(v));
+                 dMemcpy(v.points, other.v.points, sizeof(v.points));
                  type = ConsoleValueType::cvVector;
          }
 #endif
@@ -540,9 +595,9 @@ private:
       case ConsoleValueType::cvInteger:
          i = other.i;
          break;
-#ifdef  TEST_STRUCT_FAST_PATH
+#ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-          dMemcpy(v, other.v, sizeof(v));
+          dMemcpy(v.points, other.v.points, sizeof(v.points));
 #endif
       case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:

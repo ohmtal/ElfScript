@@ -1,5 +1,7 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+//
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -348,7 +350,7 @@ public:
 
       // ElfScript !
       // void setIntValue(U32 val)
-      void setIntValue(S64 val)
+      inline void setIntValue(S64 val)
       {
          if (mIsConstant)
          {
@@ -375,7 +377,7 @@ public:
 
       // ElfScript !
       // void setFloatValue(F32 val)
-      void setFloatValue(F64 val)
+      inline void setFloatValue(F64 val)
       {
          if (mIsConstant)
          {
@@ -401,7 +403,7 @@ public:
       }
 
 
-      void setStringValue(const char* val)
+      inline void setStringValue(const char* val)
       {
          if (mIsConstant)
          {
@@ -422,7 +424,51 @@ public:
          if (notify)
             notify->trigger();
       }
+
+
+      // -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VECTOR
+
+      inline ConsoleVector getVectorVariable()
+      {
+            return value.getVector();
+      }
+
+      inline void setVectorVariable(ConsoleVector vec)
+      {
+            if (mIsConstant)
+            {
+                  Con::errorf("Cannot assign value to constant '%s'.", name);
+                  return;
+            }
+
+            if (value.isConsoleType())
+            {
+             //dang i need something like this!      const char* dptr = Con::getData(TypeF64, &val, 0);
+                    // Con::setData(value.type, value.dataPtr, 0, 1, &dptr, value.enumTable);
+                  Con::debugf("setVectorValue no idea if this works here !!");
+                  static const U32 bufSize = 256;
+                  char* returnBuffer = Con::getReturnBuffer(bufSize);
+                  dSprintf(returnBuffer, bufSize, "%g %g %g %g", vec.points[0], vec.points[1],vec.points[2], vec.points[3]);
+                  const char* val = returnBuffer;
+                  Con::setData(value.type, value.dataPtr, 0, 1, &val, value.enumTable);
+            }
+            else
+            {
+                  value.setVector(vec);
+            }
+
+            // Fire off the notification if we have one.
+            if (notify)
+                  notify->trigger();
+      }
+   // };
+#endif
+   // -----------------------------------------------------------------------------
+
    };
+
+
 
    struct HashTableData
    {

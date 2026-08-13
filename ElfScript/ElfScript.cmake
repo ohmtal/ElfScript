@@ -3,7 +3,7 @@
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
 option(ENABLE_ZIP "Enable the ElfScript ZIP Support" OFF)
-option(ENABLE_TEST_VECTOR "Enable ElfScript's experimental Variable Vector Support" OFF)
+option(ENABLE_CONSOLE_VECTOR "Enable ElfScript's experimental Variable Vector Support" OFF)
 
 # option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
 
@@ -164,6 +164,8 @@ set(CORE_SRC
 
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/stream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/fileStream.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/stream/memStream.cpp
+    # ${CMAKE_CURRENT_LIST_DIR}/core/stream/bitStream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/streamObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/stream/fileStreamObject.cpp
 

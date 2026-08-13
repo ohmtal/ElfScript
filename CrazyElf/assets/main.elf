@@ -11,6 +11,7 @@ function GetFrameTime() { return $Global::FrameTime; }
 function GetFPS() { return $Global::FPS; }
 function ToggleFullScreen() { $Global::FullScreen = !$Global::FullScreen; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
 function ToggleVSync() { $Global::VSync = !$Global::VSync; SDL_SetRenderVSync($Main.renderer, $Global::VSync); }
+function Quit() { $Global::running = false; }
 //------------------------------------------------------------------------------
 function Main::init(%this) {
 
@@ -117,45 +118,11 @@ function Main::DrawText(%this, %x, %y, %text, %scale=1.0, %colorStr, %shadow, %s
 function Main::Render(%this) {
 
 
-    // set the background color  <<< let the module do this!!!
-    // SDL_SetRenderDrawColor(%this.renderer, 15,15,30);
-    // // clear the screen
-    // SDL_RenderClear(%this.renderer);
-
-
-    // we scale the screen (setScreenSize) so we have to use out ScreenSize not windowSize
-
-
-
-
     if (isObject(%this.module)){
         %this.module.render();
-        // if (!%this.hideBottomMessage ) %this.DrawText(5, $ScreenSize.y - 20,"Loaded module:" SPC %this.moduleName ,  1.5, BLUE, true, BLACK);
     } else {
-        // ClearBackground("20 100 100");
         %this.DrawText(5, $ScreenSize.y - 20,"Failed to load module:" SPC %this.moduleName,  1.5, RED);
     }
-    if ( %this.hideBottomMessage ) return;
-
-
-
-    // %this.DrawText(2,2, { $Global::FPS , "FPS", $Global::FrameTime}, 0.8);
-
-
-    // %this.DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module.", 1.5,  "200 200 180", true, SLATEGRAY);
-    //
-    //
-    // %this.DrawText( 15,15, FormatString("%.4f sec. Mouse: %.0f,%.0f", GetFrameTime(), SDL_GetMouseX(), SDL_GetMouseY()) );
-
-    // %this.DrawText($ScreenSize.x - 500, $ScreenSize.y - 10
-    //     , "Mouse:" SPC strFormat("%.2f",SDL_GetMouseX()) SPC strFormat("%.2f",SDL_GetMouseY())
-    //       SPC "BUTTONS:"
-    //             SPC SDL_IsMouseButtonDown(SDL_BUTTON_LEFT)
-    //             SPC SDL_IsMouseButtonDown(SDL_BUTTON_MIDDLE)
-    //             SPC SDL_IsMouseButtonDown(SDL_BUTTON_RIGHT)
-    //       SPC "WHEEL:" SPC SDL_GetMouseWheelY()
-    //     , 1.2, "0 255 200");
-
 
     // draw the stuff ...
     SDL_RenderPresent(%this.renderer);
@@ -248,11 +215,11 @@ function updateDocu() {
 // scale to 320x200 ^^
 $WindowSize = {640,400};
 
-$running = onInit();
+$Global::running = onInit();
 
 %main = Main.getId();
 
-echo("************** %main: ", %main, " RUNNUNG: ", $running);
+echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 
 // hardcode variable test ^^
 %performanceFrequency = SDL_GetPerformanceFrequency();
@@ -265,7 +232,7 @@ echo("************** %main: ", %main, " RUNNUNG: ", $running);
 // we only need to push the renderer if we scaled the screen....
 %mainLoopParam = %main.scaledScreen ? %main.renderer : 0;
 
-while ($running) {
+while ($Global::running) {
 
     %tickCount = SDL_GetPerformanceCounter();
 

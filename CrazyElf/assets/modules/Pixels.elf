@@ -1,9 +1,6 @@
 
-// FIXME
-//
-function Save() { Pixels.save("test.sto"); }
-function Load() { $_LOADING = true; Pixels.delete(); schedule(0,0,postLoad); }
-function postLoad() { exec("test.sto"); $main.module = Pixels.getId(); $_LOADING = false; }
+
+
 //
 
 /*
@@ -39,7 +36,48 @@ function postLoad() { exec("test.sto"); $main.module = Pixels.getId(); $_LOADING
  - Hard Mode (Small Blocks): The ultimate challenge. A massive grid filled with high-contrast, vibrant colors that will truly test your perception of color nuances.
  */
 //----------------------------------------------------------------------
+$_PixelsFileName = SDL_GetPrefPath("Ohmtal", "Pixels") @ "userdata.elfdata";
+
+function _Pixels_Save(%filename = $_PixelsFileName) {
+    echo("Saving" SPC %fileName SPC ".......");
+    if (!Pixels.save($_PixelsFileName)) {
+        error("Failed to save " SPC %filename);
+    }
+}
+function _Pixels_Load(%filename = $_PixelsFileName) {
+    if (SDL_FileExists(%filename)) {
+        echo("Loading" SPC %fileName SPC ".......");
+        $_LOADING = true;
+        if (isObject(Pixels)) Pixels.delete();
+        exec(%filename);
+        //NOT this should be done by the caller !!!$main.module = Pixels.getId();
+        $_LOADING = false;
+        // schedule(0,0,_Pixels_Post_Load, %fileName);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+function _Pixels_Post_Load(%filename) {
+    $_LOADING = false;
+}
+
+//----------------------------------------------------------------------
 function createPixels(%renderer, %window) {
+
+    if (_Pixels_Load() && isObject(Pixels)){
+         Pixels.renderer  = %renderer;
+         Pixels.window    = %window;
+
+         echo("----------------------------");
+         echo("STORAGE IS:" SPC PixelStorage.getId());
+         echo("----------------------------");
+
+         return Pixels.getId();
+    }
+
+
     %obj = new ScriptGroup(Pixels) {
         TypeS32 renderer    = %renderer;
         TypeS32 window      = %window;
@@ -61,19 +99,56 @@ function createPixels(%renderer, %window) {
 
         TypeBool  gameWon    = false;
         TypeBool  gridSetup  = false;
+        TypeBool  menuActive = false;
         TypeBool  recordSet  = false;
+
+        TypeBool soundOn = true;
         TypeS32   clickCount = 0;
     };
     $_LOADING = false;
+
     return %obj;
 }
 //----------------------------------------------------------------------
-function Pixels::onAdd(%this) {
+function Pixels::refreshBlockSize(%this) {
+
+
     %w = %this.CanvasW;
     %h = %this.CanvasH;
     %borderTop  = %this.BorderTop;
     %borderLeft = %this.BorderLeft;
+
     %blockSize  = %this.BlockSize;
+
+
+    %this.cols = mFloor((%w - %borderLeft) / %blockSize);
+    %this.rows = mFloor((%h - %borderTop) / %blockSize);
+    %this.pixelCount = %this.cols * %this.rows;
+
+    print("Add ", %this.pixelCount, " pixels to storage. (Cols: ", %this.cols, ", Rows: ", %this.rows, ")");
+
+    if (isObject(PixelStorage)) PixelStorage.delete();
+    %this.add (new PointStorageObject(PixelStorage) {
+        storageSize = %this.pixelCount;
+    });
+
+    if (isObject(SolvedPixelStorage)) SolvedPixelStorage.delete();
+    %this.add(new PointStorageObject(SolvedPixelStorage) {
+        storageSize = %this.pixelCount;
+    });
+
+
+    %this.newGame();
+}
+//----------------------------------------------------------------------
+
+function Pixels::onAdd(%this) {
+    echo("Pixels::onAdd ............ Loading:" SPC $_LOADING SPC "PixelStorage exists:" SPC isObject(PixelStorage));
+
+    %w = %this.CanvasW;
+    %h = %this.CanvasH;
+    %borderTop  = %this.BorderTop;
+    %borderLeft = %this.BorderLeft;
 
     %this.CanvasBackGroundRect = { %borderLeft - 2, %borderTop - 2, %w - %borderLeft + 4, %h - %borderTop + 4 };
     %this.CanvasBordeRect = { %borderLeft - 1, %borderTop - 1, %w - %borderLeft + 2, %h - %borderTop + 2 };
@@ -82,40 +157,16 @@ function Pixels::onAdd(%this) {
     %this.HeaderRect.height = %borderTop - 4;
 
     %this.OverlayRect = { 40 ,40, $Global::ScreenSize.x - 80, $Global::ScreenSize.y - 80};
-
-    %this.cols = mFloor((%w - %borderLeft) / %blockSize);
-    %this.rows = mFloor((%h - %borderTop) / %blockSize);
-    %this.pixelCount = %this.cols * %this.rows;
-
-    print("Add: ", %this.pixelCount, " pixels to storage. (Cols: ", %this.cols, ", Rows: ", %this.rows, ")");
-
-    //FIXME sound for won and shuffle
+    %this.SettingsButtonRect = { %this.HeaderRect.x + %this.HeaderRect.width - 40, %this.HeaderRect.y +7, 30,14 };
+    %this.SettingsTextPos = { %this.SettingsButtonRect.x + 6, %this.SettingsButtonRect.y + 5};
 
     %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
     %this.SndShuffle = Audio_LoadWav("assets/sound/shuffle.wav");
     %this.SndWon = Audio_LoadWav("assets/sound/won.wav");
 
 
-    if ( !isObject(ClickTable) ) {
-        // FIXME load click table data
-        %this.add(new SimObject(ClickTable));
-    }
-
-
-    if (! $_LOADING ) {
-
-        %this.add (new PointStorageObject(Storage) {
-            storageSize = %this.pixelCount;
-        });
-
-        %this.add(new PointStorageObject(SolvedStorage) {
-            storageSize = %this.pixelCount;
-        });
-
-
-        %this.newGame();
-    } else {
-        print(".... skip object create we did load a game ....");
+    if (!$_LOADING ) {
+        %this.refreshBlockSize();
     }
 
     return true;
@@ -126,6 +177,7 @@ function Pixels::OnRemove(%this) {
     Audio_UnLoadWav(%this.SndBlop);
     Audio_UnLoadWav(%this.SndShuffle);
     Audio_UnLoadWav(%this.SndWon);
+    _Pixels_Save();
 }
 //----------------------------------------------------------------------
 function Pixels::newGame(%this) {
@@ -138,15 +190,21 @@ function Pixels::newGame(%this) {
 
     %this.resetGrid();
 
-    Audio_Play(%this.SndShuffle);
+    %this.PlaySound(%this.SndShuffle);
 
     %this.schedule(%this.shuffleDelay,shuffleGrid);
 }
 
 //----------------------------------------------------------------------
+function Pixels::PlaySound(%this, %snd) {
+
+    if (!%this.soundOn) return;
+    Audio_Play(%snd);
+}
+//----------------------------------------------------------------------
 function Pixels::shuffleGrid(%this) {
     %this.gameWon = false;
-    %storage = Storage.getId();
+    %storage = PixelStorage.getId();
     %count = %this.pixelCount;
 
     print("shuffleGrid......");
@@ -170,15 +228,15 @@ function Pixels::shuffleGrid(%this) {
         %storage.storePoint(%j);
     }
 
-    // Audio_Play(%this.SndBlop);
+    // %this.PlaySound(%this.SndBlop);
     %this.gridSetup = false;
     print("shuffle done");
 }
 
 //----------------------------------------------------------------------
-function Pixels::dumpStorage(%this) {
-    for(%i in range Storage.storageSize) {
-        print(formatString("%d: %s", %i, Storage.getPointVec(%i)));
+function Pixels::dumpPixelStorage(%this) {
+    for(%i in range PixelStorage.storageSize) {
+        print(formatString("%d: %s", %i, PixelStorage.getPointVec(%i)));
     }
 }
 //----------------------------------------------------------------------
@@ -211,8 +269,8 @@ function Pixels::resetGrid(%this) {
 
     %this.generateBorderColors();
 
-    %storage    = Storage.getId();
-    %solvedStorage    = SolvedStorage.getId();
+    %storage    = PixelStorage.getId();
+    %solvedPixelStorage    = SolvedPixelStorage.getId();
 
     %rTL = %this.TopLeft.r;    %gTL = %this.TopLeft.g;     %bTL = %this.TopLeft.b;
     %rTR = %this.TopRight.r;   %gTR = %this.TopRight.g;    %bTR = %this.TopRight.b;
@@ -254,7 +312,7 @@ function Pixels::resetGrid(%this) {
         }
     }
     foreach(%index in range %storage.storageSize) {
-        %solvedStorage.setPointVec(%index, %storage.getPointVec(%index));
+        %solvedPixelStorage.setPointVec(%index, %storage.getPointVec(%index));
     }
 }
 //----------------------------------------------------------------------
@@ -263,6 +321,28 @@ function Pixels::DrawText(%this, %x, %y, %text, %scale=1.0 /*, %colorStr, %shado
     SDL_SetRenderScale(%this.renderer, %scale, %scale);
     SDL_RenderDebugText(%this.renderer, %x /%scale , %y/%scale, %text );
     SDL_SetRenderScale(%this.renderer, 1.0, 1.0);
+}
+//----------------------------------------------------------------------
+function Pixels::Button(%this, %rect, %text, %fontScale = 1.0) {
+    %result = false;
+    %r = %this.renderer;
+    SDL_SetRenderDrawColor(%r, 60,60,60);
+    SDL_RenderFillRect(%r, %rect);
+    SDL_SetRenderDrawColor(%r, 128, 128, 128);
+    SDL_RenderRect(%r, %rect);
+
+
+    if (SDL_PointInRectFloat({ SDL_GetMouseX(), SDL_GetMouseY() }, %rect)) {
+        SDL_SetRenderDrawColor(%r, 128, 255, 128);
+        if (SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
+            %result = true;
+        }
+    } else {
+        SDL_SetRenderDrawColor(%r, 205,205, 205,255);
+    }
+    %this.DrawText(%rect.x+6 ,%rect.y+4, %text,%fontScale);
+
+    return %result;
 }
 //----------------------------------------------------------------------
 function Pixels::Render(%this) {
@@ -275,9 +355,9 @@ function Pixels::Render(%this) {
     %blockSize  = %this.BlockSize;
     %borderTop     = %this.BorderTop;
     %borderLeft     = %this.BorderLeft;
-    if(!isObject(Storage)) return;
-    %storage    = Storage.getId();
-    %solvedStorage    = SolvedStorage.getId();
+    if(!isObject(PixelStorage)) return;
+    %storage    = PixelStorage.getId();
+    %solvedPixelStorage    = SolvedPixelStorage.getId();
 
 
     SDL_SetRenderDrawColor(%r, 125, 125, 145);
@@ -303,7 +383,7 @@ function Pixels::Render(%this) {
             }
 
             // Mouse:
-            if (!%this.gameWon && !%this.gridSetup) {
+            if (!%this.gameWon && !%this.gridSetup && !%this.menuActive) {
                 if (  SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)
                     && SDL_PointInRectFloat(
                         { SDL_GetMouseX(), SDL_GetMouseY() },
@@ -315,7 +395,7 @@ function Pixels::Render(%this) {
 
             SDL_RenderRectF(%r, %x, %y, %blockSize, %blockSize, true);
 
-            if (%storage.w == 1.0 || %solvedStorage.getPointVec(%index) $= %storage.getPointVec(%index)) {
+            if (%storage.w == 1.0 || %solvedPixelStorage.getPointVec(%index) $= %storage.getPointVec(%index)) {
                 SDL_SetRenderDrawColor(%r, 200,200,200);
                 SDL_RenderRectF(%r, %x + 2, %y + 2, %blockSize - 4 , %blockSize - 4 , false);
                 // SDL_RenderRectF(%r, %x + %blockSize / 2 - 2, %y + %blockSize / 2 - 2, 4 , 4 , false);
@@ -324,8 +404,8 @@ function Pixels::Render(%this) {
 
 
             if (%this.cheatMode) {
-                %solvedStorage.fetchPoint(%index);
-                SDL_SetRenderDrawColor(%r,%solvedStorage.x, %solvedStorage.y, %solvedStorage.z);
+                %solvedPixelStorage.fetchPoint(%index);
+                SDL_SetRenderDrawColor(%r,%solvedPixelStorage.x, %solvedPixelStorage.y, %solvedPixelStorage.z);
             }
             else if (%this.gameWon && !%this.gridSetup) {
                 // SDL_SetRenderDrawColor(%r, getRandom(200 + 55), getRandom(200 + 55), getRandom(200 + 55));
@@ -369,17 +449,92 @@ function Pixels::Render(%this) {
     SDL_SetRenderScale(%r, %scale, %scale);
     SDL_RenderDebugText(%r, 140 / %scale, 7 / %scale, "Clicks:" SPC %this.clickCount);
     SDL_RenderDebugText(%r, 140 / %scale, 17 / %scale, "Size  :" SPC %this.blockSize);
-     %this.DrawText(200,7, "Best:" SPC (ClickTable.record[%this.blockSize] * 1 > 0  ? ClickTable.record[%this.blockSize] : "---"),%scale);
+     %this.DrawText(200,7, "Best:" SPC (%this.record[%this.blockSize] * 1 > 0  ? %this.record[%this.blockSize] : "---"),%scale);
     SDL_SetRenderScale(%r); //reset
 
-    if (%this.gridSetup) {
+    if (%this.Button(%this.SettingsButtonRect, "Menu", 0.6)) {
+        %this.MenuBlockSize = %this.BlockSize;
+        %this.Menuactive = true;
+
+    }
+
+
+
+
+
+    if (%this.menuActive) {
+        SDL_SetRenderDrawBlendMode(%r, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(%r, 50,50,50,180);
+        SDL_RenderFillRect(%r,%this.OverlayRect);
+        SDL_SetRenderDrawBlendMode(%r, SDL_BLENDMODE_NONE);
+        // a silver border
+        SDL_SetRenderDrawColor(%r, 128,128, 128);
+        SDL_RenderRect(%r,%this.OverlayRect);
+
+
+        %y = %this.OverlayRect.y;
+        %y += 5;
+        %x = %this.OverlayRect.x + 10;
+        SDL_SetRenderDrawColor(%r, 205,205, 205,255);
+        %this.DrawText(%x,%y+1, "Menu",0.9);
+
+
+        %y += 12;
+        %rect = { %x , %y, 100,12 };
+        // Button Sound on ...
+        if (%this.Button(%rect, "Sound" SPC (%this.soundOn ? "on" : "off") , 0.6)) {
+             %this.soundOn = !%this.soundOn;
+        }
+
+        // Select BlockSize
+        %y += 16;
+        %rect = { %x , %y, 15,12 };
+        if (%this.Button(%rect, "<", 0.6) ) {
+            %this.MenuBlockSize = mClamp(%this.MenuBlockSize - 2, 8, 48);
+        }
+        SDL_SetRenderDrawColor(%r, 205,205, 205,255);
+        %this.DrawText(%x+17,%y+4, "BlockSize:" SPC %this.MenuBlockSize,0.6);
+        %rect = { %x + 85, %y, 15,12 };
+        if (%this.Button(%rect, ">", 0.6) ) {
+            %this.MenuBlockSize = mClamp(%this.MenuBlockSize + 2, 8, 48);
+        }
+
+        %y = %this.OverlayRect.y + %this.OverlayRect.height - 18;
+        %rect = { %x , %y, 60,12 };
+        // Button Sound on ...
+        if (%this.Button(%rect, "Apply", 0.6) ) {
+            if (%this.BlockSize != %this.MenuBlockSize) {
+                %this.BlockSize = %this.MenuBlockSize;
+                %this.refreshBlockSize();
+            }
+            %this.menuActive = false;
+        }
+
+        // %y += 20;
+        %rect = { %x + 62, %y, 50,12 };
+        // Button Sound on ...
+        if (%this.Button(%rect, "Close", 0.6) ) {
+            %this.menuActive = false;
+        }
+
+        // %y += 20;
+        %rect = { %x + 164, %y, 60,12 };
+        // Button Sound on ...
+        if (%this.Button(%rect, "Quit Game", 0.6) ) {
+            quit();
+        }
+
+
+
 
     } else if (%this.gameWon) {
         SDL_SetRenderDrawBlendMode(%r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(%r, 50,50,50,180);
         SDL_RenderFillRect(%r,%this.OverlayRect);
         SDL_SetRenderDrawBlendMode(%r, SDL_BLENDMODE_NONE);
-
+        // a silver border
+        SDL_SetRenderDrawColor(%r, 128,128, 128);
+        SDL_RenderRect(%r,%this.OverlayRect);
 
         %y = %this.OverlayRect.y;
         %y += 20;
@@ -397,9 +552,9 @@ function Pixels::Render(%this) {
         %this.DrawText(92,%y,  "Clicks:" SPC %this.clickCount,1.3);
 
 
-        SDL_SetRenderDrawColor(%r, 200,20,28);
+        SDL_SetRenderDrawColor(%r, 200,220,28);
         %y += 20;
-        %this.DrawText(92,%y, "Best  :" SPC ClickTable.record[%this.blockSize],1.3);
+        %this.DrawText(92,%y, "Best  :" SPC %this.record[%this.blockSize],1.3);
 
         %y += 20;
         if (%this.recordSet) {
@@ -422,9 +577,6 @@ function Pixels::Render(%this) {
         }
 
 
-        // a silver border
-        SDL_SetRenderDrawColor(%r, 128,128, 128);
-        SDL_RenderRect(%r,%this.OverlayRect);
     }
 
 
@@ -439,11 +591,11 @@ function Pixels::checkWinCondition(%this) {
 
     %this.clickCount++;
 
-    %storage = Storage.getId();
-    %solvedStorage    = SolvedStorage.getId();
+    %storage = PixelStorage.getId();
+    %solvedPixelStorage    = SolvedPixelStorage.getId();
     foreach(%index in range %storage.storageSize) {
         // string compare good idea ?
-        if (%solvedStorage.getPointVec(%index) !$= %storage.getPointVec(%index))
+        if (%solvedPixelStorage.getPointVec(%index) !$= %storage.getPointVec(%index))
             return false;
     }
 
@@ -467,13 +619,13 @@ function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRe
 
 function Pixels::onPixelClicked(%this, %clickedIndex) {
 
-    if (%this.gameWon || %this.gridSetup) return;
+    if (%this.gameWon || %this.gridSetup || %this.menuActive) return;
 
     if (%clickedIndex == -1) return;
 
 
-    %storage = Storage.getId();
-    %solvedStorage = SolvedStorage.getId();
+    %storage = PixelStorage.getId();
+    %solvedPixelStorage = SolvedPixelStorage.getId();
     if (%storage.getPointW(%clickedIndex) == 1.0) {
         return;
     }
@@ -494,10 +646,10 @@ function Pixels::onPixelClicked(%this, %clickedIndex) {
             %storage.setPointVec(%idxB, %bucket);
 
             if (
-                %storage.getPointVec(%idxA) $= %solvedStorage.getPointVec(%idxA)
-                || %storage.getPointVec(%idxB) $= %solvedStorage.getPointVec(%idxB)
+                %storage.getPointVec(%idxA) $= %solvedPixelStorage.getPointVec(%idxA)
+                || %storage.getPointVec(%idxB) $= %solvedPixelStorage.getPointVec(%idxB)
             ) {
-                Audio_Play(%this.SndBlop);
+                %this.PlaySound(%this.SndBlop);
             }
             // print("Pixel swap: ", %idxA, " with ", %idxB);
         }  else {
@@ -505,13 +657,13 @@ function Pixels::onPixelClicked(%this, %clickedIndex) {
         }
 
         if (%this.checkWinCondition()) {
-            Audio_Play(%this.SndWon);
+            %this.PlaySound(%this.SndWon);
             %this.gameWon = true;
 
-            if (ClickTable.record[%this.blockSize] $= ""
-                ||  ClickTable.record[%this.blockSize] > %this.clickCount) {
+            if (%this.record[%this.blockSize] $= ""
+                ||  %this.record[%this.blockSize] > %this.clickCount) {
                     %this.recordSet = true;
-                    ClickTable.record[%this.blockSize] = %this.clickCount;
+                    %this.record[%this.blockSize] = %this.clickCount;
                 }
 
         }

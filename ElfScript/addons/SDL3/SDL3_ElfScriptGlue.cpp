@@ -18,7 +18,8 @@ namespace ElfSDL3 {
 
     // ----------------------------------------------------------------------------
     // ----------------------------------------------------------------------------
-    void InitSDLBindings() {
+    // void InitSDLBindings() {
+    void Init() {
         ElfSDL3::RegisterCoreConstants();
         ElfSDL3::InitKeyCodes();
         ElfSDL3::RegisterFileSystemConstants();
@@ -28,7 +29,8 @@ namespace ElfSDL3 {
 
     // DefineEngineFunction(InitSDLBindings, void, (), ,"Init the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
 
-    void ShutdownSDLBindings(){
+    // void ShutdownSDLBindings(){
+    void Shutdown(){
         ElfSDL3::ShutDownRenderer();
         ElfSDL3::Audio::ShutDown();
     }

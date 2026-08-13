@@ -13,7 +13,7 @@
 //remove is now default #define ELFSCRIPT_FASTPATH_FLD
 
 // fast path test for struct << i do test this in CrazyElf
-// #define TEST_STRUCT_FAST_PATH
+// #define ENABLE_CONSOLE_VECTOR
 
 // added Integer operation, which should give a huge speed up but ended in a slower test!
 // also only tested with a for loop $foo++ still used float ...

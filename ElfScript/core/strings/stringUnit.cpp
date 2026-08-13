@@ -22,7 +22,6 @@
 
 #include "core/strings/stringFunctions.h"
 #include "core/strings/stringUnit.h"
-//XXTH not needed here ?!  #include "console/console.h"
 
 namespace StringUnit
 {

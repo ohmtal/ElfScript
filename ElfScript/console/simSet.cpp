@@ -736,12 +736,13 @@ void SimGroup::popObject()
 void SimGroup::onRemove()
 {
    lock();
+   SimObject::onRemove(); //ElfScript moved up ... seams to work .. crossing fingers
    if( !mObjectList.empty() )
    {
 	   mObjectList.sortId();
       clear();
    }
-   SimObject::onRemove();
+   // XXTH need this before clear or i need to add a new event^^ SimObject::onRemove();
    unlock();
 }
 

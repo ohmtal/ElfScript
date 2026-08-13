@@ -204,26 +204,48 @@ namespace Con
    }
 }
 
-static void getFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, char val[], S32 currentLocalRegister)
+// -----------------------------------------------------------------------------
+static void stackFieldComponent(SimObject* object, StringTableEntry field, const char* array
+      , StringTableEntry subField, ConsoleValue* pStack, S32 currentLocalRegister)
 {
-   const char* prevVal = NULL;
 
-   if (object && field)
-      prevVal = object->getDataField(field, array);
-   else if (currentLocalRegister != -1)
-      prevVal = Script::gEvalState.getLocalStringVariable(currentLocalRegister);
-   else if (Script::gEvalState.currentVariable)
-      prevVal = Script::gEvalState.getStringVariable();
 
-   // Make sure we got a value.
-   if (prevVal && *prevVal)
-   {
+
+      /*ConsoleValueType*/ S32 targetType = pStack->type;
+
+      static ConsoleValue srcStoreValue = {};
+      ConsoleValue* srcValue = nullptr;
+      // Local Variable
+
+      if (object && field) {
+#ifdef ENABLE_CONSOLE_VECTOR
+            srcStoreValue.type = ConsoleValueType::cvVector;
+#else
+            srcStoreValue.type = ConsoleValueType::cvString;
+#endif
+            srcValue = &srcStoreValue;
+            object->stackDataField(field, array, srcValue); //get the current
+            // Con::debugf("srcStoreValue.type is: %d value: %s", srcStoreValue.type, srcStoreValue.getString());
+      } else if (currentLocalRegister != -1) {
+            srcValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
+      } else if (Script::gEvalState.currentVariable) {
+            srcValue = Script::gEvalState.getConsoleValue();
+      }
+
+      // no srcValue empty target pStack
+      if (!srcValue) {
+            pStack->setEmptyString();
+            return;
+      }
+
+
+      // -----
       static const StringTableEntry xyzw[] =
       {
-         StringTable->insert("x"),
-         StringTable->insert("y"),
-         StringTable->insert("z"),
-         StringTable->insert("w")
+            StringTable->insert("x"),
+            StringTable->insert("y"),
+            StringTable->insert("z"),
+            StringTable->insert("w")
       };
 
       //XXTH added
@@ -236,32 +258,242 @@ static void getFieldComponent(SimObject* object, StringTableEntry field, const c
 
       static const StringTableEntry rgba[] =
       {
-         StringTable->insert("r"),
-         StringTable->insert("g"),
-         StringTable->insert("b"),
-         StringTable->insert("a")
+            StringTable->insert("r"),
+            StringTable->insert("g"),
+            StringTable->insert("b"),
+            StringTable->insert("a")
       };
-
+      // -----
+      F64 targetValue = 0.f;
       // Translate xyzw and rgba into the indexed component
       // of the variable or field.
-      if (subField == xyzw[0] || subField == rgba[0])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 0, " \t\n"), 128);
 
-      else if (subField == xyzw[1] || subField == rgba[1])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 1, " \t\n"), 128);
+#ifdef  ENABLE_CONSOLE_VECTOR
 
-      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 2, " \t\n"), 128);
+      // Con::debugf("srcValue->type == %d",  srcValue->type );
 
-      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 3, " \t\n"), 128);
+      // Now we get advantage out of it .. if the variable still have the type
+      // global == NOT :/ have -2
+      // local  == NOT :/ have -2
+      // somewhere my type get lost :/
+      if (subField == xyzw[0] || subField == rgba[0]) {
+            if (srcValue->type == cvVector) targetValue = srcValue->v.points[0];
+            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 0, " \t\n"));
+      } else if (subField == xyzw[1] || subField == rgba[1]) {
+            if (srcValue->type == cvVector) targetValue = srcValue->v.points[1];
+            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 1, " \t\n"));
 
-      else
-         val[0] = 0;
-   }
-   else
-      val[0] = 0;
+      } else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
+            if (srcValue->type == cvVector) targetValue = srcValue->v.points[2];
+            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 2, " \t\n"));
+
+      } else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
+            if (srcValue->type == cvVector) targetValue = srcValue->v.points[3];
+            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 3, " \t\n"));
+      } else {
+            //nothing found ^^
+            pStack->setEmptyString();
+            return;
+      }
+#else
+      if (subField == xyzw[0] || subField == rgba[0]){
+            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 0, " \t\n"));
+      } else if (subField == xyzw[1] || subField == rgba[1]) {
+            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 1, " \t\n"));
+
+      } else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
+            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 2, " \t\n"));
+
+      } else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
+            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 3, " \t\n"));
+
+      } else {
+            //nothing found ^^
+            pStack->setEmptyString();
+            return;
+      }
+#endif
+
+      switch ( targetType ) {
+            case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
+            case cvFloat: pStack->setFastFloat(targetValue); break;
+            default: pStack->setFloat(targetValue); break;
+      }
+
 }
+
+// -----------------------------------------------------------------------------
+
+// replaced by stackFieldComponent
+// static void getFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, char val[], S32 currentLocalRegister)
+// {
+//    const char* prevVal = NULL;
+//
+//    if (object && field)
+//       prevVal = object->getDataField(field, array);
+//    else if (currentLocalRegister != -1)
+//       prevVal = Script::gEvalState.getLocalStringVariable(currentLocalRegister);
+//    else if (Script::gEvalState.currentVariable)
+//       prevVal = Script::gEvalState.getStringVariable();
+//
+//    // Make sure we got a value.
+//    if (prevVal && *prevVal)
+//    {
+//       static const StringTableEntry xyzw[] =
+//       {
+//          StringTable->insert("x"),
+//          StringTable->insert("y"),
+//          StringTable->insert("z"),
+//          StringTable->insert("w")
+//       };
+//
+//       //XXTH added
+//       static const StringTableEntry wh[] =
+//       {
+//             StringTable->insert("width"),
+//             StringTable->insert("height")
+//       };
+//
+//
+//       static const StringTableEntry rgba[] =
+//       {
+//          StringTable->insert("r"),
+//          StringTable->insert("g"),
+//          StringTable->insert("b"),
+//          StringTable->insert("a")
+//       };
+//
+//       // Translate xyzw and rgba into the indexed component
+//       // of the variable or field.
+//       if (subField == xyzw[0] || subField == rgba[0])
+//          dStrcpy(val, StringUnit::getUnit(prevVal, 0, " \t\n"), 128);
+//
+//       else if (subField == xyzw[1] || subField == rgba[1])
+//          dStrcpy(val, StringUnit::getUnit(prevVal, 1, " \t\n"), 128);
+//
+//       else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
+//          dStrcpy(val, StringUnit::getUnit(prevVal, 2, " \t\n"), 128);
+//
+//       else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
+//          dStrcpy(val, StringUnit::getUnit(prevVal, 3, " \t\n"), 128);
+//
+//       else
+//          val[0] = 0;
+//    }
+//    else
+//       val[0] = 0;
+// }
+// -----------------------------------------------------------------------------
+// called at %foo.x = 1.0;
+static void pushFieldComponent(SimObject* object, StringTableEntry field, const char* array
+      , StringTableEntry subField, ConsoleValue* pSrcStack, S32 currentLocalRegister)
+{
+      static ConsoleValue dstStoreValue = {};
+      ConsoleValue *dstValue = nullptr;
+
+      if (object && field) {
+            // not! dstStoreValue.type = ConsoleValueType::cvVector;
+            dstStoreValue.type = ConsoleValueType::cvString;
+            dstValue = &dstStoreValue;
+            object->stackDataField(field,array,dstValue);
+      } else if (currentLocalRegister != -1) {
+            dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
+      } else if (Script::gEvalState.currentVariable) {
+            dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
+      }
+
+      // no dstValue nothing to do here
+      if (!dstValue) {
+            return;
+      }
+
+      // ----
+      static const StringTableEntry xyzw[] =
+      {
+            StringTable->insert("x"),
+            StringTable->insert("y"),
+            StringTable->insert("z"),
+            StringTable->insert("w")
+      };
+
+      static const StringTableEntry wh[] =
+      {
+            StringTable->insert("width"),
+            StringTable->insert("height")
+      };
+
+
+      static const StringTableEntry rgba[] =
+      {
+            StringTable->insert("r"),
+            StringTable->insert("g"),
+            StringTable->insert("b"),
+            StringTable->insert("a")
+      };
+      // ----
+
+
+#ifdef  ENABLE_CONSOLE_VECTOR
+      // Con::debugf("dstValue->type == %d",  dstValue->type );
+
+      if (dstValue->type == ConsoleValueType::cvVector)
+      {
+            if (subField == xyzw[0] || subField == rgba[0]) {
+                  dstValue->v.points[0] = pSrcStack->getFloat();
+                  // currentStr = StringUnit::setUnit(currentStr, 0, pSrcStack->getString(), " \t\n");
+            }
+            else if (subField == xyzw[1] || subField == rgba[1]) {
+                  dstValue->v.points[1] = pSrcStack->getFloat();
+                  // currentStr = StringUnit::setUnit(currentStr, 1, pSrcStack->getString(), " \t\n");
+
+            }
+            else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
+                  dstValue->v.points[2] = pSrcStack->getFloat();
+                  // currentStr = StringUnit::setUnit(currentStr, 2, pSrcStack->getString(), " \t\n");
+            }
+            else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
+                  dstValue->v.points[3] = pSrcStack->getFloat();
+                  // currentStr = StringUnit::setUnit(currentStr, 3, pSrcStack->getString(), " \t\n");
+
+            } else {
+                  // nothing found bail out!
+                  return;
+            }
+      }
+      else  //slow string ....
+#endif
+      {
+            String currentStr = dstValue->getString();
+
+            // Insert the value into the specified
+            // component of the string.
+            if (subField == xyzw[0] || subField == rgba[0]) {
+                  currentStr = StringUnit::setUnit(currentStr, 0, pSrcStack->getString(), " \t\n");
+            }
+            else if (subField == xyzw[1] || subField == rgba[1]) {
+                  currentStr = StringUnit::setUnit(currentStr, 1, pSrcStack->getString(), " \t\n");
+
+            }
+            else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
+                  currentStr = StringUnit::setUnit(currentStr, 2, pSrcStack->getString(), " \t\n");
+            }
+            else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
+                  currentStr = StringUnit::setUnit(currentStr, 3, pSrcStack->getString(), " \t\n");
+
+            } else {
+                  // nothing found bail out!
+                  return;
+            }
+
+            dstValue->setString(currentStr);
+      }
+
+      if (object && field) {
+            object->pushDataField(field,array,dstValue);
+      }
+
+}
+// -----------------------------------------------------------------------------
 
 static void setFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, S32 currentLocalRegister)
 {
@@ -417,6 +649,11 @@ const char *ExprEvalState::getStringVariable()
    return currentVariable ? currentVariable->getStringValue() : "";
 }
 
+ConsoleValue* ExprEvalState::getConsoleValue()
+{
+      if (!currentVariable) return nullptr;
+      return &currentVariable->value;
+}
 //------------------------------------------------------------
 
 void ExprEvalState::setIntVariable(S32 val)
@@ -436,6 +673,20 @@ void ExprEvalState::setStringVariable(const char *val)
    AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
 }
+#ifdef  ENABLE_CONSOLE_VECTOR
+void ExprEvalState::setVectorVariable(ConsoleVector vec)
+{
+      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      currentVariable->setVectorVariable(vec);
+}
+
+ConsoleVector ExprEvalState::getVectorVariable()
+{
+      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      if (!currentVariable) return ConsoleVector();
+      return currentVariable->getVectorVariable();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -466,7 +717,7 @@ TORQUE_NOINLINE void doSlowMathOp()
    else if constexpr (Op == FloatOperation::Sub)
       stack[_STK - 1].setFloat(a.getFloat() - b.getFloat());
    else if constexpr (Op == FloatOperation::Mul) {
-// #ifndef TEST_STRUCT_FAST_PATH
+// #ifndef ENABLE_CONSOLE_VECTOR
 //          // TESTING b cast as a float :P
 //          // ok get parse error and *= is not here so i keep it but it's
 //          // never called.
@@ -1810,6 +2061,12 @@ handle_OP_SAVEVAR_STR:
             Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
             DISPATCH();
       }
+#ifdef ENABLE_CONSOLE_VECTOR
+      if (stack[_STK].type == cvVector) {
+            Script::gEvalState.setVectorVariable(stack[_STK].getVector());
+            DISPATCH();
+      }
+#endif
 
       Script::gEvalState.setStringVariable(stack[_STK].getString());
       DISPATCH();
@@ -1852,8 +2109,13 @@ handle_OP_LOAD_LOCAL_VAR_STR:
       {
             const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
             S32 varType = localVal.getType();
-            if (varType == ConsoleValueType::cvFloat ||
-                  varType == ConsoleValueType::cvInteger)
+            if (
+                  varType == ConsoleValueType::cvFloat ||
+#ifdef ENABLE_CONSOLE_VECTOR
+                  varType == ConsoleValueType::cvVector ||
+#endif
+                  varType == ConsoleValueType::cvInteger
+            )
             {
                   //fast fetch
                   stack[_STK + 1] = localVal;
@@ -1932,10 +2194,15 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          }
 
          if (stack[_STK].type == cvFloat) {
-             Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+               Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+               DISPATCH();
+         }
+#ifdef ENABLE_CONSOLE_VECTOR
+         if (stack[_STK].type == cvVector) {
+             Script::gEvalState.setLocalVectorVariable(reg, stack[_STK].getVector());
              DISPATCH();
          }
-
+#endif
          // orig slowmo =>
          val = stack[_STK].getString();
          Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
@@ -2006,10 +2273,14 @@ handle_OP_LOADFIELD_UINT:
             }
             else
             {
-                  char buff[FieldBufferSizeString];
-                  memset(buff, 0, sizeof(buff));
-                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-                  stack[_STK + 1].setString(buff);
+                  stack[_STK + 1].cleanupData();
+                  stack[_STK + 1].type = cvInteger; //HardCore!
+                  stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+
+                  // char buff[FieldBufferSizeString];
+                  // memset(buff, 0, sizeof(buff));
+                  // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  // stack[_STK + 1].setString(buff);
             }
             PUSH_STK();
             DISPATCH();
@@ -2024,10 +2295,14 @@ handle_OP_LOADFIELD_FLT:
             }
             else
             {
-                  char buff[FieldBufferSizeString];
-                  memset(buff, 0, sizeof(buff));
-                  getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-                  stack[_STK + 1].setString(buff);
+                  stack[_STK + 1].cleanupData();
+                  stack[_STK + 1].type = cvFloat; //HardCore!
+                  stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+
+                  // char buff[FieldBufferSizeString];
+                  // memset(buff, 0, sizeof(buff));
+                  // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+                  // stack[_STK + 1].setString(buff);
             }
             PUSH_STK();
             DISPATCH();
@@ -2042,12 +2317,16 @@ handle_OP_LOADFIELD_STR:
          }
          else
          {
+            stack[_STK + 1].cleanupData();
+            stack[_STK + 1].type = cvString;
+            stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+
             // The field is not being retrieved from an object. Maybe it's
             // a special accessor?
-            char buff[FieldBufferSizeString];
-            memset(buff, 0, sizeof(buff));
-            getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-            stack[_STK + 1].setString(buff);
+            // char buff[FieldBufferSizeString];
+            // memset(buff, 0, sizeof(buff));
+            // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
+            // stack[_STK + 1].setString(buff);
          }
          PUSH_STK();
          DISPATCH();
@@ -2060,7 +2339,8 @@ handle_OP_SAVEFIELD_FASTPATH:
             curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
       } else {
             // The field is not being set on an object. Maybe it's a special accessor?
-            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+            // setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
             prevObject = NULL;
       }
       DISPATCH();
@@ -2071,7 +2351,8 @@ handle_OP_SAVEFIELD_STR:
             curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
       } else {
             // The field is not being set on an object. Maybe it's a special accessor?
-            setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+            // setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
             prevObject = NULL;
       }
 DISPATCH();
@@ -2775,7 +3056,52 @@ handle_OP_ITER_END:
 }
 
 // ~~~~~~~~~~~~~~~~~ VECTOR_STRING
+#ifdef ENABLE_CONSOLE_VECTOR
 // PoD !! :D only kosmetic max 16 elements
+handle_OP_BUILD_VECTOR_STRING: {
+      // read the count
+      U32 count = code[ip++];
+
+      const U32 MAX_ELEMENTS = 16;
+      const char* stringValues[MAX_ELEMENTS];
+      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+      bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
+      ConsoleVector cv = {0};
+      // get values from stack
+      for (S32 i = count - 1; i >= 0; i--) {
+            if (matchVectorFields) cv.points[i] = stack[_STK].getFloat();
+            else stringValues[i] = stack[_STK].getString();
+            POP_STK();
+      }
+
+      static char buffer[256];
+      if (!matchVectorFields) {
+            // i have to translate it to a string again :(
+            S32 offset = 0;
+            buffer[0] = '\0';
+
+            for (U32 i = 0; i < count; i++) {
+                  offset += dSprintf(buffer + offset
+                  , sizeof(buffer) - offset
+                  , (i == 0) ? "%s" : " %s", stringValues[i]);
+            }
+      }
+
+      PUSH_STK();
+
+      // after setString!!
+      if (matchVectorFields) {
+            stack[_STK].type = ConsoleValueType::cvVector;
+            // Con::debugf("Set value type to ConsoleValueType::cvVector");
+            // copy  to stack
+            dMemcpy(stack[_STK].v.points, cv.points, sizeof(cv.points));
+      } else {
+            stack[_STK].setString(buffer);
+      }
+
+      DISPATCH();
+}
+#else // #ifdef ENABLE_CONSOLE_VECTOR
 handle_OP_BUILD_VECTOR_STRING: {
       // read the count
       U32 count = code[ip++];
@@ -2785,16 +3111,8 @@ handle_OP_BUILD_VECTOR_STRING: {
 
       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
 
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
-      F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
-#endif
       // get values from stack
       for (S32 i = count - 1; i >= 0; i--) {
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-            if (matchVectorFields) v[i] = stack[_STK].getFloat();
-#endif
-
             stringValues[i] = stack[_STK].getString();
             POP_STK();
       }
@@ -2813,32 +3131,9 @@ handle_OP_BUILD_VECTOR_STRING: {
       PUSH_STK();
       stack[_STK].setString(buffer);
 
-#ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
-      // after setString!!
-      if (matchVectorFields) {
-            // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);
-
-            //TODO
-            stack[_STK].type = cvVector;
-
-            // this break:
-            // static void thunk( S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
-            // {
-            //       Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
-            // }
-            // not sure why because i return the string which is filled above
-            // but i only added a small part where  type is used so why knows .....
-
-            // copy v to stack
-            dMemcpy(stack[_STK].v, v, sizeof(v));
-
-      }
-#endif
-
-
       DISPATCH();
 }
-
+#endif // #ifdef ENABLE_CONSOLE_VECTOR
 // ~~~~~~~~~~~~~~~~~ SAVEFIELD_FASTPATH
 // NOTE placed under handle_OP_SAVEFIELD_FLT:
 
@@ -4184,7 +4479,7 @@ handle_OP_INVALID:
 //
 //                   }
 //
-// #ifdef TEST_STRUCT_FAST_PATH  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
+// #ifdef ENABLE_CONSOLE_VECTOR  // TEST WHERE WHICH INFOS WE CAN GET from fld for struct fast path (EngineTypeKind, EngineStructTypeInfo)
 // else if (fld && fld->type != TypeString && fld->type != TypeName){
 //
 //       if ( stack[_STK].type == cvVector) {
@@ -4584,13 +4879,13 @@ handle_OP_INVALID:
 //
 //       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
 //
-// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// #ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
 //       bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
 //       F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
 // #endif
 //       // get values from stack
 //       for (S32 i = count - 1; i >= 0; i--) {
-// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// #ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
 //             if (matchVectorFields) v[i] = stack[_STK].getFloat();
 // #endif
 //
@@ -4625,13 +4920,13 @@ handle_OP_INVALID:
 // //
 // //       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
 // //
-// // #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// // #ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
 // //       bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
 // //       F64   v[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {};
 // // #endif
 // //       // get values from stack
 // //       for (S32 i = count - 1; i >= 0; i--) {
-// // #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// // #ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
 // //             if (matchVectorFields) v[i] = stack[_STK].getFloat();
 // // #endif
 // //
@@ -4653,7 +4948,7 @@ handle_OP_INVALID:
 // //       _STK++;
 // //       stack[_STK].setString(buffer);
 //
-// #ifdef TEST_STRUCT_FAST_PATH //XXTH TEST
+// #ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
 //       // after setString!!
 //       if (matchVectorFields) {
 //             // Con::warnf("stack %d to cvVector (%s)", _STK, buffer);

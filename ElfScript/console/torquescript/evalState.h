@@ -46,6 +46,18 @@ public:
    void setFloatVariable(F64 val);
    void setStringVariable(const char *str);
 
+   ConsoleValue* getConsoleValue(); //ElfScript
+
+#ifdef  ENABLE_CONSOLE_VECTOR
+   void setVectorVariable(ConsoleVector vec);
+   ConsoleVector getVectorVariable();
+#endif
+
+   TORQUE_FORCEINLINE ConsoleValue* getLocalConsoleValue(S32 reg) {
+      return &currentRegisterArray->values[reg];
+   }
+
+
    TORQUE_FORCEINLINE S32 getLocalIntVariable(S32 reg)
    {
       return currentRegisterArray->values[reg].getInt();
@@ -75,6 +87,20 @@ public:
    {
       currentRegisterArray->values[reg].setString(val, len);
    }
+
+#ifdef ENABLE_CONSOLE_VECTOR
+
+TORQUE_FORCEINLINE void setLocalVectorVariable(S32 reg, ConsoleVector val)
+{
+   currentRegisterArray->values[reg].setVector(val);
+}
+TORQUE_FORCEINLINE ConsoleVector getLocalVectorVariable(S32 reg)
+{
+   return currentRegisterArray->values[reg].getVector();
+}
+
+
+#endif
 
    TORQUE_FORCEINLINE void setLocalStringTableEntryVariable(S32 reg, StringTableEntry val)
    {

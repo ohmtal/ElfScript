@@ -146,7 +146,7 @@ class EngineFieldTable
          U32 mOffset;
 
          /// ElfScript Type of Field like TypeF32
-         // was an idea for TEST_STRUCT_FAST_PATH - i stop here - too tired ;)
+         // was an idea for ENABLE_CONSOLE_VECTOR - i stop here - too tired ;)
          // U32 mFieldType = 0;
 
 

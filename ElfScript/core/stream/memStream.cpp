@@ -53,8 +53,8 @@ MemStream::MemStream( U32 bufferSize,
    mBufferSize( bufferSize ),
    mStreamSize( bufferSize ),
    mBufferBase( buffer ),
-   mInstCaps( 0 ),
    mOwnsMemory( false ),
+   mInstCaps( 0 ),
    mCurrentPosition( 0 )
 {
    AssertFatal( bufferSize > 0,  "Invalid buffer size");

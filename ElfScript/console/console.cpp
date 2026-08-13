@@ -61,6 +61,16 @@ void ConsoleValue::resetConversionBuffer()
 
 char* ConsoleValue::convertToBuffer() const
 {
+
+#ifdef  ENABLE_CONSOLE_VECTOR
+   if (type == ConsoleValueType::cvVector) {
+        char* buffer = static_cast<char*>(sConversionAllocator.alloc(128));
+        //NOTE: hard coded 4
+        dSprintf(buffer, 128, "%.9g %.9g %.9g %.9g", v.points[0], v.points[1],v.points[2],v.points[3]);
+        return buffer;
+   }
+#endif
+
    char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
    
    if (type == ConsoleValueType::cvFloat)

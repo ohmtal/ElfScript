@@ -1094,6 +1094,12 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
                         entry->mValue.setFloat(stackP->getFloat());
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
+#ifdef ENABLE_CONSOLE_VECTOR
+                  case ConsoleValueType::cvVector:
+                        entry->mValue.setVector(stackP->getVector());
+                        // entry->mValue.setFastFloat(stackP->getFloat());
+                        break;
+#endif
                   default:
                         entry->mValue.setString(stackP->getString());
                         break;
@@ -1441,6 +1447,11 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                                     stackP->setFloat(entry->mValue.getFloat());
                                     // stackP->setFastFloat(entry->mValue.getFloat());
                                     break;
+#ifdef ENABLE_CONSOLE_VECTOR
+                              case ConsoleValueType::cvVector:
+                                    stackP->setVector(entry->mValue.getVector());
+                                    break;
+#endif
                               default: {
                                     const char* str = entry->mValue.getString();
                                     if (str) stackP->setString(str);

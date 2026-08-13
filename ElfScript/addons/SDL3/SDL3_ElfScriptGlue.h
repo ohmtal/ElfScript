@@ -15,8 +15,8 @@
 #include <functional> //<< bad boy ;)
 
 namespace ElfSDL3 {
-    void InitSDLBindings() ;
-    void ShutdownSDLBindings();
+    void Init() ;
+    void Shutdown();
 
 
     // FrameTime
