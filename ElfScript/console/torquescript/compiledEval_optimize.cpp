@@ -209,8 +209,6 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       , StringTableEntry subField, ConsoleValue* pStack, S32 currentLocalRegister)
 {
 
-
-
       /*ConsoleValueType*/ S32 targetType = pStack->type;
 
       static ConsoleValue srcStoreValue = {};
@@ -265,54 +263,66 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       };
       // -----
       F64 targetValue = 0.f;
-      // Translate xyzw and rgba into the indexed component
-      // of the variable or field.
+
+      int componentIndex = -1;
+      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
+      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
+      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
+      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
+
+      if (componentIndex < 0) {
+            pStack->setEmptyString();
+            return;
+      }
 
 #ifdef  ENABLE_CONSOLE_VECTOR
-
-      // Con::debugf("srcValue->type == %d",  srcValue->type );
-
-      // Now we get advantage out of it .. if the variable still have the type
-      // global == NOT :/ have -2
-      // local  == NOT :/ have -2
-      // somewhere my type get lost :/
-      if (subField == xyzw[0] || subField == rgba[0]) {
-            if (srcValue->type == cvVector) targetValue = srcValue->v.points[0];
-            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 0, " \t\n"));
-      } else if (subField == xyzw[1] || subField == rgba[1]) {
-            if (srcValue->type == cvVector) targetValue = srcValue->v.points[1];
-            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 1, " \t\n"));
-
-      } else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
-            if (srcValue->type == cvVector) targetValue = srcValue->v.points[2];
-            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 2, " \t\n"));
-
-      } else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
-            if (srcValue->type == cvVector) targetValue = srcValue->v.points[3];
-            else targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 3, " \t\n"));
-      } else {
-            //nothing found ^^
-            pStack->setEmptyString();
-            return;
-      }
-#else
-      if (subField == xyzw[0] || subField == rgba[0]){
-            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 0, " \t\n"));
-      } else if (subField == xyzw[1] || subField == rgba[1]) {
-            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 1, " \t\n"));
-
-      } else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
-            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 2, " \t\n"));
-
-      } else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
-            targetValue = dAtof(StringUnit::getUnit(srcValue->getString(), 3, " \t\n"));
-
-      } else {
-            //nothing found ^^
-            pStack->setEmptyString();
-            return;
-      }
+       if (srcValue->type == cvVector) {
+             targetValue = srcValue->v.points[componentIndex];
+       } else
 #endif
+      {
+            const char* srcStr = srcValue->getString();
+            const char* pStr = srcStr;
+            int compCount = 0;
+
+            const char* tokenStart = nullptr;
+            size_t tokenLen = 0;
+
+            while (*pStr != '\0') {
+                  while (*pStr == ' ' || *pStr == '\t' || *pStr == '\n' || *pStr == '\r') {
+                        pStr++;
+                  }
+                  if (*pStr == '\0') break;
+
+                  if (compCount == componentIndex) {
+                        tokenStart = pStr;
+                  }
+
+                  while (*pStr != '\0' && *pStr != ' ' && *pStr != '\t' && *pStr != '\n' && *pStr != '\r') {
+                        pStr++;
+                  }
+
+                  if (compCount == componentIndex) {
+                        tokenLen = pStr - tokenStart;
+                        break;
+                  }
+
+                  compCount++;
+            }
+
+            if (tokenLen > 0) {
+                  char tokenBuffer[32];
+                  if (tokenLen >= 32) tokenLen = 31;
+
+                  memcpy(tokenBuffer, tokenStart, tokenLen);
+                  tokenBuffer[tokenLen] = '\0';
+
+                  targetValue = dAtof(tokenBuffer);
+            } else {
+                  targetValue = 0.0;
+            }
+
+      }
 
       switch ( targetType ) {
             case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
@@ -432,60 +442,105 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
       };
       // ----
 
+      int componentIndex = -1;
+      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
+      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
+      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
+      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
+
+      if (componentIndex < 0) return;
+
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       // Con::debugf("dstValue->type == %d",  dstValue->type );
 
       if (dstValue->type == ConsoleValueType::cvVector)
       {
-            if (subField == xyzw[0] || subField == rgba[0]) {
-                  dstValue->v.points[0] = pSrcStack->getFloat();
-                  // currentStr = StringUnit::setUnit(currentStr, 0, pSrcStack->getString(), " \t\n");
-            }
-            else if (subField == xyzw[1] || subField == rgba[1]) {
-                  dstValue->v.points[1] = pSrcStack->getFloat();
-                  // currentStr = StringUnit::setUnit(currentStr, 1, pSrcStack->getString(), " \t\n");
-
-            }
-            else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
-                  dstValue->v.points[2] = pSrcStack->getFloat();
-                  // currentStr = StringUnit::setUnit(currentStr, 2, pSrcStack->getString(), " \t\n");
-            }
-            else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
-                  dstValue->v.points[3] = pSrcStack->getFloat();
-                  // currentStr = StringUnit::setUnit(currentStr, 3, pSrcStack->getString(), " \t\n");
-
-            } else {
-                  // nothing found bail out!
-                  return;
-            }
+            dstValue->v.points[componentIndex] = pSrcStack->getFloat();
       }
       else  //slow string ....
 #endif
       {
             String currentStr = dstValue->getString();
 
-            // Insert the value into the specified
-            // component of the string.
-            if (subField == xyzw[0] || subField == rgba[0]) {
-                  currentStr = StringUnit::setUnit(currentStr, 0, pSrcStack->getString(), " \t\n");
+            // -----------------------------------
+            // only get ONE number:
+            // -----------------------------------
+            const char *s = pSrcStack->getString();
+            const char *p = s;
+            if (*p == '-' || *p == '+') p++;
+            bool seen_point = false;
+            while (*p != '\0') {
+                  if (*p >= '0' && *p <= '9') {
+                        p++;
+                  } else if (*p == '.' && !seen_point) {
+                        seen_point = true;
+                        p++;
+                  } else {
+                        break;
+                  }
             }
-            else if (subField == xyzw[1] || subField == rgba[1]) {
-                  currentStr = StringUnit::setUnit(currentStr, 1, pSrcStack->getString(), " \t\n");
-
-            }
-            else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) {
-                  currentStr = StringUnit::setUnit(currentStr, 2, pSrcStack->getString(), " \t\n");
-            }
-            else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) {
-                  currentStr = StringUnit::setUnit(currentStr, 3, pSrcStack->getString(), " \t\n");
-
+            size_t len = p - s;
+            if (len >= 32) len = 31;
+            static char buffer[32];
+            if (len > 0) {
+                  memcpy(buffer, s, len);
+                  buffer[len] = '\0';
             } else {
-                  // nothing found bail out!
-                  return;
+                  buffer[0] = '0';
+                  buffer[1] = '\0';
             }
 
-            dstValue->setString(currentStr);
+            // -----------------------------------
+            //
+            //  speed up :D
+            //
+
+            const char* compStart[4] = { nullptr, nullptr, nullptr, nullptr };
+            size_t compLen[4] = { 0, 0, 0, 0 };
+            int compCount = 0;
+
+            const char* pStr = currentStr.c_str();
+
+            while (*pStr != '\0' && compCount < 4) {
+                  while (*pStr == ' ' || *pStr == '\t' || *pStr == '\n' || *pStr == '\r') {
+                        pStr++;
+                  }
+                  if (*pStr == '\0') break;
+
+                  compStart[compCount] = pStr;
+
+                  while (*pStr != '\0' && *pStr != ' ' && *pStr != '\t' && *pStr != '\n' && *pStr != '\r') {
+                        pStr++;
+                  }
+
+                  compLen[compCount] = pStr - compStart[compCount];
+                  compCount++;
+            }
+
+            char finalResult[128];
+            char* out = finalResult;
+            size_t bufferLen = strlen(buffer);
+
+            for (int i = 0; i < 4; i++) {
+                  if (i == componentIndex) {
+                        memcpy(out, buffer, bufferLen);
+                        out += bufferLen;
+                  } else if (i < compCount) {
+                        memcpy(out, compStart[i], compLen[i]);
+                        out += compLen[i];
+                  } else {
+                        *out++ = '0';
+                  }
+
+                  if (i < 3) {
+                        *out++ = ' ';
+                  }
+            }
+            *out = '\0';
+
+            dstValue->setString(finalResult);
+
       }
 
       if (object && field) {
@@ -494,77 +549,77 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
 
 }
 // -----------------------------------------------------------------------------
-
-static void setFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, S32 currentLocalRegister)
-{
-   // Copy the current string value
-   char strValue[1024];
-   dStrncpy(strValue, stack[_STK].getString(), 1024);
-
-   char val[1024] = "";
-   const char* prevVal = NULL;
-
-   if (object && field)
-      prevVal = object->getDataField(field, array);
-   else if (currentLocalRegister != -1)
-      prevVal = Script::gEvalState.getLocalStringVariable(currentLocalRegister);
-   // Set the value on a variable.
-   else if (Script::gEvalState.currentVariable)
-      prevVal = Script::gEvalState.getStringVariable();
-
-   // Ensure that the variable has a value
-   if (!prevVal)
-      return;
-
-   static const StringTableEntry xyzw[] =
-   {
-      StringTable->insert("x"),
-      StringTable->insert("y"),
-      StringTable->insert("z"),
-      StringTable->insert("w")
-   };
-
-   //XXTH added
-   static const StringTableEntry wh[] =
-   {
-         StringTable->insert("width"),
-         StringTable->insert("height")
-   };
-
-
-   static const StringTableEntry rgba[] =
-   {
-      StringTable->insert("r"),
-      StringTable->insert("g"),
-      StringTable->insert("b"),
-      StringTable->insert("a")
-   };
-
-   // Insert the value into the specified
-   // component of the string.
-   if (subField == xyzw[0] || subField == rgba[0])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 0, strValue, " \t\n"), 128);
-
-   else if (subField == xyzw[1] || subField == rgba[1])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 1, strValue, " \t\n"), 128);
-
-   else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 2, strValue, " \t\n"), 128);
-
-   else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 3, strValue, " \t\n"), 128);
-
-   if (val[0] != 0)
-   {
-      // Update the field or variable.
-      if (object && field)
-         object->setDataField(field, 0, val);
-      else if (currentLocalRegister != -1)
-         Script::gEvalState.setLocalStringVariable(currentLocalRegister, val, dStrlen(val));
-      else if (Script::gEvalState.currentVariable)
-         Script::gEvalState.setStringVariable(val);
-   }
-}
+// replaved by pushFieldComponent
+// static void setFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, S32 currentLocalRegister)
+// {
+//    // Copy the current string value
+//    char strValue[1024];
+//    dStrncpy(strValue, stack[_STK].getString(), 1024);
+//
+//    char val[1024] = "";
+//    const char* prevVal = NULL;
+//
+//    if (object && field)
+//       prevVal = object->getDataField(field, array);
+//    else if (currentLocalRegister != -1)
+//       prevVal = Script::gEvalState.getLocalStringVariable(currentLocalRegister);
+//    // Set the value on a variable.
+//    else if (Script::gEvalState.currentVariable)
+//       prevVal = Script::gEvalState.getStringVariable();
+//
+//    // Ensure that the variable has a value
+//    if (!prevVal)
+//       return;
+//
+//    static const StringTableEntry xyzw[] =
+//    {
+//       StringTable->insert("x"),
+//       StringTable->insert("y"),
+//       StringTable->insert("z"),
+//       StringTable->insert("w")
+//    };
+//
+//    //XXTH added
+//    static const StringTableEntry wh[] =
+//    {
+//          StringTable->insert("width"),
+//          StringTable->insert("height")
+//    };
+//
+//
+//    static const StringTableEntry rgba[] =
+//    {
+//       StringTable->insert("r"),
+//       StringTable->insert("g"),
+//       StringTable->insert("b"),
+//       StringTable->insert("a")
+//    };
+//
+//    // Insert the value into the specified
+//    // component of the string.
+//    if (subField == xyzw[0] || subField == rgba[0])
+//       dStrcpy(val, StringUnit::setUnit(prevVal, 0, strValue, " \t\n"), 128);
+//
+//    else if (subField == xyzw[1] || subField == rgba[1])
+//       dStrcpy(val, StringUnit::setUnit(prevVal, 1, strValue, " \t\n"), 128);
+//
+//    else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0])
+//       dStrcpy(val, StringUnit::setUnit(prevVal, 2, strValue, " \t\n"), 128);
+//
+//    else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1])
+//       dStrcpy(val, StringUnit::setUnit(prevVal, 3, strValue, " \t\n"), 128);
+//
+//    if (val[0] != 0)
+//    {
+//       // Update the field or variable.
+//       if (object && field)
+//          object->setDataField(field, 0, val);
+//       else if (currentLocalRegister != -1)
+//          Script::gEvalState.setLocalStringVariable(currentLocalRegister, val, dStrlen(val));
+//       else if (Script::gEvalState.currentVariable)
+//          Script::gEvalState.setStringVariable(val);
+//    }
+// }
 
 //------------------------------------------------------------
 

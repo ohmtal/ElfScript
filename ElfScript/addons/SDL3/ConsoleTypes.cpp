@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 // TypeColor
 // -----------------------------------------------------------------------------
-IMPLEMENT_STRUCT( Color, Color,,
+IMPLEMENT_STRUCT( Color, TypeColor,,
                   "RGBA color in byte format: 255 255 255 255 << pure white ;)" )
 
 FIELD( r, red, 1, "Red channel value." )
@@ -21,7 +21,7 @@ FIELD( a, alpha, 1, "Alpha channel value." )
 END_IMPLEMENT_STRUCT;
 
 
-ConsoleType(Color, TypeColor, Color, "")
+ConsoleType(TypeColor, TypeColor, Color, "")
 ImplementConsoleTypeCasters( TypeColor, Color )
 
 ConsoleGetType( TypeColor )
@@ -71,7 +71,7 @@ ConsoleSetType( TypeColor )
 // TypeColorF
 // -----------------------------------------------------------------------------
 IMPLEMENT_STRUCT( Color4F,
-   Color4F,,
+   TypeColorF,,
    "RGBA color quadruple in 32bit floating-point precision per channel." )
 
    FIELD( r, red, 1, "Red channel value." )
@@ -81,7 +81,7 @@ IMPLEMENT_STRUCT( Color4F,
 
 END_IMPLEMENT_STRUCT;
 
-ConsoleType(Color4F, TypeColorF, Color4F, "")
+ConsoleType(TypeColorF, TypeColorF, Color4F, "")
 ImplementConsoleTypeCasters( TypeColorF, Color4F )
 
 ConsoleGetType( TypeColorF )
@@ -152,7 +152,7 @@ ConsoleSetType( TypeColorF )
 // TypePoint2I
 // -----------------------------------------------------------------------------
 IMPLEMENT_STRUCT( Point2I,
-                  Point2I,,
+                  TypePoint2I,,
                   "2 point integer" )
 
 FIELD( x, y, 1, "x" )
@@ -160,7 +160,7 @@ FIELD( y, y, 1, "y" )
 
 END_IMPLEMENT_STRUCT;
 
-ConsoleType(Point2I, TypePoint2I, Point2I, "")
+ConsoleType(TypePoint2I, TypePoint2I, Point2I, "")
 ImplementConsoleTypeCasters( TypePoint2I, Point2I )
 
 ConsoleGetType( TypePoint2I )
@@ -201,11 +201,11 @@ ConsoleSetType( TypePoint2I )
 // -----------------------------------------------------------------------------
 
 IMPLEMENT_STRUCT( RectI,
-                  RectI, ,
+                  TypeRectI, ,
                   "" )
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectF,
-                  RectF, ,
+                  TypeRectF, ,
                   "" )
 END_IMPLEMENT_STRUCT;
 
@@ -213,7 +213,7 @@ END_IMPLEMENT_STRUCT;
 //-----------------------------------------------------------------------------
 // TypeRectI
 //-----------------------------------------------------------------------------
-ConsoleType(RectI, TypeRectI, RectI, "")
+ConsoleType(TypeRectI, TypeRectI, RectI, "")
 ImplementConsoleTypeCasters( TypeRectI, RectI )
 
 ConsoleGetType( TypeRectI )
@@ -240,7 +240,7 @@ ConsoleSetType( TypeRectI )
 //-----------------------------------------------------------------------------
 // TypeRectF
 //-----------------------------------------------------------------------------
-ConsoleType(RectF, TypeRectF, RectF, "")
+ConsoleType(TypeRectF, TypeRectF, RectF, "")
 ImplementConsoleTypeCasters( TypeRectF, RectF )
 
 ConsoleGetType( TypeRectF )
@@ -269,7 +269,7 @@ ConsoleSetType( TypeRectF )
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_STRUCT( Point2F,
-                  Point2F, ,
+                  TypePoint2F, ,
                   "" )
 
 FIELD( x, x, 1, "X coordinate." )
@@ -280,7 +280,7 @@ END_IMPLEMENT_STRUCT;
 //-----------------------------------------------------------------------------
 // TypePoint2F
 //-----------------------------------------------------------------------------
-ConsoleType(Point2F, TypePoint2F, Point2F, "")
+ConsoleType(TypePoint2F, TypePoint2F, Point2F, "")
 ImplementConsoleTypeCasters( TypePoint2F, Point2F )
 
 ConsoleGetType( TypePoint2F )
@@ -308,7 +308,7 @@ ConsoleSetType( TypePoint2F )
 
 /*
 IMPLEMENT_STRUCT( Point3F,
-                  Point3F, ,
+                  TypePoint3F, ,
                   "" )
 
 FIELD( x, x, 1, "X coordinate." )
@@ -319,7 +319,7 @@ END_IMPLEMENT_STRUCT;
 //-----------------------------------------------------------------------------
 // TypePoint3F
 //-----------------------------------------------------------------------------
-ConsoleType(Point3F, TypePoint3F, Point3F, "")
+ConsoleType(TypePoint3F, TypePoint3F, Point3F, "")
 ImplementConsoleTypeCasters(TypePoint3F, Point3F)
 
 ConsoleGetType( TypePoint3F )

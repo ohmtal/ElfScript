@@ -271,8 +271,8 @@ set(ELFSCRIPT_SRC
     ${EXT_SRC}
 )
 
-if (ENABLE_TEST_VECTOR)
-     add_compile_definitions(TEST_STRUCT_FAST_PATH)
+if (ENABLE_CONSOLE_VECTOR)
+     add_compile_definitions(ENABLE_CONSOLE_VECTOR)
 endif()
 
 if (ENABLE_ZIP)

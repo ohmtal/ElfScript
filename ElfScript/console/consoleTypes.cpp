@@ -1200,3 +1200,37 @@ ConsoleSetType( TypeSimPersistId )
    else
       Con::printf( "(TypeSimPersistId) Cannot set multiple args to a single SimPersistId." );
 }
+
+//-----------------------------------------------------------------------------
+// TypeVector four point vector
+//-----------------------------------------------------------------------------
+IMPLEMENT_STRUCT( ConsoleVector,
+                  TypeVector, ,
+                  "" )
+END_IMPLEMENT_STRUCT;
+ConsoleType(TypeVector, TypeVector, ConsoleVector, "Four point internal Vector")
+ImplementConsoleTypeCasters( TypeVector, ConsoleVector )
+
+ConsoleGetType( TypeVector )
+{
+      ConsoleVector *vec = (ConsoleVector *) dptr;
+      static const U32 bufSize = 256;
+      char* returnBuffer = Con::getReturnBuffer(bufSize);
+      dSprintf(returnBuffer, bufSize, "%g %g %g %g", vec->points[0],vec->points[1],vec->points[2],vec->points[3]);
+      return returnBuffer;
+}
+
+ConsoleSetType( TypeVector )
+{
+      if(argc == 1)
+            dSscanf(argv[0], "%lg %lg %lg %lg",
+                    &((ConsoleVector *) dptr)->points[0],
+                    &((ConsoleVector *) dptr)->points[1],
+                    &((ConsoleVector *) dptr)->points[2],
+                    &((ConsoleVector *) dptr)->points[3]
+            );
+            else if(argc == 4)
+                  *((ConsoleVector *)dptr) = ConsoleVector{ dAtod(argv[0]), dAtod(argv[1]), dAtod(argv[2]), dAtod(argv[3]) };
+      else
+            Con::printf("ConsoleVector must be set as { x, y, z, w } or \"x y width height\"");
+}

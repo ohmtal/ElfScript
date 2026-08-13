@@ -1025,6 +1025,9 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
                         || fld->type == TypeS8
                         || fld->type == TypeU8
                         || fld->type == TypeS16
+#ifdef ENABLE_CONSOLE_VECTOR
+                        || fld->type == TypeVector
+#endif
                   ) {
                         // - Static fields can only have an integer Index
                         // - we only do fastpath at the moment when no array is used.
@@ -1034,6 +1037,14 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
                               && fld->setDataFn == &defaultProtectedSetFn
                               && fld->flag == 0
                         ) {
+#ifdef ENABLE_CONSOLE_VECTOR
+                              if (fld->type == TypeVector) {
+                                    ConsoleVector* target = (ConsoleVector*)(((const char*)this) + fld->offset);
+                                    *target = stackP->getVector();
+                                    fastPath =  true;
+                              }
+                              else
+#endif
                               if (fld->type == TypeF32 || fld->type == TypeF64)
                                     fastPath = this->setDataField(fld,stackP->getFloat() );
                               else
@@ -1396,7 +1407,18 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
                   if (arrayEmpty && fld->writeDataFn == &defaultProtectedWriteFn
                               && fld->setDataFn == &defaultProtectedSetFn) {
 
+
+
                         F64 floatValue = 0.f;
+#ifdef ENABLE_CONSOLE_VECTOR
+
+                        if (fld->type == TypeVector) {
+                              ConsoleVector* source = (ConsoleVector*)(((const char*)this) + fld->offset);
+                              stackP->setVector(*source);
+                              return true;
+                        }
+                        else
+#endif
                         if (getDataField(fld, floatValue)) {
                               if (fld->type == TypeF64 || fld->type == TypeF32) {
                                     stackP->setFastFloat(floatValue);

@@ -1,5 +1,5 @@
 
-
+$_DISABLE_SAVE_LOAD = true;
 
 //
 
@@ -39,12 +39,16 @@
 $_PixelsFileName = SDL_GetPrefPath("Ohmtal", "Pixels") @ "userdata.elfdata";
 
 function _Pixels_Save(%filename = $_PixelsFileName) {
+    if ($_DISABLE_SAVE_LOAD) return false;
     echo("Saving" SPC %fileName SPC ".......");
     if (!Pixels.save($_PixelsFileName)) {
         error("Failed to save " SPC %filename);
+        return false;
     }
+    return true;
 }
 function _Pixels_Load(%filename = $_PixelsFileName) {
+    if ($_DISABLE_SAVE_LOAD) return false;
     if (SDL_FileExists(%filename)) {
         echo("Loading" SPC %fileName SPC ".......");
         $_LOADING = true;
@@ -87,10 +91,17 @@ function createPixels(%renderer, %window) {
         TypeS32 BorderTop   = 32;
         TypeS32 BorderLeft  = 8;
         TypeS32 selectedFirstIndex = -1;
-        TypeColor TopLeft       = {255, 50,100}; //pink
-        TypeColor TopRight      = {  0,200,255}; //cyan
-        TypeColor BottomLeft    = { 80,  0,150}; //violett
-        TypeColor BottomRight   = {255,150,  0}; //orange
+        TypeVector TopLeft       = {255, 50,100}; //pink
+        TypeVector TopRight      = {  0,200,255}; //cyan
+        TypeVector BottomLeft    = { 80,  0,150}; //violett
+        TypeVector BottomRight   = {255,150,  0}; //orange
+
+
+        TypeVector CanvasBackGroundRect  =  { 0.0 ,0.0 ,0.0 ,0.0 };
+        TypeVector CanvasBordeRect       =  { 0.0 ,0.0 ,0.0 ,0.0 };
+        TypeVector HeaderRect            =  { 0.0 ,0.0 ,0.0 ,0.0 };
+        TypeVector OverlayRect           =  { 0.0 ,0.0 ,0.0 ,0.0 };
+        TypeVector SettingsButtonRect    =  { 0.0 ,0.0 ,0.0 ,0.0 };
 
         // status
         TypeS32 BlockSize      = 24; //24; // 16; //16; //32 ; //42; //8 .. 48
@@ -158,7 +169,6 @@ function Pixels::onAdd(%this) {
 
     %this.OverlayRect = { 40 ,40, $Global::ScreenSize.x - 80, $Global::ScreenSize.y - 80};
     %this.SettingsButtonRect = { %this.HeaderRect.x + %this.HeaderRect.width - 40, %this.HeaderRect.y +7, 30,14 };
-    %this.SettingsTextPos = { %this.SettingsButtonRect.x + 6, %this.SettingsButtonRect.y + 5};
 
     %this.SndBlop = Audio_LoadWav("assets/sound/blop.wav");
     %this.SndShuffle = Audio_LoadWav("assets/sound/shuffle.wav");

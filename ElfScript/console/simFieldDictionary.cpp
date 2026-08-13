@@ -152,6 +152,11 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
             ) {
             walk->mValue.setInt(walk->mValue.getInt());
             walk->mValue.type = ConsoleValueType::cvInteger;
+#ifdef ENABLE_CONSOLE_VECTOR
+         } else if (typeID == TypeVector) {
+            walk->mValue.setVector(walk->mValue.getVector());
+            walk->mValue.type = ConsoleValueType::cvVector;
+#endif
          } else {
             walk->mValue.type = ConsoleValueType::cvString;
          }

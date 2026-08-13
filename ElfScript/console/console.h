@@ -137,12 +137,12 @@ enum ConsoleValueType
    cvConsoleValueType =  0    ///< First valid engine console type ID
 };
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
+//should i add a count ?!
 struct ConsoleVector {
-      //should i add a count ?!
       F64   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
 };
-#endif
+// #endif
 
 class ConsoleValue
 {
@@ -298,18 +298,19 @@ public:
       case ConsoleValueType::cvInteger:
          return static_cast<F64>(i);
       case ConsoleValueType::cvSTEntry:
-         return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
+         return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  (v.points[0]);
 #endif
       case ConsoleValueType::cvString:
-         return (s[0] == '\0') ? 0.0 : dAtof(s);
+         return (s[0] == '\0') ? 0.0 : dAtod(s);//F64! dAtof(s);
       case ConsoleValueType::cvNULL:
          return 0.0;
       default:
-         return dAtof(getConsoleData());
+         return dAtod(getConsoleData());
+         // return dAtof(getConsoleData());
       }
    }
 

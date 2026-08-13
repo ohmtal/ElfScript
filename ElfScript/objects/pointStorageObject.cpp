@@ -26,7 +26,7 @@
 //     sto.fetchPoint(0);
 //     sto.dumpFields();
 // modify y
-//     sto.y = 66.67;
+//     sto.points[1] = 66.67;
 // push it to storage at index 0
 //     sto.pushPoint(0);
 //     print(sto.getPointVec(0));
@@ -37,7 +37,7 @@
 //     print(sto.getPointVec(1));
 // for (%i = 0; %i < 1000; %i++) { sto.setPoint(%i, getRandomF(1.0),getRandomF(1.0),getRandomF(1.0),getRandomF(1.0)); } echo("DONE!");
 // for (%i = 0; %i < 1000; %i++) { print("#",%i SPC sto.getPointVec(%i)); }
-// for (%i = 0; %i < 1000; %i++) { sto.fetchPoint(%i); echo("#",%i SPC sto.x SPC sto.y SPC sto.width SPC sto.height); }
+// for (%i = 0; %i < 1000; %i++) { sto.fetchPoint(%i); echo("#",%i SPC sto.points[0] SPC sto.points[1] SPC sto.points[3]idth SPC sto.height); }
 // for (%i = 0; %i < 1000; %i++) { echo(sto.getPointx(%i) SPC sto.getPointy(%i) SPC sto.getPointz(%i) SPC sto.getPointw(%i)); }
 //-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
@@ -48,16 +48,13 @@
 #include "ext/tinyexpr.h"
 // #include "console/localVar.h"
 
-struct InternalVector4{
-    F32 x = 0;
-    F32 y = 0;
-    F32 z = 0;
-    F32 w = 0;
-};
-
 // ------------ Vector2 helper ----------------
 inline float lengthSquaredXY(const F32 x, const F32 y) {
     return x * x + y * y;
+}
+
+inline float lengthXY(const F64 x, const F64 y) {
+    return ElfMath::mSqrt(lengthSquaredXY(static_cast<F32>(x) ,static_cast<F32>(y) ));
 }
 
 inline float lengthXY(const F32 x, const F32 y) {
@@ -93,7 +90,8 @@ class PointStorageObject: public SimObject
     typedef SimObject Parent;
 public:
     DECLARE_CONOBJECT(PointStorageObject);
-    F32 mX, mY, mZ, mW;
+    ConsoleVector mVector;
+
     /*
      * Storing Point in a vector Vector implementation
      *
@@ -103,14 +101,15 @@ public:
      * storePoint
      * fetchPoint
      */
-    Vector<InternalVector4> mPoints;
+    Vector<ConsoleVector> mPoints;
 
     // math (tinyexpr) operation direct access:
     F64 mtX, mtY, mtZ, mtW;
 
     // -------------------------------------------------------------------------
     PointStorageObject() {
-        mX = mY = mZ = mW = 0.f;
+        // mVector.points[0] = mVector.points[1] = mVector.points[2] = mVector.points[3] = 0.f;
+        mVector = {0};
         mtX =  mtY = mtZ =  mtW = 0.f;
     }
 
@@ -127,8 +126,8 @@ public:
             this->mPoints.setSize(size);
             if (size > oldSize) {
                 U32 newElements = size - oldSize;
-                InternalVector4* startOfNewData = this->mPoints.address() + oldSize;
-                dMemset(startOfNewData, 0, newElements * sizeof(InternalVector4));
+                ConsoleVector* startOfNewData = this->mPoints.address() + oldSize;
+                dMemset(startOfNewData, 0, newElements * sizeof(ConsoleVector));
             }
         } else {
             Con::errorf("setStorageSize value too high! max: 1000000, send:%u", size);
@@ -156,12 +155,15 @@ public:
     static void initPersistFields()
     {
         Parent::initPersistFields();
-        addField("x",     TypeF32,     Offset(mX, PointStorageObject));
-        addField("y",     TypeF32,     Offset(mY, PointStorageObject));
-        addField("z",     TypeF32,     Offset(mZ, PointStorageObject));
-        addField("w",     TypeF32,     Offset(mW, PointStorageObject));
-        addField("width",     TypeF32,     Offset(mZ, PointStorageObject),  "alias for z");
-        addField("height",     TypeF32,     Offset(mW, PointStorageObject), "alias for w - yes w.");
+
+        addField("point", TypeVector,  Offset(mVector, PointStorageObject));
+        addField("x",     TypeF64,     Offset(mVector.points[0], PointStorageObject));
+        addField("y",     TypeF64,     Offset(mVector.points[1], PointStorageObject));
+        addField("z",     TypeF64,     Offset(mVector.points[2], PointStorageObject));
+        addField("w",     TypeF64,     Offset(mVector.points[3], PointStorageObject));
+        addField("width",     TypeF64,     Offset(mVector.points[2], PointStorageObject),  "alias for z");
+        addField("height",    TypeF64,     Offset(mVector.points[3], PointStorageObject), "alias for w - yes w.");
+
         //----
         addProtectedField("storageSize", TypeU32, 0, &_setStorageSize,&_getStorageSize, "Set the storage size (how many points we can work with) Max:1000000.");
 
@@ -169,19 +171,16 @@ public:
     }
 
     // -------------------------------------------------------------------------
-    void setPos(F32 x, F32 y, F32 z, F32 w) {
-        mX = x;
-        mY = y;
-        mZ = z;
-        mW = w;
+    void setPos(F64 x, F64 y, F64 z, F64 w) {
+        mVector.points[0] = x;
+        mVector.points[1] = y;
+        mVector.points[2] = z;
+        mVector.points[3] = w;
     }
 
     // -------------------------------------------------------------------------
-    void setPos(const InternalVector4& vec4) {
-        this->mX = vec4.x;
-        this->mY = vec4.y;
-        this->mZ = vec4.z;
-        this->mW = vec4.w;
+    void setPos(const ConsoleVector& vec4) {
+        this->mVector = vec4;
     }
 
 
@@ -211,7 +210,11 @@ public:
             String trimmedExpr = Expr.trim();
             if (trimmedExpr.equal("normalizeXY()", String::NoCase)) {
                 for (U32 i = startIndex; i <= endIndex; i++) {
-                    normalizeXY( mPoints[i].x, mPoints[i].y );
+                    F32 x = static_cast<F32>(mPoints[i].points[0]);
+                    F32 y = static_cast<F32>(mPoints[i].points[1]);
+                    normalizeXY( x,y );
+                    mPoints[i].points[0] = static_cast<F64>(x);
+                    mPoints[i].points[1] = static_cast<F64>(y);
                 }
                 return true;
             }
@@ -252,22 +255,22 @@ public:
         }
 
         for (U32 i = startIndex; i <= endIndex; i++) {
-            InternalVector4& p = mPoints[i];
+            ConsoleVector& p = mPoints[i];
 
-            mtX = (F64)p.x;
-            mtY = (F64)p.y;
-            mtZ = (F64)p.z;
-            mtW = (F64)p.w;
+            mtX = p.points[0];
+            mtY = p.points[1];
+            mtZ = p.points[2];
+            mtW = p.points[3];
 
             mtX = te_eval(exprX);
             mtY = te_eval(exprY);
             mtZ = te_eval(exprZ);
             mtW = te_eval(exprW);
 
-            p.x = (F32)mtX;
-            p.y = (F32)mtY;
-            p.z = (F32)mtZ;
-            p.w = (F32)mtW;
+            p.points[0] = mtX;
+            p.points[1] = mtY;
+            p.points[2] = mtZ;
+            p.points[3] = mtW;
         }
 
         sCurrentInstance = nullptr;
@@ -284,10 +287,10 @@ public:
     // -------------------------------------------------------------------------
     // // // // **** direct local var access !!!! - i ignore fails here ...***
     // // // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-    // // //     ElfScript::setLocalFloat(varX, mX);
-    // // //     ElfScript::setLocalFloat(varY, mY);
-    // // //     if (varZ) ElfScript::setLocalFloat(varZ, mZ);
-    // // //     if (varW) ElfScript::setLocalFloat(varW, mW);
+    // // //     ElfScript::setLocalFloat(varX, mVector.points[0]);
+    // // //     ElfScript::setLocalFloat(varY, mVector.points[1]);
+    // // //     if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
+    // // //     if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
     // // // }
 
     // -------------------------------------------------------------------------
@@ -312,10 +315,10 @@ public:
         S32 count = this->mPoints.size();
         dSprintf(buffer, sizeof(buffer), "TypeS32 _populate = %d;\r\n", count); //magic populate ^^
         stream.writeTabs(tabStop);
-        stream.write(dStrlen(buffer), buffer);
+            stream.write(dStrlen(buffer), buffer);
         for (S32 i = 0; i < count; i++) {
-            InternalVector4 vec4 = this->mPoints[i];
-            dSprintf(buffer, sizeof(buffer), "_p[%d] = { %g, %g, %g, %g};\r\n",i, vec4.x, vec4.y, vec4.z, vec4.w );
+            ConsoleVector vec4 = this->mPoints[i];
+            dSprintf(buffer, sizeof(buffer), "_p[%d] = { %g, %g, %g, %g};\r\n",i, vec4.points[0], vec4.points[1], vec4.points[2], vec4.points[3] );
             stream.writeTabs(tabStop);
             stream.write(dStrlen(buffer), buffer);
         }
@@ -328,8 +331,8 @@ public:
     // set the point in the Point Storage at index by Vector (String)
     bool setPointVec( U32 index, String strVector ) {
         if ( index >= this->mPoints.size()) return false;
-        InternalVector4 vec4;
-        dSscanf(strVector.c_str(), "%g %g %g %g",&vec4.x, &vec4.y, &vec4.z, &vec4.w);
+        ConsoleVector vec4;
+        dSscanf(strVector.c_str(), "%lg %lg %lg %lg",&vec4.points[0], &vec4.points[1], &vec4.points[2], &vec4.points[3]);
         this->mPoints[index] = vec4;
         return true;
     }
@@ -411,11 +414,11 @@ IMPLEMENT_CONOBJECT(PointStorageObject);
 // ---------- get/set Vector String ----------
 DefineEngineMethod(PointStorageObject, getPosVec, String, (), , "get the position as Vector (String)") {
     StringBuilder str;
-    str.format("%g %g %g %g", object->mX, object->mY, object->mZ, object->mW);
+    str.format("%g %g %g %g", object->mVector.points[0], object->mVector.points[1], object->mVector.points[2], object->mVector.points[3]);
     return Con::getStringArg(str.end());
 }
 DefineEngineMethod(PointStorageObject, setPosVec, void, (String strVector), , "set the position by Vector (String)") {
-      dSscanf(strVector.c_str(), "%g %g %g %g",&object->mX, &object->mY, &object->mZ, &object->mW);
+      dSscanf(strVector.c_str(), "%g %g %g %g",&object->mVector.points[0], &object->mVector.points[1], &object->mVector.points[2], &object->mVector.points[3]);
 }
 
 // // // DefineEngineMethod(PointStorageObject, getPosByRef, void,
@@ -426,103 +429,113 @@ DefineEngineMethod(PointStorageObject, setPosVec, void, (String strVector), , "s
 
 
 // ---------- set Pos by float's ----------
-DefineEngineMethod(PointStorageObject, setPos, void, (F32 x, F32 y, F32 z, F32 w),(0.f,0.f) ,
+DefineEngineMethod(PointStorageObject, setPos, void, (F64 x, F64 y, F64 z, F64 w),(0.f,0.f) ,
                    "Set position by method ") {
     object->setPos(x,y,z,w);
 }
 DefineEngineMethod(PointStorageObject, normalizeXZ, void, (), ,
                    "normalize the current position") {
-    normalizeXY(object->mX, object->mY);
+    F32 x = static_cast<F32>(object->mVector.points[0]);
+    F32 y = static_cast<F32>(object->mVector.points[1]);
+    normalizeXY(x,y);
+    object->mVector.points[0] = static_cast<F64>(x);
+    object->mVector.points[1] = static_cast<F64>(y);
 }
 DefineEngineMethod(PointStorageObject, getLen, F32, (), ,
                    "len of current position") {
-    return lengthXY(object->mX, object->mY);
+    return lengthXY( object->mVector.points[0], object->mVector.points[1]);
 }
 // -------------------------------------
 // ---------- mPoints storage ----------
-DefineEngineMethod(PointStorageObject, setPoint, bool, (U32 index, F32 x, F32 y, F32 z, F32 w),(0.f, 0.f) ,
+DefineEngineMethod(PointStorageObject, setPoint, bool, (U32 index, F64 x, F64 y, F64 z, F64 w),(0.f, 0.f) ,
             "Set a  point at index in the point storage.") {
     if ( index >= object->mPoints.size()) return false;
     object->mPoints[index] = { x, y, z, w};
     return true;
 }
 
-DefineEngineMethod(PointStorageObject, getPointX, F32, (U32 index),
-                   , "get the point.x from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, getPointX, F64, (U32 index),
+                   , "get the point.points[0] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].x);
+    return (object->mPoints[index].points[0]);
 }
-DefineEngineMethod(PointStorageObject, getPointY, F32, (U32 index),
-                   , "get the point.x from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, getPointY, F64, (U32 index),
+                   , "get the point.points[0] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].y);
+    return (object->mPoints[index].points[1]);
 }
-DefineEngineMethod(PointStorageObject, getPointZ, F32, (U32 index),
-                   , "get the point.z from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, getPointZ, F64, (U32 index),
+                   , "get the point.points[2] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].z);
+    return (object->mPoints[index].points[2]);
 }
-DefineEngineMethod(PointStorageObject, getPointW, F32, (U32 index),
-                   , "get the point.w from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, getPointW, F64, (U32 index),
+                   , "get the point.points[3] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].w);
+    return (object->mPoints[index].points[3]);
 }
 DefineEngineMethod(PointStorageObject, setPointX, bool, (U32 index, F32 value),
-                   , "set the point.x from the point storage at index as Vector (String)") {
+                   , "set the point.points[0] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].x = value;
+    object->mPoints[index].points[0] = value;
     return true;
 }
-DefineEngineMethod(PointStorageObject, setPointY, bool, (U32 index, F32 value),
-                   , "set the point.y from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, setPointY, bool, (U32 index, F64 value),
+                   , "set the point.points[1] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].y = value;
+    object->mPoints[index].points[1] = value;
     return true;
 }
-DefineEngineMethod(PointStorageObject, setPointZ, bool, (U32 index, F32 value),
-                   , "set the point.z from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, setPointZ, bool, (U32 index, F64 value),
+                   , "set the point.points[2] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].z = value;
+    object->mPoints[index].points[2] = value;
     return true;
 }
-DefineEngineMethod(PointStorageObject, setPointW, bool, (U32 index, F32 value),
-                   , "set the point.z from the point storage at index as Vector (String)") {
+DefineEngineMethod(PointStorageObject, setPointW, bool, (U32 index, F64 value),
+                   , "set the point.points[2] from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].w = value;
+    object->mPoints[index].points[3] = value;
     return true;
 }
 
-DefineEngineMethod(PointStorageObject, getPointVec, String, (U32 index),
+DefineEngineMethod(PointStorageObject, getPointVec, ConsoleVector, (U32 index),
                    , "get the point from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return "";
-    InternalVector4 vec4 = object->mPoints[index];
-    StringBuilder str;
-    str.format("%g %g %g %g", vec4.x, vec4.y, vec4.z, vec4.w);
-    return Con::getStringArg(str.end());
+    if ( index >= object->mPoints.size()) return {0};
+    return object->mPoints[index];
+
+    // ConsoleVector vec4 = object->mPoints[index];
+    // StringBuilder str;
+    // str.format("%g %g %g %g", vec4.points[0], vec4.points[1], vec4.points[2], vec4.points[3]);
+    // return Con::getStringArg(str.end());
 }
-DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, String strVector), ,
+DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, ConsoleVector vec4), ,
                    "set the point in the Point Storage at index by Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
-    InternalVector4 vec4;
-    dSscanf(strVector.c_str(), "%g %g %g %g",&vec4.x, &vec4.y, &vec4.z, &vec4.w);
+
     object->mPoints[index] = vec4;
     return true;
+
+    // ConsoleVector vec4;
+    // dSscanf(strVector.c_str(), "%g %g %g %g",&vec4.points[0], &vec4.points[1], &vec4.points[2], &vec4.points[3]);
+    // object->mPoints[index] = vec4;
+    // return true;
 }
 DefineEngineMethod(PointStorageObject, getPoint2Vec, String, (U32 index),
                    , "get the point xy from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return "";
-    InternalVector4 vec4 = object->mPoints[index];
+    ConsoleVector vec4 = object->mPoints[index];
     StringBuilder str;
-    str.format("%g %g", vec4.x, vec4.y);
+    str.format("%g %g", vec4.points[0], vec4.points[1]);
     return Con::getStringArg(str.end());
 }
 DefineEngineMethod(PointStorageObject, setPoint2Vec, bool, ( U32 index, String strVector), ,
                    "set the point xy in the Point Storage at index by Vector (String)") {
     if ( index >= object->mPoints.size()) return false;
     F32 x,y;
-    dSscanf(strVector.c_str(), "%g %g",&x, &y);
-    object->mPoints[index].x = x;
-    object->mPoints[index].y = y;
+    dSscanf(strVector.c_str(), "%lg %lg",&x, &y);
+    object->mPoints[index].points[0] = x;
+    object->mPoints[index].points[1] = y;
     return true;
 }
 // ---------- mPoints storage from/to objects position ----------
@@ -530,7 +543,13 @@ DefineEngineMethod(PointStorageObject, storePoint, bool, (U32 index), ,
                    "store the current values x,y,z,w, to the point storage") {
     if ( index >= object->mPoints.size()) return false;
 
-    object->mPoints[index] = { object->mX, object->mY, object->mZ, object->mW};
+    object->mPoints[index] = {
+        static_cast<F64>(object->mVector.points[0]),
+        static_cast<F64>(object->mVector.points[1]),
+        static_cast<F64>(object->mVector.points[2]),
+        static_cast<F64>(object->mVector.points[3])
+
+    };
 
     return true;
 }

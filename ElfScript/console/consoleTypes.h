@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#pragma once
 
 #ifndef _CONSOLETYPES_H_
 #define _CONSOLETYPES_H_
@@ -85,6 +86,11 @@ DefineConsoleType( TypeRealString, String )
 DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, const char*)
+
+//ElfScript
+DECLARE_STRUCT( ConsoleVector );
+DefineConsoleType( TypeVector, ConsoleVector)
+IMPLEMENT_ENGINE_TYPE_TRAITS(ConsoleVector);
 
 // DefineConsoleType(TypeRotationF, RotationF)
 
