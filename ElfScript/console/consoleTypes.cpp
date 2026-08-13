@@ -1208,13 +1208,13 @@ IMPLEMENT_STRUCT( ConsoleVector,
                   TypeVector, ,
                   "" )
 END_IMPLEMENT_STRUCT;
-ConsoleType(TypeVector, TypeVector, ConsoleVector, "Four point internal Vector")
+ConsoleType(TypeVector, TypeVector, ConsoleVector, "Four point F32 internal Vector")
 ImplementConsoleTypeCasters( TypeVector, ConsoleVector )
 
 ConsoleGetType( TypeVector )
 {
       ConsoleVector *vec = (ConsoleVector *) dptr;
-      static const U32 bufSize = 256;
+      static const U32 bufSize = 128;
       char* returnBuffer = Con::getReturnBuffer(bufSize);
       dSprintf(returnBuffer, bufSize, "%g %g %g %g", vec->points[0],vec->points[1],vec->points[2],vec->points[3]);
       return returnBuffer;
@@ -1223,14 +1223,14 @@ ConsoleGetType( TypeVector )
 ConsoleSetType( TypeVector )
 {
       if(argc == 1)
-            dSscanf(argv[0], "%lg %lg %lg %lg",
+            dSscanf(argv[0], "%g %g %g %g",
                     &((ConsoleVector *) dptr)->points[0],
                     &((ConsoleVector *) dptr)->points[1],
                     &((ConsoleVector *) dptr)->points[2],
                     &((ConsoleVector *) dptr)->points[3]
             );
             else if(argc == 4)
-                  *((ConsoleVector *)dptr) = ConsoleVector{ dAtod(argv[0]), dAtod(argv[1]), dAtod(argv[2]), dAtod(argv[3]) };
+                  *((ConsoleVector *)dptr) = ConsoleVector{ dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]) };
       else
             Con::printf("ConsoleVector must be set as { x, y, z, w } or \"x y width height\"");
 }

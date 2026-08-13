@@ -140,7 +140,7 @@ enum ConsoleValueType
 // #ifdef ENABLE_CONSOLE_VECTOR
 //should i add a count ?!
 struct ConsoleVector {
-      F64   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
+      F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
 };
 // #endif
 
@@ -263,20 +263,14 @@ public:
          ConsoleVector result = {0};
          switch (type)
          {
-               case ConsoleValueType::cvFloat: result.points[0] = f; break;
-               case ConsoleValueType::cvInteger: result.points[0] = static_cast<F64>(i); break;
+               case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
+               case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
                // case ConsoleValueType::cvSTEntry:
                //       return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
                case ConsoleValueType::cvVector: return v;
                case ConsoleValueType::cvString: {
                      if (s[0] == '\0') break;
-                     // THIS FAIL!!!!   ==>
-                     // dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-
-                     //F64 not %g => %lg!!!!!!!
-                     dSscanf(s, "%lg %lg %lg %lg", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-
-
+                     dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
                      break;
                }
 
@@ -302,7 +296,7 @@ public:
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-         return  (v.points[0]);
+         return  static_cast<F64>(v.points[0]);
 #endif
       case ConsoleValueType::cvString:
          return (s[0] == '\0') ? 0.0 : dAtod(s);//F64! dAtof(s);

@@ -277,7 +277,7 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
 
 #ifdef  ENABLE_CONSOLE_VECTOR
        if (srcValue->type == cvVector) {
-             targetValue = srcValue->v.points[componentIndex];
+             targetValue = (F64)srcValue->v.points[componentIndex];
        } else
 #endif
       {
@@ -456,7 +456,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
 
       if (dstValue->type == ConsoleValueType::cvVector)
       {
-            dstValue->v.points[componentIndex] = pSrcStack->getFloat();
+            dstValue->v.points[componentIndex] = (F32)pSrcStack->getFloat();
       }
       else  //slow string ....
 #endif
@@ -3124,7 +3124,7 @@ handle_OP_BUILD_VECTOR_STRING: {
       ConsoleVector cv = {0};
       // get values from stack
       for (S32 i = count - 1; i >= 0; i--) {
-            if (matchVectorFields) cv.points[i] = stack[_STK].getFloat();
+            if (matchVectorFields) cv.points[i] = static_cast<F32> (stack[_STK].getFloat());
             else stringValues[i] = stack[_STK].getString();
             POP_STK();
       }
