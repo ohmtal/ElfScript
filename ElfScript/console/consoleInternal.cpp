@@ -1109,6 +1109,24 @@ void Namespace::addCommand(StringTableEntry name, FloatCallback cb, const char *
    ent->mType = Entry::FloatCallbackType;
    ent->cb.mFloatCallbackFunc = cb;
 }
+// -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+void Namespace::addCommand(StringTableEntry name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly , ConsoleFunctionHeader* header)
+{
+      Entry *ent = createLocalEntry(name);
+      trashCache();
+
+      ent->mUsage = usage;
+      ent->mHeader = header;
+      ent->mMinArgs = minArgs;
+      ent->mMaxArgs = maxArgs;
+      ent->mToolOnly = isToolOnly;
+
+      ent->mType = Entry::VectorCallbackType;
+      ent->cb.mVectorCallbackFunc = cb;
+}
+#endif
+// -----------------------------------------------------------------------------
 
 void Namespace::addCommand(StringTableEntry name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header)
 {
@@ -1226,6 +1244,11 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
       case BoolCallbackType:
          result.setBool(cb.mBoolCallbackFunc(thisObj, argc, argv));
          break;
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+      case VectorCallbackType:
+            result.setVector(cb.mVectorCallbackFunc(thisObj, argc, argv));
+        break;
+#endif
    }
 
    return result;
@@ -1570,7 +1593,11 @@ String Namespace::Entry::getPrototypeString() const
          case BoolCallbackType:
             str.append("bool ");
             break;
-
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+         case VectorCallbackType:
+            str.append("TypeVector ");
+            break;
+#endif
          case ScriptCallbackType:
             break;
       }

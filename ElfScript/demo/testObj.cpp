@@ -41,6 +41,9 @@ const char* getConsoleValueTypeName(S32 type) {
         case ConsoleValueType::cvInteger: return "S64";
         case ConsoleValueType::cvString:  return "String";
         case ConsoleValueType::cvSTEntry: return "Empty";
+#ifdef ENABLE_CONSOLE_VECTOR
+        case ConsoleValueType::cvVector:  return "Vector";
+#endif
         default: return "other";
     }
 }

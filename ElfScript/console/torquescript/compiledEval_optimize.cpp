@@ -453,6 +453,11 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       // Con::debugf("dstValue->type == %d",  dstValue->type );
+      if (dstValue->type != ConsoleValueType::cvVector) //TEST typecasting by component
+      {
+            dstValue->setVector(dstValue->getVector());
+            // Con::debugf("*** typecast by component ?!...");
+      }
 
       if (dstValue->type == ConsoleValueType::cvVector)
       {
@@ -2666,6 +2671,18 @@ handle_OP_CALLFUNC:
             {
                   switch (nsEntry->mType)
                   {
+
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+                        case Namespace::Entry::VectorCallbackType:
+                        {
+                              ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+                              stack[_STK + 1].setVector(result);
+                              PUSH_STK();
+                              break;
+                        }
+#endif
+
                         case Namespace::Entry::StringCallbackType:
                         {
                               const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);

@@ -126,7 +126,7 @@ typedef const char *StringTableEntry;
 
 enum ConsoleValueType
 {
-#ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
+#ifdef ENABLE_CONSOLE_VECTOR
    cvVector  =          -6,
 #endif
    cvNULL =             -5,
@@ -164,7 +164,7 @@ public:
          EnumTable* enumTable;
       };
    };
-#ifdef ENABLE_CONSOLE_VECTOR //XXTH TEST
+#ifdef ENABLE_CONSOLE_VECTOR
   ConsoleVector v;
 #endif
 #pragma warning(pop)
@@ -670,6 +670,10 @@ typedef F32(*FloatCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef void(*VoidCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]); // We have it return a value so things don't break..
 typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+typedef ConsoleVector(*VectorCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
+#endif
+
 typedef void(*ConsumerCallback)(U32 level, const char *consoleLine);
 /// @}
 
@@ -1023,7 +1027,9 @@ namespace Con
    void addCommand(const char* name, FloatCallback  cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, VoidCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, BoolCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+   void addCommand( const char* name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+#endif
                                                                                                                                                                    /// @}
 
                                                                                                                                                                    /// @name Namespace Function Registration
@@ -1046,7 +1052,9 @@ namespace Con
    void addCommand(const char *nameSpace, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+   void addCommand(const char *nameSpace, const char *name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+#endif
                                                                                                                                                                                         /// @}
 
                                                                                                                                                                                         /// @name Special Purpose Registration
@@ -1314,6 +1322,10 @@ public:
    FloatCallback mFC;    ///< A function/method that returns a float.
    VoidCallback mVC;     ///< A function/method that returns nothing.
    BoolCallback mBC;     ///< A function/method that returns a bool.
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+   VectorCallback mVecC;     ///< A function/method that returns a ConsoleVector.
+#endif
+
    bool mGroup;          ///< Indicates that this is a group marker.
    bool mNS;             ///< Indicates that this is a namespace marker.
                         ///  @deprecated Unused.
@@ -1423,7 +1435,9 @@ public:
    ConsoleConstructor(const char* className, const char* funcName, FloatCallback  ffunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, VoidCallback   vfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, BoolCallback   bfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+   ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
+#endif
    /// @}
 
    /// @name Magic Console Constructors

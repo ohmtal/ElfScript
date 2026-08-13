@@ -435,6 +435,19 @@ inline bool _EngineConsoleThunkReturnValue( bool value )
 {
    return value;
 }
+// -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
+{
+      return value;
+}
+// // // inline ConsoleVector _EngineConsoleThunkReturnValue( const char* value )
+// // // {
+// // //       //FIXME IF THIS IS MISSING
+// // // }
+
+#endif
+// -----------------------------------------------------------------------------
 inline S32 _EngineConsoleThunkReturnValue( S32 value )
 {
    return value;
@@ -495,6 +508,16 @@ struct _EngineConsoleThunkType< bool >
    typedef bool ReturnType;
    typedef BoolCallback CallbackType;
 };
+// -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+template<>
+struct _EngineConsoleThunkType< ConsoleVector >
+{
+      typedef ConsoleVector ReturnType;
+      typedef VectorCallback CallbackType;
+};
+#endif
+// -----------------------------------------------------------------------------
 template<>
 struct _EngineConsoleThunkType< void >
 {

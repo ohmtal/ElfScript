@@ -1,5 +1,5 @@
 function rl() {
-    exec("test.elf");
+    exec("ElfScript/demo/test.elf");
 }
 
 
@@ -13,6 +13,7 @@ new PointStorageObject(sto) {
     class ="FooBar";
     TypeS32 DynX = 99;
     TypeF32 speed = 0.1;
+    TypeVector DynVec = { 0,0};
 
 };
 
@@ -143,10 +144,68 @@ for (%i in 0..10) {
 
 
 // echo("------------------------ LocalVar ---------------------");
-// %localX = 5.0;
+
+
+%localVec = { 10, 10, 10};
+varDump("%localVec");
+%localVec.x = 20;
+varDump("%localVec");
+
+
+
+%copyDynVec = sto.DynVec;
+varDump("%copyDynVec");
+
+echo("Test TypeCast by component field:");
+%localStr = "1 2 3";
+%localStr.x = 66;
+varDump("%localStr");
+%localStr.y = 99;
+varDump("%localStr");
+
+
+error("staticfield to var is not implemented so far");
+%copyX = sto.getPointX(0);
+// echo("**this makes a case Namespace::Entry::FloatCallbackType: on line ~ 2697");
+// echo("** initalized by FloatCallback");
+// echo("** ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, FloatCallback ffunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )");
+// echo("** void Namespace::addCommand(StringTableEntry name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header) ");
+// echo(" THIS ====> void ConsoleConstructor::setup()");
+varDump("%copyX");
+
+%copyVec = sto.getPointVec(0);
+varDump("%copyVec");
+echo("........ tried to implement it but no luck so far => ENABLE_CONSOLE_VECTOR_CALLBACK");
+echo("........ it compiles and run but the methods using ConsoleVector  like getPointVec are gone.");
+echo("........ DefineConsoleType is it or Trampolin - i dont know.");
+
+%copyVec.x *= 1.0; // ok we dont get it work like it should so i use this trick
+varDump("%copyVec");
+
+// echo("this makes a case Namespace::Entry::StringCallbackType: on line ~ 2674");
+// echo("added: typedef ConsoleVector(*VectorCallBack)(SimObject *obj, S32 argc, ConsoleValue argv[]);");
+// echo("added lot of stuff like .............. mVectorCallbackFunc ...............");
+
+// error("---------- I STUCK AT ---------------");
+// echo ("struct _EngineConsoleThunkType< ConsoleVector > ...");
+//
+// /opt/ElfScript/./ElfScript/console/engineAPI.h:614:44: error:
+//   could not convert ‘_EngineConsoleThunkReturnValue<ConsoleVector>(engineAPI::detail::ThunkHelpers<2, ConsoleVector>::dispatchHelper<_PointStorageObjectgetPosVecframe>(argc, argv, fn, frame, (* & defaultArgs), (_EngineConsoleThunk<2, ConsoleVector()>::SeqType(), _EngineConsoleThunk<2, ConsoleVector()>::SeqType())))’ from ‘const char*’ to ‘_EngineConsoleThunk<2, ConsoleVector()>::ReturnType’ {aka ‘ConsoleVector’}
+
+// #ifdef ENABLE_CONSOLE_VECTOR
+// template<>
+// struct _EngineConsoleThunkType< ConsoleVector >
+// {
+//     typedef ConsoleVector ReturnType;
+//     typedef VectorCallback CallbackType;
+// };
+// #endif
+// error("---------- I STUCK AT ---------------");
+
+
+
 // setLocalFloatVariable("%localX", 666);
 // echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
-// varDump("%localX");
 // varDump("%i");
 //
 // function localPoints( ) {
@@ -161,4 +220,4 @@ for (%i in 0..10) {
 
 
 
-$Debug::DumpByteCode=1;
+// $Debug::DumpByteCode=1;

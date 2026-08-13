@@ -93,6 +93,10 @@ public:
          FloatCallbackType,
          VoidCallbackType,
          BoolCallbackType
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+        , VectorCallbackType
+#endif
+
       };
 
       /// Link back to the namespace to which the entry belongs.
@@ -146,6 +150,9 @@ public:
          VoidCallback mVoidCallbackFunc;
          FloatCallback mFloatCallbackFunc;
          BoolCallback mBoolCallbackFunc;
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+         VectorCallback mVectorCallbackFunc;
+#endif
          const char *mGroupName;
          const char *mCallbackName;
       } cb;
@@ -193,7 +200,9 @@ public:
    void addCommand(StringTableEntry name, FloatCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    void addCommand(StringTableEntry name, VoidCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    void addCommand(StringTableEntry name, BoolCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+   void addCommand(StringTableEntry name, VectorCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+#endif
    void addScriptCallback(const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);
 
    void markGroup(const char* name, const char* usage);

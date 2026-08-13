@@ -1457,9 +1457,12 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
             {
 
 
-                  switch (stackP->getType()) {
+                  // switch (stackP->getType()) {
+                  switch(entry->mValue.getType()) //TEST
+                  {
                         case ConsoleValueType::cvInteger:
-                              switch(entry->mValue.getType()) {
+                              // switch(entry->mValue.getType()) {
+                              switch(stackP->getType()) { //TEST
                                     case ConsoleValueType::cvInteger: stackP->setFastInt(entry->mValue.getFastInt()); break;
                                     case ConsoleValueType::cvFloat: stackP->setInt(entry->mValue.getInt()); break;
                                     default: stackP->setInt(entry->mValue.getInt()); break;
@@ -3270,7 +3273,18 @@ namespace {
                   mPadding[ 2 ] = ' ';
                   mPadding[ 3 ] = ' ';
                   mPadding[ 4 ] = 0;
-                  break;                  
+                  break;
+#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+               case Namespace::Entry::VectorCallbackType:
+                     mReturnType = "TypeVector";
+                     // NOTE no idea what to set here ...
+                     mPadding[ 0 ] = ' ';
+                     mPadding[ 1 ] = ' ';
+                     mPadding[ 2 ] = ' ';
+                     mPadding[ 3 ] = ' ';
+                     mPadding[ 4 ] = 0;
+                     break;
+#endif
             }
          }
       }
