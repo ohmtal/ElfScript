@@ -94,7 +94,7 @@ DECLARE_STRUCT( ConsoleVector );
 
 DefineConsoleType( TypeVector, ConsoleVector)
 IMPLEMENT_ENGINE_TYPE_TRAITS(ConsoleVector);
-
+// TEST: IMPLEMENT_PRIMITIVE(ConsoleVector, ConsoleVector,, "A Point Vector");
 
 
 

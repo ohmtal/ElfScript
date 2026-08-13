@@ -409,7 +409,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
       } else if (currentLocalRegister != -1) {
             dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
       } else if (Script::gEvalState.currentVariable) {
-            dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
+            dstValue = Script::gEvalState.getConsoleValue();
       }
 
       // no dstValue nothing to do here
@@ -453,7 +453,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       // Con::debugf("dstValue->type == %d",  dstValue->type );
-      if (dstValue->type != ConsoleValueType::cvVector) //TEST typecasting by component
+      if (/*dstValue->type < cvConsoleValueType && */ dstValue->type != ConsoleValueType::cvVector ) //TEST typecasting by component
       {
             dstValue->setVector(dstValue->getVector());
             // Con::debugf("*** typecast by component ?!...");
@@ -2333,8 +2333,8 @@ handle_OP_LOADFIELD_UINT:
             }
             else
             {
-                  stack[_STK + 1].cleanupData();
-                  stack[_STK + 1].type = cvInteger; //HardCore!
+                  // stack[_STK + 1].cleanupData();
+                  // stack[_STK + 1].type = cvInteger; //HardCore!
                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
 
                   // char buff[FieldBufferSizeString];
@@ -2355,8 +2355,8 @@ handle_OP_LOADFIELD_FLT:
             }
             else
             {
-                  stack[_STK + 1].cleanupData();
-                  stack[_STK + 1].type = cvFloat; //HardCore!
+                  // stack[_STK + 1].cleanupData();
+                  // stack[_STK + 1].type = cvFloat; //HardCore!
                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
 
                   // char buff[FieldBufferSizeString];
@@ -2377,8 +2377,8 @@ handle_OP_LOADFIELD_STR:
          }
          else
          {
-            stack[_STK + 1].cleanupData();
-            stack[_STK + 1].type = cvString;
+            // stack[_STK + 1].cleanupData();
+            // stack[_STK + 1].type = cvString;
             stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
 
             // The field is not being retrieved from an object. Maybe it's
@@ -3129,7 +3129,7 @@ handle_OP_ITER_END:
 
 // ~~~~~~~~~~~~~~~~~ VECTOR_STRING
 #ifdef ENABLE_CONSOLE_VECTOR
-// PoD !! :D only kosmetic max 16 elements
+// PoD !! :D if count < 4 we get into vector mode :)
 handle_OP_BUILD_VECTOR_STRING: {
       // read the count
       U32 count = code[ip++];

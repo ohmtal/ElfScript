@@ -178,29 +178,19 @@ varDump("%copyVec");
 echo("........ tried to implement it but no luck so far => ENABLE_CONSOLE_VECTOR_CALLBACK");
 echo("........ it compiles and run but the methods using ConsoleVector  like getPointVec are gone.");
 echo("........ DefineConsoleType is it or Trampolin - i dont know.");
+echo("........ Check also IMPLEMENT_PRIMITIVE");
 
 %copyVec.x *= 1.0; // ok we dont get it work like it should so i use this trick
 varDump("%copyVec");
+print("This did the trick! ==> %copyVec.x *= 1.0;");
 
-// echo("this makes a case Namespace::Entry::StringCallbackType: on line ~ 2674");
-// echo("added: typedef ConsoleVector(*VectorCallBack)(SimObject *obj, S32 argc, ConsoleValue argv[]);");
-// echo("added lot of stuff like .............. mVectorCallbackFunc ...............");
+sto.DynVec = sto.getPointVec(0);
+%fooVec = sto.DynVec;
+varDump("%fooVec");
 
-// error("---------- I STUCK AT ---------------");
-// echo ("struct _EngineConsoleThunkType< ConsoleVector > ...");
-//
-// /opt/ElfScript/./ElfScript/console/engineAPI.h:614:44: error:
-//   could not convert ‘_EngineConsoleThunkReturnValue<ConsoleVector>(engineAPI::detail::ThunkHelpers<2, ConsoleVector>::dispatchHelper<_PointStorageObjectgetPosVecframe>(argc, argv, fn, frame, (* & defaultArgs), (_EngineConsoleThunk<2, ConsoleVector()>::SeqType(), _EngineConsoleThunk<2, ConsoleVector()>::SeqType())))’ from ‘const char*’ to ‘_EngineConsoleThunk<2, ConsoleVector()>::ReturnType’ {aka ‘ConsoleVector’}
 
-// #ifdef ENABLE_CONSOLE_VECTOR
-// template<>
-// struct _EngineConsoleThunkType< ConsoleVector >
-// {
-//     typedef ConsoleVector ReturnType;
-//     typedef VectorCallback CallbackType;
-// };
-// #endif
-// error("---------- I STUCK AT ---------------");
+
+
 
 
 
