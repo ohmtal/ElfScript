@@ -38,7 +38,7 @@ exec ("include/GuiTool.elf");
 #define SCALE_SNAP 8
 #define PREVIEW_SIZE 96
 #define SHOW_PREVIEW 0
-#define BACKGROUND_COLOR { 176, 233, 252 }
+#define BACKGROUND_COLOR { 176, 233, 252 , 255}
 #define SCENE_FILE "pref:/aquarium.elfscene"
 #define SCENE_PATH "pref:/"
 #define EXPORT_PNG_FILE "pictures:/AquariumBackground.png"
@@ -98,6 +98,7 @@ function Aquarium::onAdd(%this) {
         OnMenuObject = %this;
         OnMenuMethod = "onMainMenu";
     };
+    %this.add(%this.MainMenu);
 
     %this.ConfirmMenu = new SimObject() {
         class = "GuiToolMenu";
@@ -107,6 +108,7 @@ function Aquarium::onAdd(%this) {
         OnMenuObject = %this;
         OnMenuMethod = "onConfirmMenu";
     };
+    %this.add(%this.ConfirmMenu);
 
     %this.SelectObjectMenu = new SimObject() {
         class = "GuiToolMenu";
@@ -120,6 +122,7 @@ function Aquarium::onAdd(%this) {
         MenuTextureRects = "";
         NoDarkenOverlay = true;
     };
+    %this.add(%this.SelectObjectMenu);
 
     GuiTool.CurrentMenu = 0; //reset
 

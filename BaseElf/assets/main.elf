@@ -24,7 +24,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
         error("Failed to load module" SPC %this.moduleName);
         return false;
     }
-
+    print("[infoRemoveing old module:" SPC %this.module);
     if (isObject(%this.module)) {
         %this.module.delete();
     }

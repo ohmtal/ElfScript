@@ -201,7 +201,7 @@ function lala() {%foo = 1;}
 
 function localPoints( ) {
     sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
-    %pointX = %pointY = %pointZ = 47.0;
+    %pointX = %pointY = %pointZ = 47.01;
 
 
     whereAmI();
@@ -219,6 +219,15 @@ function localPoints( ) {
     varDump("%x");
     varDump("$y");
 
+    %vec = {1.5};
+    echo("vec x is:" SPC %vec.x);
+    %vec.x *= 2;
+    %vec.y += 2;
+    %vec.z += 3;
+    %vec.w += 4;
+    // %vec * = 2;
+    varDump("%vec");
+
 
 }
 
@@ -226,6 +235,7 @@ dumpLocals();
 
 localPoints();
 
+// new SimObjects(simo) { int foo = 1;}
 
 
 // $Debug::DumpByteCode=1;

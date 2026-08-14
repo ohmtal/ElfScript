@@ -11,7 +11,7 @@ namespace ElfScript {
     const char* getConsoleValueTypeName(S32 type);
     S32 findLocalVarRegisterInCurrentScope(const char* variableName);
 
-    void varDumpGlobals(const char* variableName); //alien here ;)
+    void varDumpGlobals(const char* variableName);
     void varDumpLocals(const char* variableName);
     void dumpAllLocalVariables();
 

@@ -54,8 +54,6 @@ namespace ElfScript {
 
     }
     // -----------------------------------------------------------------------------
-
-    // -----------------------------------------------------------------------------
     void varDumpGobals(const char* variableName)
     {
         if (!variableName) return;
@@ -121,103 +119,104 @@ namespace ElfScript {
         }
         Con::printSeparator();
     }
-    // -----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-//
-//  get a local or global variable ConsoleValue
-//  i also added global but keep the name getLocalVariable
-//
-bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
-    if (!variableName) return false;
+    //-----------------------------------------------------------------------------
+    //
+    //  get a local or global variable ConsoleValue
+    //  i also added global but keep the name getLocalVariable
+    //
+    bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
+        if (!variableName) return false;
 
-    if (variableName[0] == '$') {
-        Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
-        if (!entry) return false;
-        stack = &entry->getValue();
-        if (!stack ) return false;
+        if (variableName[0] == '$') {
+            Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
+            if (!entry) return false;
+            stack = &entry->getValue();
+            if (!stack ) return false;
+            return true;
+        }
+
+        if (variableName[0] == '%') {
+            reg = findLocalVarRegisterInCurrentScope(variableName);
+            if (reg < 0) return false;
+            stack = &Script::gEvalState.currentRegisterArray->values[reg];
+            if (!stack ) return false;
+            return true;
+        }
+
+        return false;
+    }
+
+    ConsoleValue* getLocalVariable(const char* variableName ){
+        ConsoleValue* stack = nullptr; S32 reg = -1;
+        if (!getLocalVariable(variableName, stack, reg)) {
+            return nullptr;
+        }
+        return stack;
+    }
+
+    //-----------------------------------------------------------------------------
+    bool setLocalFloat(const char* variableName, F64 value) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return false;
+        stack->setFloat(value);
+        return true;
+    }
+    //-----------------------------------------------------------------------------
+    bool setLocalInt(const char* variableName, S64 value) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return false;
+        stack->setInt(value);
+        return true;
+    }
+    //-----------------------------------------------------------------------------
+    bool setLocalString(const char* variableName, const char* value) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return false;
+        stack->setString(value);
+        return true;
+    }
+    //-----------------------------------------------------------------------------
+    F64 getLocalFloat(const char* variableName) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return 0.f;
+        return stack->getFloat();
+    }
+    //-----------------------------------------------------------------------------
+    S64 getLocalInt(const char* variableName) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return 0;
+        return stack->getInt();
+    }
+    //-----------------------------------------------------------------------------
+    const char* getLocalString(const char* variableName) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return "";
+        return stack->getString();
+    }
+
+    //-----------------------------------------------------------------------------
+    #ifdef ENABLE_CONSOLE_VECTOR
+    ConsoleVector getLocalVector(const char* variableName) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return ConsoleVector{0};
+        return stack->getVector();
+    }
+    //-----------------------------------------------------------------------------
+    bool setLocalVector(const char* variableName, ConsoleVector& value) {
+        ConsoleValue* stack = getLocalVariable(variableName);
+        if (stack == nullptr) return false;
+        stack->setVector(value);
         return true;
     }
 
-    if (variableName[0] == '%') {
-        reg = findLocalVarRegisterInCurrentScope(variableName);
-        if (reg < 0) return false;
-        stack = &Script::gEvalState.currentRegisterArray->values[reg];
-        if (!stack ) return false;
-        return true;
-    }
+    #endif
 
-    return false;
-}
-
-ConsoleValue* getLocalVariable(const char* variableName ){
-    ConsoleValue* stack = nullptr; S32 reg = -1;
-    if (!getLocalVariable(variableName, stack, reg)) {
-        return nullptr;
-    }
-    return stack;
-}
-
-//-----------------------------------------------------------------------------
-bool setLocalFloat(const char* variableName, F64 value) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return false;
-    stack->setFloat(value);
-    return true;
-}
-//-----------------------------------------------------------------------------
-bool setLocalInt(const char* variableName, S64 value) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return false;
-    stack->setInt(value);
-    return true;
-}
-//-----------------------------------------------------------------------------
-bool setLocalString(const char* variableName, const char* value) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return false;
-    stack->setString(value);
-    return true;
-}
-//-----------------------------------------------------------------------------
-F64 getLocalFloat(const char* variableName) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return 0.f;
-    return stack->getFloat();
-}
-//-----------------------------------------------------------------------------
-S64 getLocalInt(const char* variableName) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return 0;
-    return stack->getInt();
-}
-//-----------------------------------------------------------------------------
-const char* getLocalString(const char* variableName) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return "";
-    return stack->getString();
-}
-
-//-----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
-ConsoleVector getLocalVector(const char* variableName) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return ConsoleVector{0};
-    return stack->getVector();
-}
-//-----------------------------------------------------------------------------
-bool setLocalVector(const char* variableName, ConsoleVector& value) {
-    ConsoleValue* stack = getLocalVariable(variableName);
-    if (stack == nullptr) return false;
-    stack->setVector(value);
-    return true;
-}
-
-#endif
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 } //namespace ElfScript
-DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump.only valid in the variables scope")
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+DefineEngineFunction(varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
     if ( !variableName ) return;
     if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);

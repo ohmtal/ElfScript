@@ -45,7 +45,7 @@ function StarField::UpdateSize(%this) {
 // -----------------------------------------------------------------------------
 function StarField::OnAdd(%this) {
     // %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
-    SetClearBackground({ 20, 20, 40 });
+    SetClearBackground({ 20, 20, 40 , 255});
 
     %this.updateSize();
 
