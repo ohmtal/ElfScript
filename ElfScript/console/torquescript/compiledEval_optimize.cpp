@@ -2333,8 +2333,8 @@ handle_OP_LOADFIELD_UINT:
             }
             else
             {
-                  // stack[_STK + 1].cleanupData();
-                  // stack[_STK + 1].type = cvInteger; //HardCore!
+                  stack[_STK + 1].cleanupData();
+                  stack[_STK + 1].type = cvInteger; //HardCore!
                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
 
                   // char buff[FieldBufferSizeString];
@@ -2355,8 +2355,8 @@ handle_OP_LOADFIELD_FLT:
             }
             else
             {
-                  // stack[_STK + 1].cleanupData();
-                  // stack[_STK + 1].type = cvFloat; //HardCore!
+                  stack[_STK + 1].cleanupData();
+                  stack[_STK + 1].type = cvFloat; //HardCore!
                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
 
                   // char buff[FieldBufferSizeString];

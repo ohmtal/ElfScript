@@ -13,7 +13,7 @@ new PointStorageObject(sto) {
     class ="FooBar";
     TypeS32 DynX = 99;
     TypeF32 speed = 0.1;
-    TypeVector DynVec = { 0,0};
+    TypeVector DynVec = { 8,9,10,11};
 
 };
 
@@ -30,14 +30,16 @@ function foo() {
 
 $MODULES = "A B C D E F G H I J K L M N O P";
 sto.Module = getWord($MODULES,1);
-echo(sto.Module);
+echo("B ==" SPC sto.Module);
 
 
 for (%i = 0; %i < 10; %i++) {
-    sto.Keys[%i] = %i;
+    // sto.Keys[%i] = %i;
+    sto.addTypeField(formatString("Keys%d", %i), "TypeS32", %i);
     %key = getWord($MODULES, %i);
     echo("* setting sto.Keys[",%key,"] to:",%i * 10);
-    sto.Keys[%key] = %i * 10;
+    sto.addTypeField(formatString("Keys%s", %key), "TypeS32", %i*10);
+    // sto.Keys[%key] = %i * 10;
 
 }
 sto.dumpFields();
@@ -120,8 +122,7 @@ setFloatVariable("$foo", 13);
 echo("setfloat did: $foo ==" SPC $foo);
 
 
-// setFloatVariable("%localX", 666);
-// echo("setFloatVariable set 666?: %localX ==" SPC %localX);
+
 
 echo("------------------------ Foreach step ---------------------");
 for( %i in 0..10 step 2) echo("test step2 = ", %i);
@@ -189,24 +190,41 @@ sto.DynVec = sto.getPointVec(0);
 varDump("%fooVec");
 
 
+%localVec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+varDump("%localVec");
+%localVec += 5;
+varDump("%localVec");
 
 
+function lala() {%foo = 1;}
 
 
+function localPoints( ) {
+    sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
+    %pointX = %pointY = %pointZ = 47.0;
 
-// setLocalFloatVariable("%localX", 666);
-// echo("setLocalFloatVariable set 666?: %localX ==" SPC %localX);
-// varDump("%i");
-//
-// function localPoints( ) {
-// error("Rejoicing too soon << does not work in function");
-//     sto.x = 1.0;sto.y = 2.0;sto.z = 3.0;
-//     %pointX = %pointY = %pointZ = 0.0;
-//     sto.getPosByRef( "%pointX", "%pointY", "%pointZ");
-//     print("POINTS:" SPC %pointX SPC %pointY SPC %pointZ);
-//
-// }
-// localPoints();
+
+    whereAmI();
+    varDump("%pointY");
+    // varDump("");
+    // varDump("%localVec");
+
+    setLocalFloatVariable("%pointY", 66.66);
+    varDump("%pointY");
+
+    echo("SET BY REFERENCE :D variables must exist");
+    sto.x = 100.12; sto.y = 200.11;
+    %x = $y = 0.0; //testing local AND global
+    sto.getPosByReference("%x","$y");
+    varDump("%x");
+    varDump("$y");
+
+
+}
+
+dumpLocals();
+
+localPoints();
 
 
 

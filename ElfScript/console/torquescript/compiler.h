@@ -317,6 +317,7 @@ public:
    S32 lookup(StringTableEntry var, S32 lineNumber);
 
    S32 lookupExising(StringTableEntry var); //Elfscript for direkt variable access - return -1 if not found
+   void listExising(); // Elfscript
 
    TypeReq lookupType(StringTableEntry var, S32 lineNumber);
 

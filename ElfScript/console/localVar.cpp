@@ -1,9 +1,8 @@
-
-Rejoicing too soon << does not work in function
-
 //-----------------------------------------------------------------------------
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Local Variable (%) Power :D ... also added  global ($) but kept the nameing
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
@@ -13,29 +12,144 @@ Rejoicing too soon << does not work in function
 #include <console/torquescript/compiler.h>
 
 
-extern  FuncVars* getFuncVars(S32 lineNumber);
+extern  FuncVars gEvalFuncVars;
+extern  FuncVars gGlobalScopeFuncVars;
+
 //-----------------------------------------------------------------------------
 namespace ElfScript {
 
-const char* getConsoleValueTypeName(S32 type) {
-    switch (type) {
-        case ConsoleValueType::cvFloat:   return "F64";
-        case ConsoleValueType::cvInteger: return "S64";
-        case ConsoleValueType::cvString:  return "String";
-        case ConsoleValueType::cvSTEntry: return "Empty";
-        default: return "other";
+    const char* getConsoleValueTypeName(S32 type) {
+        switch (type) {
+            case ConsoleValueType::cvFloat:   return "Float";
+            case ConsoleValueType::cvInteger: return "Integer";
+            case ConsoleValueType::cvString:  return "String";
+            case ConsoleValueType::cvSTEntry: return "Empty";
+            #ifdef ENABLE_CONSOLE_VECTOR
+            case ConsoleValueType::cvVector:  return "Vector";
+            #endif
+            default: return "other";
+        }
     }
-}
+    // -----------------------------------------------------------------------------
+    inline FuncVars* _getFuncVars() {
+        return Compiler::gIsEvalCompile ? &gEvalFuncVars : &gGlobalScopeFuncVars;
+    }
+    // -----------------------------------------------------------------------------
+    S32 findLocalVarRegisterInCurrentScope(const char* variableName)  {
+        // sanity
+        if (!variableName || variableName[0] != '%') return -1;
+
+        // check we are in a function
+        Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+        if (stackFrame.scopeName && stackFrame.scopeNamespace ){
+            StringTableEntry functionName = stackFrame.scopeName;
+            StringTableEntry namespaceName = stackFrame.scopeNamespace->mName;
+
+            StringTableEntry varToLookup = StringTable->insert(variableName);
+            return ((CodeBlock*)stackFrame.module)->variableRegisterTable.lookup(namespaceName, functionName, varToLookup);
+        }
+
+        // 2. we should be in global scope
+        return _getFuncVars()->lookupExising(StringTable->insert(variableName));
+
+    }
+    // -----------------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------------
+    void varDumpGobals(const char* variableName)
+    {
+        if (!variableName) return;
+
+        if (variableName[0] != '$') {
+            Con::errorf("Sorry [%s] in no global variable %s", variableName);
+            return;
+        }
+        Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
+        if (!entry) {
+            Con::printf("%s not found.", variableName);
+            return ;
+        }
+
+        ConsoleValue& localVal = entry->getValue();
+        Con::printf(" %10s [type:%8s] [value:%20s]"
+        , variableName, getConsoleValueTypeName(localVal.type), localVal.getString());
+
+    }
+    // -----------------------------------------------------------------------------
+    void varDumpLocals(const char* variableName)
+    {
+        // sanity
+        if (!variableName) return;
+
+        if (variableName[0] != '%') {
+            Con::errorf("Sorry [%s] in no local variable %s", variableName);
+            return;
+        }
+
+        S32 reg = findLocalVarRegisterInCurrentScope(variableName);
+
+        if (reg < 0) {
+            Con::printf("%s not found.", variableName);
+            return ;
+        }
+
+
+        ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+        Con::printf(" %10s [type:%8s] [value:%20s] [reg:%2d] "
+        , variableName, getConsoleValueTypeName(localVal.type), localVal.getString(), reg);
+    }
+    // -----------------------------------------------------------------------------
+    void dumpAllLocalVariables() {
+        // 1. gEvalFuncVars
+        Con::printSeparator();
+        Con::printf("       ------------------- GlobalScope -------------------");
+        _getFuncVars()->listExising();
+
+        Con::printSeparator();
+        Con::printf("       ------------------- LocalScope -------------------");
+        CompilerLocalVariableToRegisterMappingTable* tbl = &Compiler::getFunctionVariableMappingTable();
+        if (!tbl) {
+            Con::errorf("no CompilerLocalVariableToRegisterMappingTable found ");
+            return ;
+        }
+
+        for (auto& [funcName, maptbl] : tbl->localVarToRegister) {
+            Con::printf("%s, count ", funcName, maptbl.varList.size());
+            for (S32 i = 0 ; i < maptbl.varList.size(); i++)
+                Con::printf("   - %s", maptbl.varList[i]);
+            // Con::printf("%s: reg:%d currentType: %d", key, val.reg ,(S32)val.currentType);
+        }
+        Con::printSeparator();
+    }
+    // -----------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------
+//
+//  get a local or global variable ConsoleValue
+//  i also added global but keep the name getLocalVariable
+//
 bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
-    if (!variableName || variableName[0] != '%') return false;
+    if (!variableName) return false;
 
-    reg = getFuncVars(0)->lookupExising(StringTable->insert(variableName));
-    if (reg < 0) return false;
-    stack = &Script::gEvalState.currentRegisterArray->values[reg];
+    if (variableName[0] == '$') {
+        Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
+        if (!entry) return false;
+        stack = &entry->getValue();
+        if (!stack ) return false;
+        return true;
+    }
 
-    return true;
+    if (variableName[0] == '%') {
+        reg = findLocalVarRegisterInCurrentScope(variableName);
+        if (reg < 0) return false;
+        stack = &Script::gEvalState.currentRegisterArray->values[reg];
+        if (!stack ) return false;
+        return true;
+    }
+
+    return false;
 }
+
 ConsoleValue* getLocalVariable(const char* variableName ){
     ConsoleValue* stack = nullptr; S32 reg = -1;
     if (!getLocalVariable(variableName, stack, reg)) {
@@ -83,23 +197,51 @@ const char* getLocalString(const char* variableName) {
     if (stack == nullptr) return "";
     return stack->getString();
 }
+
 //-----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VECTOR
+ConsoleVector getLocalVector(const char* variableName) {
+    ConsoleValue* stack = getLocalVariable(variableName);
+    if (stack == nullptr) return ConsoleVector{0};
+    return stack->getVector();
+}
 //-----------------------------------------------------------------------------
-DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump.only valid in the variables scope")
-{
-    Con::printSeparator();
-
-    ConsoleValue* localVal = nullptr;S32 reg = -1;
-    bool fail = !ElfScript::getLocalVariable(variableName, localVal, reg) || localVal == nullptr;
-    if (fail) {
-        Con::printf("varDump %s not found or not a local variable:", variableName);
-        return ;
-    }
-
-    Con::printf("Variable: %10s [reg:%2d] [type:%8s] [value:%20s]"
-    , variableName, reg, getConsoleValueTypeName(localVal->type), localVal->getString());
-
-    // Con::printSeparator();
+bool setLocalVector(const char* variableName, ConsoleVector& value) {
+    ConsoleValue* stack = getLocalVariable(variableName);
+    if (stack == nullptr) return false;
+    stack->setVector(value);
+    return true;
 }
 
+#endif
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 } //namespace ElfScript
+DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump.only valid in the variables scope")
+{
+    if ( !variableName ) return;
+    if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
+    else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(dumpLocals, void, (),,"dump local variables") {
+    ElfScript:: dumpAllLocalVariables();
+}
+// -----------------------------------------------------------------------------
+
+DefineEngineFunction(whereAmI, void,(),,"look up the function where i'am called from") {
+    Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+    if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+        Con::printf("Global scope i guess ...");
+        return;
+    }
+    StringTableEntry functionName = stackFrame.scopeName;
+    StringTableEntry namespaceName = stackFrame.scopeNamespace->mName;
+
+    Con::printSeparator();
+    Con::printf("you are in function:  [%s::%s] ",
+                namespaceName ? namespaceName : ""
+                , functionName ? functionName :"unknown");
+
+}
+

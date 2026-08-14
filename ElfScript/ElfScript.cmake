@@ -120,7 +120,7 @@ set(CONSOLE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/console/scriptPreprocessor.cpp
 
     # local var tools
-    # // Rejoicing too soon << does not work in function // ${CMAKE_CURRENT_LIST_DIR}/console/localVar.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/console/localVar.cpp
 
 
     # new monster with direct threading:
@@ -253,12 +253,6 @@ elseif(UNIX)
     list(APPEND PLATFORM_SRC ${POSIX_SRC})
 endif()
 
-
-# if (ENABLE_DIRECT_THREADING)
-#     list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp)
-# else()
-#     list(APPEND CONSOLE_SRC ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval.cpp)
-# endif()
 
 
 set(ELFSCRIPT_SRC

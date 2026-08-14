@@ -3,7 +3,7 @@
 #include <console/consoleInternal.h>
 #include <console/torquescript/ast.h>
 #include <console/torquescript/compiler.h>
-// #include <console/localVar.h>
+#include <console/localVar.h>
 
 ///////////////////////////////////////////////////////
 // some testfunction .......
@@ -31,42 +31,130 @@ DefineEngineFunction(setFloatVariable, void, (const char* VariableName, F32 valu
     Con::setFloatVariable(VariableName, value);
 }
 
-#ifdef TORQUE_DEBUG
+// ================================================================================================
+// Playing with local vars .... moved to console/localVar.cpp
+// ================================================================================================
+    extern  FuncVars gEvalFuncVars;
+    extern  FuncVars gGlobalScopeFuncVars;
 
-extern  FuncVars* getFuncVars(S32 lineNumber);
+namespace ElfScriptDEBUG {
 
-const char* getConsoleValueTypeName(S32 type) {
-    switch (type) {
-        case ConsoleValueType::cvFloat:   return "F64";
-        case ConsoleValueType::cvInteger: return "S64";
-        case ConsoleValueType::cvString:  return "String";
-        case ConsoleValueType::cvSTEntry: return "Empty";
-#ifdef ENABLE_CONSOLE_VECTOR
-        case ConsoleValueType::cvVector:  return "Vector";
-#endif
-        default: return "other";
+    // -----------------------------------------------------------------------------
+    FuncVars* getFuncVars() {
+         return Compiler::gIsEvalCompile ? &gEvalFuncVars : &gGlobalScopeFuncVars;
     }
+    // -----------------------------------------------------------------------------
+    S32 findLocalVarRegisterInCurrentScope(const char* variableName)  {
+        // sanity
+        if (!variableName || variableName[0] != '%') return -1;
+
+        // check we are in a function
+        Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+        if (stackFrame.scopeName && stackFrame.scopeNamespace ){
+            StringTableEntry functionName = stackFrame.scopeName;
+            StringTableEntry namespaceName = stackFrame.scopeNamespace->mName;
+
+            StringTableEntry varToLookup = StringTable->insert(variableName);
+            return ((CodeBlock*)stackFrame.module)->variableRegisterTable.lookup(namespaceName, functionName, varToLookup);
+        }
+
+        // 2. we should be in global scope
+        return getFuncVars()->lookupExising(StringTable->insert(variableName));
+
+    }
+    // -----------------------------------------------------------------------------
+    const char* getConsoleValueTypeName(S32 type) {
+        switch (type) {
+            case ConsoleValueType::cvFloat:   return "Float";
+            case ConsoleValueType::cvInteger: return "Integer";
+            case ConsoleValueType::cvString:  return "String";
+            case ConsoleValueType::cvSTEntry: return "Empty";
+    #ifdef ENABLE_CONSOLE_VECTOR
+            case ConsoleValueType::cvVector:  return "Vector";
+    #endif
+            default: return "other";
+        }
+    }
+    // -----------------------------------------------------------------------------
+    void varDumpLocals(const char* variableName)
+    {
+        if (!variableName) return;
+
+        if (variableName[0] != '%') {
+            Con::errorf("Sorry [%s] in no local variable %s", variableName);
+            return;
+        }
+
+        S32 reg = findLocalVarRegisterInCurrentScope(variableName);
+
+        if (reg < 0) {
+            Con::printf("%s not found.", variableName);
+            return ;
+        }
+
+
+        ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+        Con::printf("Variable: %10s [reg:%2d] [type:%8s] [value:%20s]"
+        , variableName, reg, getConsoleValueTypeName(localVal.type), localVal.getString());
+    }
+    // -----------------------------------------------------------------------------
+    void dumpAllLocalVariables() {
+        // 1. gEvalFuncVars
+        Con::printSeparator();
+        Con::printf("       ------------------- GlobalScope -------------------");
+        getFuncVars()->listExising();
+
+        Con::printSeparator();
+        Con::printf("       ------------------- LocalScope -------------------");
+        CompilerLocalVariableToRegisterMappingTable* tbl = &Compiler::getFunctionVariableMappingTable();
+        if (!tbl) {
+            Con::errorf("no CompilerLocalVariableToRegisterMappingTable found ");
+            return ;
+        }
+
+        for (auto& [funcName, maptbl] : tbl->localVarToRegister) {
+            Con::printf("%s, count ", funcName, maptbl.varList.size());
+            for (S32 i = 0 ; i < maptbl.varList.size(); i++)
+                Con::printf("   - %s", maptbl.varList[i]);
+            // Con::printf("%s: reg:%d currentType: %d", key, val.reg ,(S32)val.currentType);
+        }
+
+
+
+        Con::printSeparator();
+    }
+    // -----------------------------------------------------------------------------
 }
+// ================================================================================================
+/*
+DefineEngineFunction(dumpLocals, void, (),,"") {
+    ElfScriptDEBUG:: dumpAllLocalVariables();
+}
+// -----------------------------------------------------------------------------
 
-
-DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump, you cant use this on console!")
-{
-    Con::printSeparator();
-    if (variableName[0] != '%') {
-        Con::errorf("must be a local Variable!");
+DefineEngineFunction(whereAmI, void,(),,"look up the function where i'am called from") {
+    Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+    if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+        Con::printf("Global scope i guess ...");
         return;
     }
+    StringTableEntry functionName = stackFrame.scopeName;
+    StringTableEntry namespaceName = stackFrame.scopeNamespace->mName;
 
-    S32 reg = getFuncVars(0)->lookupExising(StringTable->insert(variableName));
-    if (reg < 0) {
-        Con::printf("%s not found.", variableName);
-        return ;
-    }
+    Con::printSeparator();
+    Con::printf("you are in function:  [%s::%s] ",
+        namespaceName ? namespaceName : ""
+        , functionName ? functionName :"unknown");
 
-    ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-    Con::printf("Variable: %10s [reg:%2d] [type:%8s] [value:%20s]"
-        , variableName, reg, getConsoleValueTypeName(localVal.type), localVal.getString());
-}
+    // StringTableEntry varToLookup = StringTable->insert(variableName);
+    // S32 registerId = ((CodeBlock*)stackFrame.module)->variableRegisterTable.lookup(namespaceName, functionName, varToLookup);
+}*/
+
+
+// DefineEngineFunction(varDump, void, (const char* variableName), , "local variable dump, you cant use this on console!")
+// {
+//     ElfScriptDEBUG::varDumpLocals(variableName);
+// }
 
 DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32 value), , "local float test!")
 {
@@ -75,26 +163,24 @@ DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32
         return;
     }
 
-    S32 reg = getFuncVars(0)->lookupExising(StringTable->insert(VariableName));
+    S32 reg = ElfScriptDEBUG::findLocalVarRegisterInCurrentScope(VariableName);
 
     if (reg < 0) {
         Con::errorf("I can only set the value on a existing local variable!");
         return ;
     }
 
-    Con::printf("Found register %d for %s", reg, VariableName);
+    Con::printf(" --- Found register %d for %s", reg, VariableName);
 
     // is 0 valid ??
     if (reg > 0 ) {
         ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-        Con::printf("%s type is %d %s", VariableName, localVal.type, getConsoleValueTypeName(localVal.type));
+        Con::printf(" --- %s type is (%d) %s", VariableName, localVal.type, ElfScript::getConsoleValueTypeName(localVal.type));
         localVal.setFloat(value);
-        Con::printf("type after setFloat: %d %s", localVal.type, getConsoleValueTypeName(localVal.type));
+        Con::printf(" --- type after setFloat: (%d) %s", localVal.type, ElfScript::getConsoleValueTypeName(localVal.type));
     }
 
 }
-
-#endif
 
 ///////////////////////////////////////////////////////
     // class EmptyObject : public SimObject

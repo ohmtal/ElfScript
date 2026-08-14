@@ -191,6 +191,13 @@ S32 FuncVars::lookupExising(StringTableEntry var) {
       return found->second.reg;
 }
 
+void FuncVars::listExising() {
+
+      for (auto& [key, val] : vars) {
+            Con::printf("%s: reg:%d currentType: %d", key, val.reg ,(S32)val.currentType);
+      }
+}
+// -----------------------------------------------------------------------------
 
 S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
 {

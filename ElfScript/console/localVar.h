@@ -1,15 +1,21 @@
-
-Rejoicing too soon << does not work in function
-
 //-----------------------------------------------------------------------------
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Local Variable (%) Power :D ... also added  global ($) but kept the nameing
 //-----------------------------------------------------------------------------
 #pragma once
 
 class ConsoleValue;
 namespace ElfScript {
     const char* getConsoleValueTypeName(S32 type);
+    S32 findLocalVarRegisterInCurrentScope(const char* variableName);
+
+    void varDumpGlobals(const char* variableName); //alien here ;)
+    void varDumpLocals(const char* variableName);
+    void dumpAllLocalVariables();
+
+
     bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg);
     ConsoleValue* getLocalVariable(const char* variableName );
 
@@ -20,4 +26,10 @@ namespace ElfScript {
     F64 getLocalFloat(const char* variableName);
     S64 getLocalInt(const char* variableName);
     const char* getLocalString(const char* variableName);
+
+
+#ifdef ENABLE_CONSOLE_VECTOR
+    ConsoleVector getLocalVector(const char* variableName);
+    bool setLocalVector(const char* variableName, ConsoleVector& value);
+#endif
 }

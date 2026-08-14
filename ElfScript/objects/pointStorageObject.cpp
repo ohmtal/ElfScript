@@ -46,7 +46,8 @@
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
 #include "ext/tinyexpr.h"
-// #include "console/localVar.h"
+// Heavy Metal!
+#include "console/localVar.h"
 
 // ------------ Vector2 helper ----------------
 inline float lengthSquaredXY(const F32 x, const F32 y) {
@@ -285,13 +286,13 @@ public:
 
 
     // -------------------------------------------------------------------------
-    // // // // **** direct local var access !!!! - i ignore fails here ...***
-    // // // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-    // // //     ElfScript::setLocalFloat(varX, mVector.points[0]);
-    // // //     ElfScript::setLocalFloat(varY, mVector.points[1]);
-    // // //     if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
-    // // //     if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
-    // // // }
+    // **** direct local var access !!!! - i ignore fails here ...***
+    void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+        ElfScript::setLocalFloat(varX, mVector.points[0]);
+        ElfScript::setLocalFloat(varY, mVector.points[1]);
+        if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
+        if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
+    }
 
     // -------------------------------------------------------------------------
     void write(Stream &stream, U32 tabStop, U32 flags) override {
@@ -414,20 +415,18 @@ IMPLEMENT_CONOBJECT(PointStorageObject);
 // ---------- get/set Vector String ----------
 DefineEngineMethod(PointStorageObject, getPosVec, ConsoleVector, (), , "get the position as Vector ") {
     return object->mVector;
-    // StringBuilder str;
-    // str.format("%g %g %g %g", object->mVector.points[0], object->mVector.points[1], object->mVector.points[2], object->mVector.points[3]);
-    // return Con::getStringArg(str.end());
 }
 DefineEngineMethod(PointStorageObject, setPosVec, void, (ConsoleVector vector), , "set the position by Vector (String)") {
-      // dSscanf(strVector.c_str(), "%g %g %g %g",&object->mVector.points[0], &object->mVector.points[1], &object->mVector.points[2], &object->mVector.points[3]);
        object->mVector = vector;
 }
 
-// // // DefineEngineMethod(PointStorageObject, getPosByRef, void,
-// // //                    (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-// // //                    , "set the position by Vector (String)") {
-// // //     object->getPosByReference(varX, varY, varZ, varW);
-// // // }
+DefineEngineMethod(PointStorageObject, getPosByReference, void,
+                   (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+                   , "set the position by by Referency on up to 4 Variables\n"
+                     "NOTE: the variables must exists before this is called it does NOT create them."
+) {
+    object->getPosByReference(varX, varY, varZ, varW);
+}
 
 
 // ---------- set Pos by float's ----------
@@ -438,11 +437,6 @@ DefineEngineMethod(PointStorageObject, setPos, void, (F32 x, F32 y, F32 z, F32 w
 DefineEngineMethod(PointStorageObject, normalizeXZ, void, (), ,
                    "normalize the current position") {
     normalizeXY(object->mVector.points[0],object->mVector.points[1]);
-    // F32 x = static_cast<F32>(object->mVector.points[0]);
-    // F32 y = static_cast<F32>(object->mVector.points[1]);
-    // normalizeXY(x,y);
-    // object->mVector.points[0] = static_cast<F32>(x);
-    // object->mVector.points[1] = static_cast<F32>(y);
 }
 DefineEngineMethod(PointStorageObject, getLen, F32, (), ,
                    "len of current position") {
