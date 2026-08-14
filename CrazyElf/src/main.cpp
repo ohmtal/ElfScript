@@ -17,11 +17,11 @@
 // ElfScript SDL3 addon
 #include "addons/SDL3/SDL3_ElfScriptGlue.h"
 
-#ifdef TORQUE_DEBUG
+// #ifdef TORQUE_DEBUG
     #if defined(__unix__)
         #include "addons/shellConsole/POSIXStdConsole.h"
     #endif
-#endif
+// #endif
 
 
 
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     Con::infof("Init SDL3 ElfScript.....");
     ElfSDL3::Init();
 
-#ifdef TORQUE_DEBUG
+// #ifdef TORQUE_DEBUG
     #if defined(__unix__)
     StdConsole::create();
     stdConsole->enable(true);
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
          stdConsole->process();
     };
     #endif
-#endif
+// #endif
 
     Con::infof("loading script %s", engineGlue::ScriptFile.c_str());
     Con::executeFile(engineGlue::ScriptFile);

@@ -3166,7 +3166,7 @@ handle_OP_BUILD_VECTOR_STRING: {
             stack[_STK].type = ConsoleValueType::cvVector;
             // Con::debugf("Set value type to ConsoleValueType::cvVector");
             // copy  to stack
-            dMemcpy(stack[_STK].v.points, cv.points, sizeof(cv.points));
+            dMemcpy(stack[_STK].v.points, cv.points, sizeof(ConsoleVector::points));
       } else {
             stack[_STK].setString(buffer);
       }

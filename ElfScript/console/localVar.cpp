@@ -61,7 +61,7 @@ namespace ElfScript {
         if (!variableName) return;
 
         if (variableName[0] != '$') {
-            Con::errorf("Sorry [%s] in no global variable %s", variableName);
+            Con::errorf("Sorry [%s] in not a global variable %s", variableName);
             return;
         }
         Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
@@ -82,7 +82,7 @@ namespace ElfScript {
         if (!variableName) return;
 
         if (variableName[0] != '%') {
-            Con::errorf("Sorry [%s] in no local variable %s", variableName);
+            Con::errorf("Sorry [%s] in not a local variable %s", variableName);
             return;
         }
 

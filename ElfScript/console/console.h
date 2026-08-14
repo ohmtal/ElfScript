@@ -519,11 +519,6 @@ private:
   /// cleaned up or is freshly constructed).
    void copyFrom(const ConsoleValue& other)
    {
-
-#ifdef  ENABLE_CONSOLE_VECTOR
-      bool wasVector = false;
-#endif
-
       switch (other.type)
       {
       case ConsoleValueType::cvNULL:
@@ -549,8 +544,11 @@ private:
 
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-            wasVector = true;
+            dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
+            type = ConsoleValueType::cvVector;
+            break;
 #endif
+
       case ConsoleValueType::cvString:
       {
          // bufferLen == allocation size (len+1), so string length == bufferLen-1.
@@ -560,13 +558,6 @@ private:
             ? static_cast<S32>(other.bufferLen) - 1
             : static_cast<S32>(dStrlen(other.s));
          setString(other.s, strLen);
-
-#ifdef  ENABLE_CONSOLE_VECTOR
-         if (wasVector) {
-                 dMemcpy(v.points, other.v.points, sizeof(v.points));
-                 type = ConsoleValueType::cvVector;
-         }
-#endif
 
          break;
       }
@@ -593,7 +584,8 @@ private:
          break;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-          dMemcpy(v.points, other.v.points, sizeof(v.points));
+          dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
+          break;
 #endif
       case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:

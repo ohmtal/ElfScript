@@ -10,7 +10,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 # -----------------------------------------------------------------------------
 # ----------  options ----------
-option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
+# // only one left so obsolete option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
+set(BUILD_ELFSCRIPT ON)
 # -----------------------------------------------------------------------------
 set(IPO_DEFAULT OFF)
 set(BUILD_WITH_IPO ${IPO_DEFAULT} CACHE BOOL "Build Application with speed profile LTO (-O3)")
