@@ -162,8 +162,16 @@ public:
         addField("y",     TypeF32,     Offset(mVector.points[1], PointStorageObject));
         addField("z",     TypeF32,     Offset(mVector.points[2], PointStorageObject));
         addField("w",     TypeF32,     Offset(mVector.points[3], PointStorageObject));
+
+        // Rectangle aliases
         addField("width",     TypeF32,     Offset(mVector.points[2], PointStorageObject),  "alias for z");
         addField("height",    TypeF32,     Offset(mVector.points[3], PointStorageObject), "alias for w - yes w.");
+
+        // Color aliases
+        addField("r",     TypeF32,     Offset(mVector.points[0], PointStorageObject), "alias for x");
+        addField("g",     TypeF32,     Offset(mVector.points[1], PointStorageObject), "alias for y");
+        addField("b",     TypeF32,     Offset(mVector.points[2], PointStorageObject), "alias for z");
+        addField("a",     TypeF32,     Offset(mVector.points[3], PointStorageObject), "alias for w");
 
         //----
         addProtectedField("storageSize", TypeU32, 0, &_setStorageSize,&_getStorageSize, "Set the storage size (how many points we can work with) Max:1000000.");

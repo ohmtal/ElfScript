@@ -14,6 +14,7 @@ namespace ElfScript {
     void varDumpGlobals(const char* variableName);
     void varDumpLocals(const char* variableName);
     void dumpAllLocalVariables();
+    void dumpAllGlobalVariables();
 
 
     bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg);

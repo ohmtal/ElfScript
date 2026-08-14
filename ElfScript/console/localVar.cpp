@@ -24,10 +24,11 @@ namespace ElfScript {
             case ConsoleValueType::cvInteger: return "Integer";
             case ConsoleValueType::cvString:  return "String";
             case ConsoleValueType::cvSTEntry: return "Empty";
+            case ConsoleValueType::cvConsoleValueType: return "Console";
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
             #endif
-            default: return "other";
+            default: return avar("type:%d", type);
         }
     }
     // -----------------------------------------------------------------------------
@@ -95,6 +96,25 @@ namespace ElfScript {
         ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
         Con::printf(" %10s [type:%8s] [value:%20s] [reg:%2d] "
         , variableName, getConsoleValueTypeName(localVal.type), localVal.getString(), reg);
+    }
+    // -----------------------------------------------------------------------------
+    void dumpAllGlobalVariables() {
+        Dictionary::HashTableData* hashTable = Con::gGlobalVars.hashTable;
+        if (!hashTable) return;
+        Con::printf("       ------------------- Global Variables -------------------");
+
+        for (S32 i = 0; i < hashTable->size; i++)
+        {
+            Dictionary::Entry *walk = hashTable->data[i];
+            while (walk)
+            {
+                ConsoleValue& localVal = walk->getValue();
+                Con::printf(" %30s [type:%8s] [value:%20s]"
+                , walk->name, getConsoleValueTypeName(localVal.type), localVal.getString());
+
+                walk = walk->nextEntry;
+            }
+        }
     }
     // -----------------------------------------------------------------------------
     void dumpAllLocalVariables() {
@@ -225,6 +245,7 @@ DefineEngineFunction(varDump, void, (const char* variableName), , "local/global 
 // -----------------------------------------------------------------------------
 DefineEngineFunction(dumpLocals, void, (),,"dump local variables") {
     ElfScript:: dumpAllLocalVariables();
+    ElfScript:: dumpAllGlobalVariables();
 }
 // -----------------------------------------------------------------------------
 

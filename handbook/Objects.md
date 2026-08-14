@@ -50,7 +50,7 @@ member of one SimGroup.
     - function GameGroup::ghi(%this) << used by the object named GameGroup
 - Methods first parameter is %this which hold the objectId
 - Methods are called with a dot and ()
-- Properties are also accessed with a for but without the brackets.
+- Properties are also separated with a dot bit without () on the end.
 - Use `isObject([ObjectID])` to check a object exits
 - Use `OBJECT.isMethod("foo")` to check a method of a object exits
 
