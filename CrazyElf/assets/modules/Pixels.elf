@@ -121,6 +121,20 @@ function createPixels(%renderer, %window) {
     return %obj;
 }
 //----------------------------------------------------------------------
+// TODO this can be used to calculate the available blocksizes for selection
+function Pixels::getPixelCount(%this, %blockSize) {
+    %w = %this.CanvasW;
+    %h = %this.CanvasH;
+    %borderTop  = %this.BorderTop;
+    %borderLeft = %this.BorderLeft;
+
+    %blockSize  = %this.BlockSize;
+
+    %cols = mFloor((%w - %borderLeft) / %blockSize);
+    %rows = mFloor((%h - %borderTop) / %blockSize);
+    return  %cols * %rows;
+}
+//----------------------------------------------------------------------
 function Pixels::refreshBlockSize(%this) {
 
 

@@ -2,10 +2,12 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 
-option(ENABLE_ZIP "Enable the ElfScript ZIP Support" OFF)
-option(ENABLE_CONSOLE_VECTOR "Enable ElfScript's experimental Variable Vector Support" OFF)
+option(ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
+option(ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)
 
-# option(ENABLE_DIRECT_THREADING "Enable the experimental Direct Threading code" OFF)
+option(ENABLE_DOC_EXPORTER "ElfScript: Enable the Doc Exporter addon" OFF)
+option(ENABLE_NATIV_CONSOLE "ElfScript: Enable nativ console addon (unix only)" OFF)
+
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(TORQUE_DEBUG)
@@ -275,3 +277,15 @@ if (ENABLE_ZIP)
 else()
     add_compile_definitions(TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM)
 endif()
+
+if (ENABLE_DOC_EXPORTER)
+    list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
+endif()
+
+if (ENABLE_NATIV_CONSOLE)
+    if(UNIX)
+      list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
+    endif()
+endif()
+
+# add_compile_definitions(TORQUE_DISABLE_MEMORY_MANAGER)

@@ -34,6 +34,7 @@
 #include "console/engineAPI.h"
 #include "core/idGenerator.h"
 #include "core/util/safeDelete.h"
+#include "localVar.h"
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -352,15 +353,23 @@ SimObject* findObject(const char* name)
 
    if (c == '%')
    {
-      if (!Con::getFrameStack().empty())
-      {
-         Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(name));
 
-         if (ent)
-            return Sim::findObject(ent->getIntValue());
-         else
-            return NULL; //XXTH added, why do we continue here
+      ConsoleValue* localVal = ElfScript::getLocalVariable(name);
+      if (localVal) {
+           return Sim::findObject(localVal);
+      } else {
+          return nullptr;
       }
+      // ElfScipt this does not work!!!
+      // if (!Con::getFrameStack().empty())
+      // {
+      //    Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(name));
+      //
+      //    if (ent)
+      //       return Sim::findObject(ent->getIntValue());
+      //    else
+      //       return NULL; //XXTH added, why do we continue here
+      // }
    }
    if(c == '/') //XXTH what is this ? never saw a '/' as variable pre.
       return gRootGroup->findObject(name + 1 );

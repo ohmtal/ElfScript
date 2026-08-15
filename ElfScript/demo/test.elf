@@ -235,7 +235,8 @@ dumpLocals();
 
 localPoints();
 
-// new SimObjects(simo) { int foo = 1;}
-
+echo("DYNX:");
+varDumpField("sto.dynX");
+%sto = sto.getId(); varDumpField("%sto.dynX");
 
 // $Debug::DumpByteCode=1;

@@ -1120,8 +1120,54 @@ void stripColorChars(char* line)
    }
 }
 
+// ElfScript -------------------------------------------------------------------
+// get a dynamic fields ConsoleValue pointer
+// slow because it can have multiple token get string get string ...
+ConsoleValue* getObjectDynamicFieldConsoleValue(const char* name) {
+      const char *dot = dStrchr(name, '.');
+      if (!dot) return nullptr;
+      U64 len = dStrlen(name);
+      AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - name too long");
+      dMemcpy(scratchBuffer, name, len+1);
 
+      char * token = dStrtok(scratchBuffer, ".");
+      SimObject * obj = Sim::findObject(token);
+      if(!obj)
+            return nullptr;
 
+      token = dStrtok(0, ".\0");
+      if(!token)
+            return nullptr;
+
+      String savToken = "";
+
+      while(token != NULL)
+      {
+            const char * val = obj->getDataField(StringTable->insert(token), 0);
+            if(!val)
+                   return nullptr;
+
+            savToken = token;
+            token = dStrtok(0, ".\0");
+            if(token)
+            {
+                  obj = Sim::findObject(token);
+                  if(!obj)
+                          return nullptr;
+            }
+            else {
+                  SimFieldDictionary* dict = obj->getFieldDictionary();
+                  if (!dict) return nullptr;
+                  SimFieldDictionary::Entry* entry =  dict->findDynamicField(savToken);
+                  if (!entry) return nullptr;
+                  return &entry->mValue;
+            }
+      }
+
+      return nullptr;
+}
+
+// -----------------------------------------------------------------------------
 
 //
 const char *getObjectTokenField(const char *name)

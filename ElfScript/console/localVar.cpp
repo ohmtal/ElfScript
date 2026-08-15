@@ -98,6 +98,16 @@ namespace ElfScript {
         , variableName, getConsoleValueTypeName(localVal.type), localVal.getString(), reg);
     }
     // -----------------------------------------------------------------------------
+    void varDumpDynamicField(const char* variableName) {
+        ConsoleValue* cval = nullptr;
+        cval = Con::getObjectDynamicFieldConsoleValue(variableName);
+        if (cval) {
+            Con::printf(" %20s [type:%8s] [value:%20s]"
+            , variableName, getConsoleValueTypeName(cval->type), cval->getString());
+        }
+
+    }
+    // -----------------------------------------------------------------------------
     void dumpAllGlobalVariables() {
         Dictionary::HashTableData* hashTable = Con::gGlobalVars.hashTable;
         if (!hashTable) return;
@@ -235,12 +245,19 @@ namespace ElfScript {
 } //namespace ElfScript
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+DefineEngineFunction(varDumpField, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
+{
+    if ( !variableName || variableName[0] == '\0') return;
+    ElfScript::varDumpDynamicField(variableName);
+}
 
 DefineEngineFunction(varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
-    if ( !variableName ) return;
+    if ( !variableName || variableName[0] == '\0') return;
     if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
     else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
+
+
 }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(dumpLocals, void, (),,"dump local variables") {

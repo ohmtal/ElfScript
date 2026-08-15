@@ -13,6 +13,7 @@ namespace ElfScript {
 
     void varDumpGlobals(const char* variableName);
     void varDumpLocals(const char* variableName);
+    void varDumpDynamicField(const char* variableName);
     void dumpAllLocalVariables();
     void dumpAllGlobalVariables();
 

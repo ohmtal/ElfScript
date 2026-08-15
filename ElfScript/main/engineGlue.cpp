@@ -6,6 +6,10 @@
 #include "engineGlue.h"
 #include "core/iTickable.h"
 //--------------------------------------------------------------------------------------
+#if !defined(TORQUE_FRAME_SIZE)
+#define TORQUE_FRAME_SIZE     32 << 20
+#endif
+//--------------------------------------------------------------------------------------
 namespace engineAPI
 {
     bool gUseConsoleInterop = true;

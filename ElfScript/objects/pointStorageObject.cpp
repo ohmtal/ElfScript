@@ -46,8 +46,8 @@
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
 #include "ext/tinyexpr.h"
-// Heavy Metal!
-#include "console/localVar.h"
+
+// //  nice but slower #include "console/localVar.h"
 
 // ------------ Vector2 helper ----------------
 inline float lengthSquaredXY(const F32 x, const F32 y) {
@@ -294,14 +294,32 @@ public:
 
 
     // -------------------------------------------------------------------------
-    // **** direct local var access !!!! - i ignore fails here ...***
-    void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-        ElfScript::setLocalFloat(varX, mVector.points[0]);
-        ElfScript::setLocalFloat(varY, mVector.points[1]);
-        if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
-        if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
-    }
-
+    // it's slower then fetch/store so i remove it again!
+    // // **** direct local var access !!!! - i ignore fails here ...***
+    // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+    //     ElfScript::setLocalFloat(varX, mVector.points[0]);
+    //     ElfScript::setLocalFloat(varY, mVector.points[1]);
+    //     if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
+    //     if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
+    // }
+    // // **** direct local var access for points !!!! - i ignore fails here ...***
+    // bool getPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+    //     if ( index >= this->mPoints.size()) return false;
+    //     ElfScript::setLocalFloat(varX, this->mPoints[index].points[0]);
+    //     ElfScript::setLocalFloat(varY, this->mPoints[index].points[1]);
+    //     if (varZ) ElfScript::setLocalFloat(varZ, this->mPoints[index].points[2]);
+    //     if (varW) ElfScript::setLocalFloat(varW, this->mPoints[index].points[3]);
+    //     return true;
+    // }
+    // // **** direct local var access for points !!!! - i ignore fails here ...***
+    // bool setPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+    //     if ( index >= this->mPoints.size()) return false;
+    //     this->mPoints[index].points[0] = ElfScript::getLocalFloat(varX);
+    //     this->mPoints[index].points[1] = ElfScript::getLocalFloat(varY);
+    //     if (varZ) this->mPoints[index].points[2] = ElfScript::getLocalFloat(varZ);
+    //     if (varW) this->mPoints[index].points[3] = ElfScript::getLocalFloat(varW);
+    //     return true;
+    // }
     // -------------------------------------------------------------------------
     void write(Stream &stream, U32 tabStop, U32 flags) override {
         // Parent::write >>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -428,13 +446,13 @@ DefineEngineMethod(PointStorageObject, setPosVec, void, (ConsoleVector vector), 
        object->mVector = vector;
 }
 
-DefineEngineMethod(PointStorageObject, getPosByReference, void,
-                   (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-                   , "set the position by by Referency on up to 4 Variables\n"
-                     "NOTE: the variables must exists before this is called it does NOT create them."
-) {
-    object->getPosByReference(varX, varY, varZ, varW);
-}
+// DefineEngineMethod(PointStorageObject, getPosByReference, void,
+//                    (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+//                    , "set the position by by Referency on up to 4 Variables\n"
+//                      "NOTE: the variables must exists before this is called it does NOT create them."
+// ) {
+//     object->getPosByReference(varX, varY, varZ, varW);
+// }
 
 
 // ---------- set Pos by float's ----------
@@ -458,6 +476,22 @@ DefineEngineMethod(PointStorageObject, setPoint, bool, (U32 index, F32 x, F32 y,
     object->mPoints[index] = { x, y, z, w};
     return true;
 }
+
+// THIS IS SLOWER  then fetch / store !!!!
+// DefineEngineMethod(PointStorageObject, getPointByReference, void,
+//                    (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+//                    , "set the point at index  by Reference to 2-4 Variables\n"
+//                    "NOTE: the variables must exists before this is called it does NOT create them."
+// ) {
+//     object->getPointByReference(index,varX, varY, varZ, varW);
+// }
+// DefineEngineMethod(PointStorageObject, setPointByReference, void,
+//                    (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+//                    , "get the point at index  by Reference from 2-4 Variables\n"
+//                    "NOTE: the variables must exists before this is called it does NOT create them."
+// ) {
+//     object->setPointByReference(index,varX, varY, varZ, varW);
+// }
 
 DefineEngineMethod(PointStorageObject, getPointX, F32, (U32 index),
                    , "get the point.points[0] from the point storage at index as Vector (String)") {
@@ -508,11 +542,6 @@ DefineEngineMethod(PointStorageObject, getPointVec, ConsoleVector, (U32 index),
                    , "get the point from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return {0};
     return object->mPoints[index];
-
-    // ConsoleVector vec4 = object->mPoints[index];
-    // StringBuilder str;
-    // str.format("%g %g %g %g", vec4.points[0], vec4.points[1], vec4.points[2], vec4.points[3]);
-    // return Con::getStringArg(str.end());
 }
 DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, ConsoleVector vec4), ,
                    "set the point in the Point Storage at index by Vector (String)") {
@@ -521,42 +550,32 @@ DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, ConsoleVe
     object->mPoints[index] = vec4;
     return true;
 
-    // ConsoleVector vec4;
-    // dSscanf(strVector.c_str(), "%g %g %g %g",&vec4.points[0], &vec4.points[1], &vec4.points[2], &vec4.points[3]);
-    // object->mPoints[index] = vec4;
-    // return true;
+
 }
-// DefineEngineMethod(PointStorageObject, getPoint2Vec, String, (U32 index),
-//                    , "get the point xy from the point storage at index as Vector (String)") {
-//     if ( index >= object->mPoints.size()) return "";
-//     ConsoleVector vec4 = object->mPoints[index];
-//     StringBuilder str;
-//     str.format("%g %g", vec4.points[0], vec4.points[1]);
-//     return Con::getStringArg(str.end());
-// }
-// DefineEngineMethod(PointStorageObject, setPoint2Vec, bool, ( U32 index, String strVector), ,
-//                    "set the point xy in the Point Storage at index by Vector (String)") {
-//     if ( index >= object->mPoints.size()) return false;
-//     F32 x,y;
-//     dSscanf(strVector.c_str(), "%g %g",&x, &y);
-//     object->mPoints[index].points[0] = x;
-//     object->mPoints[index].points[1] = y;
-//     return true;
-// }
+
+DefineEngineMethod(PointStorageObject, getPoint2Vec, String, (U32 index),
+                   , "get the point xy from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return "";
+    ConsoleVector vec4 = object->mPoints[index];
+    StringBuilder str;
+    str.format("%g %g", vec4.points[0], vec4.points[1]);
+    return Con::getStringArg(str.end());
+}
+DefineEngineMethod(PointStorageObject, setPoint2Vec, bool, ( U32 index, String strVector), ,
+                   "set the point xy in the Point Storage at index by Vector (String)") {
+    if ( index >= object->mPoints.size()) return false;
+    F32 x,y;
+    dSscanf(strVector.c_str(), "%g %g",&x, &y);
+    object->mPoints[index].points[0] = x;
+    object->mPoints[index].points[1] = y;
+    return true;
+}
 // ---------- mPoints storage from/to objects position ----------
 DefineEngineMethod(PointStorageObject, storePoint, bool, (U32 index), ,
                    "store the current values x,y,z,w, to the point storage") {
     if ( index >= object->mPoints.size()) return false;
 
     object->mPoints[index] = object->mVector;
-
-    // object->mPoints[index] = {
-    //     static_cast<F32>(object->mVector.points[0]),
-    //     static_cast<F32>(object->mVector.points[1]),
-    //     static_cast<F32>(object->mVector.points[2]),
-    //     static_cast<F32>(object->mVector.points[3])
-    //
-    // };
 
     return true;
 }

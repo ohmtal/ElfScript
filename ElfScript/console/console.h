@@ -973,6 +973,10 @@ namespace Con
    /// @return       The string value of the variable or NULL if no object is specified
    const char* getObjectField(const char* name);
 
+
+   // only works witth dynamic firlds !!
+   ConsoleValue* getObjectDynamicFieldConsoleValue(const char* name);
+
    /// Same as setVariable(), but for bools.
    void setBoolVariable(const char* name, bool var);
 

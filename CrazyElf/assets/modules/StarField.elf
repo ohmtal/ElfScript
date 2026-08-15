@@ -1,15 +1,5 @@
 // -----------------------------------------------------------------------------
-// ported from raylib-elfScript to BaseElf / NativSDL
-// Same speed
-// -----------------------------------------------------------------------------
-// using PointStorageObject (since ElfScript 0.4) << this rocks!
-// RelWithDebInfo > ~500 fps
-// Debug ~ 190
-//
-// using PointStorageObject (since ElfScript 0.4e) rocket mode (Rectangle)
-// RelWithDebInfo > ~900 fps ... with 4200 stars still 120fps yay, 9000 stats 60fps
-//
-// NOTE foreach does not make a difference here ?! :/
+// ported from raylib-elfScript to BaseElf / NativSDL to CrazyElf
 // -----------------------------------------------------------------------------
 
 // orig 420
@@ -27,9 +17,6 @@ function createStarField() {
 }
 // -----------------------------------------------------------------------------
 function StarField::UpdateSize(%this) {
-    // $screenHeight = GetScreenHeight();
-    // $screenWidth = GetScreenWidth();
-    // %this.screenSize = GetScreenSize();
     %this.screenSize = $Global::ScreenSize;
     $screenWidth  = %this.screenSize.x;
     $screenHeight = %this.screenSize.y;
@@ -45,7 +32,7 @@ function StarField::UpdateSize(%this) {
 }
 // -----------------------------------------------------------------------------
 function StarField::OnAdd(%this) {
-    // %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
+
     SetClearBackground({ 20, 20, 40 });
 
     %this.updateSize();
@@ -55,24 +42,16 @@ function StarField::OnAdd(%this) {
     });
 
 
-    // for ( %i = 0; %i < STAR_COUNT; %i++)
     for(%i in range STAR_COUNT)
     {
         starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
 
-
-    // setWindowSize(800,450);
-    // SetTargetFPS(0);
-    // setVSync(0);
-    // SDL_SetRenderVSync(1,0);
-
     return true;
 }
 // -----------------------------------------------------------------------------
 function StarField::onRemove(%this) {
-  // SetTargetFPS(60);
-    // setVSync(1);
+
 }
 
 // -----------------------------------------------------------------------------
@@ -94,20 +73,12 @@ function StarField::Render(%this) {
     // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
     {
-        // one call more but maybe faster because we have only one funtion call
+        // this fetch/ setPoint combination is the fastest way i found so far.
+        // the local vars are fast anyway.
         %lStarPoints.fetchPoint(%i);
         %pointX = %lStarPoints.x;
         %pointY = %lStarPoints.y;
-        // %pointZ = %lStarPoints.z; <<<< later
-
-        // %pointX = %lStarPoints.getPointX(%i);
-        // %pointY = %lStarPoints.getPointY(%i);
-        // %pointZ = %lStarPoints.getPointZ(%i);
-
-
-        // >>>>>>>>>>>>>>>> update point
-        // %pointZ -= %dt * %speed;
-        %pointZ = %lStarPoints.z - %dt * %speed; //one call saved
+        %pointZ = %lStarPoints.z - %dt * %speed;
 
         // Calculate the screen position
         %invZ = 1.0 /  %pointZ;
@@ -117,8 +88,6 @@ function StarField::Render(%this) {
         if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
             || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
         {
-
-            // %lStarPoints.setPos(GetRandomF($minH, $maxH), GetRandomF($minH, $maxH), 1.0);
             %pointX = GetRandomF($minH, $maxH);
             %pointY = GetRandomF($minH, $maxH);
             %pointZ = 1.0;
@@ -141,15 +110,12 @@ function StarField::Render(%this) {
         }
         else
         {
-            // %radius = mLerp(4.0, 0.5, %pointZ);
             %radius = mLerp(2.0, 0.3, %pointZ);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
         %lStarPoints.setPoint(%i, %pointX, %pointY, %pointZ);
     }
-
-
 
 
     %fontScale = 0.7;
