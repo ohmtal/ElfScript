@@ -2794,7 +2794,7 @@ handle_OP_TERMINATE_REWIND_STR:
 
 handle_OP_COMPARE_STR:
       stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));
-      POP_STK(); //XXTH memfix attempt orig: _STK--;
+      POP_STK();
       DISPATCH();
 // ~~~~~~~~~~~~~~~~~ STACK
 handle_OP_PUSH:

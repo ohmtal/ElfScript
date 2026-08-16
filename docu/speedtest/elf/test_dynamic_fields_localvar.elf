@@ -15,8 +15,8 @@ for (%j = 0; %j < JLOOPS; %j++) {
         %sto.DynX --;
     }
     echo("SUM (--) IS:" SPC %sto.DynX);
-    // %sto.DynX = 66;
-    echo("set Sum to 66 == " SPC %sto.DynX * 1);
+    %sto.DynX = 66.0;
+    echo("set Sum to 66 == " SPC %sto.DynX);
     for (%i = 0; %i < ILOOPS; %i++) {
         %sto.DynX *= %i + 1;
         %sto.DynX /= %i + 1;

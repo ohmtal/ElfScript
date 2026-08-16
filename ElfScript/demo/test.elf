@@ -238,5 +238,6 @@ localPoints();
 echo("DYNX:");
 varDumpField("sto.dynX");
 %sto = sto.getId(); varDumpField("%sto.dynX");
-
+$sto = sto.getId(); varDumpField("$sto.dynX");
+echo("------");
 // $Debug::DumpByteCode=1;

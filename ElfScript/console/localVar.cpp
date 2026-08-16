@@ -158,6 +158,13 @@ namespace ElfScript {
     bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
         if (!variableName) return false;
 
+        if (variableName[0] == '%') {
+            reg = findLocalVarRegisterInCurrentScope(variableName);
+            if (reg < 0) return false;
+            stack = &Script::gEvalState.currentRegisterArray->values[reg];
+            if (!stack ) return false;
+            return true;
+        }
         if (variableName[0] == '$') {
             Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
             if (!entry) return false;
@@ -166,13 +173,6 @@ namespace ElfScript {
             return true;
         }
 
-        if (variableName[0] == '%') {
-            reg = findLocalVarRegisterInCurrentScope(variableName);
-            if (reg < 0) return false;
-            stack = &Script::gEvalState.currentRegisterArray->values[reg];
-            if (!stack ) return false;
-            return true;
-        }
 
         return false;
     }
