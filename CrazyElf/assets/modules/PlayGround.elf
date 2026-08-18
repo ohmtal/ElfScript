@@ -1,0 +1,68 @@
+#define PIXEL_SIZE 2.0
+
+function createPlayGround(%renderer, %window) {
+    %obj = new ScriptGroup(PlayGround) {
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function PlayGround::onAdd(%this) {
+    %this.add(new PointStorageObject(Points){
+       storageSize = 2000;
+    });
+
+    for (%i in range Points.storageSize) {
+
+        Points.setPoint(%i, getRandomf($Global::ScreenSize.x),getRandomf($Global::ScreenSize.y),
+                        getRandom(2), getRandomF(5.0,20.0));
+    }
+
+    return true;
+}
+//----------------------------------------------------------------------
+function PlayGround::OnRemove(%this) { }
+//----------------------------------------------------------------------
+function PlayGround::Render(%this) {
+    if (!%this.renderer) return;
+    %dt = GetFrameTime();
+    SDL_SetRenderDrawColor(%this.renderer, 20, 20, 40);
+    SDL_RenderClear(%this.renderer);
+
+
+    %points = Points.getId();
+    for (%i in range %points.storageSize) {
+        %points.fetchPoint(%i);
+        switch( %points.z ) {
+            case 0:
+                SDL_SetRenderDrawColor(%this.renderer, 200,   0,   0);
+                %points.x += %dt * %points.w;
+                if (%points.x > 320.0) %points.x = -1.0;
+            case 1:
+                SDL_SetRenderDrawColor(%this.renderer,   0, 200,   0);
+                %points.x -= %dt * %points.w;
+                if (%points.x < 0.0) %points.x = 320.0;
+
+            case 2:
+                SDL_SetRenderDrawColor(%this.renderer,   0,   0, 200);
+                %points.y += %dt * %points.w;
+                if (%points.y > 200.0) %points.y = -1.0;
+        }
+        SDL_RenderRectF(%this.renderer, %points.x,%points.y,PIXEL_SIZE, PIXEL_SIZE, false);
+        %points.storePoint(%i);
+    }
+
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_SetRenderScale(%this.renderer, 0.7,0.7);
+    SDL_RenderDebugText(%this.renderer, 7, 7, getFPS() SPC "FPS");
+    SDL_SetRenderScale(%this.renderer);
+}
+//----------------------------------------------------------------------
+function  PlayGround::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  PlayGround::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  PlayGround::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+
