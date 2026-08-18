@@ -1092,8 +1092,11 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
 
 
             // let fetch the entry directly ::::: FIXME ConsoleBaseType ?!
-            if (!entry) entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
-
+            if (!entry) {
+                  entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
+                  entry->mValue.bufferLen = 0; // else we get in trouble on clean
+                  entry->mValue.type = stackP->type;
+            }
 
             // ConsoleValueType
             switch (entry->mValue.type)  {
