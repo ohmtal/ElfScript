@@ -72,9 +72,12 @@ if(NOT EXISTS ${ELF_CMAKE})
         "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
     )
 else()
-# defines  ${ELFSCRIPT_SRC}
+
+ set(ELF_APP_NAME "CrazyElf" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
+ set(ELF_APP_VERSION "500" CACHE STRING "ElfScript: App-Version used in scripts" FORCE)
+ set(ELF_APP_VERSION_STRING "Version 26.08" CACHE STRING "ElfScript: App-Version String used in scripts" FORCE)
+
  include(${ELF_CMAKE})
-# defines ${SDL3_ELFSCRIPT_SRC}
  include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
 
   set (ELFSCRIPT_INCLUDES

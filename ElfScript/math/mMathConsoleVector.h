@@ -144,8 +144,6 @@ inline float Vec3LengthSq(const ConsoleVector& v) {
 }
 
 
-
-
 inline float Vec2Length(const ConsoleVector& v) {
     return ElfMath::mSqrt(Vec2LengthSq(v));
 }

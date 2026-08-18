@@ -47,8 +47,10 @@ set(BUILD_WITH_SANITIZE ${SANITIZE_DEFAULT} CACHE BOOL "Build Application with -
 if (BUILD_ELFSCRIPT)
 
     set(TARGET_NAME HelloElf)
+
+    set(ELF_APP_NAME "ElfScript Demo" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
     include("${CMAKE_CURRENT_LIST_DIR}/ElfScript/ElfScript.cmake")
-    
+
 #     set_target_properties(${PROJECT_NAME} PROPERTIES
 #         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 # 

@@ -1,3 +1,8 @@
+
+
+OBSOLETE !! useing Cmake for this!
+
+
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
 // Copyright (c) 2026 Thomas Hühn (XXTH)

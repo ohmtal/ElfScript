@@ -25,9 +25,10 @@
 
 #include <stdlib.h>
 
-#ifndef _TORQUECONFIG_H_
-#include "torqueConfig.h"
-#endif
+// Replaced by cmake definition
+// #ifndef _TORQUECONFIG_H_
+// #include "torqueConfig.h"
+// #endif
 #ifndef _TORQUE_TYPES_H_
 #include "platform/types.h"
 #endif

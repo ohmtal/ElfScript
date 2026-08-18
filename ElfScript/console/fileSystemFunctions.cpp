@@ -25,7 +25,7 @@
 #include "console/consoleInternal.h"
 #include "console/engineAPI.h"
 #include "core/stream/fileStream.h"
-#include "torqueConfig.h"
+// ElfScript replaced by CMake definition ! #include "torqueConfig.h"
 #include "core/frameAllocator.h"
 
 // Buffer for expanding script filenames.

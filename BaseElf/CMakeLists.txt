@@ -58,13 +58,20 @@ if(NOT EXISTS ${ELF_CMAKE})
         "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
     )
 else()
+
+ set(ELF_APP_NAME "BaseElf" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
+ set(ELF_APP_VERSION "500" CACHE STRING "ElfScript: App-Version used in scripts" FORCE)
+ set(ELF_APP_VERSION_STRING "Version 26.08" CACHE STRING "ElfScript: App-Version String used in scripts" FORCE)
+
+ set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)
+
  include(${ELF_CMAKE})
 
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
   )
   # optinal doc exporter
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
   # ImGui Bindings
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/ImGui/bindings_imgui.cpp)
   # SDL3Elf
