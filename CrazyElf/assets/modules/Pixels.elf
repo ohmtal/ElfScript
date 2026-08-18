@@ -1,3 +1,6 @@
+#define MIN_BLOCK_SIZE 8
+#define MAX_BLOCK_SIZE 48
+#define PIXELS_VERSION "0.260818"
 
 $_DISABLE_SAVE_LOAD = false;
 
@@ -102,9 +105,9 @@ function createPixels(%renderer, %window) {
     //         return 0;
     //     }
     // }
-    if (getOS() $= "Emscripten") {
-        schedule(100,0,SDL_SetWindowFullscreen,%window,1);
-    }
+
+
+
 
     if (_Pixels_Load() && isObject(Pixels)){
          Pixels.renderer  = %renderer;
@@ -140,7 +143,8 @@ function createPixels(%renderer, %window) {
         TypeVector SettingsButtonRect    =  { 0.0 ,0.0 ,0.0 ,0.0 };
 
         // status
-        TypeS32 BlockSize      = 24; //24; // 16; //16; //32 ; //42; //8 .. 48
+        TypeS32 BlockSize      = 25;
+
         TypeBool  cheatMode   = false; // difficult to see
         TypeS32   shuffleDelay = 1400;
 
@@ -150,6 +154,7 @@ function createPixels(%renderer, %window) {
         TypeBool  recordSet  = false;
 
         TypeBool soundOn = true;
+        TypeBool FullScreen = false;
         TypeS32   clickCount = 0;
     };
     $_LOADING = false;
@@ -163,8 +168,6 @@ function Pixels::getPixelCount(%this, %blockSize) {
     %h = %this.CanvasH;
     %borderTop  = %this.BorderTop;
     %borderLeft = %this.BorderLeft;
-
-    %blockSize  = %this.BlockSize;
 
     %cols = mFloor((%w - %borderLeft) / %blockSize);
     %rows = mFloor((%h - %borderTop) / %blockSize);
@@ -228,6 +231,28 @@ function Pixels::onAdd(%this) {
     if (!$_LOADING ) {
         %this.refreshBlockSize();
     }
+
+    %lastSize = 0;
+    %this.blocksizeList = "";
+    for ( %i in MAX_BLOCK_SIZE .. MIN_BLOCK_SIZE  step -1) {
+        %blockSize = %this.getPixelCount(%i);
+        // echo("I=",%i, " SIZE= ", %blockSize);
+        if (%blockSize > %lastSize) {
+            %lastSize = %blockSize;
+            // if (%i == 25) %i = 24;  // i had 24 as default
+            %this.blocksizeList = %i SPC %this.blocksizeList;
+        }
+    }
+    %this.blocksizeList = trim( %this.blocksizeList ) ;
+
+    // echo("BlockSizeList:" SPC %this.blocksizeList);
+
+    if (%this.FullScreen $= "") %this.FullScreen = getOS() $= "Emscripten" ? 1 : 0;
+
+    if (%this.FullScreen) {
+        SetFullScreen(1);
+    }
+
 
     return true;
 }
@@ -339,10 +364,12 @@ function Pixels::resetGrid(%this) {
 
     %index = 0;
 
-    for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+    // for (%gridY = 0; %gridY < %this.rows; %gridY++) {
+    for (%gridY in range %this.rows) {
         %pctY = %gridY / (%this.rows - 1);
 
-        for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+        // for (%gridX = 0; %gridX < %this.cols; %gridX++) {
+        for ( %gridX in range %this.cols ) {
             %pctX = %gridX / (%this.cols - 1);
 
             %rTop = %rTL + (%rTR - %rTL) * %pctX;
@@ -518,10 +545,6 @@ function Pixels::Render(%this) {
 
     }
 
-
-
-
-
     if (%this.menuActive) {
         SDL_SetRenderDrawBlendMode(%r, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(%r, 50,50,50,180);
@@ -538,10 +561,15 @@ function Pixels::Render(%this) {
         SDL_SetRenderDrawColor(%r, 205,205, 205,255);
         %this.DrawText(%x,%y+1, "Menu",0.9);
 
-
         %y += 12;
         %rect = { %x , %y, 100,12 };
-        // Button Sound on ...
+        if (%this.Button(%rect, "FullScreen" SPC ($Global::FullScreen ? "on" : "off") , 0.6)) {
+            ToggleFullScreen();
+            %this.FullScreen = $Global::FullScreen;
+        }
+
+        %y += 16;
+        %rect = { %x , %y, 100,12 };
         if (%this.Button(%rect, "Sound" SPC (%this.soundOn ? "on" : "off") , 0.6)) {
              %this.soundOn = !%this.soundOn;
         }
@@ -549,19 +577,44 @@ function Pixels::Render(%this) {
         // Select BlockSize
         %y += 16;
         %rect = { %x , %y, 15,12 };
+        %needle = -1;
+        %l = %this.blocksizeList;
+        %count = getWordCount( %l );
+        for (%i = 0 ; %i < %count; %i++) {
+            if (%this.MenuBlockSize == getWord(%l, %i)) {
+                %needle = %i;
+                break;
+            }
+        }
+        if ( %needle == -1 ) %needle = 15; // ~~23
+        // echo("%needle is ", %needle);
+
         if (%this.Button(%rect, "<", 0.6) ) {
-            %this.MenuBlockSize = mClamp(%this.MenuBlockSize - 2, 8, 48);
+            %needle = mClamp(%needle - 1, 0, %count - 1 );
+            %this.MenuBlockSize = getWord(%l, %needle);
         }
         SDL_SetRenderDrawColor(%r, 205,205, 205,255);
-        %this.DrawText(%x+17,%y+4, "BlockSize:" SPC %this.MenuBlockSize,0.6);
+        // lazy coding:
+        %text = formatString( "Size: %2d [%3d]",  %this.MenuBlockSize, %this.getPixelCount( %this.MenuBlockSize ));
+        %this.DrawText(%x+17,%y+4, %text ,0.6);
         %rect = { %x + 85, %y, 15,12 };
         if (%this.Button(%rect, ">", 0.6) ) {
-            %this.MenuBlockSize = mClamp(%this.MenuBlockSize + 2, 8, 48);
+            %needle = mClamp(%needle + 1, 0, %count - 1);
+            %this.MenuBlockSize = getWord(%l, %needle);
         }
+
+        // if (%this.Button(%rect, "<", 0.6) ) {
+        //     %this.MenuBlockSize = mClamp(%this.MenuBlockSize - 2, 8, 48);
+        // }
+        // SDL_SetRenderDrawColor(%r, 205,205, 205,255);
+        // %this.DrawText(%x+17,%y+4, "BlockSize:" SPC %this.MenuBlockSize,0.6);
+        // %rect = { %x + 85, %y, 15,12 };
+        // if (%this.Button(%rect, ">", 0.6) ) {
+        //     %this.MenuBlockSize = mClamp(%this.MenuBlockSize + 2, 8, 48);
+        // }
 
         %y = %this.OverlayRect.y + %this.OverlayRect.height - 18;
         %rect = { %x , %y, 60,12 };
-        // Button Sound on ...
         if (%this.Button(%rect, "Apply", 0.6) ) {
             if (%this.BlockSize != %this.MenuBlockSize) {
                 %this.BlockSize = %this.MenuBlockSize;
@@ -572,14 +625,12 @@ function Pixels::Render(%this) {
 
         // %y += 20;
         %rect = { %x + 62, %y, 50,12 };
-        // Button Sound on ...
         if (%this.Button(%rect, "Close", 0.6) ) {
             %this.menuActive = false;
         }
 
         // %y += 20;
         %rect = { %x + 164, %y, 60,12 };
-        // Button Sound on ...
         if (%this.Button(%rect, "Quit Game", 0.6) ) {
             quit();
         }
@@ -631,15 +682,11 @@ function Pixels::Render(%this) {
             %y += 20;
             %this.DrawText(102,%y, "Click for new puzzle.",0.7);
             if (SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)) {
-                $ignoreButtonTimer = 0.0;
+
                 %this.newGame();
             }
         }
-
-
     }
-
-
 
 
     //----- reset color .......
@@ -653,8 +700,8 @@ function Pixels::checkWinCondition(%this) {
 
     %storage = PixelStorage.getId();
     %solvedPixelStorage    = SolvedPixelStorage.getId();
-    foreach(%index in range %storage.storageSize) {
-        // string compare good idea ?
+    for (%index in range %storage.storageSize) {
+        // string compare ...
         if (%solvedPixelStorage.getPointVec(%index) !$= %storage.getPointVec(%index))
             return false;
     }
@@ -676,7 +723,6 @@ function  Pixels::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRe
     }
 }
 //----------------------------------------------------------------------
-
 function Pixels::onPixelClicked(%this, %clickedIndex) {
 
     if (%this.gameWon || %this.gridSetup || %this.menuActive) return;
@@ -698,8 +744,6 @@ function Pixels::onPixelClicked(%this, %clickedIndex) {
 
         %this.selectedFirstIndex = -1;
 
-
-
         if (%idxA != %idxB) {
             %bucket = %storage.getPointVec(%idxA);
             %storage.setPointVec(%idxA, %storage.getPointVec(%idxB));
@@ -719,6 +763,7 @@ function Pixels::onPixelClicked(%this, %clickedIndex) {
         if (%this.checkWinCondition()) {
             %this.PlaySound(%this.SndWon);
             %this.gameWon = true;
+            $ignoreButtonTimer = 0.0;
 
             if (%this.record[%this.blockSize] $= ""
                 ||  %this.record[%this.blockSize] > %this.clickCount) {
@@ -729,8 +774,7 @@ function Pixels::onPixelClicked(%this, %clickedIndex) {
         }
     }
 }
-
-
+//----------------------------------------------------------------------
 function  Pixels::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
     if (!%isDown) return ;
 

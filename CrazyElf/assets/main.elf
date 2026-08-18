@@ -9,6 +9,7 @@ $Global::VSync = 1; //initial
 //------------------------------------------------------------------------------
 function GetFrameTime() { return $Global::FrameTime; }
 function GetFPS() { return $Global::FPS; }
+function SetFullScreen(%value) { $Global::FullScreen = %value; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
 function ToggleFullScreen() { $Global::FullScreen = !$Global::FullScreen; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
 function ToggleVSync() { $Global::VSync = !$Global::VSync; SDL_SetRenderVSync($Main.renderer, $Global::VSync); }
 function Quit() { $Global::running = false; }

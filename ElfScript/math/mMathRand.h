@@ -1,3 +1,7 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
 #pragma once
 #include "mConstants.h"
 #include <random>
