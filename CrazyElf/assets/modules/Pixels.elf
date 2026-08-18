@@ -1,6 +1,8 @@
 
 $_DISABLE_SAVE_LOAD = false;
 
+echo("Pixels running on " SPC getOS());
+
 //
 
 /*
@@ -38,6 +40,10 @@ $_DISABLE_SAVE_LOAD = false;
 //----------------------------------------------------------------------
 $_PixelsFileName = SDL_GetPrefPath("Ohmtal", "Pixels") @ "userdata.elfdata";
 
+
+
+//NOTE Emscriten check mount: Module.FS.mounts.map(m => ({ point: m.mountpoint, type: m.type.mount.name, opts: m.opts }));
+
 function _Pixels_Save(%filename = $_PixelsFileName) {
     if ($_DISABLE_SAVE_LOAD) return false;
     echo("Saving" SPC %fileName SPC ".......");
@@ -45,30 +51,60 @@ function _Pixels_Save(%filename = $_PixelsFileName) {
         error("Failed to save " SPC %filename);
         return false;
     }
+    EmscriptenSync();
     return true;
 }
 function _Pixels_Load(%filename = $_PixelsFileName) {
     if ($_DISABLE_SAVE_LOAD) return false;
+
+    echo("DIRECTORY exists? " SPC SDL_FileExists(SDL_GetPrefPath("Ohmtal", "Pixels")));
+    echo("FILE exists? " SPC %filename SPC SDL_FileExists(%filename));
+
+
     if (SDL_FileExists(%filename)) {
         echo("Loading" SPC %fileName SPC ".......");
         $_LOADING = true;
         if (isObject(Pixels)) Pixels.delete();
         exec(%filename);
-        //NOT this should be done by the caller !!!$main.module = Pixels.getId();
         $_LOADING = false;
-        // schedule(0,0,_Pixels_Post_Load, %fileName);
     } else {
         return false;
     }
     return true;
 }
+// -----------------------------------------------------------------------------
+// if ($Globals::mountReady   $= "" ) $Globals::mountReady = false;
+// if ($Globals::mountAttempt $= "" ) $Globals::mountAttempt = 0;
 
-function _Pixels_Post_Load(%filename) {
-    $_LOADING = false;
+// function onEmscriptenMountReady(%success) {
+//     echo("MOUNT READY ...." SPC %success);
+//
+//     if (!%success) {
+//         schedule(120,0,onEmscriptenMountReady, true);
+//         return;
+//     }
+//
+//     $Globals::mountReady = true;
+// }
+
+function onSDL_ENTER_BACKGROUND() {
+    _Pixels_Save();
 }
-
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------------
 function createPixels(%renderer, %window) {
+
+    // if ($Globals::mountAttempt == 0) EmscriptenMount();
+    // $Globals::mountAttempt++;
+
+    // if (getOS() $= "Emscripten") {
+    //     if (!$Globals::mountReady ) {
+    //         Main.schedule(100, loadModule); //without index parameter should work
+    //         return 0;
+    //     }
+    // }
+    if (getOS() $= "Emscripten") {
+        schedule(100,0,SDL_SetWindowFullscreen,%window,1);
+    }
 
     if (_Pixels_Load() && isObject(Pixels)){
          Pixels.renderer  = %renderer;

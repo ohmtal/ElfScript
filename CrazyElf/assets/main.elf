@@ -1,4 +1,4 @@
-$MODULES = "NativSDL blank StarField Pixels";
+$MODULES = "Pixels NativSDL blank StarField";
 
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};
@@ -13,11 +13,21 @@ function ToggleFullScreen() { $Global::FullScreen = !$Global::FullScreen; SDL_Se
 function ToggleVSync() { $Global::VSync = !$Global::VSync; SDL_SetRenderVSync($Main.renderer, $Global::VSync); }
 function Quit() { $Global::running = false; }
 //------------------------------------------------------------------------------
+function onEmscriptenMountReady(%success) {
+
+    if (!%success) {
+        schedule(100,0,onEmscriptenMountReady, true);
+        return;
+    }
+
+    Main.loadModule();
+}
+//------------------------------------------------------------------------------
 function Main::init(%this) {
 
     if (!SDL_Init()) return false;
 
-    // I create Window ;)
+    // create a Window ;)
     %flags = SDL_WINDOW_RESIZABLE;
     %this.window = SDL_CreateWindow("Crazy Elf.", $WindowSize.x, $WindowSize.y, %flags);
 
@@ -44,8 +54,13 @@ function Main::init(%this) {
     %this.scaledScreen = SDL_SetRenderLogicalPresentation(%this.renderer, $Global::ScreenSize.x,$Global::ScreenSize.y);
 
 
+    if (getOS() $= "Emscripten") {
+       EmscriptenMount();
+       return true;
+    }
 
     %this.loadModule();
+
 
     return true;
 }
@@ -55,6 +70,7 @@ function Main::OnRemove(%this) {
     SDL_DestroyWindow(%this.window);
     if (isObject(%this.module)) %this.module.delete();
 }
+
 //------------------------------------------------------------------------------
 function Main::loadModule(%this, %setNewModuleIndex) {
     if (%setNewModuleIndex !$= "" ) {

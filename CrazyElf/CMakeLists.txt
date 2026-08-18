@@ -30,8 +30,34 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ------------- SDL3
 # lazy add
+if (EMSCRIPTEN)
+    include(FetchContent)
+    FetchContent_Declare(
+        SDL3
+        URL "${CMAKE_CURRENT_LIST_DIR}/lib/SDL-release-3.4.14.tar.gz"
+        DOWNLOAD_EXTRACT_TIMESTAMP FALSE
+    )
+
+#     NOTE: should enable SDL3/Emscripten permanent file system
+    set(SDL_EMSCRIPTEN_PERSISTENT_PATH "/storage" CACHE STRING "" FORCE)
+
+    set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+    set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+    if(ANDROID)
+        set(SDL_SHARED ON CACHE BOOL "" FORCE)
+        set(SDL_STATIC OFF CACHE BOOL "" FORCE)
+        set(SDL_ANDROID_APK ON CACHE BOOL "" FORCE)
+    else()
+        set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+        set(SDL_STATIC ON CACHE BOOL "" FORCE)
+        set(BUILD_SHARED_LIBS OFF)
+    endif()
+
+    FetchContent_MakeAvailable(SDL3)
+else()
 find_package(SDL3 REQUIRED)
 
+endif()
 
 # =============== ElfScript >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 set(ELFSCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../" CACHE PATH "Path to ElfScript")
@@ -54,16 +80,13 @@ else()
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
   )
-  # optinal doc exporter
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
 
-
-
+  if (NOT EMSCRIPTEN)
     if(UNIX)
       list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
     endif()
     list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
-
+  endif()
 endif()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 
@@ -108,13 +131,22 @@ endif()
 # Web Configurations
 if (EMSCRIPTEN)
 
-    add_link_options(
+    add_compile_options("-sUSE_SDL=3" )
+
+    #moved up set(SDL_EMSCRIPTEN_PERSISTENT_PATH "/storage" CACHE STRING "")
+
+    target_link_options(${PROJECT_NAME} PUBLIC --sUSE_SDL=3 PUBLIC --preload-file ${ASSET_PATH})
+    target_link_options(${PROJECT_NAME} PRIVATE
         "-sALLOW_MEMORY_GROWTH=1"
+        "-sASYNCIFY"
+        # filesystem
+        "-sEXPORTED_RUNTIME_METHODS=FS"
+        "-sFORCE_FILESYSTEM=1"
+        "-lidbfs.js"
     )
 
 
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "index" SUFFIX ".html")
-    target_link_options(${PROJECT_NAME} PUBLIC --sUSE_SDL=3 PUBLIC --preload-file ${ASSET_PATH} PRIVATE "-lidbfs.js")
 
 
     set(TARGET_NAME ${PROJECT_NAME})

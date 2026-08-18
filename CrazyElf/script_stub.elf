@@ -359,6 +359,12 @@ class  SimObject {
     * @return const char*
     */
       function getField( int index );
+   /** --- ArrayObject* getDebugInfo ---
+    * Return some behind-the-scenes information on the object.
+    * @return An ArrayObject filled with internal information about the object.
+    * @return ArrayObject*
+    */
+      function getDebugInfo();
    /** --- void dumpFields ---
     * Dump a description of all fields defined on this object to the console.
     * @param detailed Whether to print detailed information about members.
@@ -438,6 +444,170 @@ class  SimObject {
    
     */
    pid persistentId;
+};
+class  PointStorageObject : public SimObject {
+  public:
+   /** --- ConsoleVector getPosVec ---
+    * get the position as Vector 
+    * @return ConsoleVector
+    */
+      function getPosVec();
+   /** --- void setPosVec ---
+    * set the position by Vector (String)
+    */
+      function setPosVec( ConsoleVector vector );
+   /** --- void setPos ---
+    * Set position by method 
+    */
+      function setPos( float x, float y, float z=0.f, float w=0.f );
+   /** --- void normalizeXZ ---
+    * normalize the current position
+    */
+      function normalizeXZ();
+   /** --- F32 getLen ---
+    * len of current position
+    * @return F32
+    */
+      function getLen();
+   /** --- bool setPoint ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
+   /** --- F32 getPointX ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.points[2] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.points[3] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.points[0] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.points[1] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
+   /** --- ConsoleVector getPointVec ---
+    * get the point from the point storage at index as Vector (String)
+    * @return ConsoleVector
+    */
+      function getPointVec( uint index );
+   /** --- bool setPointVec ---
+    * set the point in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPointVec( uint index, ConsoleVector vec4 );
+   /** --- String getPoint2Vec ---
+    * get the point xy from the point storage at index as Vector (String)
+    * @return String
+    */
+      function getPoint2Vec( uint index );
+   /** --- bool setPoint2Vec ---
+    * set the point xy in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPoint2Vec( uint index, String strVector );
+   /** --- bool storePoint ---
+    * store the current values x,y,z,w, to the point storage
+    * @return bool
+    */
+      function storePoint( uint index );
+   /** --- bool fetchPoint ---
+    * fetch the point from the point storage at index to the current values x,y,z,w
+    * @return bool
+    */
+      function fetchPoint( uint index );
+   /** --- bool applyMathOnPoints ---
+    * Apply a Math expression on point Storage.
+    * expected format: "x+5; y*2; z; w" separated by ';'
+    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
+    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
+    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
+    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+    * @return bool
+    */
+      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   TypeVector point;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float z;
+   /*!
+    */
+   float w;
+   /*!
+   alias for z
+   
+    */
+   float width;
+   /*!
+   alias for w - yes w.
+   
+    */
+   float height;
+   /*!
+   alias for x
+   
+    */
+   float r;
+   /*!
+   alias for y
+   
+    */
+   float g;
+   /*!
+   alias for z
+   
+    */
+   float b;
+   /*!
+   alias for w
+   
+    */
+   float a;
+   /*!
+   Set the storage size (how many points we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
 };
 /*!
 @brief A collection of SimObjects.
@@ -1583,145 +1753,6 @@ function Message::onRemove(%this)
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
-};
-class  PointStorageObject : public SimObject {
-  public:
-   /** --- ConsoleVector getPosVec ---
-    * get the position as Vector 
-    * @return ConsoleVector
-    */
-      function getPosVec();
-   /** --- void setPosVec ---
-    * set the position by Vector (String)
-    */
-      function setPosVec( ConsoleVector vector );
-   /** --- void getPosByReference ---
-    * set the position by by Referency on up to 4 Variables
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function getPosByReference( string varX, string varY, string varZ="", string varW="" );
-   /** --- void setPos ---
-    * Set position by method 
-    */
-      function setPos( float x, float y, float z=0.f, float w=0.f );
-   /** --- void normalizeXZ ---
-    * normalize the current position
-    */
-      function normalizeXZ();
-   /** --- F32 getLen ---
-    * len of current position
-    * @return F32
-    */
-      function getLen();
-   /** --- bool setPoint ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
-   /** --- F32 getPointX ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointX( uint index );
-   /** --- F32 getPointY ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointY( uint index );
-   /** --- F32 getPointZ ---
-    * get the point.points[2] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointZ( uint index );
-   /** --- F32 getPointW ---
-    * get the point.points[3] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointW( uint index );
-   /** --- bool setPointX ---
-    * set the point.points[0] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointX( uint index, float value );
-   /** --- bool setPointY ---
-    * set the point.points[1] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointY( uint index, float value );
-   /** --- bool setPointZ ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointZ( uint index, float value );
-   /** --- bool setPointW ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointW( uint index, float value );
-   /** --- ConsoleVector getPointVec ---
-    * get the point from the point storage at index as Vector (String)
-    * @return ConsoleVector
-    */
-      function getPointVec( uint index );
-   /** --- bool setPointVec ---
-    * set the point in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPointVec( uint index, ConsoleVector vec4 );
-   /** --- bool storePoint ---
-    * store the current values x,y,z,w, to the point storage
-    * @return bool
-    */
-      function storePoint( uint index );
-   /** --- bool fetchPoint ---
-    * fetch the point from the point storage at index to the current values x,y,z,w
-    * @return bool
-    */
-      function fetchPoint( uint index );
-   /** --- bool applyMathOnPoints ---
-    * Apply a Math expression on point Storage.
-    * expected format: "x+5; y*2; z; w" separated by ';'
-    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
-    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
-    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
-    *   normalizeXY => applyMathOnPoints("normalizeXY()");
-    * @return bool
-    */
-      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   TypeVector point;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float z;
-   /*!
-    */
-   float w;
-   /*!
-   alias for z
-   
-    */
-   float width;
-   /*!
-   alias for w - yes w.
-   
-    */
-   float height;
-   /*!
-   Set the storage size (how many points we can work with) Max:1000000.
-   
-    */
-   uint storageSize;
 };
 //------------------------------------------------------------------
 //                  F U N C T I O N S 
@@ -3171,6 +3202,12 @@ namespace Global {
     * @return bool
     */
       function dumpEngineDocs( string outputFile );
+   /** --- void debugDumpAllObjects ---
+    * @brief Dumps all current EngineObject instances to the console.
+    * @note This function is only available in debug builds.
+    * @ingroup Debugging
+    */
+      function debugDumpAllObjects();
    /** --- const char* expandFilename ---
     * @brief Grabs the full path of a specified file
     * @param filename Name of the local file to locate
@@ -3256,6 +3293,13 @@ namespace Global {
     * @return bool
     */
       function isValidObjectName( string name );
+   /** --- void debugEnumInstances ---
+    * Call the given function for each instance of the given class.
+    * @param className Name of the class for which to enumerate instances.
+    * @param functionName Name of function to call and pass each instance of the given class.
+    * @note This function is only available in debug builds and primarily meant as an aid in debugging.@ingroup Console
+    */
+      function debugEnumInstances( string className, string functionName );
    /** --- ArrayObject* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
@@ -3302,8 +3346,12 @@ namespace Global {
     * Dumps the script constants table to the console. Using filter for keys if not empty.
     */
       function dumpScriptConstants( String filter="" );
+   /** --- void varDumpField ---
+    * local/global variable dump. local only valid in the variables scope
+    */
+      function varDumpField( string variableName );
    /** --- void varDump ---
-    * local variable dump.only valid in the variables scope
+    * local/global variable dump. local only valid in the variables scope
     */
       function varDump( string variableName );
    /** --- void dumpLocals ---
@@ -3545,6 +3593,10 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
+   /** --- void enableWinConsole ---
+    * enableWinConsole(bool);
+    */
+      function enableWinConsole( bool _enable );
    /** --- void ConsoleDocForStub ---
     * @brief Set Con::ConsoleDocForStub - human readable output- exportConsoleDocu overwrites it.
     */
@@ -3557,10 +3609,6 @@ namespace Global {
     * @return bool
     */
       function exportConsoleDocu( String fileName, bool humanreadable=false, bool append=false, bool dumpScript=true, bool dumpEngine=true );
-   /** --- void enableWinConsole ---
-    * enableWinConsole(bool);
-    */
-      function enableWinConsole( bool _enable );
    /** --- bool SDL_MainLoop ---
     * Main Loop for events and more...
     * optional RendererID parameter is required when you set SDL_SetRenderLogicalPresentation
@@ -3568,6 +3616,14 @@ namespace Global {
     * @return bool
     */
       function SDL_MainLoop( int RendererID=0 );
+   /** --- void EmscriptenMount ---
+    * Init the save Game for Emscripten
+    */
+      function EmscriptenMount();
+   /** --- void EmscriptenSync ---
+    * Sync the save Game for Emscripten
+    */
+      function EmscriptenSync();
    /** --- bool SDL_IsKeyPressed ---
     * return if the key with value scancode is pressed.
     * @return bool

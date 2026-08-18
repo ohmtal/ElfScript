@@ -3,6 +3,60 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // Glue them together .. you can also use them separatly
+// Added Emscripten logic also here !
+//-----------------------------------------------------------------------------
+// NOTE EMSCRIPTEN: -sASYNCIFY
+// 1. SDL compile flag:
+//
+//  set(SDL_EMSCRIPTEN_PERSISTENT_PATH "/storage" CACHE STRING "" FORCE)
+//
+
+//
+// 2. Linker settings:
+//
+/*
+    target_link_options(${PROJECT_NAME} PUBLIC --sUSE_SDL=3 PUBLIC --preload-file ${ASSET_PATH})
+    target_link_options(${PROJECT_NAME} PRIVATE
+    "-sALLOW_MEMORY_GROWTH=1"
+    "-sASYNCIFY"
+    # filesystem
+    "-sEXPORTED_RUNTIME_METHODS=FS"
+    "-sFORCE_FILESYSTEM=1"
+    "-lidbfs.js"
+    )
+*/
+
+//
+// 3. Save / Load a file - this was hard to finally get it work:
+//
+// Load:
+//
+// We need to call  >> EmscriptenMount(); << to mount /storage but then it's not
+// ready to use wait for >> onEmscriptenMountReady() << to load your game.
+// In pixels with the module loader i did :
+/*
+    $Globals::mountReady = false;
+    function onEmscriptenMountReady() {
+        echo("MOUNT READY ....");
+        $Globals::mountReady = true;
+    }
+
+    function createPixels(%renderer, %window) {
+
+        EmscriptenMount();
+        if (getOS() $= "Emscripten") {
+            SDL_SetWindowFullscreen(%window, 1);
+            if (!$Globals::mountReady ) {
+                Main.schedule(100, loadModule); //without index parameter should work
+                return 0;
+            }
+        }
+        ......
+
+
+*/
+// SAVE:
+// Save is a bit easier simply call >> EmscriptenSync(); << after you saved it.
 //-----------------------------------------------------------------------------
 
 #include <SDL3/SDL.h>
@@ -10,7 +64,10 @@
 #include "main/engineGlue.h"
 #include "SDL3_ElfScriptGlue.h"
 
-
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <iostream>
+#endif
 
 namespace ElfSDL3 {
     // ----------------------------------------------------------------------------
@@ -75,8 +132,17 @@ namespace ElfSDL3 {
                     break;
                 case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                     Con::printf("******* Window Close Event ********");
-                    //FIXME check main window ......
+                    break;
 
+
+                case SDL_EVENT_WILL_ENTER_BACKGROUND:
+                    Con::printf("******* SDL_EVENT_WILL_ENTER_BACKGROUND ********");
+                    Con::executef("onSDL_ENTER_BACKGROUND");
+                    break;
+
+                case SDL_EVENT_TERMINATING:
+                    Con::printf("******* SDL_EVENT_TERMINATING ********");
+                    return false;
                     break;
             };
             ElfSDL3::onEvent(event);
@@ -86,8 +152,61 @@ namespace ElfSDL3 {
         // Event is called with current event...
         if (OnLoop) OnLoop(event);
 
+        #ifdef __EMSCRIPTEN__
+        emscripten_sleep(1);
+        #endif
+
 
         return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // Emscripten:
+    // -------------------------------------------------------------------------
+    #ifdef __EMSCRIPTEN__
+
+        extern "C" {
+            EMSCRIPTEN_KEEPALIVE void SetIDBFSReady(bool success) {
+                Con::executef("onEmscriptenMountReady", success);
+            }
+        }
+    #endif
+
+    // -------------------------------------------------------------------------
+    DefineEngineFunction(EmscriptenMount, void, (),,"Init the save Game for Emscripten") {
+        #ifdef __EMSCRIPTEN__
+        EM_ASM(
+            try {
+                try { FS.mkdir('/storage'); } catch(e) {}
+
+                FS.mount(IDBFS, {}, '/storage');
+                console.log("IDBFS successful mouted to /storage .");
+
+                FS.syncfs(true, function (err) {
+                    if (err) console.error("IDBFS Error:", err);
+                    else console.log("Loaded from IDBSF.");
+                    _SetIDBFSReady(true);
+                });
+            } catch (e) {
+                console.error("Critical mount error:", e);
+                _SetIDBFSReady(false);
+            }
+        );
+        Con::printf("EmscriptenMount.....  onEmscriptenMountReady !!");
+
+        #endif
+    }
+    // -------------------------------------------------------------------------
+    DefineEngineFunction(EmscriptenSync, void, (),,"Sync the save Game for Emscripten") {
+        #ifdef __EMSCRIPTEN__
+        EM_ASM(
+            FS.syncfs(false, function (err) {
+                if (err) console.error("Error writing to IndexedDB:", err);
+                else console.log("IndexDB should now be populateed");
+            });
+        );
+        Con::printf("EmscriptenSync.....");
+        #endif
     }
 
 }
