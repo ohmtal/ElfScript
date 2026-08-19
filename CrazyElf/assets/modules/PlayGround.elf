@@ -1,4 +1,13 @@
-#define PIXEL_SIZE 2.0
+// .----.
+//
+// with all the optimations i did with ElfSctipt when collide and draw many (>200)
+// objects there is now other way than put this into C as i did in
+// BaseElf / SpriteGroup
+//
+// .----.
+
+
+#define PIXEL_SIZE 4.0
 
 function createPlayGround(%renderer, %window) {
     %obj = new ScriptGroup(PlayGround) {
@@ -11,7 +20,7 @@ function createPlayGround(%renderer, %window) {
 //----------------------------------------------------------------------
 function PlayGround::onAdd(%this) {
     %this.add(new PointStorageObject(Points){
-       storageSize = 2000;
+       storageSize = 420;
     });
 
     for (%i in range Points.storageSize) {
@@ -27,38 +36,77 @@ function PlayGround::OnRemove(%this) { }
 //----------------------------------------------------------------------
 function PlayGround::Render(%this) {
     if (!%this.renderer) return;
+    %r  = %this.renderer;
     %dt = GetFrameTime();
-    SDL_SetRenderDrawColor(%this.renderer, 20, 20, 40);
-    SDL_RenderClear(%this.renderer);
-
+    SDL_SetRenderDrawColor(%r, 20, 20, 40);
+    SDL_RenderClear(%r);
+    SDL_SetRenderDrawColor(%r, 255, 0, 255);
 
     %points = Points.getId();
+    %p = {0}; //init vector
+    // vardump("%p");
     for (%i in range %points.storageSize) {
-        %points.fetchPoint(%i);
-        switch( %points.z ) {
-            case 0:
-                SDL_SetRenderDrawColor(%this.renderer, 200,   0,   0);
-                %points.x += %dt * %points.w;
-                if (%points.x > 320.0) %points.x = -1.0;
-            case 1:
-                SDL_SetRenderDrawColor(%this.renderer,   0, 200,   0);
-                %points.x -= %dt * %points.w;
-                if (%points.x < 0.0) %points.x = 320.0;
 
-            case 2:
-                SDL_SetRenderDrawColor(%this.renderer,   0,   0, 200);
-                %points.y += %dt * %points.w;
-                if (%points.y > 200.0) %points.y = -1.0;
+        %points.fetchPoint(%i);
+        %x      = %points.x;
+        %y      = %points.y;
+        %type   = %points.z;
+        %speed  = %points.w;
+
+        // not really faster - same speed , maybe a little bit slower ...
+        // %points.getPointVecByReference(%i, "%p");
+        // %x      = %p.x;
+        // %y      = %p.y;
+        // %type   = %p.z;
+        // %speed  = %p.w;
+
+
+        // using Strings fetch push intersect .. all this slow stuff ^^
+        // %points.getPoint2Vec(%i) is put 2 values into a string and move it
+        // into the stack then  SPC PIXEL_SIZE SPC PIXEL_SIZE add this 2 values
+        // to the string. This is down 2 times than SDL_HasRectIntersectionFloat
+        // parse the strings and put them back into floats .... hard to optimize
+        // with the string only way function calles work on this
+        // => maybe my localvar by reference may help here
+        // when i add a collide function to PointStorage it's not what it made
+        // for.
+        // // for ( %j in range %points.storageSize) {
+        // //     if (%type == 0.0 && %i != %j && SDL_HasRectIntersectionFloat(
+        // //             %points.getPoint2Vec(%i) SPC PIXEL_SIZE SPC PIXEL_SIZE
+        // //           , %points.getPoint2Vec(%j) SPC PIXEL_SIZE SPC PIXEL_SIZE)) {
+        // //         %speed = 0;
+        // //     }
+        // // }
+
+        switch( %type ) {
+            case 0.0:
+                SDL_SetRenderDrawColor(%r, 200,   0,   0);
+                %x += %dt * %speed;
+                if (%x > 320.0) %x = -1.0;
+            case 1.0:
+                SDL_SetRenderDrawColor(%r,   0, 200,   0);
+                %x -= %dt * %speed;
+                if (%x < -PIXEL_SIZE) %x = 320.0;
+
+            case 2.0:
+                SDL_SetRenderDrawColor(%r,   0,   0, 200);
+                %y += %dt * %speed;
+                if (%y > 200.0) %y = -1.0;
         }
-        SDL_RenderRectF(%this.renderer, %points.x,%points.y,PIXEL_SIZE, PIXEL_SIZE, false);
-        %points.storePoint(%i);
+
+
+
+        SDL_RenderRectF(%r, %x,%y,PIXEL_SIZE, PIXEL_SIZE, true);
+        %points.setPoint2(%i,%x,%y);
     }
 
 
-    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
-    SDL_SetRenderScale(%this.renderer, 0.7,0.7);
-    SDL_RenderDebugText(%this.renderer, 7, 7, getFPS() SPC "FPS");
-    SDL_SetRenderScale(%this.renderer);
+    SDL_SetRenderDrawColor(%r, 55,55,55);
+    SDL_SetRenderScale(%r, 0.7,0.7);
+    SDL_RenderDebugText(%r, 7, 7, getFPS() SPC "FPS");
+    SDL_SetRenderDrawColor(%r, 255,255,255);
+    SDL_RenderDebugText(%r, 6, 6, getFPS() SPC "FPS");
+    SDL_SetRenderScale(%r);
 }
 //----------------------------------------------------------------------
 function  PlayGround::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }

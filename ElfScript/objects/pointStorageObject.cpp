@@ -47,7 +47,7 @@
 #include "math/mMathFn.h"
 #include "ext/tinyexpr.h"
 
-// //  nice but slower #include "console/localVar.h"
+#include "console/localVar.h"
 
 // ------------ Vector2 helper ----------------
 inline float lengthSquaredXY(const F32 x, const F32 y) {
@@ -294,32 +294,47 @@ public:
 
 
     // -------------------------------------------------------------------------
-    // it's slower then fetch/store so i remove it again!
-    // // **** direct local var access !!!! - i ignore fails here ...***
-    // void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-    //     ElfScript::setLocalFloat(varX, mVector.points[0]);
-    //     ElfScript::setLocalFloat(varY, mVector.points[1]);
-    //     if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
-    //     if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
-    // }
-    // // **** direct local var access for points !!!! - i ignore fails here ...***
-    // bool getPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-    //     if ( index >= this->mPoints.size()) return false;
-    //     ElfScript::setLocalFloat(varX, this->mPoints[index].points[0]);
-    //     ElfScript::setLocalFloat(varY, this->mPoints[index].points[1]);
-    //     if (varZ) ElfScript::setLocalFloat(varZ, this->mPoints[index].points[2]);
-    //     if (varW) ElfScript::setLocalFloat(varW, this->mPoints[index].points[3]);
-    //     return true;
-    // }
-    // // **** direct local var access for points !!!! - i ignore fails here ...***
-    // bool setPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-    //     if ( index >= this->mPoints.size()) return false;
-    //     this->mPoints[index].points[0] = ElfScript::getLocalFloat(varX);
-    //     this->mPoints[index].points[1] = ElfScript::getLocalFloat(varY);
-    //     if (varZ) this->mPoints[index].points[2] = ElfScript::getLocalFloat(varZ);
-    //     if (varW) this->mPoints[index].points[3] = ElfScript::getLocalFloat(varW);
-    //     return true;
-    // }
+    // **** direct local var access !!!! - i ignore fails here ...***
+    void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+        ElfScript::setLocalFloat(varX, mVector.points[0]);
+        ElfScript::setLocalFloat(varY, mVector.points[1]);
+        if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
+        if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
+    }
+    // **** direct local var access for points !!!! - i ignore fails here ...***
+    bool getPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+        if ( index >= this->mPoints.size()) return false;
+        ElfScript::setLocalFloat(varX, this->mPoints[index].points[0]);
+        ElfScript::setLocalFloat(varY, this->mPoints[index].points[1]);
+        if (varZ) ElfScript::setLocalFloat(varZ, this->mPoints[index].points[2]);
+        if (varW) ElfScript::setLocalFloat(varW, this->mPoints[index].points[3]);
+        return true;
+    }
+    // **** direct local var access for points !!!! - i ignore fails here ...***
+    bool setPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+        if ( index >= this->mPoints.size()) return false;
+        this->mPoints[index].points[0] = ElfScript::getLocalFloat(varX);
+        this->mPoints[index].points[1] = ElfScript::getLocalFloat(varY);
+        if (varZ) this->mPoints[index].points[2] = ElfScript::getLocalFloat(varZ);
+        if (varW) this->mPoints[index].points[3] = ElfScript::getLocalFloat(varW);
+        return true;
+    }
+
+#ifdef ENABLE_CONSOLE_VECTOR
+    // fast fetch !!
+    // **** direct local var access for ConsoleVector!!!! - i ignore fails here ...***
+    bool getPointVecByReference(U32 index, const char* vecVar) {
+        if ( index >= this->mPoints.size()) return false;
+        ElfScript::setLocalVector(vecVar, this->mPoints[index]);
+        return true;
+    }
+    // **** direct local var access for ConsoleVector !!!! - i ignore fails here ...***
+    bool setPointVecByReference(U32 index,  const char* vecVar) {
+        if ( index >= this->mPoints.size()) return false;
+        this->mPoints[index] = ElfScript::getLocalVector(vecVar);
+        return true;
+    }
+#endif
     // -------------------------------------------------------------------------
     void write(Stream &stream, U32 tabStop, U32 flags) override {
         // Parent::write >>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -476,22 +491,54 @@ DefineEngineMethod(PointStorageObject, setPoint, bool, (U32 index, F32 x, F32 y,
     object->mPoints[index] = { x, y, z, w};
     return true;
 }
+DefineEngineMethod(PointStorageObject, setPoint3, bool, (U32 index, F32 x, F32 y, F32 z), ,
+                   "Set a  point at index in the point storage.") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[0] = x;
+    object->mPoints[index].points[1] = y;
+    object->mPoints[index].points[2] = z;
+    return true;
+}
+DefineEngineMethod(PointStorageObject, setPoint2, bool, (U32 index, F32 x, F32 y), ,
+            "Set a  point at index in the point storage.") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[0] = x;
+    object->mPoints[index].points[1] = y;
+    return true;
+}
 
-// THIS IS SLOWER  then fetch / store !!!!
-// DefineEngineMethod(PointStorageObject, getPointByReference, void,
-//                    (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-//                    , "set the point at index  by Reference to 2-4 Variables\n"
-//                    "NOTE: the variables must exists before this is called it does NOT create them."
-// ) {
-//     object->getPointByReference(index,varX, varY, varZ, varW);
-// }
-// DefineEngineMethod(PointStorageObject, setPointByReference, void,
-//                    (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-//                    , "get the point at index  by Reference from 2-4 Variables\n"
-//                    "NOTE: the variables must exists before this is called it does NOT create them."
-// ) {
-//     object->setPointByReference(index,varX, varY, varZ, varW);
-// }
+
+DefineEngineMethod(PointStorageObject, getPointByReference, void,
+                   (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+                   , "get the point at index  by Reference from 2-4 Variables\n"
+                   "NOTE: the variables must exists before this is called it does NOT create them."
+) {
+    object->getPointByReference(index,varX, varY, varZ, varW);
+}
+DefineEngineMethod(PointStorageObject, setPointByReference, void,
+                   (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
+                   , "set the point at index  by Reference to 2-4 Variables\n"
+                   "NOTE: the variables must exists before this is called it does NOT create them."
+) {
+    object->setPointByReference(index,varX, varY, varZ, varW);
+}
+
+#ifdef ENABLE_CONSOLE_VECTOR
+DefineEngineMethod(PointStorageObject, getPointVecByReference, void, (U32 index,const char* vecVar),
+                   , "get the point at index and push it into vecVar\n"
+                   "NOTE: the variables must exists before this is called it does NOT create them."
+) {
+    object->getPointVecByReference(index,vecVar);
+}
+DefineEngineMethod(PointStorageObject, setPointVecByReference, void,
+                   (U32 index,const char* vecVar ),
+                   , "use the data from vecVar to save a point at index\n"
+                   "NOTE: the variables must exists before this is called it does NOT create them."
+) {
+    object->setPointVecByReference(index,vecVar);
+}
+#endif
+
 
 DefineEngineMethod(PointStorageObject, getPointX, F32, (U32 index),
                    , "get the point.points[0] from the point storage at index as Vector (String)") {

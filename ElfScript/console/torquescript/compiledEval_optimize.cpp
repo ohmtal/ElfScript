@@ -325,7 +325,11 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       }
 
       switch ( targetType ) {
-            case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
+            // case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
+#ifdef  ENABLE_CONSOLE_VECTOR
+            case cvVector: TORQUE_CASE_FALLTHROUGH;
+#endif
+            case cvInteger: TORQUE_CASE_FALLTHROUGH;
             case cvFloat: pStack->setFastFloat(targetValue); break;
             default: pStack->setFloat(targetValue); break;
       }
