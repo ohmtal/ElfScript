@@ -1,8 +1,6 @@
 // .----.
 //
-// with all the optimations i did with ElfSctipt when collide and draw many (>200)
-// objects there is now other way than put this into C as i did in
-// BaseElf / SpriteGroup
+// Script based partial grid with objects..
 //
 // .----.
 
@@ -59,8 +57,10 @@ function Pupser::Update(%this, %dt) {
         %this.node = Grid.getNode(%pos.x, %pos.y);
         %this.node.add(%this);
     } else if ( !VEC_PointInRect( "%pos", "%nodeRect")) { // by reference
+
         %this.node.remove(%this);
         %this.node = Grid.getNode(%pos.x, %pos.y);
+        // echo("MOVE object ", %this, " to node: ", %this.node);
         %this.node.add(%this);
     }
 }

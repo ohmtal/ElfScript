@@ -209,7 +209,7 @@ set ( OBJECTS_SRC
     # some neat objects to work with
     ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/objects/objectAliases.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp
+
 
 )
 
@@ -284,6 +284,7 @@ set(ELFSCRIPT_SRC
 
 if (ELF_ENABLE_CONSOLE_VECTOR)
      add_compile_definitions(ENABLE_CONSOLE_VECTOR)
+     list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp)
 endif()
 
 if (ELF_ENABLE_ZIP)
