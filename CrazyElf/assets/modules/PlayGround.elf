@@ -11,8 +11,8 @@
 #define VECTOR TypeVector
 
 #define PIXEL_SIZE 4.0
-#define INITAL_COUNT 30
-#define UPDATE_TIME 0.1
+#define INITAL_COUNT 50
+#define UPDATE_TIME 0.05
 #define CANVAS_WIDTH 250.0
 #define CANVAS_HEIGHT 200.0
 
@@ -56,7 +56,7 @@ function Pupser::Update(%this, %dt) {
     if ( %this.node == 0)  {
         %this.node = Grid.getNode(%pos.x, %pos.y);
         %this.node.add(%this);
-    } else if ( !VEC_PointInRect( "%pos", "%nodeRect")) { // by reference
+    } else if ( !RectPointInRect( "%pos", "%nodeRect")) { // by reference
 
         %this.node.remove(%this);
         %this.node = Grid.getNode(%pos.x, %pos.y);

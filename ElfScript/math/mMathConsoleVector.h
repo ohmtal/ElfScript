@@ -104,7 +104,7 @@ inline ConsoleVector operator /= ( ConsoleVector& v1, const ConsoleVector& v2)  
 
 inline bool operator == ( ConsoleVector& v1, const ConsoleVector& v2)  { return Vec4Equal(v1,v2); }
 
-bool pointInRect(const ConsoleVector& pt, const ConsoleVector& v)  {
+inline bool pointInRect(const ConsoleVector& pt, const ConsoleVector& v)  {
     return (
            pt.points[0] >= v.points[0]
         && pt.points[0] <  v.points[0] + v.points[2]
@@ -112,7 +112,7 @@ bool pointInRect(const ConsoleVector& pt, const ConsoleVector& v)  {
         && pt.points[1] <  v.points[1] + v.points[3]
     );
 }
-bool pointInRect(F32 x, F32 y, const ConsoleVector& v)  {
+inline bool pointInRect(F32 x, F32 y, const ConsoleVector& v)  {
     return (
            x >= v.points[0]
         && x <  v.points[0] + v.points[2]
@@ -121,18 +121,40 @@ bool pointInRect(F32 x, F32 y, const ConsoleVector& v)  {
     );
 }
 
-bool contains( ConsoleVector& v1, const ConsoleVector& v2)  {
+inline bool contains( ConsoleVector& v1, const ConsoleVector& v2)  {
     return (v2.points[0] >= v1.points[0] &&
     v2.points[1] >= v1.points[1] &&
     v2.points[0] + v2.points[2] <= v1.points[0] + v1.points[2] &&
     v2.points[1] + v2.points[3] <= v1.points[1] + v1.points[3]);
 }
 
-bool intersects(ConsoleVector& v1, const ConsoleVector& v2)  {
+inline bool intersects(ConsoleVector& v1, const ConsoleVector& v2)  {
     return (v1.points[0] < v2.points[0] + v2.points[2] &&
     v1.points[0] + v1.points[2] > v2.points[0] &&
     v1.points[1] < v2.points[1] + v2.points[3] &&
     v1.points[1] + v1.points[3] > v2.points[1]);
+}
+
+// ----------------
+inline float Vec2DistSq(const ConsoleVector& v1, const ConsoleVector& v2) {
+    F32 dx = v1.points[0] - v2.points[0];
+    F32 dy = v1.points[1] - v2.points[1];
+    return (dx * dx) + (dy * dy);
+}
+
+inline float Vec2Dist(const ConsoleVector& v1, const ConsoleVector& v2) {
+     return ElfMath::mSqrt(Vec2DistSq(v1, v2));
+}
+
+inline float Vec3DistSq(const ConsoleVector& v1, const ConsoleVector& v2) {
+    F32 dx = v1.points[0] - v2.points[0];
+    F32 dy = v1.points[1] - v2.points[1];
+    F32 dz = v1.points[2] - v2.points[2];
+    return (dx * dx) + (dy * dy) + (dz * dz);
+}
+
+inline float Vec3Dist(const ConsoleVector& v1, const ConsoleVector& v2) {
+    return ElfMath::mSqrt(Vec3DistSq(v1, v2));
 }
 
 // ----------------
