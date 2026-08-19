@@ -128,8 +128,10 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, const U32 typeI
    setFieldType(slotName, cbt);
 }
 
-void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType *type)
+void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType* type)
 {
+   if (!type) return ;
+
    // If the field exists on the object, set the type
    U32 bucket = getHashValue(slotName);
 

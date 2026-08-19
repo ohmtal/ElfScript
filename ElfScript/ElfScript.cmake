@@ -208,6 +208,8 @@ set(PLATFORM_SRC
 set ( OBJECTS_SRC
     # some neat objects to work with
     ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/objectAliases.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp
 
 )
 

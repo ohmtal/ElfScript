@@ -6,28 +6,124 @@
 //
 // .----.
 
+// bad idea i guess ;)
+#define INT TypeS32
+#define FLOAT TypeF32
+#define STRING TypeString
+#define VECTOR TypeVector
 
 #define PIXEL_SIZE 4.0
+#define INITAL_COUNT 30
+#define UPDATE_TIME 0.1
+#define CANVAS_WIDTH 250.0
+#define CANVAS_HEIGHT 200.0
+
 
 function createPlayGround(%renderer, %window) {
-    %obj = new ScriptGroup(PlayGround) {
+    %obj = new Group(PlayGround) {
         TypeS32 renderer = %renderer;
         TypeS32 window   = %window;
+
+        TypeF32 updateDT = 0.0;
     };
+
 
     return %obj;
 }
 //----------------------------------------------------------------------
+function Pupser::onAdd(%this) { }
+function Pupser::onRemove(%this) { }
+
+function Pupser::Update(%this, %dt) {
+    %this.rect.x += %this.velo.x  * %dt;
+    if (%this.rect.x  > CANVAS_WIDTH - PIXEL_SIZE) {
+        %this.rect.x = CANVAS_WIDTH - PIXEL_SIZE;
+        %this.velo.x *= -1.0;
+    } else if (%this.rect.x < 0.0) {
+        %this.rect.x = 0.0;
+        %this.velo.x *= -1.0;
+    }
+
+    %this.rect.y += %this.velo.y * %dt;
+    if (%this.rect.y > CANVAS_HEIGHT - PIXEL_SIZE) {
+        %this.rect.y = CANVAS_HEIGHT - PIXEL_SIZE;
+        %this.velo.y *= -1.0;
+    } else if (%this.rect.y < 0.0) {
+        %this.rect.y = 0.0;
+        %this.velo.y *= -1.0;
+    }
+
+    %pos = {%this.rect.x, %this.rect.y};
+    %nodeRect = %this.node.rect;
+    if ( %this.node == 0)  {
+        %this.node = Grid.getNode(%pos.x, %pos.y);
+        %this.node.add(%this);
+    } else if ( !VEC_PointInRect( "%pos", "%nodeRect")) { // by reference
+        %this.node.remove(%this);
+        %this.node = Grid.getNode(%pos.x, %pos.y);
+        %this.node.add(%this);
+    }
+}
+
+//----------------------------------------------------------------------
+function Grid::getNode(%this, %x, %y) {
+    %xNode = mFloor(%x / %this.nodeSize);
+    %yNode = mFloor(%y / %this.nodeSize);
+    %node  = %xNode + %yNode * %this.nodesX;
+
+
+    if (%node < %this.getCount()) {
+        %obj = %this.getObject(%node);
+        // echo(FormatString("NODE: %d, %d/%d {%s}", %node, %xNode, %yNode, %obj.rect));
+        return %obj;
+    }
+    return 0;
+}
+
+function Grid::onAdd(%this) {
+    if (!%this.nodeSize) %this.nodeSize = 50.0;
+    %this.nodesX = CANVAS_WIDTH / %this.nodeSize;
+    echo("XNODES: ", %this.nodesX);
+    %this.nodesY = CANVAS_HEIGHT / %this.nodeSize;
+    for (%j in range %this.nodesY)
+     for (%i in range %this.nodesX) {
+        %node = new SimSet() {
+            VECTOR rect = {
+              ( %i * %this.nodeSize ),
+              ( %j * %this.nodeSize ),
+              %this.nodeSize,
+              %this.nodeSize
+            };
+        };
+        // %node.dumpFields();
+        echo( formatString("NODE[%d]: %d,%d pos %7.2f, %7.2f", %node, %i,%j, %node.rect.x, %node.rect.y));
+        %this.add(%node);
+    }
+}
+//----------------------------------------------------------------------
 function PlayGround::onAdd(%this) {
-    %this.add(new PointStorageObject(Points){
-       storageSize = 420;
+
+    %this.add(new Group(PupserGroup));
+
+    %this.add(new Group(Grid) {
+        FLOAT nodeSize = 50.0;
+        INT   nodesX = 0;
+        INT   nodesY = 0;
     });
 
-    for (%i in range Points.storageSize) {
-
-        Points.setPoint(%i, getRandomf($Global::ScreenSize.x),getRandomf($Global::ScreenSize.y),
-                        getRandom(2), getRandomF(5.0,20.0));
+    for (%i in range INITAL_COUNT) {
+        %pupser = new Object() {
+            class   = "Pupser";
+            VECTOR  rect    = { GetRandomF(CANVAS_WIDTH),  GetRandomF(CANVAS_HEIGHT), PIXEL_SIZE, PIXEL_SIZE};
+            INT     gender  = GetRandom(1);
+            FLOAT   age     = 0.0;
+            VECTOR  velo    = { GetRandomF(-10.0,10.0), GetRandomF(-10.0,10.0) };
+            INT     Node    = 0;
+        };
+        PupserGroup.add(%pupser);
     }
+
+    // %pupser.dumpFields();
 
     return true;
 }
@@ -38,74 +134,47 @@ function PlayGround::Render(%this) {
     if (!%this.renderer) return;
     %r  = %this.renderer;
     %dt = GetFrameTime();
+    %this.updateDT += %dt;
+    %doUpdate = %this.updateDT > UPDATE_TIME;
+    if (%doUpdate) {
+        %udt = %this.updateDT;
+        %this.updateDT -= UPDATE_TIME;
+    }
+
     SDL_SetRenderDrawColor(%r, 20, 20, 40);
     SDL_RenderClear(%r);
-    SDL_SetRenderDrawColor(%r, 255, 0, 255);
 
-    %points = Points.getId();
-    %p = {0}; //init vector
-    // vardump("%p");
-    for (%i in range %points.storageSize) {
+    SDL_SetRenderDrawColor(%r, 20, 50, 20);
+    SDL_RenderRectF(%r, 0,0,CANVAS_WIDTH, CANVAS_HEIGHT, true);
 
-        %points.fetchPoint(%i);
-        %x      = %points.x;
-        %y      = %points.y;
-        %type   = %points.z;
-        %speed  = %points.w;
+    %scale = 0.7;
+    foreach(%node in Grid) {
+        SDL_SetRenderDrawColor(%r, 180, 180, 180);
+        SDL_SetRenderScale(%r, %scale, %scale);
+        SDL_RenderDebugText(%r, (%node.rect.x + 3.0 ) / %scale, (%node.rect.y + 3.0)/ %scale, %node.getCount());
+        SDL_SetRenderScale(%r);
+        SDL_SetRenderDrawColor(%r, 80, 80, 80);
+        SDL_RenderRect(%r, %node.rect);
+    }
 
-        // not really faster - same speed , maybe a little bit slower ...
-        // %points.getPointVecByReference(%i, "%p");
-        // %x      = %p.x;
-        // %y      = %p.y;
-        // %type   = %p.z;
-        // %speed  = %p.w;
-
-
-        // using Strings fetch push intersect .. all this slow stuff ^^
-        // %points.getPoint2Vec(%i) is put 2 values into a string and move it
-        // into the stack then  SPC PIXEL_SIZE SPC PIXEL_SIZE add this 2 values
-        // to the string. This is down 2 times than SDL_HasRectIntersectionFloat
-        // parse the strings and put them back into floats .... hard to optimize
-        // with the string only way function calles work on this
-        // => maybe my localvar by reference may help here
-        // when i add a collide function to PointStorage it's not what it made
-        // for.
-        // // for ( %j in range %points.storageSize) {
-        // //     if (%type == 0.0 && %i != %j && SDL_HasRectIntersectionFloat(
-        // //             %points.getPoint2Vec(%i) SPC PIXEL_SIZE SPC PIXEL_SIZE
-        // //           , %points.getPoint2Vec(%j) SPC PIXEL_SIZE SPC PIXEL_SIZE)) {
-        // //         %speed = 0;
-        // //     }
-        // // }
-
-        switch( %type ) {
-            case 0.0:
-                SDL_SetRenderDrawColor(%r, 200,   0,   0);
-                %x += %dt * %speed;
-                if (%x > 320.0) %x = -1.0;
-            case 1.0:
-                SDL_SetRenderDrawColor(%r,   0, 200,   0);
-                %x -= %dt * %speed;
-                if (%x < -PIXEL_SIZE) %x = 320.0;
-
-            case 2.0:
-                SDL_SetRenderDrawColor(%r,   0,   0, 200);
-                %y += %dt * %speed;
-                if (%y > 200.0) %y = -1.0;
+    foreach(%pupser in PupserGroup) {
+        if (%doUpdate) {
+            %pupser.update(%udt);
         }
 
+        if (%pupser.gender == 0) SDL_SetRenderDrawColor(%r,   0,   0, 200);
+        else SDL_SetRenderDrawColor(%r,   200,   0, 0);
 
-
-        SDL_RenderRectF(%r, %x,%y,PIXEL_SIZE, PIXEL_SIZE, true);
-        %points.setPoint2(%i,%x,%y);
+        SDL_RenderRect(%r, %pupser.rect);
     }
 
 
     SDL_SetRenderDrawColor(%r, 55,55,55);
-    SDL_SetRenderScale(%r, 0.7,0.7);
-    SDL_RenderDebugText(%r, 7, 7, getFPS() SPC "FPS");
+    %scale = 0.7;
+    SDL_SetRenderScale(%r, %scale, %scale);
+    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 5) / %scale , 7, getFPS() SPC "FPS");
     SDL_SetRenderDrawColor(%r, 255,255,255);
-    SDL_RenderDebugText(%r, 6, 6, getFPS() SPC "FPS");
+    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 4) / %scale, 6, getFPS() SPC "FPS");
     SDL_SetRenderScale(%r);
 }
 //----------------------------------------------------------------------

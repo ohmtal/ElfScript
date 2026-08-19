@@ -35,7 +35,6 @@
 #include "console/consoleExtras.h" // for PoD types - dont forget to add the .cpp to your build
 
 
-
 namespace ElfSDL3 {
 
 void RegisterRenderConstants() {
@@ -816,6 +815,9 @@ DefineEngineFunction(SDL_PointInRectFloat, bool , (Point2F p, RectF rect),
                      ,"Check a point is in rect") {
     return SDL_PointInRectFloat(&p, &rect);
 }
+
+
+
 DefineEngineFunction(SDL_HasRectIntersection, bool , (RectI rectA, RectI rectB),
                      ,"Check rect intersection") {
     return SDL_HasRectIntersection(&rectA, &rectB);
