@@ -241,11 +241,13 @@ HEXDIGIT [a-fA-F0-9]
 // names or field names in script without causing parse errors.  If you add
 // syntax that consumes those keywords, add both the lexer rule and the
 // grammar token declaration at the same time.
+
+// ElfScript 0.6: added blank on range and step since i have methods which are named like that ...
+//                hope this is a good idea
 %}
 "in"        { CMDlval.i = MakeToken<int>(rwIN,               yylineno); return rwIN;               }
-
-"range"     { CMDlval.i = MakeToken<int>(rwRANGE,            yylineno); return rwRANGE;            }
-"step"      { CMDlval.i = MakeToken<int>(rwSTEP,             yylineno); return rwSTEP;             }
+" range "     { CMDlval.i = MakeToken<int>(rwRANGE,            yylineno); return rwRANGE;            }
+" step "      { CMDlval.i = MakeToken<int>(rwSTEP,             yylineno); return rwSTEP;             }
 
 "or"        { CMDlval.i = MakeToken<int>(rwCASEOR,           yylineno); return rwCASEOR;           }
 "break"     { CMDlval.i = MakeToken<int>(rwBREAK,            yylineno); return rwBREAK;            }

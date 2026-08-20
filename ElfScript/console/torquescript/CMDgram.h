@@ -122,8 +122,7 @@ extern int CMDdebug;
     opDOTDOT = 323,                /* opDOTDOT  */
     rwRANGE = 324,                 /* rwRANGE  */
     rwSTEP = 325,                  /* rwSTEP  */
-    rwStruct = 326,                /* rwStruct  */
-    UNARY = 327                    /* UNARY  */
+    UNARY = 326                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -132,7 +131,7 @@ extern int CMDdebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 117 "CMDgram.y"
+#line 115 "CMDgram.y"
 
    Token< char >           c;
    Token< int >            i;
@@ -150,7 +149,7 @@ union YYSTYPE
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 
-#line 154 "CMDgram.h"
+#line 153 "CMDgram.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
