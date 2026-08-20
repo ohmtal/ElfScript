@@ -359,6 +359,12 @@ class  SimObject {
     * @return const char*
     */
       function getField( int index );
+   /** --- ArrayObject* getDebugInfo ---
+    * Return some behind-the-scenes information on the object.
+    * @return An ArrayObject filled with internal information about the object.
+    * @return ArrayObject*
+    */
+      function getDebugInfo();
    /** --- void dumpFields ---
     * Dump a description of all fields defined on this object to the console.
     * @param detailed Whether to print detailed information about members.
@@ -478,6 +484,26 @@ class  PointStorageObject : public SimObject {
     * @return bool
     */
       function setPoint2( uint index, float x, float y );
+   /** --- void getPointByReference ---
+    * get the point at index  by Reference from 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void setPointByReference ---
+    * set the point at index  by Reference to 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void getPointVecByReference ---
+    * get the point at index and push it into vecVar
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointVecByReference( uint index, string vecVar );
+   /** --- void setPointVecByReference ---
+    * use the data from vecVar to save a point at index
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointVecByReference( uint index, string vecVar );
    /** --- F32 getPointX ---
     * get the point.points[0] from the point storage at index as Vector (String)
     * @return F32
@@ -828,25 +854,6 @@ class  ScriptGroup : public SimGroup {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
-class  PoDObject : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   TypePoint2F p2F;
-   /*!
-    */
-   TypePoint2I p2I;
-   /*!
-    */
-   TypeColor color;
-   /*!
-    */
-   TypeColorF colorF;
-};
 /*!
 @brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
 ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
@@ -863,6 +870,20 @@ new ScriptObject(Game)
 @ingroup Console
  */
 class  ScriptObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
+class  Object : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
+class  Group : public SimGroup {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
@@ -1753,6 +1774,123 @@ function Message::onRemove(%this)
     * Decrement the reference count for this message
     */
       function freeReference();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
+/*!
+@brief Provides access to a zip file.
+A ZipObject add, delete and extract files that are within a zip archive.  You may also read and write directly to the files within the archive by obtaining a StreamObject for the file.@tsexample
+// Open a zip archive, creating it if it doesn't exist
+%archive = new ZipObject();
+%archive.openArchive("testArchive.zip", Write);
+// Add a file to the archive with the given name
+%archive.addFile("./water.png", "water.png");
+// Close the archive to save the changes
+%archive.closeArchive();
+@endtsexample
+@note Behind the scenes all of the work is being done with the ZipArchive and StreamObject classes.
+@see StreamObject when using methods such as openFileForRead() and openFileForWrite()
+@ingroup FileSystem
+ */
+class  ZipObject : public SimObject {
+  public:
+   /** --- bool openArchive ---
+    * @brief Open a zip archive for manipulation.
+    * Once a zip archive is opened use the various ZipObject methods for working with the files within the archive.  Be sure to close the archive when you are done with it.
+    * @param filename The path and file name of the zip archive to open.
+    * @param accessMode One of read, write or readwrite
+    * @return True is the archive was successfully opened.
+    * @note If you wish to make any changes to the archive, be sure to open it with a write or readwrite access mode.
+    * @see closeArchive()
+    * @return bool
+    */
+      function openArchive( string filename, string accessMode="read" );
+   /** --- void closeArchive ---
+    * @brief Close an already opened zip archive.
+    * @see openArchive()
+    */
+      function closeArchive();
+   /** --- SimObject* openFileForRead ---
+    * @brief Open a file within the zip archive for reading.
+    * Be sure to close the file when you are done with it.
+    * @param filename The path and name of the file to open within the zip archive.
+    * @return A standard StreamObject is returned for working with the file.
+    * @note You must first open the zip archive before working with files within it.
+    * @see closeFile()
+    * @see openArchive()
+    * @return SimObject*
+    */
+      function openFileForRead( string filename );
+   /** --- SimObject* openFileForWrite ---
+    * @brief Open a file within the zip archive for writing to.
+    * Be sure to close the file when you are done with it.
+    * @param filename The path and name of the file to open within the zip archive.
+    * @return A standard StreamObject is returned for working with the file.
+    * @note You must first open the zip archive before working with files within it.
+    * @see closeFile()
+    * @see openArchive()
+    * @return SimObject*
+    */
+      function openFileForWrite( string filename );
+   /** --- void closeFile ---
+    * @brief Close a previously opened file within the zip archive.
+    * @param stream The StreamObject of a previously opened file within the zip archive.
+    * @see openFileForRead()
+    * @see openFileForWrite()
+    */
+      function closeFile( SimObject stream );
+   /** --- bool addFile ---
+    * @brief Add a file to the zip archive
+    * @param filename The path and name of the file to add to the zip archive.
+    * @param pathInZip The path and name to be given to the file within the zip archive.
+    * @param replace If a file already exists within the zip archive at the same location as this new file, this parameter indicates if it should be replaced.  By default, it will be replaced.
+    * @return True if the file was successfully added to the zip archive.
+    * @return bool
+    */
+      function addFile( string filename, string pathInZip, bool replace=true );
+   /** --- bool extractFile ---
+    * @brief Extact a file from the zip archive and save it to the requested location.
+    * @param pathInZip The path and name of the file to be extracted within the zip archive.
+    * @param filename The path and name to give the extracted file.
+    * @return True if the file was successfully extracted.
+    * @return bool
+    */
+      function extractFile( string pathInZip, string filename );
+   /** --- bool deleteFile ---
+    * @brief Deleted the given file from the zip archive
+    * @param pathInZip The path and name of the file to be deleted from the zip archive.
+    * @return True of the file was successfully deleted.
+    * @note Files that have been deleted from the archive will still show up with a getFileEntryCount() until you close the archive.  If you need to have the file count up to date with only valid files within the archive, you could close and then open the archive again.
+    * @see getFileEntryCount()
+    * @see closeArchive()
+    * @see openArchive()
+    * @return bool
+    */
+      function deleteFile( string pathInZip );
+   /** --- S32 getFileEntryCount ---
+    * @brief Get the number of files within the zip archive.
+    * Use getFileEntry() to retrive information on each file within the archive.
+    * @return The number of files within the zip archive.
+    * @note The returned count will include any files that have been deleted from the archive using deleteFile().  To clear out all deleted files, you could close and then open the archive again.
+    * @see getFileEntry()
+    * @see closeArchive()
+    * @see openArchive()
+    * @return S32
+    */
+      function getFileEntryCount();
+   /** --- String getFileEntry ---
+    * @brief Get information on the requested file within the zip archive.
+    * This methods provides five different pieces of information for the requested file:
+    * <ul><li>filename - The path and name of the file within the zip archive</li><li>uncompressed size</li><li>compressed size</li><li>compression method</li><li>CRC32</li></ul>
+    * Use getFileEntryCount() to obtain the total number of files within the archive.
+    * @param index The index of the file within the zip archive.  Use getFileEntryCount() to determine the number of files.
+    * @return A tab delimited list of information on the requested file, or an empty string if the file could not be found.
+    * @see getFileEntryCount()
+    * @return String
+    */
+      function getFileEntry( int index );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
@@ -3206,6 +3344,12 @@ namespace Global {
     * @return bool
     */
       function dumpEngineDocs( string outputFile );
+   /** --- void debugDumpAllObjects ---
+    * @brief Dumps all current EngineObject instances to the console.
+    * @note This function is only available in debug builds.
+    * @ingroup Debugging
+    */
+      function debugDumpAllObjects();
    /** --- const char* expandFilename ---
     * @brief Grabs the full path of a specified file
     * @param filename Name of the local file to locate
@@ -3291,6 +3435,13 @@ namespace Global {
     * @return bool
     */
       function isValidObjectName( string name );
+   /** --- void debugEnumInstances ---
+    * Call the given function for each instance of the given class.
+    * @param className Name of the class for which to enumerate instances.
+    * @param functionName Name of function to call and pass each instance of the given class.
+    * @note This function is only available in debug builds and primarily meant as an aid in debugging.@ingroup Console
+    */
+      function debugEnumInstances( string className, string functionName );
    /** --- ArrayObject* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
@@ -3359,30 +3510,6 @@ namespace Global {
     * @ingroup Strings
     */
       function dumpStringMemStats();
-   /** --- const char * getTemporaryDirectory ---
-    * @brief Returns the OS temporary directory, "C:/Users/Mich/AppData/Local/Temp" for example
-    * @note This can be useful to adhering to OS standards and practices, but not really used in Torque 3D right now.
-    * @note Be very careful when getting into OS level File I/O.@return String containing path to OS temp directory
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryDirectory();
-   /** --- const char * getTemporaryFileName ---
-    * @brief Creates a name and extension for a potential temporary file
-    * This does not create the actual file. It simply creates a random name for a file that does not exist.
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryFileName();
-   /** --- const char * getUserDataDirectory ---
-    * getUserDataDirectory()
-    * @return const char *
-    */
-      function getUserDataDirectory();
    /** --- const char * getUserHomeDirectory ---
     * getUserHomeDirectory()
     * @return const char *
@@ -3584,6 +3711,89 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
+   /** --- void Vec4Add ---
+    * v1 = v1 + v2
+    */
+      function Vec4Add( string varVec1, string varVec2 );
+   /** --- void Vec4Sub ---
+    * v1 = v1 - v2
+    */
+      function Vec4Sub( string varVec1, string varVec2 );
+   /** --- void Vec4Mul ---
+    * v1 = v1 * v2
+    */
+      function Vec4Mul( string varVec1, string varVec2 );
+   /** --- void Vec4Scale ---
+    * v1 = v1 * v2
+    */
+      function Vec4Scale( string varVec1, float scale );
+   /** --- void Vec4Div ---
+    * v1 = v1 / v2
+    */
+      function Vec4Div( string varVec1, string varVec2 );
+   /** --- F32 Vec2Distance ---
+    * distance of two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Distance( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Distance ---
+    * distance of two 3D points by variable ref 
+    * @return F32
+    */
+      function Vec3Distance( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Dot ---
+    * dot product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Dot( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Dot ---
+    * dot product two 3D points by variable ref 
+    * @return F32
+    */
+      function Vec3Dot( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Cross ---
+    * cross product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Cross( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Cross ---
+    * cross product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec3Cross( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Length ---
+    * length of a  3D point by variable ref 
+    * @return F32
+    */
+      function Vec2Length( string varPoint1 );
+   /** --- F32 Vec3Length ---
+    * length of a  3D point by variable ref 
+    * @return F32
+    */
+      function Vec3Length( string varPoint1 );
+   /** --- void Vec2Normalize ---
+    * Check Rect2 contains Rect1 by variable ref 
+    */
+      function Vec2Normalize( string varPoint );
+   /** --- void Vec3Normalize ---
+    * Check Rect2 contains Rect1 by variable ref 
+    */
+      function Vec3Normalize( string varPoint );
+   /** --- bool Vec4PointInRect ---
+    * Check a point is in rect by variable ref 
+    * @return bool
+    */
+      function Vec4PointInRect( string varPoint, string varRect );
+   /** --- bool Vec4Intersects ---
+    * Check a 2 rects intersects by variable ref 
+    * @return bool
+    */
+      function Vec4Intersects( string varRect1, string varRect2 );
+   /** --- bool Vec4Contains ---
+    * Check Rect2 contains Rect1 by variable ref 
+    * @return bool
+    */
+      function Vec4Contains( string varRect1, string varRect2 );
    /** --- void enableWinConsole ---
     * enableWinConsole(bool);
     */
@@ -3743,9 +3953,9 @@ namespace Global {
     * @return const char*
     */
       function SDL_GetCurrentDirectory();
-   /** --- const char* SDL_GetPrefPath ---
+   /** --- String SDL_GetPrefPath ---
     * Get the user-and-app-specific path where files can be written.
-    * @return const char*
+    * @return String
     */
       function SDL_GetPrefPath( string org, string app );
    /** --- void SDL_RENDERER_INIT ---
@@ -4108,8 +4318,6 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  START_DIV = 0.03125
-  PIXEL_SIZE = 4.0
   PIXELS_VERSION = "0.260818"
   MAX_BLOCK_SIZE = 48
   SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
@@ -4333,7 +4541,6 @@ namespace Global {
   SDL_SCANCODE_LANG3 = 146
   SDL_INIT_EVENTS = 16384
   SDL_SCANCODE_F18 = 109
-  STAR_COUNT = 420
   SDL_SCANCODE_BACKSLASH = 49
   SDL_SCANCODE_1 = 30
   SDL_PATHTYPE_OTHER = 3
@@ -4499,5 +4706,5 @@ namespace Global {
   SDL_SCANCODE_RIGHTBRACKET = 48
   SDL_KMOD_CAPS = 8192
   SDL_KMOD_SCROLL = 32768
---- End of Dump (391 items) ---
+--- End of Dump (388 items) ---
 */

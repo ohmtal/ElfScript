@@ -11,7 +11,6 @@ cmake_minimum_required(VERSION 3.24)
 project(CrazyElf)
 set(PROJECT_SRC
     src/main.cpp
-    src/pointObjects.cpp
 )
 
 set (ASSET_PATH ${CMAKE_CURRENT_LIST_DIR}/assets@assets)

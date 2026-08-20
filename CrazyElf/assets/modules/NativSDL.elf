@@ -111,23 +111,3 @@ function NativSDL::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
 
 
 
-// ------ PoD Test
-function p() {
-    if (isObject(pObj)) pObj.delete();
-    new PoDObject(pObj);
-    echo("pObj created");
-
-
-    echo("---------------- Point2F ");
-    pObj.p2F= { 5.1, 6.2};
-    echo("---------------- Point2I ");
-    pObj.p2I= { 200, 100};
-    echo("---------------- Color ");
-    pObj.color= { 200, 200, 200, 100};
-    echo("---------------- Color4F ");
-    pObj.colorF= { 1,1,1,1 };
-}
-// ---------------
-
-
-
