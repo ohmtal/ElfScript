@@ -149,7 +149,7 @@ namespace Platform
    /// for the current platform.
    // XXTH unused String localTimeToString( const LocalTime &lt );
    
-   // XXTH unused U64  getTime();
+   U64  getTime();
    // XXTH unused U64  getVirtualMilliseconds();
 
    /// Returns the milliseconds since the system was started.  You should

@@ -37,6 +37,16 @@ namespace Platform
   void process() { }
   void shutdown() { }
   //---------------------------------------------------------------------------
+  U64 getTime( void )
+  {
+    SDL_Time nanoSeconds;
+    if (SDL_GetCurrentTime(&nanoSeconds)) {
+      return (U32)(nanoSeconds / SDL_NS_PER_SECOND);
+    }
+    Con::warnf("%s failed!", __func__);
+    return 0;
+  }
+
   U64 getRealMilliseconds( void )
   {
     SDL_Time nanoSeconds;

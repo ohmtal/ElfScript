@@ -56,7 +56,7 @@ function Pupser::Update(%this, %dt) {
     if ( %this.node == 0)  {
         %this.node = Grid.getNode(%pos.x, %pos.y);
         %this.node.add(%this);
-    } else if ( !RectPointInRect( "%pos", "%nodeRect")) { // by reference
+    } else if ( !Vec4PointInRect( "%pos", "%nodeRect")) { // by reference
 
         %this.node.remove(%this);
         %this.node = Grid.getNode(%pos.x, %pos.y);

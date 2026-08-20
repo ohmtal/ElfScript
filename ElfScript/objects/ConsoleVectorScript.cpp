@@ -133,7 +133,7 @@ DefineEngineFunction(Vec3Normalize, void , (const char* varPoint),
 //               ---------------- RECT -------------------
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction(RectPointInRect, bool , (const char* varPoint, const char* varRect),
+DefineEngineFunction(Vec4PointInRect, bool , (const char* varPoint, const char* varRect),
                      ,"Check a point is in rect by variable ref ") {
 
     ConsoleVector v1 =  ElfScript::getLocalVector(varPoint);
@@ -141,7 +141,7 @@ DefineEngineFunction(RectPointInRect, bool , (const char* varPoint, const char* 
     return ElfMath::pointInRect(v1,v2);
 }
 
-DefineEngineFunction(RectIntersects, bool , (const char* varRect1, const char* varRect2),
+DefineEngineFunction(Vec4Intersects, bool , (const char* varRect1, const char* varRect2),
                      ,"Check a 2 rects intersects by variable ref ") {
 
     ConsoleVector v1 =  ElfScript::getLocalVector(varRect1);
@@ -149,7 +149,7 @@ DefineEngineFunction(RectIntersects, bool , (const char* varRect1, const char* v
     return ElfMath::intersects(v1,v2);
 }
 
-DefineEngineFunction(RectContains, bool , (const char* varRect1, const char* varRect2),
+DefineEngineFunction(Vec4Contains, bool , (const char* varRect1, const char* varRect2),
                      ,"Check Rect2 contains Rect1 by variable ref ") {
 
     ConsoleVector v1 =  ElfScript::getLocalVector(varRect1);
