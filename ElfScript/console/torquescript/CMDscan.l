@@ -246,8 +246,8 @@ HEXDIGIT [a-fA-F0-9]
 //                hope this is a good idea
 %}
 "in"        { CMDlval.i = MakeToken<int>(rwIN,               yylineno); return rwIN;               }
-" range "     { CMDlval.i = MakeToken<int>(rwRANGE,            yylineno); return rwRANGE;            }
-" step "      { CMDlval.i = MakeToken<int>(rwSTEP,             yylineno); return rwSTEP;             }
+"range"     { CMDlval.i = MakeToken<int>(rwRANGE,            yylineno); return rwRANGE;            }
+"step"      { CMDlval.i = MakeToken<int>(rwSTEP,             yylineno); return rwSTEP;             }
 
 "or"        { CMDlval.i = MakeToken<int>(rwCASEOR,           yylineno); return rwCASEOR;           }
 "break"     { CMDlval.i = MakeToken<int>(rwBREAK,            yylineno); return rwBREAK;            }
