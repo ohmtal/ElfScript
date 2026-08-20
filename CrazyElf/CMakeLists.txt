@@ -12,7 +12,6 @@ project(CrazyElf)
 set(PROJECT_SRC
     src/main.cpp
     src/pointObjects.cpp
-    src/myPlatformProcess.cc
 )
 
 set (ASSET_PATH ${CMAKE_CURRENT_LIST_DIR}/assets@assets)

@@ -107,8 +107,8 @@ void Journal::Record(const char * file)
    {
       Con::errorf("//---------------------------------------------//");            
       Con::errorf("Journal::Record() - Cannot record a journal after GuiCanvas or NetConnection creation!");            
-      Con::errorf("To record before canvas/netConnection creation, run %s with the following arguments: -jSave %s",
-         Platform::getExecutableName(), file);
+      // Con::errorf("To record before canvas/netConnection creation, run %s with the following arguments: -jSave %s",
+         // Platform::getExecutableName(), file);
       Con::errorf("//---------------------------------------------//");      
       return;
    }
@@ -137,8 +137,8 @@ void Journal::Play(const char * file)
    {
       Con::errorf("//---------------------------------------------//");            
       Con::errorf("Journal::Play() - Cannot playback a journal after GuiCanvas or NetConnection creation!");            
-      Con::errorf("To playback before canvas/netConnection creation, run %s with the following arguments: -jPlay %s",
-         Platform::getExecutableName(), file);
+      // Con::errorf("To playback before canvas/netConnection creation, run %s with the following arguments: -jPlay %s",
+      //    Platform::getExecutableName(), file);
       Con::errorf("//---------------------------------------------//");      
       return;
    }

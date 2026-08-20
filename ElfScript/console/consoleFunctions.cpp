@@ -2266,11 +2266,11 @@ DefineEngineFunction( quitWithErrorMessage, void, ( const char* message, S32 sta
 {
    Con::errorf( message );
    Platform::AlertOK( "Error", message );
-   
+
    // [rene 03/30/10] This was previously using forceShutdown which is a bad thing
    //    as the script code should not be allowed to pretty much hard-crash the engine
    //    and prevent proper shutdown.  Changed this to use postQuitMessage.
-   
+
    Platform::postQuitMessage( status );
 }
 

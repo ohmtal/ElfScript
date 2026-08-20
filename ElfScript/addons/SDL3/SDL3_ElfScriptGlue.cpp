@@ -104,6 +104,8 @@ namespace ElfSDL3 {
     "to match the mouse position to the scaled screen."
     ) {
 
+        if (ElfSDL3::shutDownRequested) return false;
+
         static U32 lastTicks = SDL_GetTicks();
 
         U32 msEllapsed = SDL_GetTicks() - lastTicks;

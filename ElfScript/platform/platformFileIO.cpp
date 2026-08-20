@@ -29,145 +29,147 @@
 
 //-----------------------------------------------------------------------------
 
-StringTableEntry Platform::getTemporaryDirectory()
-{
-   StringTableEntry path = osGetTemporaryDirectory();
-
-   if(! Platform::isDirectory(path))
-      path = Platform::getCurrentDirectory();
-
-   return path;
-}
-
-DefineEngineFunction( getTemporaryDirectory, const char *, (), ,
-				"@brief Returns the OS temporary directory, \"C:/Users/Mich/AppData/Local/Temp\" for example\n\n"
-				"@note This can be useful to adhering to OS standards and practices, "
-				"but not really used in Torque 3D right now.\n"
-				"@note Be very careful when getting into OS level File I/O."
-				"@return String containing path to OS temp directory\n"
-				"@note This is legacy function brought over from TGB, and does not appear "
-				"to have much use. Possibly deprecate?\n"
-				"@ingroup FileSystem\n"
-				"@internal")
-{
-   return Platform::getTemporaryDirectory();
-}
-
-StringTableEntry Platform::getTemporaryFileName()
-{
-   char buf[512];
-   StringTableEntry path = Platform::getTemporaryDirectory();
-
-   dSprintf(buf, sizeof(buf), "%s/tgb.%08x.%02x.tmp", path, Platform::getRealMilliseconds(), U32(Platform::getRandom() * 255));
-
-   // [tom, 9/7/2006] This shouldn't be needed, but just in case
-   if(Platform::isFile(buf))
-      return Platform::getTemporaryFileName();
-
-   return StringTable->insert(buf);
-}
-
-DefineEngineFunction( getTemporaryFileName, const char *, (), ,
-				"@brief Creates a name and extension for a potential temporary file\n\n"
-				"This does not create the actual file. It simply creates a random name "
-				"for a file that does not exist.\n\n"
-				"@note This is legacy function brought over from TGB, and does not appear "
-				"to have much use. Possibly deprecate?\n"
-				"@ingroup FileSystem\n"
-				"@internal")
-{
-   return Platform::getTemporaryFileName();
-}
-
-//-----------------------------------------------------------------------------
-static char filePathBuffer[1024];
-static bool deleteDirectoryRecusrive(const char* pPath)
-{
-   // Sanity!
-   AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
-
-   // Find directories.
-   Vector<StringTableEntry> directories;
-   if (!Platform::dumpDirectories(pPath, directories, 0))
-   {
-      // Warn.
-      Con::warnf("Could not retrieve sub-directories of '%s'.", pPath);
-      return false;
-   }
-
-   // Iterate directories.
-   for (Vector<StringTableEntry>::iterator basePathItr = directories.begin(); basePathItr != directories.end(); ++basePathItr)
-   {
-      // Fetch base path.
-      StringTableEntry basePath = *basePathItr;
-
-      // Skip if the base path.
-      if (basePathItr == directories.begin() && String::compare(pPath, basePath) == 0)
-         continue;
-
-      // Delete any directories recursively.
-      if (!deleteDirectoryRecusrive(basePath))
-         return false;
-   }
-
-   // Find files.
-   Vector<Platform::FileInfo> files;
-   if (!Platform::dumpPath(pPath, files, 0))
-   {
-      // Warn.
-      Con::warnf("Could not retrieve files for directory '%s'.", pPath);
-      return false;
-   }
-
-   // Iterate files.
-   for (Vector<Platform::FileInfo>::iterator fileItr = files.begin(); fileItr != files.end(); ++fileItr)
-   {
-      // Format file.
-      dSprintf(filePathBuffer, sizeof(filePathBuffer), "%s/%s", fileItr->pFullPath, fileItr->pFileName);
-
-      // Delete file.
-      if (!Platform::fileDelete(filePathBuffer))
-      {
-         // Warn.
-         Con::warnf("Could not delete file '%s'.", filePathBuffer);
-         return false;
-      }
-   }
-
-   // Delete the directory.
-   if (!Platform::fileDelete(pPath))
-   {
-      // Warn.
-      Con::warnf("Could not delete directory '%s'.", pPath);
-      return false;
-   }
-
-   return true;
-}
+// // StringTableEntry Platform::getTemporaryDirectory()
+// // {
+// //    StringTableEntry path = osGetTemporaryDirectory();
+// //
+// //    if(! Platform::isDirectory(path))
+// //       path = Platform::getCurrentDirectory();
+// //
+// //    return path;
+// // }
+// //
+// // DefineEngineFunction( getTemporaryDirectory, const char *, (), ,
+// // 				"@brief Returns the OS temporary directory, \"C:/Users/Mich/AppData/Local/Temp\" for example\n\n"
+// // 				"@note This can be useful to adhering to OS standards and practices, "
+// // 				"but not really used in Torque 3D right now.\n"
+// // 				"@note Be very careful when getting into OS level File I/O."
+// // 				"@return String containing path to OS temp directory\n"
+// // 				"@note This is legacy function brought over from TGB, and does not appear "
+// // 				"to have much use. Possibly deprecate?\n"
+// // 				"@ingroup FileSystem\n"
+// // 				"@internal")
+// // {
+// //    return Platform::getTemporaryDirectory();
+// // }
+// //
+// // StringTableEntry Platform::getTemporaryFileName()
+// // {
+// //    char buf[512];
+// //    StringTableEntry path = Platform::getTemporaryDirectory();
+// //
+// //    dSprintf(buf, sizeof(buf), "%s/tgb.%08x.%02x.tmp", path, Platform::getRealMilliseconds(), U32(Platform::getRandom() * 255));
+// //
+// //    // [tom, 9/7/2006] This shouldn't be needed, but just in case
+// //    if(Platform::isFile(buf))
+// //       return Platform::getTemporaryFileName();
+// //
+// //    return StringTable->insert(buf);
+// // }
+// //
+// // DefineEngineFunction( getTemporaryFileName, const char *, (), ,
+// // 				"@brief Creates a name and extension for a potential temporary file\n\n"
+// // 				"This does not create the actual file. It simply creates a random name "
+// // 				"for a file that does not exist.\n\n"
+// // 				"@note This is legacy function brought over from TGB, and does not appear "
+// // 				"to have much use. Possibly deprecate?\n"
+// // 				"@ingroup FileSystem\n"
+// // 				"@internal")
+// // {
+// //    return Platform::getTemporaryFileName();
+// // }
 
 //-----------------------------------------------------------------------------
+//XXTH unused static char filePathBuffer[1024];
 
-bool Platform::deleteDirectory(const char* pPath)
-{
-      return false; //XXTH
-   // // Sanity!
-   // AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
-   //
-   // // Is the path a file?
-   // if (Platform::isFile(pPath))
-   // {
-   //    // Yes, so warn.
-   //    Con::warnf("Cannot delete directory '%s' as it specifies a file.", pPath);
-   //    return false;
-   // }
-   //
-   // // Expand module location.
-   // char pathBuffer[1024];
-   // Con::expandPath(pathBuffer, sizeof(pathBuffer), pPath, NULL, true);
-   //
-   // // Delete directory recursively.
-   // return deleteDirectoryRecusrive(pathBuffer);
-}
+//XXTH unused !
+// // static bool deleteDirectoryRecusrive(const char* pPath)
+// // {
+// //    // Sanity!
+// //    AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
+// //
+// //    // Find directories.
+// //    Vector<StringTableEntry> directories;
+// //    if (!Platform::dumpDirectories(pPath, directories, 0))
+// //    {
+// //       // Warn.
+// //       Con::warnf("Could not retrieve sub-directories of '%s'.", pPath);
+// //       return false;
+// //    }
+// //
+// //    // Iterate directories.
+// //    for (Vector<StringTableEntry>::iterator basePathItr = directories.begin(); basePathItr != directories.end(); ++basePathItr)
+// //    {
+// //       // Fetch base path.
+// //       StringTableEntry basePath = *basePathItr;
+// //
+// //       // Skip if the base path.
+// //       if (basePathItr == directories.begin() && String::compare(pPath, basePath) == 0)
+// //          continue;
+// //
+// //       // Delete any directories recursively.
+// //       if (!deleteDirectoryRecusrive(basePath))
+// //          return false;
+// //    }
+// //
+// //    // Find files.
+// //    Vector<Platform::FileInfo> files;
+// //    if (!Platform::dumpPath(pPath, files, 0))
+// //    {
+// //       // Warn.
+// //       Con::warnf("Could not retrieve files for directory '%s'.", pPath);
+// //       return false;
+// //    }
+// //
+// //    // Iterate files.
+// //    for (Vector<Platform::FileInfo>::iterator fileItr = files.begin(); fileItr != files.end(); ++fileItr)
+// //    {
+// //       // Format file.
+// //       dSprintf(filePathBuffer, sizeof(filePathBuffer), "%s/%s", fileItr->pFullPath, fileItr->pFileName);
+// //
+// //       // Delete file.
+// //       if (!Platform::fileDelete(filePathBuffer))
+// //       {
+// //          // Warn.
+// //          Con::warnf("Could not delete file '%s'.", filePathBuffer);
+// //          return false;
+// //       }
+// //    }
+// //
+// //    // Delete the directory.
+// //    if (!Platform::fileDelete(pPath))
+// //    {
+// //       // Warn.
+// //       Con::warnf("Could not delete directory '%s'.", pPath);
+// //       return false;
+// //    }
+// //
+// //    return true;
+// // }
+
+//-----------------------------------------------------------------------------
+
+// // bool Platform::deleteDirectory(const char* pPath)
+// // {
+// //       return false; //XXTH
+// //    // // Sanity!
+// //    // AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
+// //    //
+// //    // // Is the path a file?
+// //    // if (Platform::isFile(pPath))
+// //    // {
+// //    //    // Yes, so warn.
+// //    //    Con::warnf("Cannot delete directory '%s' as it specifies a file.", pPath);
+// //    //    return false;
+// //    // }
+// //    //
+// //    // // Expand module location.
+// //    // char pathBuffer[1024];
+// //    // Con::expandPath(pathBuffer, sizeof(pathBuffer), pPath, NULL, true);
+// //    //
+// //    // // Delete directory recursively.
+// //    // return deleteDirectoryRecusrive(pathBuffer);
+// // }
 
 //-----------------------------------------------------------------------------
 
@@ -626,10 +628,10 @@ StringTableEntry Platform::getPrefsPath(const char *file /* = NULL */)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( getUserDataDirectory, const char *, (), , "getUserDataDirectory()")
-{
-   return Platform::getUserDataDirectory();
-}
+// // DefineEngineFunction( getUserDataDirectory, const char *, (), , "getUserDataDirectory()")
+// // {
+// //    return Platform::getUserDataDirectory();
+// // }
 
 DefineEngineFunction( getUserHomeDirectory, const char *, (), , "getUserHomeDirectory()")
 {

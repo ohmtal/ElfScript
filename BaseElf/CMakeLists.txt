@@ -98,6 +98,7 @@ else()
  set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)
 
  include(${ELF_CMAKE})
+ include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
 
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
@@ -107,10 +108,10 @@ else()
   # ImGui Bindings
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/ImGui/bindings_imgui.cpp)
   # SDL3Elf
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
-  list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
+  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
 endif()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 
@@ -119,8 +120,10 @@ endif()
 add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
+    ${SDL3_ELFSCRIPT_SRC}
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE
+  ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC
   IMGUI_DEFINE_MATH_OPERATORS
 )
 

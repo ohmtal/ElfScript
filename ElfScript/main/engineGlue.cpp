@@ -201,6 +201,7 @@ namespace engineGlue
     // -----------------------------------------------------------------------------
     // SimTime U32 ms since last Loop
     void process(SimTime delta) {
+        Platform::process();
         Sim::advanceTime(delta);
         ITickable::advanceTime(delta);
         ConsoleValue::resetConversionBuffer();

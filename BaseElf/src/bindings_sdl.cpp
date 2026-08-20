@@ -1502,9 +1502,10 @@ DefineEngineFunction(getFrameTime, F32,(),, "get the current frame time in secon
     return (F32) BaseFlux::getFrameTime();
 }
 
-DefineEngineFunction(SDL_GetTicks, U64, (),, "Ticks from SDL") {
-    return SDL_GetTicks();
-}
+// in SDL3_core.cpp
+// // DefineEngineFunction(SDL_GetTicks, U64, (),, "Ticks from SDL") {
+// //     return SDL_GetTicks();
+// // }
 
 
 DefineEngineFunction(getRealTime, S32, (),, "get current time from script engine") {

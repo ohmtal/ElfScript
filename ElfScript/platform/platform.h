@@ -147,74 +147,74 @@ namespace Platform
    
    /// Converts the local time to a formatted string appropriate
    /// for the current platform.
-   String localTimeToString( const LocalTime &lt );
+   // XXTH unused String localTimeToString( const LocalTime &lt );
    
-   U64  getTime();
-   U64  getVirtualMilliseconds();
+   // XXTH unused U64  getTime();
+   // XXTH unused U64  getVirtualMilliseconds();
 
    /// Returns the milliseconds since the system was started.  You should
    /// not depend on this for high precision timing.
    /// @see PlatformTimer
    U64 getRealMilliseconds();
 
-   void advanceTime(U32 delta);
-   S32 getBackgroundSleepTime();
+   // XXTH unused void advanceTime(U32 delta);
+   // XXTH unused S32 getBackgroundSleepTime();
 
    // Platform control
    void init();
-   void initConsole();
+   // XXTH unused void initConsole();
    void shutdown();
    void process();
 
    // Math control state
-   U32 getMathControlState();
-   void setMathControlState(U32 state);
-   void setMathControlStateKnown();
+   // XXTH unused U32 getMathControlState();
+   // XXTH unused void setMathControlState(U32 state);
+   // XXTH unused void setMathControlStateKnown();
    
    // Process control
    void sleep(U32 ms);
-   bool excludeOtherInstances(const char *string);
-   bool checkOtherInstances(const char *string);
-   void restartInstance();
+   // XXTH unused bool excludeOtherInstances(const char *string);
+   // XXTH unused bool checkOtherInstances(const char *string);
+   // XXTH unused void restartInstance();
    void postQuitMessage(const S32 in_quitVal);
    void forceShutdown(S32 returnValue);
 
    // Debug
-   void outputDebugString(const char *string, ...);
+   // XXTH unused void outputDebugString(const char *string, ...);
    void debugBreak();
    
    // Random
    F32 getRandom();
    
    // Window state
-   void setWindowLocked(bool locked);
-   void minimizeWindow();
+   // XXTH unused void setWindowLocked(bool locked);
+   // XXTH unused void minimizeWindow();
    //const Point2I &getWindowSize();
-   void setWindowSize( U32 newWidth, U32 newHeight, bool fullScreen );
-   void closeWindow();
+   // XXTH unused void setWindowSize( U32 newWidth, U32 newHeight, bool fullScreen );
+   // XXTH unused void closeWindow();
 
    // File stuff
-   bool doCDCheck();
-   StringTableEntry createPlatformFriendlyFilename(const char *filename);
+   // XXTH unused bool doCDCheck();
+   // XXTH unused StringTableEntry createPlatformFriendlyFilename(const char *filename);
    struct FileInfo
    {
       const char* pFullPath;
       const char* pFileName;
       U32 fileSize;
    };
-   bool cdFileExists(const char *filePath, const char *volumeName, S32 serialNum);
-   void fileToLocalTime(const FileTime &ft, LocalTime *lt);
+   // XXTH unused bool cdFileExists(const char *filePath, const char *volumeName, S32 serialNum);
+   // XXTH unused void fileToLocalTime(const FileTime &ft, LocalTime *lt);
    /// compare file times returns < 0 if a is earlier than b, >0 if b is earlier than a
-   S32 compareFileTimes(const FileTime &a, const FileTime &b);
-   bool stringToFileTime(const char * string, FileTime * time);
-   bool fileTimeToString(FileTime * time, char * string, U32 strLen);
+   // XXTH unused S32 compareFileTimes(const FileTime &a, const FileTime &b);
+   // XXTH unused bool stringToFileTime(const char * string, FileTime * time);
+   // XXTH unused bool fileTimeToString(FileTime * time, char * string, U32 strLen);
 
    /// Compares the last modified time between two file paths.  Returns < 0 if
    /// the first file is earlier than the second, > 0 if the second file is earlier
    /// than the first, and 0 if the files are equal.
    ///
    /// If either of the files doesn't exist it returns -1.
-   S32 compareModifiedTimes( const char *firstPath, const char *secondPath );
+   // XXTH unused S32 compareModifiedTimes( const char *firstPath, const char *secondPath );
 
    // Directory functions.  Dump path returns false iff the directory cannot be
    //  opened.
@@ -222,13 +222,13 @@ namespace Platform
    StringTableEntry getCurrentDirectory();
    bool             setCurrentDirectory(StringTableEntry newDir);
 
-   StringTableEntry getTemporaryDirectory();
-   StringTableEntry getTemporaryFileName();
+    // XXTH unusedStringTableEntry getTemporaryDirectory();
+   // XXTH unused StringTableEntry getTemporaryFileName();
 
    /// Returns the filename of the torque executable.
    /// On Win32, this is the .exe file.
    /// On Mac, this is the .app/ directory bundle.
-   StringTableEntry getExecutableName();
+   // XXTH unused StringTableEntry getExecutableName();
    /// Returns full pathname of the torque executable without filename
    StringTableEntry getExecutablePath();
    
@@ -249,24 +249,24 @@ namespace Platform
 
    String stripExtension( String fileName, Vector< String >& validExtensions );
 
-   bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth = -1);
-   bool dumpDirectories( const char *path, Vector<StringTableEntry> &directoryVector, S32 depth = 0, bool noBasePath = false );
-   bool hasSubDirectory( const char *pPath );
-   bool getFileTimes(const char *filePath, FileTime *createTime, FileTime *modifyTime);
+   // XXTH unused bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth = -1);
+   // XXTH unused bool dumpDirectories( const char *path, Vector<StringTableEntry> &directoryVector, S32 depth = 0, bool noBasePath = false );
+   // XXTH unused bool hasSubDirectory( const char *pPath );
+   // XXTH unused bool getFileTimes(const char *filePath, FileTime *createTime, FileTime *modifyTime);
    bool isFile(const char *pFilePath);
-   S32  getFileSize(const char *pFilePath);
-   bool isDirectory(const char *pDirPath);
-   bool isSubDirectory(const char *pParent, const char *pDir);
+   // XXTH unused  S32  getFileSize(const char *pFilePath);
+   // XXTH unused bool isDirectory(const char *pDirPath);
+   // XXTH unused bool isSubDirectory(const char *pParent, const char *pDir);
 
    void addExcludedDirectory(const char *pDir);
    void clearExcludedDirectories();
    bool isExcludedDirectory(const char *pDir);
 
-   bool deleteDirectory(const char* pPath);
-   bool fileDelete(const char *name);
+   // XXTH unused bool deleteDirectory(const char* pPath);
+   // XXTH unused bool fileDelete(const char *name);
 
    /// Given a directory path, create all necessary directories for that path to exist.
-   bool createPath(const char *path); // create a directory path
+   // XXTH unused bool createPath(const char *path); // create a directory path
 
    // Alerts
    void AlertOK(const char *windowTitle, const char *message);
@@ -287,8 +287,8 @@ namespace Platform
    extern struct VolumeInformation  *PVolumeInformation;
 
    // Volume functions.
-   void getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bOnlyFixedDrives = false );
-   void getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeInfoVector, bool bOnlyFixedDrives = false );
+   // XXTH unused void getVolumeNamesList( Vector<const char*>& out_rNameVector, bool bOnlyFixedDrives = false );
+   // XXTH unused void getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeInfoVector, bool bOnlyFixedDrives = false );
 
    struct SystemInfo_struct
    {
@@ -308,29 +308,29 @@ namespace Platform
    extern SystemInfo_struct  SystemInfo;
 
    // Web page launch function:
-   bool openWebBrowser( const char* webAddress );
+   // XXTH unused bool openWebBrowser( const char* webAddress );
 
    // display Splash Window
-   bool displaySplashWindow( String path );
+   // XXTH unused bool displaySplashWindow( String path );
 
    // close Splash Window
-   bool closeSplashWindow();
+   // XXTH unused bool closeSplashWindow();
 
-   void openFolder( const char* path );
+   // XXTH unused void openFolder( const char* path );
 
    // Open file at the OS level, according to registered file-types.
-   void openFile( const char* path );
+  // XXTH unused  void openFile( const char* path );
 
-   const char* getLoginPassword();
-   bool setLoginPassword( const char* password );
+   // XXTH unused const char* getLoginPassword();
+   // XXTH unused bool setLoginPassword( const char* password );
 
    const char* getClipboard();
    bool setClipboard(const char *text);
 
    // User Specific Functions
    StringTableEntry getUserHomeDirectory();
-   StringTableEntry getUserDataDirectory();
-   bool getUserIsAdministrator();
+   // XXTH unused StringTableEntry getUserDataDirectory();
+   // XXTH unused bool getUserIsAdministrator();
    
    // Displays a fancy platform specific message box
    // S32 messageBox(const UTF8 *title, const UTF8 *message, MBButtons buttons = MBOkCancel, MBIcons icon = MIInformation);
@@ -363,18 +363,18 @@ namespace Platform
    };
 
    /// Reset the keyboard input exclusion list.
-   void clearKeyboardInputExclusion();
+  // XXTH unused  void clearKeyboardInputExclusion();
    
    /// Add a new keyboard exclusion.
-   void addKeyboardInputExclusion(const KeyboardInputExclusion &kie);
+   // XXTH unused void addKeyboardInputExclusion(const KeyboardInputExclusion &kie);
 
    /// Check if a given input event should be excluded.
-   const bool checkKeyboardInputExclusion(const InputEventInfo *info);
+   // XXTH unused const bool checkKeyboardInputExclusion(const InputEventInfo *info);
 	
    
    /// Set/Get whether this is a web deployment 
-	bool getWebDeployment();
-   void setWebDeployment(bool v);
+	// XXTH unused bool getWebDeployment();
+  // XXTH unused  void setWebDeployment(bool v);
    
 };
 
@@ -547,7 +547,7 @@ extern S32 dFileRead(FILE_HANDLE handle, U32 bytes, char *dst, DFILE_STATUS &err
 extern S32 dFileWrite(FILE_HANDLE handle, U32 bytes, const char *dst, DFILE_STATUS &error);
 extern void dFileClose(FILE_HANDLE handle);
 
-extern StringTableEntry osGetTemporaryDirectory();
+//XXTH unused extern StringTableEntry osGetTemporaryDirectory();
 
 //------------------------------------------------------------------------------
 struct Math

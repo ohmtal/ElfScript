@@ -106,7 +106,7 @@ function BaseDemo::Render(%this) {
         BeginBlendMode();
         DrawRect(%x, %y - 5, %borders.x - 2 * %x, 20, "20 20 20 80");
         EndBlendMode();
-        DrawRect(%x, %y - 5, %borders.x - 2 * %x, 20, "%addY0 %addY0 %addY0", false);
+        DrawRect(%x, %y - 5, %borders.x - 2 * %x, 20, "155 155 155 255", false);
         %y+= %addY;DrawText(%x,%y,"[X] Texture rotate", %fontScale, GREEN, true, SLATEGRAY);
         %y+= %addY;DrawText(%x,%y,"[X] atlas font script", %fontScale, GREEN, true, SLATEGRAY);
         // %y+= %addY;DrawText(%x,%y,"[ ] add source editor with example", %fontScale, DARKGRAY, true, SLATEGRAY);
