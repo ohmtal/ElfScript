@@ -404,7 +404,8 @@ void SimObject::writeFields(Stream &stream, U32 tabStop)
       mFieldDictionary->writeFields(this, stream, tabStop);
 
    // Cleanup our created default object
-   delete defaultConObject;
+   // MEMleak ==>  delete defaultConObject;
+   defaultConObject->destroySelf();
 }
 
 //-----------------------------------------------------------------------------

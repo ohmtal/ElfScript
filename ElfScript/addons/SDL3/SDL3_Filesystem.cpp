@@ -134,9 +134,15 @@ DefineEngineFunction(SDL_GetCurrentDirectory, const char* , () ,,
                      "Get what the system believes is the current working directory.") {
     return SDL_GetCurrentDirectory();
 }
-DefineEngineFunction(SDL_GetPrefPath,  const char* , (const char* org, const char* app) ,,
+DefineEngineFunction(SDL_GetPrefPath,  String , (const char* org, const char* app) ,,
                      "Get the user-and-app-specific path where files can be written."){
-    return SDL_GetPrefPath(org, app);
+    static String resultPath = "";
+    char* rawPath = SDL_GetPrefPath(org, app);
+    if (!rawPath) return "";
+    resultPath = rawPath;
+    SDL_free(rawPath);
+
+    return resultPath;
 }
 
 
