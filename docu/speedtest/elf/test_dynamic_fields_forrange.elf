@@ -7,26 +7,26 @@
 
 // %sto.DynX = 0;
 for (%j in range  JLOOPS) {
-    for (%j in range ILOOPS) {
+    for (%i in range ILOOPS) {
         %sto.DynX ++;
     }
     echo("SUM (++) IS:" SPC %sto.DynX);
     // varDumpField("%sto.DynX");
-    for (%j in range  ILOOPS) {
+    for (%i in range  ILOOPS) {
         %sto.DynX --;
     }
     echo("SUM (--) IS:" SPC %sto.DynX);
     // varDumpField("%sto.DynX");
     %sto.DynX = 66.0;
     echo("set Sum to 66 == " SPC %sto.DynX * 1);
-    for (%j in range  ILOOPS) {
+    for (%i in range  ILOOPS) {
         %sto.DynX *= %i + 1;
         %sto.DynX /= %i + 1;
     }
     echo("SUM (*/ %i+1) IS:" SPC %sto.DynX);
     // varDumpField("%sto.DynX");
     %ran = 0.0;
-    for (%j in range  ILOOPS / 2) {
+    for (%i in range  ILOOPS / 2) {
         %ran = getRandomF(%i);
         %sto.DynX -= %ran;
         %sto.DynX += %ran;
