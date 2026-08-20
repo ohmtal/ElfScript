@@ -61,7 +61,7 @@ function StarField::OnAdd(%this) {
     }
 
 
-    setWindowSize(800,450);
+    // // setWindowSize(800,450);
     // SetTargetFPS(0);
     setVSync(0);
 
