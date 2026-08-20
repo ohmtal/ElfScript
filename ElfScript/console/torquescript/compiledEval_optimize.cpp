@@ -2090,7 +2090,10 @@ handle_OP_LOADVAR_STR:
                   static S32 valueType = 0;
                   valueType = varEntry->value.getType();
                   fastPath =  valueType == ConsoleValueType::cvFloat ||
-                  valueType == ConsoleValueType::cvInteger;
+#ifdef ENABLE_CONSOLE_VECTOR
+                              valueType == ConsoleValueType::cvVector ||
+#endif
+                              valueType == ConsoleValueType::cvInteger;
             }
             if (fastPath)
             {

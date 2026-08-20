@@ -1,0 +1,41 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+$myVec = { 0.0, 0.0 };
+vardump("$myVec");
+
+for (%j in range  JLOOPS) {
+    for (%i in range ILOOPS) {
+        $myVec.x ++;
+    }
+    echo("SUM (++) IS:" SPC $myVec.x);
+    // varDumpField("$myVec.x");
+    for (%i in range  ILOOPS) {
+        $myVec.x --;
+    }
+    echo("SUM (--) IS:" SPC $myVec.x);
+    // varDumpField("$myVec.x");
+    $myVec.x = 66.0;
+    echo("set Sum to 66 == " SPC $myVec.x * 1);
+    for (%i in range  ILOOPS) {
+        $myVec.x *= %i + 1;
+        $myVec.x /= %i + 1;
+    }
+    echo("SUM (*/ %i+1) IS:" SPC $myVec.x);
+    // varDumpField("$myVec.x");
+    %ran = 0.0;
+    for (%i in range  ILOOPS / 2) {
+        %ran = getRandomF(%i);
+        $myVec.x -= %ran;
+        $myVec.x += %ran;
+    }
+    vardump("%ran");
+    echo("SUM (rand +-) IS:" SPC $myVec.x);
+    // varDumpField("$myVec.x");
+}
+$myVec.x -= 66.0 ;
+echo("---------------------");
+echo("---------------------");
+echo("Final sum should be 0 == ", $myVec.x);
+echo("---------------------");
+echo("---------------------");

@@ -240,11 +240,10 @@ varDumpField("sto.dynX");
 %sto = sto.getId(); varDumpField("%sto.dynX");
 $sto = sto.getId(); varDumpField("$sto.dynX");
 echo("------");
-// $Debug::DumpByteCode=1;
 
-function sto::step(%this, %value) {
-    echo("STEP VALUE" SPC %value);
-}
-sto.step(5);
+
+$Debug::DumpByteCode=1;
+getRandomf(1.0);
+
 
 

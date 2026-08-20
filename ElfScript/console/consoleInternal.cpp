@@ -725,7 +725,6 @@ Namespace::~Namespace()
       mCleanUpUsage = false;
    }
 
-   //XXTH TEST: ASan:
    Entry *walk = mEntryList;
    while(walk)
    {

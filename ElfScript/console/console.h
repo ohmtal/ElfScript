@@ -382,7 +382,6 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
-         // XXTH_TEST !! cause memleak here ?
          cleanupData();
          type =  ConsoleValueType::cvVector;
          v = vec;
@@ -393,7 +392,6 @@ public:
       cleanupData();
       type = ConsoleValueType::cvFloat;
       f = val;
-      // bufferLen is already 0 after cleanupData — correct for non-string types
    }
 
    TORQUE_FORCEINLINE void setInt(S64 val)
