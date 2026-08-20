@@ -4,9 +4,62 @@
 
 Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 
-Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
+
+
+## Folder: ElfScript
+
+The current codebase i use with the latest changes and fixes. 
+Like the stuff in the TorqueScript folder but more cleanup unused Files and
+Functions. 
+
+- [ElfScript](./ElfScript/)
+
+## Folder: BaseElf
+![ScreenShots](./BaseElf/ScreenShotsCombined.png)
+
+Located in Folder [BaseElf](./BaseElf): 
+
+A neat basic Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as 
+base for SDL3/ImGui/ResourceManager and ElfScript. It's also an enhanced example 
+how to embed ElfScript.
+
+This is a nice place to learn ElfScript (aka TorqueScipt ). 
+
+## Folder: CrazyElf
+
+A neat SDL3-ElfScript implemtation based on my [SDL3 addon](./ElfScript/addons/SDL3/). 
+SDL3 Bindings are close to the C function calls except Audio is wrapped and PollEvents is in C++ Code only.
+
+Located in Folder [CrazyElf](./CrazyElf): 
+
+
+## Folder: obsolete 
+
+- TorqueScript : My first working Version. I will not change this anymore. I work on the code in the ElfScript folder.
+- experimental : Unfinished non functional attempt to make it much smaller. 
+
+## Example / TestBed Application using OhmFlux:
+
+- ~~added math (using also Ohmflux functions)~~
+- added Platform functions (not complete)
+- added some classes to test Sprite/Texture/Label/Font/Audio instance ....
+
+[Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
+
+## Raylib Bindings (raylib-elfscript):
+
+- Using the raylib commands but in three Main-Callbacks:
+    - function MainInit() { return true;}
+    - function MainUpdate() {}
+    - function MainShutDown() {}
+
+[raylib-elfscript](https://github.com/ohmtal/raylib-elfscript)
+
 
 ## Notable changes:
+
+Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
+
 - 🚀 **ElfScript:** Foreach for integers: `foreach(%i in 1..3)` iterate from 1 to 3 (including the 1 and the 3 like pascal `for 1 to 3`), also added `foreach(%i in range 1..3)` iterate from 1..2. Also added same as for. [Operators](https://github.com/ohmtal/ElfScript/blob/main/handbook/Operators.md)
 - 🚀 **ElfScript:** Byte Code handling replaced the for/case monster in compiledEval with direct threading.
 - 🚀 **ElfScript:** Dynamic Fields can be int, float or string which give a very good performace boost. Also if you setup them with TypeF32 for example. The type is really set to float and not only cosmetic. 
@@ -32,6 +85,37 @@ Based on the Torque3D (4.x) source code this is my version of TorqueScript witho
 - Fixed Emscripten and Android Build  (Android problem: file loading does not work in apk - i added overwrite exec - example in OhmFlux/ElfTest)
 - Replaced Math with Light Version (based on Torque2D) since the Types like Point3F are removed
 - Since i also removed nearly all platform code - network is not implemented, because i need to add threading/mutex again in order to get it working. 
+
+
+
+## Windows 
+Just tested BaseElf on Windows. All Projects using ElfScript needs:
+
+```
+# Windows - winVolume :: need to set on all builds 
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE "/Zc:wchar_t-")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+        NOMINMAX 
+        UNICODE 
+        _UNICODE
+    )
+endif()
+```
+
+And if you want the binary in the base directory:
+
+```
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+
+    # -- for windows: 
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+```
+
+## Syntax examples:
 
 ```
 // Hello World example:
@@ -61,77 +145,7 @@ echo(Tom.playerName);  // since i renamed it with .name= Foo is gone and Tom is 
 $fooObj.dumpFields(); //list all fields of the object
 $fooObj.dump(); //list all fields and methods of the object 
 ```
-Since ElfScript is based on TorqueScript you can also read this [Documentation](http://wiki.torque3d.org/wiki:_scripter-start)
 
-
-## Folder: ElfScript
-
-The current codebase i use with the latest changes and fixes. 
-Like the stuff in the TorqueScript folder but more cleanup unused Files and
-Functions. 
-
-- [ElfScript](./ElfScript/)
-
-## Folder: BaseElf
-![ScreenShots](./BaseElf/ScreenShotsCombined.png)
-
-Located in Folder [BaseElf](./BaseElf): 
-
-A neat basic Game Engine using [BaseFlux](https://github.com/ohmtal/BaseFlux/) as 
-base for SDL3/ImGui/ResourceManager and ElfScript. It's also an enhanced example 
-how to embed ElfScript.
-
-This is a nice place to learn ElfScript (aka TorqueScipt ). 
-
-## Folder: obsolete 
-
-- TorqueScript : My first working Version. I will not change this anymore. I work on the code in the ElfScript folder.
-- experimental : Unfinished non functional attempt to make it much smaller. 
-
-## Example / TestBed Application using OhmFlux:
-
-- ~~added math (using also Ohmflux functions)~~
-- added Platform functions (not complete)
-- added some classes to test Sprite/Texture/Label/Font/Audio instance ....
-
-[Ohmflux ElfTest](https://github.com/ohmtal/OhmFlux/tree/main/ElfTest)
-
-## Raylib Bindings (raylib-elfscript):
-
-- Using the raylib commands but in three Main-Callbacks:
-    - function MainInit() { return true;}
-    - function MainUpdate() {}
-    - function MainShutDown() {}
-
-[raylib-elfscript](https://github.com/ohmtal/raylib-elfscript)
-
-
-## FIXME Windows 
-Just tested BaseElf on Windows. All Projects using ElfScript needs:
-
-```
-# Windows - winVolume :: need to set on all builds 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE "/Zc:wchar_t-")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE 
-        NOMINMAX 
-        UNICODE 
-        _UNICODE
-    )
-endif()
-```
-
-And if you want the binary in the base directory:
-
-```
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-
-    # -- for windows: 
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}"
-)
-```
 
 ## Script related links
 
