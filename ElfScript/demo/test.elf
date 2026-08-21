@@ -241,9 +241,8 @@ varDumpField("sto.dynX");
 $sto = sto.getId(); varDumpField("$sto.dynX");
 echo("------");
 
-
 $Debug::DumpByteCode=1;
-getRandomf(1.0);
+
 
 
 

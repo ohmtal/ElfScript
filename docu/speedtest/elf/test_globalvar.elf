@@ -3,7 +3,7 @@
 
 // new PointStorageObject(sto);
 
-$globalX = 0;
+$globalX = 0.0;
 for (%j = 0; %j < JLOOPS; %j++) {
     for (%i = 0; %i < ILOOPS; %i++) {
         $globalX ++;

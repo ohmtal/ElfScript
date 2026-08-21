@@ -825,9 +825,7 @@ TORQUE_FORCEINLINE inline void doFloatMathOperation()
 
    // S32 fastIf = (a.getType() == ConsoleValueType::cvFloat) & (b.getType() == ConsoleValueType::cvFloat);
    // XXTH FIX Compiler warning:
-   S32 fastIf = static_cast<S32>(a.getType() == ConsoleValueType::cvFloat)
-   & static_cast<S32>(b.getType() == ConsoleValueType::cvFloat);
-
+   bool fastIf = (a.type == ConsoleValueType::cvFloat) && (b.type == ConsoleValueType::cvFloat);
 
    if (fastIf)
    {
@@ -2314,7 +2312,14 @@ handle_OP_SETCUROBJECT_INTERNAL:
 handle_OP_SETCURFIELD:
       // Save the previous field for parsing vector fields.
       prevField = curField;
-      dStrcpy(prevFieldArray, curFieldArray, 256);
+      // // dStrcpy(prevFieldArray, curFieldArray, 256);
+      if (curFieldArray[0] != 0) {
+            dStrcpy(prevFieldArray, curFieldArray, 256);
+      } else {
+            prevFieldArray[0] = 0;
+      }
+
+
       curField = CodeToSTE(code, ip);
       curFieldArray[0] = 0;
       ip += 2;

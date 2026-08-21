@@ -1492,6 +1492,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
 
       case OP_BUILD_VECTOR_STRING: {
          Con::printf("%i: OP_BUILD_VECTOR_STRING stk=-1", ip - 1);
+          ++ip;
          break;
       }
       case OP_SAVEFIELD_FASTPATH: {

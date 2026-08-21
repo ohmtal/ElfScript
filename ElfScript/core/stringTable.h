@@ -79,14 +79,26 @@ private:
    /// @name Implementation details
    /// @{
 
-   /// This is internal to the _StringTable class.
-   struct Node
-   {
-      char *val;
-      Node *next;
+
+   // ElfScript 0.6 Linear Probing:
+   struct StringNode {
+      const char* val = nullptr;
+      U32 len = 0;
    };
 
-   Node**      buckets;
+   StringNode* buckets = nullptr;
+
+
+   /// This is internal to the _StringTable class.
+   // ORIG:
+   // // struct Node
+   // // {
+   // //    char *val;
+   // //    Node *next;
+   // //    U32 len; //<< ElfScript 0.6
+   // // };
+   // //
+   // // Node**      buckets;
    U32         numBuckets;
    U32         itemCount;
    DataChunker mempool;

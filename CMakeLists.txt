@@ -13,6 +13,13 @@ endif()
 # // only one left so obsolete option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
 set(BUILD_ELFSCRIPT ON)
 # -----------------------------------------------------------------------------
+set(FAST_DEFAULT OFF)
+set(BUILD_O_FAST ${FAST_DEFAULT} CACHE BOOL "Build Application with maximum speed (-Ofast)")
+
+set(GPROF_DEFAULT OFF)
+set(BUILD_GPROF ${GPROF_DEFAULT} CACHE BOOL "Build Application with -pg for gprof analysis")
+
+# -----------------------------------------------------------------------------
 set(IPO_DEFAULT OFF)
 set(BUILD_WITH_IPO ${IPO_DEFAULT} CACHE BOOL "Build Application with speed profile LTO (-O3)")
 
@@ -86,6 +93,14 @@ if (BUILD_ELFSCRIPT)
         target_link_options(${TARGET_NAME} PRIVATE -fsanitize=address)
     endif()
 
+    if (BUILD_O_FAST)
+        target_compile_options(${TARGET_NAME} PRIVATE -Ofast)
+        target_link_options(${TARGET_NAME} PRIVATE -Ofast)
+    endif()
+    if (BUILD_GPROF)
+        target_compile_options(${TARGET_NAME} PRIVATE -pg)
+        target_link_options(${TARGET_NAME} PRIVATE -pg)
+    endif()
 
     # Windows - winVolume :: need to set on all builds
     if(MSVC)
