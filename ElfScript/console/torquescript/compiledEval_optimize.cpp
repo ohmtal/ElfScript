@@ -1,3 +1,5 @@
+#define ENABLE_INLINE_CACHE_LOAD
+#define ENABLE_INLINE_CACHE_SAVE
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -470,16 +472,21 @@ static void stackFieldComponent(ConsoleValue *srcValue, S32 componentIndex, Cons
 // }
 
 // -----------------------------------------------------------------------------
-static bool FillComponentCache(SimObject* object, StringTableEntry field, const char* array
-, StringTableEntry subField, FieldCache* CachePtr, S32 currentLocalRegister, ConsoleValue* stackPtr) {
+static bool FillComponentCache(StringTableEntry subField, FieldCache* CachePtr, S32 currentLocalRegister) {
+
+      //FIXME ?? Component does not work !!!
+      CachePtr->type = FieldCacheType::componentFieldFallBack;
+      return true;
+
       static ConsoleValue dstStoreValue = {};
       ConsoleValue *dstValue = nullptr;
 
-      if (object && field) {
-            return object->fillFieldCache(field,array,CachePtr, stackPtr);
-      } else if (currentLocalRegister != -1) {
+      if (currentLocalRegister != -1) {
             dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
       } else if (Script::gEvalState.currentVariable) {
+
+
+
             dstValue = Script::gEvalState.getConsoleValue();
       }
 
@@ -2544,18 +2551,23 @@ handle_OP_SETCUROBJECT_INTERNAL:
       DISPATCH();
 // ~~~~~~~~~~~~~~~~~ SETCURFIELD
 handle_OP_SETCURFIELD:
+
       // Save the previous field for parsing vector fields.
       prevField = curField;
-      // // dStrcpy(prevFieldArray, curFieldArray, 256);
+
+
+      // // orig: dStrcpy(prevFieldArray, curFieldArray, 256);
+
+      // ElfScript 0.6 optimize copy:
       if (curFieldArray[0] != 0) {
             dStrcpy(prevFieldArray, curFieldArray, 256);
       } else {
             prevFieldArray[0] = 0;
       }
 
-
       curField = CodeToSTE(code, ip);
       curFieldArray[0] = 0;
+
       ip += 2;
       DISPATCH();
 
@@ -2575,33 +2587,37 @@ handle_OP_LOADFIELD_FASTPATH:
       stack[_STK + 1].cleanupData();
       stack[_STK + 1].type = (S32) code[ip]; ip++;
 
-#ifdef ENABLE_INLINE_CACHE
+#ifdef ENABLE_INLINE_CACHE_LOAD
       ConsoleValue* stackPtr = &stack[_STK + 1];
-
       // XXTH FieldCache prepare: FIXME redundant !!!!!
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ip+=2;
       FieldCache* cachePtr = *cacheSlot;
-      if (!cachePtr) {
+
+      if (!cachePtr || (curObject && cachePtr->objectPtr != curObject) ) {
             cachePtr = new FieldCache();
+            if (curObject) cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
             if (curObject) {
-                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr);
+                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
                   if (cachePtr->cacheFailed) {
-                        Con::printf("error invalid field detected : %s", curField);
+                        Con::errorf("error invalid field detected : %s", curField);
                         PUSH_STK();
                         DISPATCH();
                   }
             } else {
-                  cachePtr->cacheFailed = !FillComponentCache(prevObject, prevField,
-                                                              prevFieldArray,curField, cachePtr,
-                                                              currentRegister, stackPtr);
-                  if ( cachePtr->cacheFailed) {
-                        Con::printf("error invalid component detected : %s", curField);
-                        prevObject = NULL;
-                        PUSH_STK();
-                        DISPATCH();
+                  if (prevObject && prevField) {
+
+                        cachePtr->type = componentFieldFallBack;
+                        cachePtr->cacheFailed = false;
+                  } else {
+                        cachePtr->cacheFailed = !FillComponentCache(curField, cachePtr, currentRegister);
+                        if ( cachePtr->cacheFailed) {
+                              Con::errorf("error invalid component detected : %s", curField);
+                              PUSH_STK();
+                              DISPATCH();
+                        }
                   }
             }
 
@@ -2616,7 +2632,8 @@ handle_OP_LOADFIELD_FASTPATH:
                   DISPATCH();
             }
 
-            // FIXME 3 simobject must be revisited!
+
+            // FIXME  simobject must be revisited!
             switch (cachePtr->type) {
                   case staticField: {
                         F64 floatValue = 0.f;
@@ -2669,8 +2686,13 @@ handle_OP_LOADFIELD_FASTPATH:
                         }
                         break;
                   }
+                  case componentFieldFallBack: {
+                        // to bad need to fallback
+                       stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+                       break;
+                  }
                   case componentField: {
-                        stackFieldComponent( cachePtr->fieldValuePtr,  cachePtr->componentIndex, &stack[_STK]);
+                        stackFieldComponent( cachePtr->fieldValuePtr,  cachePtr->componentIndex, stackPtr);
                         break;
                   }
                   default: {
@@ -2700,6 +2722,7 @@ handle_OP_LOADFIELD_FASTPATH:
       {
             stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
       }
+
       PUSH_STK();
       DISPATCH();
 #endif
@@ -2784,7 +2807,7 @@ handle_OP_LOADFIELD_FASTPATH:
 handle_OP_SAVEFIELD_FASTPATH:
 {
 
-#ifdef ENABLE_INLINE_CACHE
+#ifdef ENABLE_INLINE_CACHE_SAVE
       // XXTH FieldCache prepare:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ++ip; ++ip;
@@ -2793,16 +2816,19 @@ handle_OP_SAVEFIELD_FASTPATH:
 
       FieldCache* cachePtr = *cacheSlot;
 
-      if (!cachePtr) {
+      if (!cachePtr || (curObject && cachePtr->objectPtr != curObject) ) {
             cachePtr = new FieldCache();
+            if (curObject) cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
             if (curObject) {
                   // is is static or dynamic and we need to fill it
-                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK]);
+                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
 
                   if (cachePtr->cacheFailed) {
-                        Con::printf("error invalid field detected : %s", curField);
+                        Con::printSeparator();
+                        Con::errorf("error invalid field detected : %s[%s]", curField, curFieldArray);
+                        Con::printSeparator();
 
                         DISPATCH();
                   } else {
@@ -2815,24 +2841,31 @@ handle_OP_SAVEFIELD_FASTPATH:
                               case  dynamicField: typeName = "dynamic field"; break;
                               default: typeName = "ERROR ?!! check fillFieldCache!!!!"; break;
                         }
-                        Con::printf("cached field: %s type: %s (%d)", curField, typeName.c_str(), (S32)cachePtr->type);
+                        Con::printf("cached field: %s[%s] type: %s (%d)", curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
 #endif
                   }
 
             } else {
-                  cachePtr->cacheFailed = !FillComponentCache(prevObject, prevField,
-                                                            prevFieldArray,curField, cachePtr,
-                                                            currentRegister, &stack[_STK]);
-                  if ( cachePtr->cacheFailed) {
-                        //DID NOT FIND ANYTHING SHOULD DISPATCH I GUESS !!
-                       Con::printf("error invalid component detected : %s", curField);
-                       prevObject = NULL;
-                       DISPATCH();
+                  if (prevObject && prevField) {
+
+                        cachePtr->type = componentFieldFallBack;
+                        cachePtr->cacheFailed = false;
+                        #ifdef TORQUE_DEBUG
+                        Con::printf("cached component: %s with object!  ", curField);
+                        #endif
+
                   } else {
-#ifdef TORQUE_DEBUG
-                        Con::printf("cached component: %s index: %d", curField, cachePtr->componentIndex);
-#endif
+                        cachePtr->cacheFailed = !FillComponentCache(curField, cachePtr, currentRegister);
+                        if ( cachePtr->cacheFailed) {
+                        Con::printf("error invalid component detected : %s", curField);
+                        DISPATCH();
+                        } else {
+                        #ifdef TORQUE_DEBUG
+                              Con::printf("cached component: %s index: %d ", curField, cachePtr->componentIndex);
+                        #endif
+                        }
                   }
+
             }
 
       } //if not cachePtr
@@ -2880,10 +2913,17 @@ handle_OP_SAVEFIELD_FASTPATH:
                         }
                         break;
                   }
+                  case componentFieldFallBack: {
+                        // to bad need to fallback
+                        pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+                        prevObject = NULL;
+                        break;
+                  }
                   case componentField: {
                         if (cachePtr->componentIndex >= 0) {
                               pushFieldComponent( cachePtr->fieldValuePtr,  cachePtr->componentIndex, &stack[_STK]);
                         }
+                        prevObject = NULL;
                         break;
                   }
                   default: {

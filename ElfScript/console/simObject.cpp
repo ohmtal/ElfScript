@@ -1373,7 +1373,7 @@ bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) 
 //-----------------------------------------------------------------------------
 // XXTH FieldCache
 // NOTE: lot of redundant code to stackDataField
-bool SimObject::fillFieldCache(StringTableEntry slotName, const char* array, FieldCache* cacheP,  ConsoleValue* stackP)
+bool SimObject::fillFieldCache(StringTableEntry slotName, const char* array, FieldCache* cacheP,  ConsoleValue* stackP, bool isLoad)
 {
       bool arrayEmpty = (!array || array[0] == '\0');
 
@@ -1452,12 +1452,16 @@ bool SimObject::fillFieldCache(StringTableEntry slotName, const char* array, Fie
 
             SimFieldDictionary::Entry* entry = nullptr;
             if(!mFieldDictionary) {
+
+                  if (isLoad) return false;
+
                   mFieldDictionary = new SimFieldDictionary;
             } else {
                   entry = mFieldDictionary->findDynamicField(dynamicFieldName);
             }
 
             if (!entry) {
+                  if (isLoad) return false;
                   entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
                   entry->mValue.bufferLen = 0; // else we get in trouble on clean
                   entry->mValue.type = stackP->type;

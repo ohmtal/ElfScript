@@ -241,8 +241,34 @@ varDumpField("sto.dynX");
 $sto = sto.getId(); varDumpField("$sto.dynX");
 echo("------");
 
+
+function Pupser::update(%this) {
+    %dt = 0.1;
+    echo("1 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+    %this.rect.x = 1.2;
+    echo("2 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+    %add = %this.velo.x * %dt;
+    echo("add =" SPC %add);
+    %this.rect.x += %add;
+    echo("3 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+    %this.rect.x += %this.velo.x * %dt;
+    // // %this.rect.x += %this.velo.x * %dt;
+    echo("4 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+}
+
+function cp() {
+    %result = new Object(Pupser) {
+        TypeVector rect = {10,10,50,50};
+        TypeVector velo = {0.5,-0.5,0,0};
+    };
+    %result.update();
+}
+
 $Debug::DumpByteCode=1;
-for (%i in range 5) sto.z++;
+
+
+
+// for (%i in range 5) sto.z++;
 
 // $foo = {0}; $foo.x = 1; $foo.x = 2;
 // sto.z = 0; sto.z = 0;
@@ -252,5 +278,8 @@ for (%i in range 5) sto.z++;
 // for(%i = 0; %i < 10; %i++) {
 //     sto.z ++;
 // }
+
+
+
 
 

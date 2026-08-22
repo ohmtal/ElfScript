@@ -492,7 +492,7 @@ class SimObject: public ConsoleObject
       const char *getDataField(StringTableEntry slotName, const char *array);
 
       //ElfScript 0.6 XXTH FieldCache
-      bool fillFieldCache(StringTableEntry slotName, const char *array, FieldCache* cacheP,  ConsoleValue* stackP);
+      bool fillFieldCache(StringTableEntry slotName, const char *array, FieldCache* cacheP,  ConsoleValue* stackP, bool isLoad);
 
       //ElfScript set the ConsoleValue directly
       bool stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP);
