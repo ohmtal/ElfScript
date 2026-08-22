@@ -1,5 +1,35 @@
 # ElfScript Simple Speed Test:
 
+## Version 0.6a (RelWithDebug) : 
+- rewrote StringTable but did not really speed up
+- added initial inline field cache ... thats an rocket in loops but need more cleanup and testing
+- with #define ENABLE_INLINE_CACHE but unstable on real test so ifdef'd!!! 
+
+### docu/speedtest/elf/test_localvar_foreach.elf
+- 0.6a: 2.855u 0.003s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_globalvar_forrange.elf
+- 0.6a: 4.513u 0.002s 0:04.53 99.5%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_dynamic_fields_forrange.elf
+- 0.6a: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
+- 0.6a: 6.656u 0.004s 0:06.68 99.5%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_vector_components.elf
+- 0.6a: 6.815u 0.003s 0:06.84 99.5%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_vector_components_global.elf
+- 0.6a: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
+- 0.6a 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
+
+### Crazy Elf: assets/modules/StarField.elf 
+
+---
+
 As expected, the local variables followed by the global are the fastest. The  
 static fields are many times faster than in in the vanilla torquescript. With 0.4d
 it became a real rocket. Only the Dynamic Fields are lame ducs, but i started
@@ -51,6 +81,8 @@ to change this.
 - Version 0.5c (using foreach range)): 2.696u 0.003s 0:02.70 99.6%     0+0k 0+0io 0pf+0w
 - Version 0.5d (using for range)): 2.876u 0.002s 0:02.89 99.3%     0+0k 0+0io 0pf+0w
 
+- Version 0.6a (for) : 3.750u 0.002s 0:03.77 99.4%     0+0k 0+0io 0pf+0w
+- Version 0.6a (for range) : 2.868u 0.003s 0:02.88 99.3%     0+0k 0+0io 0pf+0w
 
 
 **Mission impossible: Lua 5.5: 1.215u 0.002s 0:01.22 99.1%     0+0k 24+0io 1pf+0w**
@@ -106,6 +138,11 @@ echo("---------------------");
 - Version 0.4h🚀 (RelWithDebug) : 6.059u 0.003s 0:06.08 99.5%     0+0k 8+0io 0pf+0w
 - Version 0.5d (using for range): 4.350u 0.004s 0:04.37 99.5%     0+0k 0+0io 0pf+0w
 
+- Version 0.6a (using for range): 4.812u 0.007s 0:04.84 99.3%     0+0k 0+0io 0pf+0w
+
+
+
+
 ```
 #define JLOOPS 25
 #define ILOOPS 1000000
@@ -152,6 +189,9 @@ echo("---------------------");
 - Version 0.4f 🚀 (RelWithDebug) : 21.170u 0.003s 0:21.20 99.8%    0+0k 0+0io 0pf+0w
 - Version 0.4g 🚀 (RelWithDebug) : 21.010u 0.009s 0:21.06 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4h🚀 (RelWithDebug) : 19.916u 0.002s 0:19.97 99.6%    0+0k 8+0io 0pf+0w
+
+- Version 0.6a (RelWithDebug) : 12.193u 0.003s 0:12.23 99.6%    0+0k 0+0io 0pf+0w
+
 
 
 Here 0.4c is slower than 0.4a (no idea why) - but 0.4b was at the same speed so rocket
@@ -211,9 +251,11 @@ echo("---------------------");
 - Version 0.4h🚀 (RelWithDebug) : 13.582u 0.002s 0:13.62 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.5d (using for range): 12.359u 0.007s 0:12.40 99.5%    0+0k 0+0io 0pf+0w
 
+- Version 0.6a (using for range): **6.578u** 0.000s 0:06.60 99.5%     0+0k 0+0io 0pf+0w
 
 
-### So why is this slower (same with a global var):
+
+### So why was this slower (same with a global var):
 
 - 1. Object is created and %stoObj is set to unsigned int (OP_SAVEVAR_UINT). fine
 - 2. `%stoObj.x = 0;` It need to lookup the object and does OP_LOADIMMED_STR => OP_SETCURVAR => OP_LOADVAR_STR => OP_SETCUROBJECT
@@ -343,6 +385,10 @@ echo("---------------------");
 ---
 ### same test but using local var (docu/speedtest/elf/test_dynamic_fields_localvar.elf)
 - Version 0.4h🚀 (RelWithDebug) : 14.863u 0.001s 0:14.90 99.7%    0+0k 0+0io 0pf+0w
+
+### same test but using local var / for range (docu/speedtest/elf/test_dynamic_fields_forrange.elf)
+- Version 0.6a (RelWithDebug) : 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
+
 
 Note: dynX must have TypeF32 set, else it fall back to string.
 ---

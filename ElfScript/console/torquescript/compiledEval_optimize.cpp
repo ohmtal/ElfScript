@@ -2574,8 +2574,9 @@ handle_OP_LOADFIELD_FASTPATH:
 {
       stack[_STK + 1].cleanupData();
       stack[_STK + 1].type = (S32) code[ip]; ip++;
+
+#ifdef ENABLE_INLINE_CACHE
       ConsoleValue* stackPtr = &stack[_STK + 1];
-      PUSH_STK();
 
       // XXTH FieldCache prepare: FIXME redundant !!!!!
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
@@ -2589,6 +2590,7 @@ handle_OP_LOADFIELD_FASTPATH:
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr);
                   if (cachePtr->cacheFailed) {
                         Con::printf("error invalid field detected : %s", curField);
+                        PUSH_STK();
                         DISPATCH();
                   }
             } else {
@@ -2610,6 +2612,7 @@ handle_OP_LOADFIELD_FASTPATH:
       if (cachePtr) {
             if (cachePtr->cacheFailed) {
                   Con::warnf("we have a cache but it failed to fetch a field or component!!");
+                  PUSH_STK();
                   DISPATCH();
             }
 
@@ -2682,9 +2685,12 @@ handle_OP_LOADFIELD_FASTPATH:
             Con::errorf("FIXME something failed here !!!!!!");
       }
 
+      PUSH_STK();
       DISPATCH();
 
+#else
 
+      ip+=2; //FieldCache emitted ...
 
       if (curObject)
       {
@@ -2696,6 +2702,7 @@ handle_OP_LOADFIELD_FASTPATH:
       }
       PUSH_STK();
       DISPATCH();
+#endif
 }
 
 
@@ -2776,6 +2783,8 @@ handle_OP_LOADFIELD_FASTPATH:
 // // handle_OP_SAVEFIELD_FLT:
 handle_OP_SAVEFIELD_FASTPATH:
 {
+
+#ifdef ENABLE_INLINE_CACHE
       // XXTH FieldCache prepare:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ++ip; ++ip;
@@ -2890,22 +2899,22 @@ handle_OP_SAVEFIELD_FASTPATH:
       }
 
       DISPATCH();
+#else
 
-// FIXME IFDEF ?!
-// // //       // XXTH FieldCache prepare:
-// // //       ++ip; ++ip;
-// // //
-// // //       if (curObject) {
-// // //             curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
-// // //       } else {
-// // //             // The field is not being set on an object. Maybe it's a special accessor?
-// // //             pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
-// // //             // setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
-// // //             prevObject = NULL;
-// // //       }
-// // //       DISPATCH();
+      // XXTH FieldCache prepare:
+      ip += 2;
 
+      if (curObject) {
+            curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
+      } else {
+            // The field is not being set on an object. Maybe it's a special accessor?
+            pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+            // setFieldComponent(prevObject, prevField, prevFieldArray, curField, currentRegister);
+            prevObject = NULL;
+      }
+      DISPATCH();
 
+#endif
 }
 
 // replaced by fastpath
