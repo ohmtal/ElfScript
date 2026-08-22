@@ -6,28 +6,37 @@
 - with #define ENABLE_INLINE_CACHE but unstable on real test so ifdef'd!!! 
 
 ### docu/speedtest/elf/test_localvar_foreach.elf
-- 0.6a: 2.855u 0.003s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE : 2.855u 0.003s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
+- 0.6a : 2.857u 0.004s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
-- 0.6a: 4.513u 0.002s 0:04.53 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE : 4.513u 0.002s 0:04.53 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a : 4.571u 0.003s 0:04.59 99.5%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
-- 0.6a: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
+- 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
-- 0.6a: 6.656u 0.004s 0:06.68 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE: 6.656u 0.004s 0:06.68 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a : 11.753u 0.003s 0:11.79 99.6%    0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components.elf
-- 0.6a: 6.815u 0.003s 0:06.84 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE: 6.815u 0.003s 0:06.84 99.5%     0+0k 0+0io 0pf+0w
+- 0.6a : 7.372u 0.004s 0:07.40 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components_global.elf
-- 0.6a: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
+- 0.6a : 8.119u 0.005s 0:08.14 99.6%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
-- 0.6a 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
+- 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
+- 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
+
 
 ### Crazy Elf: assets/modules/StarField.elf 
-
+- 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak
 ---
 
 As expected, the local variables followed by the global are the fastest. The  
