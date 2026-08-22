@@ -11,7 +11,7 @@
 #define VECTOR TypeVector
 
 #define PIXEL_SIZE 4.0
-#define INITAL_COUNT 2
+#define INITAL_COUNT 50
 #define UPDATE_TIME 0.05
 #define CANVAS_WIDTH 250.0
 #define CANVAS_HEIGHT 200.0
@@ -33,9 +33,9 @@ function Pupser::onAdd(%this) { }
 function Pupser::onRemove(%this) { }
 
 function Pupser::Update(%this, %dt) {
-    echo("1 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+    // // echo("1 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
     %this.rect.x += %this.velo.x * %dt;
-    echo("2 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
+    // // echo("2 THIS:" SPC %this SPC "THIS RECT=" SPC %this.rect SPC "VELO=" SPC %this.velo);
     if (%this.rect.x  > CANVAS_WIDTH - PIXEL_SIZE) {
         %this.rect.x = CANVAS_WIDTH - PIXEL_SIZE;
         %this.velo.x *= -1.0;
