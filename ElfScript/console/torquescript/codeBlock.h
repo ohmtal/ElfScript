@@ -90,6 +90,8 @@ public:
    U32 codeSize;
    U32 *code;
 
+   std::vector<FieldCache*> mFieldCache;
+
    CompilerLocalVariableToRegisterMappingTable variableRegisterTable;
 
    U32 refCount;

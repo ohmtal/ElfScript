@@ -1352,13 +1352,22 @@ U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    switch (type)
    {
    case TypeReqUInt:
-      codeStream.emit(OP_LOADFIELD_UINT);
+      // codeStream.emit(OP_LOADFIELD_UINT);
+         codeStream.emit( OP_LOADFIELD_FASTPATH );
+         codeStream.emit( (U32)cvInteger );
+         codeStream.emit( 0 );codeStream.emit( 0 );
       break;
    case TypeReqFloat:
-      codeStream.emit(OP_LOADFIELD_FLT);
+      // codeStream.emit(OP_LOADFIELD_FLT);
+         codeStream.emit( OP_LOADFIELD_FASTPATH );
+         codeStream.emit( (U32)cvFloat );
+         codeStream.emit( 0 );codeStream.emit( 0 );
       break;
    case TypeReqString:
-      codeStream.emit(OP_LOADFIELD_STR);
+      // codeStream.emit(OP_LOADFIELD_STR);
+        codeStream.emit( OP_LOADFIELD_FASTPATH );
+        codeStream.emit( (U32)cvString );
+        codeStream.emit( 0 );codeStream.emit( 0 );
       break;
    case TypeReqNone:
       break;
@@ -1463,9 +1472,11 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    }
    // #ifdef ELFSCRIPT_FASTPATH_FLD
    codeStream.emit(OP_SAVEFIELD_FASTPATH);
-   // #else
-   // codeStream.emit(OP_SAVEFIELD_STR);
-   // #endif
+
+   //XXTH FieldCache
+   codeStream.emit(0);
+   codeStream.emit(0);
+
    if (typeID != -1)
    {
       codeStream.emit(OP_SETCURFIELD_TYPE);
@@ -1531,9 +1542,19 @@ U32 SlotAssignOpNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       if (subType == TypeReqNone || type == TypeReqNone)
          codeStream.emit(OP_POP_STK);
    }
-   codeStream.emit((subType == TypeReqFloat) ? OP_LOADFIELD_FLT : OP_LOADFIELD_UINT);
+   // codeStream.emit((subType == TypeReqFloat) ? OP_LOADFIELD_FLT : OP_LOADFIELD_UINT);
+   // codeStream.emit(operand);
+   // codeStream.emit((subType == TypeReqFloat) ? OP_SAVEFIELD_FLT : OP_SAVEFIELD_UINT);
+
+   codeStream.emit( OP_LOADFIELD_FASTPATH );
+   (subType == TypeReqFloat) ? codeStream.emit(cvFloat) : codeStream.emit(cvInteger);
+   codeStream.emit(0); codeStream.emit(0); //XXTH FieldCache
+
    codeStream.emit(operand);
-   codeStream.emit((subType == TypeReqFloat) ? OP_SAVEFIELD_FLT : OP_SAVEFIELD_UINT);
+
+   codeStream.emit( OP_SAVEFIELD_FASTPATH );
+   codeStream.emit(0); codeStream.emit(0); //XXTH FieldCache
+
    if (type == TypeReqNone)
       codeStream.emit(OP_POP_STK);
    return codeStream.tell();

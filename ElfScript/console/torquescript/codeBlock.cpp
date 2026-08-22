@@ -64,6 +64,8 @@ CodeBlock::CodeBlock()
    codeSize = 0;
    lineBreakPairCount = 0;
    nextFile = NULL;
+
+   mFieldCache.reserve(128);
 }
 
 CodeBlock::~CodeBlock()
@@ -81,6 +83,12 @@ CodeBlock::~CodeBlock()
 
    delete[] globalFloats;
    delete[] functionFloats;
+
+   for (auto cache : mFieldCache) {
+         SAFE_DELETE(cache);
+   }
+   mFieldCache.clear();
+
    delete[] code;
 }
 
@@ -1224,41 +1232,43 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
-      case OP_LOADFIELD_UINT:
-      {
-         Con::printf("%i: OP_LOADFIELD_UINT stk=+1", ip - 1);
-         break;
-      }
-
-      case OP_LOADFIELD_FLT:
-      {
-         Con::printf("%i: OP_LOADFIELD_FLT stk=+1", ip - 1);
-         break;
-      }
-
-      case OP_LOADFIELD_STR:
-      {
-         Con::printf("%i: OP_LOADFIELD_STR stk=+1", ip - 1);
-         break;
-      }
-
-      case OP_SAVEFIELD_UINT:
-      {
-         Con::printf("%i: OP_SAVEFIELD_UINT stk=0", ip - 1);
-         break;
-      }
-
-      case OP_SAVEFIELD_FLT:
-      {
-         Con::printf("%i: OP_SAVEFIELD_FLT stk=0", ip - 1);
-         break;
-      }
-
-      case OP_SAVEFIELD_STR:
-      {
-         Con::printf("%i: OP_SAVEFIELD_STR stk=0", ip - 1);
-         break;
-      }
+      // case OP_LOADFIELD_UINT:
+      // {
+      //    Con::printf("%i: OP_LOADFIELD_UINT stk=+1", ip - 1);
+      //    break;
+      // }
+      //
+      // case OP_LOADFIELD_FLT:
+      // {
+      //    Con::printf("%i: OP_LOADFIELD_FLT stk=+1", ip - 1);
+      //    break;
+      // }
+      //
+      // case OP_LOADFIELD_STR:
+      // {
+      //    Con::printf("%i: OP_LOADFIELD_STR stk=+1", ip - 1);
+      //    break;
+      // }
+      //
+      // case OP_SAVEFIELD_UINT:
+      // {
+      //        ++ip;++ip; //XXTH FieldCache
+      //    Con::printf("%i: OP_SAVEFIELD_UINT stk=0", ip - 1);
+      //    break;
+      // }
+      //
+      // case OP_SAVEFIELD_FLT:
+      // {
+      //        ++ip;++ip; //XXTH FieldCache
+      //    Con::printf("%i: OP_SAVEFIELD_FLT stk=0", ip - 1);
+      //    break;
+      // }
+      //
+      // case OP_SAVEFIELD_STR:
+      // {
+      //    Con::printf("%i: OP_SAVEFIELD_STR stk=0", ip - 1);
+      //    break;
+      // }
 
       case OP_POP_STK:
       {
@@ -1495,8 +1505,18 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
           ++ip;
          break;
       }
+
+      case OP_LOADFIELD_FASTPATH: {
+            U32 curCodeIP = code[ip];
+            S32 consoleValueType = (S32)code[ip]; ip++;
+            ip+=2; //XXTH FieldCache
+            Con::printf("%i: OP_LOADFIELD_FASTPATH stk=-1 (type: %d, curCodeIP: %u)",  ip - 1, consoleValueType, curCodeIP);
+            break;
+      }
+
       case OP_SAVEFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];
+            ++ip;++ip; //XXTH FieldCache
          Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u)", ip - 1, curCodeIP);
          break;
       }

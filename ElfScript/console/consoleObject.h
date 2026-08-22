@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -66,6 +67,7 @@
 
 class Namespace;
 class ConsoleObject;
+
 
 enum NetClassTypes
 {
@@ -1383,5 +1385,31 @@ inline bool defaultProtectedNotWriteFn(void* obj, StringTableEntry pFieldName)
 }
 
 /// @}
+
+// XXTH FieldCache >>>>>>>
+// // class ConsoleValue;
+
+enum FieldCacheType {
+      unknownField,
+      staticField,
+      staticField_NoFastPath,
+      dynamicField,
+      componentField,
+      ARCFirstCustomField //skip this
+};
+
+struct FieldCache {
+      bool cacheFailed = true;
+      FieldCacheType type = unknownField;
+      const class AbstractClassRep* classRepPtr = nullptr;
+      const struct AbstractClassRep::Field* staticFieldPtr = nullptr;
+      S32 staticArrayIndex = 0;
+      ConsoleValue* fieldValuePtr = nullptr;
+      // FieldValuePtr can be used for dynamicField or Component Variable??
+      S32 componentIndex = -1;
+
+};
+// <<<<<<<<<<< FieldCache
+
 
 #endif //_CONSOLEOBJECT_H_

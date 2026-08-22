@@ -131,13 +131,13 @@ namespace Compiler
       OP_SETCURFIELD_ARRAY, // 50
       OP_SETCURFIELD_TYPE,
 
-      OP_LOADFIELD_UINT,
-      OP_LOADFIELD_FLT,
-      OP_LOADFIELD_STR,
+      // // OP_LOADFIELD_UINT,
+      // // OP_LOADFIELD_FLT,
+      // // OP_LOADFIELD_STR,
 
-      OP_SAVEFIELD_UINT,
-      OP_SAVEFIELD_FLT,
-      OP_SAVEFIELD_STR,
+      // // OP_SAVEFIELD_UINT,
+      // // OP_SAVEFIELD_FLT,
+      // // OP_SAVEFIELD_STR,
 
       OP_POP_STK,
 
@@ -168,7 +168,8 @@ namespace Compiler
 
 
       OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
-      OP_SAVEFIELD_FASTPATH, // XXTH we guess a fast path
+      OP_SAVEFIELD_FASTPATH,
+      OP_LOADFIELD_FASTPATH,
 
 #ifdef ELFSCRIPT_INT_HACK
       OP_CMPLT_UINT,

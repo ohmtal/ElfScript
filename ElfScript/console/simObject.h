@@ -51,6 +51,7 @@ class Stream;
 // class LightManager;
 class SimFieldDictionary;
 class SimPersistID;
+struct FieldCache;
 // class GuiInspector;
 
 /// Base class for objects involved in the simulation.
@@ -489,6 +490,9 @@ class SimObject: public ConsoleObject
       /// @param   array       String containing index into array
       ///                      (if field is an array); if NULL, it is ignored.
       const char *getDataField(StringTableEntry slotName, const char *array);
+
+      //ElfScript 0.6 XXTH FieldCache
+      bool fillFieldCache(StringTableEntry slotName, const char *array, FieldCache* cacheP,  ConsoleValue* stackP);
 
       //ElfScript set the ConsoleValue directly
       bool stackDataField(StringTableEntry slotName, const char *array, ConsoleValue* stackP);

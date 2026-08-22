@@ -242,7 +242,15 @@ $sto = sto.getId(); varDumpField("$sto.dynX");
 echo("------");
 
 $Debug::DumpByteCode=1;
+for (%i in range 5) sto.z++;
 
-
+// $foo = {0}; $foo.x = 1; $foo.x = 2;
+// sto.z = 0; sto.z = 0;
+//
+// echo("................................");
+//
+// for(%i = 0; %i < 10; %i++) {
+//     sto.z ++;
+// }
 
 
