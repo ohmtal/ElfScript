@@ -1,42 +1,62 @@
 # ElfScript Simple Speed Test:
 
+## Version 0.6b (RelWithDebug) : 
+- restored StringTable - there is a bug in the new implemenation, i saved it to 
+unstable folder
+- ENABLE_INLINE_CACHE_LOAD/ENABLE_INLINE_CACHE_SAVE enabled again but disabled
+Componentfields
+
 ## Version 0.6a (RelWithDebug) : 
 - rewrote StringTable but did not really speed up
 - added initial inline field cache ... thats an rocket in loops but need more cleanup and testing
 - with #define ENABLE_INLINE_CACHE but unstable on real test so ifdef'd!!! 
 
 ### docu/speedtest/elf/test_localvar_foreach.elf
+- OGE3D* (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE : 2.855u 0.003s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
 - 0.6a : 2.857u 0.004s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
+- 0.6b : 2.892u 0.007s 0:02.91 99.3%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
+- OGE3D* (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE : 4.513u 0.002s 0:04.53 99.5%     0+0k 0+0io 0pf+0w
 - 0.6a : 4.571u 0.003s 0:04.59 99.5%     0+0k 0+0io 0pf+0w
-
+- 0.6b : 4.479u 0.002s 0:04.49 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
+- OGE3D* using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
+- 0.6b : 6.268u 0.002s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
+- OGE3D* using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE: 6.656u 0.004s 0:06.68 99.5%     0+0k 0+0io 0pf+0w
 - 0.6a : 11.753u 0.003s 0:11.79 99.6%    0+0k 0+0io 0pf+0w
+- 0.6b : 6.853u 0.009s 0:06.89 99.4%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components.elf
+- OGE3D* (current 26-08-05) :: 140.183u 0.322s 2:20.84 99.7% 0+0k 0+48io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE: 6.815u 0.003s 0:06.84 99.5%     0+0k 0+0io 0pf+0w
 - 0.6a : 7.372u 0.004s 0:07.40 99.5%     0+0k 0+0io 0pf+0w
+- 0.6b : 7.985u 0.001s 0:08.01 99.6%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components_global.elf
 - 0.6a ENABLE_INLINE_CACHE: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 8.119u 0.005s 0:08.14 99.6%     0+0k 0+0io 0pf+0w
+- 0.6b : 8.669u 0.006s 0:08.71 99.4%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
 - 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
+- 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
 
 
 ### Crazy Elf: assets/modules/StarField.elf 
 - 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak
+- 0.6b : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak
+
+OGE3D* Release Build - cant test the same scripts since it does not have the Extensions from ElfScript (for range/preprocessor/..).
 ---
 
 As expected, the local variables followed by the global are the fastest. The  
