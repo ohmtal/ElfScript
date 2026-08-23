@@ -114,7 +114,8 @@ static void dumpVariable(  Stream& stream,
 {
    // Skip variables defined in script.
 
-   if( entry->value.getType() <= ConsoleValueType::cvString )
+   // ElfScript 0.6e not sure why this is here (was cvString )
+   if( entry->value.getType() <= ConsoleValueType::cvStringByeBye )
       return;
 
    // Skip internals... don't export them.

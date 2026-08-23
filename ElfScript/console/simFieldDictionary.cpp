@@ -161,7 +161,8 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
             walk->mValue.type = ConsoleValueType::cvVector;
 #endif
          } else {
-            walk->mValue.type = ConsoleValueType::cvString;
+            // ElfScript 0.6e walk->mValue.type = ConsoleValueType::cvString;
+               walk->mValue.type = ConsoleValueType::cvSTEntry;
          }
 
 

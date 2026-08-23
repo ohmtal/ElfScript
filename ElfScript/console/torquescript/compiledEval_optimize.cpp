@@ -164,22 +164,23 @@ char *getReturnBuffer(U32 bufferSize)
    return retBuffer.getBuffer(bufferSize);
 }
 
-const char* tsconcat(const char* strA, const char* strB, S32& outputLen)
-{
-   S32 lenA = dStrlen(strA);
-   S32 lenB = dStrlen(strB);
-
-   S32 len = lenA + lenB + 1;
-
-   char* concatBuffer = (char*)dMalloc(len);
-
-   concatBuffer[len - 1] = '\0';
-   memcpy(concatBuffer, strA, lenA);
-   memcpy(concatBuffer + lenA, strB, lenB);
-
-   outputLen = lenA + lenB;
-   return concatBuffer;
-}
+// obsolete ElfScript 0.6e
+// // const char* tsconcat(const char* strA, const char* strB, S32& outputLen)
+// // {
+// //    S32 lenA = dStrlen(strA);
+// //    S32 lenB = dStrlen(strB);
+// //
+// //    S32 len = lenA + lenB + 1;
+// //
+// //    char* concatBuffer = (char*)dMalloc(len);
+// //
+// //    concatBuffer[len - 1] = '\0';
+// //    memcpy(concatBuffer, strA, lenA);
+// //    memcpy(concatBuffer + lenA, strB, lenB);
+// //
+// //    outputLen = lenA + lenB;
+// //    return concatBuffer;
+// // }
 
 namespace Con
 {
@@ -413,7 +414,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
 
       if (object && field) {
             // not! dstStoreValue.type = ConsoleValueType::cvVector;
-            dstStoreValue.type = ConsoleValueType::cvString;
+            dstStoreValue.type = ConsoleValueType::cvSTEntry;
             dstValue = &dstStoreValue;
             object->stackDataField(field,array,dstValue);
       } else if (currentLocalRegister != -1) {
@@ -3059,30 +3060,94 @@ handle_OP_CALLFUNC:
 } //OP_CALLFUNC
 
 // ~~~~~~~~~~~~~~~~~ STR
+
+// new replacements ElfScript 0.6d
 handle_OP_ADVANCE_STR_APPENDCHAR:
 {
-      char buff[2];
-      buff[0] = (char)code[ip++];
-      buff[1] = '\0';
+      char charToAppend = (char)code[ip++];
 
-      S32 len;
-      const char* concat = tsconcat(stack[_STK].getString(), buff, len);
+      const char* currentStr = stack[_STK].getString();
+      size_t lenA = dStrlen(currentStr);
+      size_t totalLen = lenA + 1;
 
-      stack[_STK].setStringRef(concat, len);
+      char localBuffer[1024];
+      char* workingBuffer = localBuffer;
+
+      if (totalLen >= 1024) {
+            workingBuffer = (char*)dMalloc(totalLen + 1);
+      }
+
+      memcpy(workingBuffer, currentStr, lenA);
+      workingBuffer[lenA] = charToAppend;
+      workingBuffer[totalLen] = '\0';
+
+      stack[_STK].setString(workingBuffer, static_cast<S32>(totalLen));
+
+      if (workingBuffer != localBuffer) {
+            dFree(workingBuffer);
+      }
+
       DISPATCH();
 }
 
 handle_OP_REWIND_STR:
-      // TORQUE_CASE_FALLTHROUGH;
 handle_OP_TERMINATE_REWIND_STR:
 {
-      S32 len;
-      const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
+      const char* strA = stack[_STK - 1].getString();
+      const char* strB = stack[_STK].getString();
 
-      stack[_STK - 1].setStringRef(concat, len);
+      size_t lenA = dStrlen(strA);
+      size_t lenB = dStrlen(strB);
+      size_t totalLen = lenA + lenB;
+
+      char localBuffer[2048];
+      char* workingBuffer = localBuffer;
+
+      if (totalLen >= 2048) {
+            workingBuffer = (char*)dMalloc(totalLen + 1);
+      }
+
+      // Beide Strings nahtlos in den Puffer kopieren
+      memcpy(workingBuffer, strA, lenA);
+      memcpy(workingBuffer + lenA, strB, lenB);
+      workingBuffer[totalLen] = '\0';
+
+      stack[_STK - 1].setString(workingBuffer, static_cast<S32>(totalLen));
+
+      if (workingBuffer != localBuffer) {
+            dFree(workingBuffer);
+      }
+
       POP_STK();
       DISPATCH();
 }
+
+
+// replace ElfScript 0.6e
+// handle_OP_ADVANCE_STR_APPENDCHAR:
+// {
+//       char buff[2];
+//       buff[0] = (char)code[ip++];
+//       buff[1] = '\0';
+//
+//       S32 len;
+//       const char* concat = tsconcat(stack[_STK].getString(), buff, len);
+//
+//       stack[_STK].setStringRef(concat, len);
+//       DISPATCH();
+// }
+//
+// handle_OP_REWIND_STR:
+//       // TORQUE_CASE_FALLTHROUGH;
+// handle_OP_TERMINATE_REWIND_STR:
+// {
+//       S32 len;
+//       const char* concat = tsconcat(stack[_STK - 1].getString(), stack[_STK].getString(), len);
+//
+//       stack[_STK - 1].setStringRef(concat, len);
+//       POP_STK();
+//       DISPATCH();
+// }
 
 handle_OP_COMPARE_STR:
       stack[_STK - 1].setBool(!dStricmp(stack[_STK].getString(), stack[_STK - 1].getString()));

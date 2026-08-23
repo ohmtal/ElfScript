@@ -1473,7 +1473,7 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_POP_STK);
    }
    codeStream.emit(OP_SAVEFIELD_FASTPATH);
-   codeStream.emit(cvString); //string means autodetect
+   codeStream.emit(U32_MAX); //autodetect!
 
    //XXTH FieldCache
    codeStream.emit(0);

@@ -22,8 +22,8 @@ namespace ElfScript {
         switch (type) {
             case ConsoleValueType::cvFloat:   return "Float";
             case ConsoleValueType::cvInteger: return "Integer";
-            case ConsoleValueType::cvString:  return "String";
-            case ConsoleValueType::cvSTEntry: return "Empty";
+            // case ConsoleValueType::cvString:  return "String";
+            case ConsoleValueType::cvSTEntry: return "String";
             case ConsoleValueType::cvConsoleValueType: return "Console";
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";

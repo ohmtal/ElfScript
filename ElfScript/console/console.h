@@ -133,7 +133,7 @@ enum ConsoleValueType
    cvNULL =             -5,
    cvInteger =          -4,
    cvFloat =            -3,
-   cvString =           -2,   ///< Heap-allocated, owned (dMalloc/dFree)
+   cvStringByeBye =     -2,   /// ElfScript 0.6e removed! < Heap-allocated, owned (dMalloc/dFree)
    cvSTEntry =          -1,   ///< StringTable pointer, NOT owned
    cvConsoleValueType =  0    ///< First valid engine console type ID
 };
@@ -168,10 +168,11 @@ public:
          EnumTable* enumTable;
       };
    };
+#pragma warning(pop)
+
 #ifdef ENABLE_CONSOLE_VECTOR
   ConsoleVector v;
 #endif
-#pragma warning(pop)
 
    S32 type;
    U32 bufferLen;
@@ -186,18 +187,20 @@ public:
 
    TORQUE_FORCEINLINE void cleanupData()
    {
-      // Only cvString strings are heap-allocated and owned by this value.
-      // cvSTEntry points into the StringTable (managed externally).
-      // Numeric types use the f/i union fields — s is not valid for them.
+      // ElfScript 0.6e OBSOLETE!
 
-      if (type == ConsoleValueType::cvString && bufferLen > 0)
-      {
-         dFree(s);
-         bufferLen = 0;
-      }
-
-      s = const_cast<char*>(StringTable->EmptyString());
-      type = ConsoleValueType::cvNULL;
+      // // Only cvString strings are heap-allocated and owned by this value.
+      // // cvSTEntry points into the StringTable (managed externally).
+      // // Numeric types use the f/i union fields — s is not valid for them.
+      //
+      // if (type == ConsoleValueType::cvString && bufferLen > 0)
+      // {
+      //    dFree(s);
+      //    bufferLen = 0;
+      // }
+      //
+      // s = const_cast<char*>(StringTable->EmptyString());
+      // type = ConsoleValueType::cvNULL;
    }
 
    ConsoleValue()
@@ -272,14 +275,16 @@ public:
                {
                      case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
                      case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
-                     // case ConsoleValueType::cvSTEntry:
-                     //       return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
-                     // case ConsoleValueType::cvVector: return v;
-                     case ConsoleValueType::cvString: {
-                           if (s[0] == '\0') break;
+                     case ConsoleValueType::cvSTEntry:
+                           if (s == StringTable->EmptyString()) break;
                            dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
                            break;
-                     }
+                     // case ConsoleValueType::cvVector: return v;
+                     // case ConsoleValueType::cvString: {
+                     //       if (s[0] == '\0') break;
+                     //       dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+                     //       break;
+                     // }
 
                      // case ConsoleValueType::cvNULL:
                      //       return 0.0;
@@ -309,8 +314,8 @@ public:
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
 #endif
-      case ConsoleValueType::cvString:
-         return (s[0] == '\0') ? 0.0 : dAtod(s);//F64! dAtof(s);
+      // case ConsoleValueType::cvString:
+      //    return (s[0] == '\0') ? 0.0 : dAtod(s);//F64! dAtof(s);
       case ConsoleValueType::cvNULL:
          return 0.0;
       default:
@@ -333,8 +338,8 @@ public:
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);
 #endif
-      case ConsoleValueType::cvString:
-         return (s[0] == '\0') ? S64(0) : static_cast<S64>(dAtoi(s));
+      // case ConsoleValueType::cvString:
+      //    return (s[0] == '\0') ? S64(0) : static_cast<S64>(dAtoi(s));
       case ConsoleValueType::cvNULL:
          return 0;
       default:
@@ -358,8 +363,8 @@ public:
          return (f != 0.0);
       case ConsoleValueType::cvSTEntry:
          return (s != StringTable->EmptyString()) && dAtob(s);
-      case ConsoleValueType::cvString:
-         return (s[0] != '\0') && dAtob(s);
+      // case ConsoleValueType::cvString:
+      //    return (s[0] != '\0') && dAtob(s);
       case ConsoleValueType::cvNULL:
          return false;
       default:
@@ -372,8 +377,8 @@ public:
       switch (type)
       {
       case ConsoleValueType::cvSTEntry:
-            TORQUE_CASE_FALLTHROUGH;
-      case ConsoleValueType::cvString:
+      //       TORQUE_CASE_FALLTHROUGH;
+      // case ConsoleValueType::cvString:
          return s;
       case ConsoleValueType::cvNULL:
          return StringTable->EmptyString();
@@ -430,27 +435,41 @@ public:
       i = val ? S64(1) : S64(0);
    }
 
+
+   // ElfScript 0.6e
    TORQUE_FORCEINLINE void setString(const char* val)
    {
-      setString(val, val ? static_cast<S32>(dStrlen(val)) : 0);
+         s = val ? const_cast<char*>(StringTable->insert(val)) : const_cast<char*>(StringTable->EmptyString());
+         type = ConsoleValueType::cvSTEntry;
    }
 
    TORQUE_FORCEINLINE void setString(const char* val, S32 len)
    {
-      if (len == 0)
-      {
-         setEmptyString();
-         return;
-      }
-
-      cleanupData();
-      type = ConsoleValueType::cvString;
-
-      bufferLen = static_cast<U32>(len) + 1u;   // allocation size, always > 0
-      s = static_cast<char*>(dMalloc(bufferLen));
-      s[len] = '\0';
-      dMemcpy(s, val, static_cast<dsize_t>(len));
+         s = (val && len > 0) ? const_cast<char*>(StringTable->insert(val, len)) : const_cast<char*>(StringTable->EmptyString());
+         type = ConsoleValueType::cvSTEntry;
    }
+
+
+//    // TORQUE_FORCEINLINE void setString(const char* val)
+//    // {
+//    //    setString(val, val ? static_cast<S32>(dStrlen(val)) : 0);
+//    // }
+//    TORQUE_FORCEINLINE void setString(const char* val, S32 len)
+//    {
+//       if (len == 0)
+//       {
+//          setEmptyString();
+//          return;
+//       }
+//
+//       cleanupData();
+//       type = ConsoleValueType::cvString;
+//
+//       bufferLen = static_cast<U32>(len) + 1u;   // allocation size, always > 0
+//       s = static_cast<char*>(dMalloc(bufferLen));
+//       s[len] = '\0';
+//       dMemcpy(s, val, static_cast<dsize_t>(len));
+//    }
 
    /// Transfer ownership of a dMalloc'd buffer to this value.
    ///
@@ -460,22 +479,23 @@ public:
    /// @param len        String length NOT including the null terminator.
    ///                   If len == 0 the buffer still gets freed correctly
    ///                   because bufferLen is stored as len+1.
-   TORQUE_FORCEINLINE void setStringOwned(char* ownedBuf, S32 len)
-   {
-      cleanupData();
-      type = ConsoleValueType::cvString;
-
-      bufferLen = static_cast<U32>(len) + 1;   // always > 0 → cleanupData will free
-      s = ownedBuf;
-   }
-
-   /// @deprecated  Use setStringOwned().  Kept so existing call sites compile.
-   ///              The old name "Ref" implied a non-owning borrow, which was
-   ///              the opposite of the actual semantics.
-   TORQUE_FORCEINLINE void setStringRef(const char* ownedBuf, S32 len)
-   {
-      setStringOwned(const_cast<char*>(ownedBuf), len);
-   }
+   // elfscript 0.6e removed
+   // TORQUE_FORCEINLINE void setStringOwned(char* ownedBuf, S32 len)
+   // {
+   //    cleanupData();
+   //    type = ConsoleValueType::cvString;
+   //
+   //    bufferLen = static_cast<U32>(len) + 1;   // always > 0 → cleanupData will free
+   //    s = ownedBuf;
+   // }
+   //
+   // /// @deprecated  Use setStringOwned().  Kept so existing call sites compile.
+   // ///              The old name "Ref" implied a non-owning borrow, which was
+   // ///              the opposite of the actual semantics.
+   // TORQUE_FORCEINLINE void setStringRef(const char* ownedBuf, S32 len)
+   // {
+   //    setStringOwned(const_cast<char*>(ownedBuf), len);
+   // }
 
    TORQUE_FORCEINLINE void setStringTableEntry(StringTableEntry val)
    {
@@ -515,8 +535,9 @@ public:
 
    TORQUE_FORCEINLINE bool isStringType()  const
    {
-      return type == ConsoleValueType::cvString
-         || type == ConsoleValueType::cvSTEntry;
+      return type == ConsoleValueType::cvSTEntry;
+      // return type == ConsoleValueType::cvString
+      //    || type == ConsoleValueType::cvSTEntry;
    }
 
    TORQUE_FORCEINLINE bool isNumberType()  const
@@ -573,18 +594,18 @@ private:
             break;
 #endif
 
-      case ConsoleValueType::cvString:
-      {
-         // bufferLen == allocation size (len+1), so string length == bufferLen-1.
-         // Guard defensively: if somehow bufferLen is 0 (pre-fix bug state),
-         // fall back to dStrlen.
-         S32 strLen = (other.bufferLen > 0)
-            ? static_cast<S32>(other.bufferLen) - 1
-            : static_cast<S32>(dStrlen(other.s));
-         setString(other.s, strLen);
-
-         break;
-      }
+      // // case ConsoleValueType::cvString:
+      // // {
+      // //    // bufferLen == allocation size (len+1), so string length == bufferLen-1.
+      // //    // Guard defensively: if somehow bufferLen is 0 (pre-fix bug state),
+      // //    // fall back to dStrlen.
+      // //    S32 strLen = (other.bufferLen > 0)
+      // //       ? static_cast<S32>(other.bufferLen) - 1
+      // //       : static_cast<S32>(dStrlen(other.s));
+      // //    setString(other.s, strLen);
+      // //
+      // //    break;
+      // // }
 
       default:
          setConsoleData(other.type, other.dataPtr, other.enumTable);
@@ -611,7 +632,7 @@ private:
           dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
           break;
 #endif
-      case ConsoleValueType::cvString:
+      // // case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:
       case ConsoleValueType::cvNULL:
          s = other.s;
@@ -629,7 +650,7 @@ private:
       other.type = ConsoleValueType::cvSTEntry;
       other.bufferLen = 0;
    }
-};
+}; // end of console value
 
 // Transparently converts ConsoleValue[] to const char**
 class ConsoleValueToStringArrayWrapper
