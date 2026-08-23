@@ -182,42 +182,7 @@ public:
 
    const char* getConsoleData() const;
 
-   // // TORQUE_FORCEINLINE void cleanupSetType(S32 newType)
-   // // {
-   // //
-   // //       if (type == ConsoleValueType::cvString && bufferLen > 0)
-   // //       {
-   // //             if (s ) {
-   // //                dFree(s);
-   // //             }
-   // //             s = const_cast<char*>(StringTable->EmptyString());
-   // //             bufferLen = 0;
-   // //       }
-   // //
-   // //       type = newType;
-   // // }
-   // //
-   // // // TORQUE_FORCEINLINE void cleanupData()
-   // // // {
-   // // //     cleanupSetType(ConsoleValueType::cvNULL);
-   // // // }
-   // //
-   // // TORQUE_FORCEINLINE void cleanupData()
-   // // {
-   // //       // Only cvString strings are heap-allocated and owned by this value.
-   // //       // cvSTEntry points into the StringTable (managed externally).
-   // //       // Numeric types use the f/i union fields — s is not valid for them.
-   // //
-   // //       if (type == ConsoleValueType::cvString && bufferLen > 0)
-   // //       {
-   // //             // // dFree(s);
-   // //             if (s ) dFree(s);
-   // //             bufferLen = 0;
-   // //       }
-   // //
-   // //       s = const_cast<char*>(StringTable->EmptyString());
-   // //       type = ConsoleValueType::cvNULL;
-   // // }
+
 
    TORQUE_FORCEINLINE void cleanupData()
    {
@@ -282,7 +247,6 @@ public:
    {
       if (this != &other)
       {
-         // cleanupSetType( other.type );
          cleanupData();
          type = other.type;
 
@@ -427,7 +391,6 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
-         // if (type != ConsoleValueType::cvVector) cleanupSetType(ConsoleValueType::cvVector);
          cleanupData();
          type = ConsoleValueType::cvVector;
          v = vec;
@@ -435,7 +398,6 @@ public:
 #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
-      // if (type != ConsoleValueType::cvFloat) cleanupSetType(ConsoleValueType::cvFloat);
       cleanupData();
       type = ConsoleValueType::cvFloat;
       f = val;
@@ -443,7 +405,6 @@ public:
 
    TORQUE_FORCEINLINE void setInt(S64 val)
    {
-      // if (type != ConsoleValueType::cvInteger) cleanupSetType(type = ConsoleValueType::cvInteger);
       cleanupData();
       type = ConsoleValueType::cvInteger;
 
@@ -452,7 +413,6 @@ public:
 
    TORQUE_FORCEINLINE void setBool(bool val)
    {
-      // if (type != ConsoleValueType::cvInteger) cleanupSetType( ConsoleValueType::cvInteger);
       cleanupData();
       type = ConsoleValueType::cvInteger;
 
@@ -472,7 +432,6 @@ public:
          return;
       }
 
-      // cleanupSetType( ConsoleValueType::cvString);
       cleanupData();
       type = ConsoleValueType::cvString;
 
@@ -492,7 +451,6 @@ public:
    ///                   because bufferLen is stored as len+1.
    TORQUE_FORCEINLINE void setStringOwned(char* ownedBuf, S32 len)
    {
-      // cleanupSetType( ConsoleValueType::cvString );
       cleanupData();
       type = ConsoleValueType::cvString;
 
@@ -510,7 +468,6 @@ public:
 
    TORQUE_FORCEINLINE void setStringTableEntry(StringTableEntry val)
    {
-      // cleanupSetType(ConsoleValueType::cvSTEntry);
       cleanupData();
       type = ConsoleValueType::cvSTEntry;
 
@@ -524,7 +481,6 @@ public:
       // cleanupData already sets s = EmptyString and type = cvNULL.
       // We then promote the type to cvSTEntry so queries return a valid
       // empty string rather than having to special-case cvNULL everywhere.
-      // cleanupSetType( ConsoleValueType::cvSTEntry );
          cleanupData();
          type = ConsoleValueType::cvSTEntry;
    }
