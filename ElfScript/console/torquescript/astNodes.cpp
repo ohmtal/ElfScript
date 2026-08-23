@@ -1366,7 +1366,9 @@ U32 SlotAccessNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    case TypeReqString:
       // codeStream.emit(OP_LOADFIELD_STR);
         codeStream.emit( OP_LOADFIELD_FASTPATH );
-        codeStream.emit( (U32)cvString );
+        // codeStream.emit( (U32)cvString );
+        codeStream.emit( U32_MAX); // let it guess
+
         codeStream.emit( 0 );codeStream.emit( 0 );
       break;
    case TypeReqNone:
@@ -1470,8 +1472,8 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_SETCURFIELD_ARRAY);
       codeStream.emit(OP_POP_STK);
    }
-   // #ifdef ELFSCRIPT_FASTPATH_FLD
    codeStream.emit(OP_SAVEFIELD_FASTPATH);
+   codeStream.emit(cvString); //string means autodetect
 
    //XXTH FieldCache
    codeStream.emit(0);
@@ -1553,6 +1555,7 @@ U32 SlotAssignOpNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    codeStream.emit(operand);
 
    codeStream.emit( OP_SAVEFIELD_FASTPATH );
+   (subType == TypeReqFloat) ? codeStream.emit(cvFloat) : codeStream.emit(cvInteger);
    codeStream.emit(0); codeStream.emit(0); //XXTH FieldCache
 
    if (type == TypeReqNone)

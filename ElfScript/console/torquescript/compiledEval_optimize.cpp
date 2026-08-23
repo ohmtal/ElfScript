@@ -2350,9 +2350,13 @@ handle_OP_SETCURFIELD_TYPE:
 
 handle_OP_LOADFIELD_FASTPATH:
 {
-      // // stack[_STK + 1].cleanupSetType((S32) code[ip]); ip++;
-      stack[_STK + 1].cleanupData();
-      stack[_STK + 1].type = (S32) code[ip]; ip++;
+      if (code[ip] < U32_MAX) {
+            if (stack[_STK + 1].type != (S32) code[ip]) {
+                  stack[_STK + 1].cleanupData();
+                  stack[_STK + 1].type = (S32) code[ip];
+            }
+      }
+      ip++;
 
 #ifdef ENABLE_INLINE_CACHE_LOAD
       ConsoleValue* stackPtr = &stack[_STK + 1];
@@ -2567,6 +2571,7 @@ handle_OP_LOADFIELD_FASTPATH:
 // // handle_OP_SAVEFIELD_FLT:
 handle_OP_SAVEFIELD_FASTPATH:
 {
+      S32 desiredType = (S32) code[ip]; ip++; //0.6e emitted type
 
 #ifdef ENABLE_INLINE_CACHE_SAVE
 
@@ -2602,7 +2607,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                         DISPATCH();
                   } else {
 
-#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG_TOO_MUCH
                         String typeName = "";
                         switch(cachePtr->type) {
                               case  staticField: typeName = "static Field"; break;
@@ -2660,7 +2665,13 @@ handle_OP_SAVEFIELD_FASTPATH:
                                     break;
                               #endif
                               default:
-                                    cachePtr->fieldValuePtr->setString(stackP->getString());
+                                    if (desiredType == ConsoleValueType::cvFloat)
+                                          cachePtr->fieldValuePtr->setFloat(stackP->getFloat());
+                                    else
+                                    if (desiredType == ConsoleValueType::cvInteger)
+                                          cachePtr->fieldValuePtr->setInt(stackP->getInt());
+                                    else
+                                          cachePtr->fieldValuePtr->setString(stackP->getString());
                                     break;
                         }
                         break;
@@ -3610,9 +3621,13 @@ handle_OP_BUILD_VECTOR_STRING: {
 
       PUSH_STK();
 
-      // after setString!!
+
       if (matchVectorFields) {
-            stack[_STK].type = ConsoleValueType::cvVector;
+            if (stack[_STK].type != ConsoleValueType::cvVector) {
+                  stack[_STK].cleanupData();
+                  stack[_STK].type = ConsoleValueType::cvVector;
+            }
+
             // Con::debugf("Set value type to ConsoleValueType::cvVector");
             // copy  to stack
             dMemcpy(stack[_STK].v.points, cv.points, sizeof(ConsoleVector::points));

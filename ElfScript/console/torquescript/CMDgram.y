@@ -651,9 +651,6 @@ stmt_expr
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
          vecNode->argList = (ExprNode*)$4;
-//          for (ExprNode* expr = (ExprNode*)$4; expr; expr = (ExprNode*)(expr->next)) {
-//              vecNode->elements.push_back(expr);
-//          }
          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
       }
    /* ============================================================================== */
@@ -666,9 +663,6 @@ stmt_expr
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
           vecNode->argList = (ExprNode*)$7;
-//          for (ExprNode* expr = (ExprNode*)$7; expr; expr = (ExprNode*)(expr->next)) {
-//             vecNode->elements.push_back(expr);
-//          }
          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, vecNode);
       }
    /* ============================================================================== */

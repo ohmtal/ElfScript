@@ -190,11 +190,7 @@ public:
       // cvSTEntry points into the StringTable (managed externally).
       // Numeric types use the f/i union fields — s is not valid for them.
 
-#ifndef ENABLE_CONSOLE_VECTOR
       if (type == ConsoleValueType::cvString && bufferLen > 0)
-#else
-      if ((type == ConsoleValueType::cvString || type == ConsoleValueType::cvVector)  && bufferLen > 0)
-#endif
       {
          dFree(s);
          bufferLen = 0;
@@ -210,8 +206,8 @@ public:
       s = const_cast<char*>(StringTable->EmptyString());
       bufferLen = 0;
 #ifdef ENABLE_CONSOLE_VECTOR
-      for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
-      // dMemset(v.points, 0, sizeof(ConsoleVector::points));
+      // for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
+      dMemset(v.points, 0, sizeof(ConsoleVector::points));
 #endif
    }
 
@@ -269,35 +265,41 @@ public:
 
    TORQUE_FORCEINLINE ConsoleVector getVector() const
    {
-         ConsoleVector result = {0};
-         switch (type)
-         {
-               case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
-               case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
-               // case ConsoleValueType::cvSTEntry:
-               //       return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
-               case ConsoleValueType::cvVector: return v;
-               case ConsoleValueType::cvString: {
-                     if (s[0] == '\0') break;
-                     dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-                     break;
-               }
+         if (type == ConsoleValueType::cvVector) return v;
+         else {
+               ConsoleVector result = {0};
+               switch (type)
+               {
+                     case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
+                     case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
+                     // case ConsoleValueType::cvSTEntry:
+                     //       return (s == StringTable->EmptyString()) ? 0.0 : dAtof(s);
+                     // case ConsoleValueType::cvVector: return v;
+                     case ConsoleValueType::cvString: {
+                           if (s[0] == '\0') break;
+                           dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+                           break;
+                     }
 
-               // case ConsoleValueType::cvNULL:
-               //       return 0.0;
-               // default:
-               //       return dAtof(getConsoleData());
+                     // case ConsoleValueType::cvNULL:
+                     //       return 0.0;
+                     // default:
+                     //       return dAtof(getConsoleData());
+               }
+               return result;
          }
-         return result;
+
    }
 #endif
 
    TORQUE_FORCEINLINE F64 getFloat() const
    {
+      if (type == ConsoleValueType::cvFloat)  return f;
+      else
       switch (type)
       {
-      case ConsoleValueType::cvFloat:
-         return f;
+      // case ConsoleValueType::cvFloat:
+      //    return f;
       case ConsoleValueType::cvInteger:
          return static_cast<F64>(i);
       case ConsoleValueType::cvSTEntry:
@@ -319,10 +321,10 @@ public:
 
    TORQUE_FORCEINLINE S64 getInt() const
    {
+      if (type == ConsoleValueType::cvInteger) return i;
+      else
       switch (type)
       {
-      case ConsoleValueType::cvInteger:
-         return i;
       case ConsoleValueType::cvFloat:
          return static_cast<S64>(f);
       case ConsoleValueType::cvSTEntry:
@@ -342,14 +344,16 @@ public:
 
    TORQUE_FORCEINLINE bool getBool() const
    {
+      if (type == ConsoleValueType::cvInteger) return (i != 0);
+      else
       switch (type)
       {
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return (v.points[0] != 0.0f);
 #endif
-      case ConsoleValueType::cvInteger:
-         return (i != 0);
+      // case ConsoleValueType::cvInteger:
+      //    return (i != 0);
       case ConsoleValueType::cvFloat:
          return (f != 0.0);
       case ConsoleValueType::cvSTEntry:
@@ -391,31 +395,38 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
+      if (type != ConsoleValueType::cvVector) {
          cleanupData();
          type = ConsoleValueType::cvVector;
-         v = vec;
+      }
+      v = vec;
    }
 #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvFloat;
+      if (type != ConsoleValueType::cvFloat) {
+            cleanupData();
+            type = ConsoleValueType::cvFloat;
+      }
       f = val;
    }
 
    TORQUE_FORCEINLINE void setInt(S64 val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvInteger;
+      if (type != ConsoleValueType::cvInteger) {
+            cleanupData();
+            type = ConsoleValueType::cvInteger;
+      }
 
       i = val;
    }
 
    TORQUE_FORCEINLINE void setBool(bool val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvInteger;
-
+      if (type != ConsoleValueType::cvInteger) {
+            cleanupData();
+            type = ConsoleValueType::cvInteger;
+      }
       i = val ? S64(1) : S64(0);
    }
 

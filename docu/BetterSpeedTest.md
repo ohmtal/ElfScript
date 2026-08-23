@@ -3,6 +3,15 @@
 ## Version 0.6d (RelWithDebug) : 
 - revisit and optimize foreach/for range
 
+### Summery ElfScript 0.6d vs TorqueScript
+
+- Static Float Field:    37 times faster
+- Dynamic Float Field:   25 times faster
+- Float Component:       19 times faster 
+- Local Float Variable:  14 times faster 
+- Global Float Variable:  8 times faster 
+
+
 ## Version 0.6c (RelWithDebug) : 
 - revisited inline cache. removed components from cache. 
 - fastpath setDataField/getDataField/fillFieldCache moved inline to header << over a second faster! 
@@ -37,6 +46,7 @@ Componentfields
 
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
+
 - OGE3D* using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
