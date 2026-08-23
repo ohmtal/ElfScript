@@ -168,6 +168,9 @@ foreach( %i  in range 0..0) { print(%i); } /* no output*/
 // all the previous also work with for:
 for( %i in range 3) { print(%i); } /* print: 1 2 */
 for( %i in range 0..5 step 3) { print(%i); } /* print: 0 3 */
+for( %i in range 0..-5 step -3) { print(%i); } /* print: 0 -3 */
+
+for( %i in range 0..-5 step 1) { print(%i); } /* print: ERROR */
 
 ```
 

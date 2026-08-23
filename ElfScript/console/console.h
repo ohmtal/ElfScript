@@ -175,7 +175,7 @@ public:
 #endif
 
    S32 type;
-   U32 bufferLen;
+   // U32 bufferLen;
 
    static DataChunker sConversionAllocator;
 

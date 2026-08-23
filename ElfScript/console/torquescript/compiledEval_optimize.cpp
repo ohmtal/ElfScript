@@ -65,7 +65,7 @@ enum EvalConstants
 struct IterStackRecord
 {
    /// If true, this is a foreach$ loop; if not, it's a foreach loop.
-   U32 mMode = 0; //1=string, 2, 102=Range, 0(default) = SimObject
+   // U32 mMode = 0; //1=string, 2, 102=Range, 0(default) = SimObject
 
    /// True if the variable referenced is a global
    // // bool mIsGlobalVariable;
@@ -104,6 +104,7 @@ struct IterStackRecord
 
    struct RangePos
    {
+      bool isPositive;
       S32  mStart; // first number (included)
       S32  mEnd;  // last number (included)
       S32  mInc;  // -1, +1 maybe we can add STEP :)
@@ -140,7 +141,6 @@ U32 _ITER = 0;    ///< Stack pointer for iterStack.
 --_ITER;                \
 --iterDepth;            \
 POP_STK();              \
-iterStack[_ITER].mMode = 0;   \
 } \
 
 #define CLEAR_ITER_STATE() \
@@ -1353,7 +1353,11 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_BREAK,
 
          &&handle_OP_ITER_BEGIN,
-         &&handle_OP_ITER,
+
+         &&handle_OP_ITER_STRING,
+         &&handle_OP_ITER_SIMOBJECT,
+         &&handle_OP_ITER_FOR_INT,
+
          &&handle_OP_ITER_END,
 
 
@@ -3221,7 +3225,7 @@ handle_OP_ITER_BEGIN:
       IterStackRecord& iter = iterStack[_ITER];
       // iter.mIsGlobalVariable = isGlobal;
 
-      iter.mMode = mode;
+      // obsolete iter.mMode = mode;
 
       if (isGlobal)
       {
@@ -3238,7 +3242,7 @@ handle_OP_ITER_BEGIN:
       }
 
 
-      switch (iter.mMode) {
+      switch (mode) {
             case 1: // string
             {
                   iter.mData.mStr.mString = stack[_STK].getString();
@@ -3257,16 +3261,15 @@ handle_OP_ITER_BEGIN:
 
                   if (iter.mData.mRange.mStart > iter.mData.mRange.mEnd) iter.mData.mRange.mInc = -1;
                   else iter.mData.mRange.mInc = 1;
-                  if ( iter.mMode == 102 ) {
+                  if ( mode == 102 ) {
                         iter.mData.mRange.mStop = iter.mData.mRange.mEnd;
-                        iter.mMode = 2;
                   } else {
                         iter.mData.mRange.mStop = iter.mData.mRange.mEnd + iter.mData.mRange.mInc;
 
                   }
 
                   iter.mConsoleValue->setInt(0);
-                  iter.mMode = iter.mData.mRange.mInc > 0 ? 200 : 201;
+                  iter.mData.mRange.isPositive = iter.mData.mRange.mInc > 0;
             }
             break;
 
@@ -3296,16 +3299,15 @@ handle_OP_ITER_BEGIN:
                   }
 
 
-                  if ( iter.mMode == 103 ) {
+                  if ( mode == 103 ) {
                         iter.mData.mRange.mStop = end;
                   } else {
                         if (inc > 0) iter.mData.mRange.mStop = end + 1;
                         else iter.mData.mRange.mStop = end - 1;
                   }
 
-                  // iter.mMode = 2; // overwrite to mode 2 .. same calulation only with variable inrement
                   iter.mConsoleValue->setInt(0);
-                  iter.mMode = iter.mData.mRange.mInc > 0 ? 200 : 201;
+                  iter.mData.mRange.isPositive = iter.mData.mRange.mInc > 0;
             }
             break;
 
@@ -3320,7 +3322,7 @@ handle_OP_ITER_BEGIN:
                   // iter.mMode = 2; // overwrite to mode 2 .. same calulation only with variable inrement
 
                   iter.mConsoleValue->setInt(0);
-                  iter.mMode = iter.mData.mRange.mInc > 0 ? 200 : 201;
+                  iter.mData.mRange.isPositive = iter.mData.mRange.mInc > 0;
             }
             break;
 
@@ -3355,15 +3357,88 @@ handle_OP_ITER_BEGIN:
       ip += isGlobal ? 4 : 3;
       DISPATCH();
 }
-
-
-handle_OP_ITER:
+// -----------------------------------------------------------------------------
+handle_OP_ITER_STRING:
 {
       U32 breakIp = code[ip];
       IterStackRecord& iter = iterStack[_ITER - 1];
+      const char* str = iter.mData.mStr.mString;
 
-      // most used first for step > 0 >>>>>>>>>>>>>>>>>>
-      if (iter.mMode == 200) {
+      U32 startIndex = iter.mData.mStr.mIndex;
+      U32 endIndex = startIndex;
+
+      // Break if at end.
+
+      if (!str[startIndex])
+      {
+            ip = breakIp;
+            DISPATCH(); // continue;
+      }
+
+      // Find right end of current component.
+
+      if (!dIsspace(str[endIndex])) {
+            while (str[endIndex] && !dIsspace(str[endIndex])) {
+                  ++endIndex;
+            }
+      }
+
+
+      // Extract component.
+
+      if (endIndex != startIndex)
+      {
+            char savedChar = str[endIndex];
+            const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+
+            iter.mConsoleValue->setString(&str[startIndex]);
+            const_cast<char*>(str)[endIndex] = savedChar;
+      }
+      else
+      {
+            iter.mConsoleValue->setString("");
+      }
+
+      // Skip separator.
+      if (str[endIndex] != '\0')
+            ++endIndex;
+
+      iter.mData.mStr.mIndex = endIndex;
+
+      //
+      ++ip;
+      DISPATCH();
+}
+
+handle_OP_ITER_SIMOBJECT:
+{
+      U32 breakIp = code[ip];
+      IterStackRecord& iter = iterStack[_ITER - 1];
+      U32 index = iter.mData.mObj.mIndex;
+      SimSet* set = iter.mData.mObj.mSet;
+
+      if (index >= set->size())
+      {
+            ip = breakIp;
+            DISPATCH(); // continue;
+      }
+
+      SimObjectId id = set->at(index)->getId();
+
+      iter.mConsoleValue->i = id;
+
+      iter.mData.mObj.mIndex = index + 1;
+
+      ++ip;
+      DISPATCH(); // fettisch
+}
+
+handle_OP_ITER_FOR_INT:
+{
+     U32 breakIp = code[ip];
+     IterStackRecord& iter = iterStack[_ITER - 1];
+     if ( iter.mData.mRange.isPositive)
+     {
             S32 needle = iter.mData.mRange.mStart;
             S32 stop   = iter.mData.mRange.mStop;
 
@@ -3378,29 +3453,7 @@ handle_OP_ITER:
             DISPATCH(); // fettisch
       }
       else
-      // now the simset looper >>>>>>>>>>>>>>>>>>>>
-      if (iter.mMode == 0) {
-            U32 index = iter.mData.mObj.mIndex;
-            SimSet* set = iter.mData.mObj.mSet;
-
-            if (index >= set->size())
-            {
-                  ip = breakIp;
-                  DISPATCH(); // continue;
-            }
-
-            SimObjectId id = set->at(index)->getId();
-
-            iter.mConsoleValue->i = id;
-
-            iter.mData.mObj.mIndex = index + 1;
-
-            ++ip;
-            DISPATCH(); // fettisch
-      }//SIMSET
-      else
-      // for range
-      if (iter.mMode == 201) {
+      {
             S32 needle = iter.mData.mRange.mStart;
             S32 stop   = iter.mData.mRange.mStop;
 
@@ -3414,62 +3467,131 @@ handle_OP_ITER:
             ++ip;
             DISPATCH(); // fettisch
       }
-      else
-      // now the slow string mode >>>>>>>>>>>>>>>>>>>
-      if (iter.mMode == 1) {
-            const char* str = iter.mData.mStr.mString;
 
-            U32 startIndex = iter.mData.mStr.mIndex;
-            U32 endIndex = startIndex;
-
-            // Break if at end.
-
-            if (!str[startIndex])
-            {
-                  ip = breakIp;
-                  DISPATCH(); // continue;
-            }
-
-            // Find right end of current component.
-
-            if (!dIsspace(str[endIndex])) {
-                  while (str[endIndex] && !dIsspace(str[endIndex])) {
-                        ++endIndex;
-                  }
-            }
-
-
-            // Extract component.
-
-            if (endIndex != startIndex)
-            {
-                  char savedChar = str[endIndex];
-                  const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
-
-                  iter.mConsoleValue->setString(&str[startIndex]);
-                  const_cast<char*>(str)[endIndex] = savedChar;
-            }
-            else
-            {
-                  iter.mConsoleValue->setString("");
-            }
-
-            // Skip separator.
-            if (str[endIndex] != '\0')
-                  ++endIndex;
-
-            iter.mData.mStr.mIndex = endIndex;
-
-            //
-            ++ip;
-            DISPATCH();
-      } //string end
-      else {
-            Con::errorf("NO valid Foreach mode --- something is really wrong here!!");
-            ip = breakIp;
-            DISPATCH();
-      }
 }
+
+// handle_OP_ITER:
+// {
+//
+//
+//       U32 breakIp = code[ip];
+//       IterStackRecord& iter = iterStack[_ITER - 1];
+//
+//
+//       Con::errorf("WHAT ARE YOU DOING HERE ???????");
+//       ip = breakIp;
+//       DISPATCH();
+//
+//
+//       // // // ............................. orig code ................
+//       // // // most used first for step > 0 >>>>>>>>>>>>>>>>>>
+//       // // if (iter.mMode == 200) {
+//       // //       S32 needle = iter.mData.mRange.mStart;
+//       // //       S32 stop   = iter.mData.mRange.mStop;
+//       // //
+//       // //       if (needle >= stop) {
+//       // //             ip = breakIp;
+//       // //             DISPATCH();
+//       // //       }
+//       // //       iter.mConsoleValue->i = needle;
+//       // //       iter.mData.mRange.mStart = needle + iter.mData.mRange.mInc;
+//       // //
+//       // //       ++ip;
+//       // //       DISPATCH(); // fettisch
+//       // // }
+//       // // else
+//       // // // now the simset looper >>>>>>>>>>>>>>>>>>>>
+//       // // if (iter.mMode == 0) {
+//       // //       U32 index = iter.mData.mObj.mIndex;
+//       // //       SimSet* set = iter.mData.mObj.mSet;
+//       // //
+//       // //       if (index >= set->size())
+//       // //       {
+//       // //             ip = breakIp;
+//       // //             DISPATCH(); // continue;
+//       // //       }
+//       // //
+//       // //       SimObjectId id = set->at(index)->getId();
+//       // //
+//       // //       iter.mConsoleValue->i = id;
+//       // //
+//       // //       iter.mData.mObj.mIndex = index + 1;
+//       // //
+//       // //       ++ip;
+//       // //       DISPATCH(); // fettisch
+//       // // }//SIMSET
+//       // // else
+//       // // // for range
+//       // // if (iter.mMode == 201) {
+//       // //       S32 needle = iter.mData.mRange.mStart;
+//       // //       S32 stop   = iter.mData.mRange.mStop;
+//       // //
+//       // //       if (needle <= stop) {
+//       // //             ip = breakIp;
+//       // //             DISPATCH();
+//       // //       }
+//       // //       iter.mConsoleValue->i = needle;
+//       // //       iter.mData.mRange.mStart = needle + iter.mData.mRange.mInc;
+//       // //
+//       // //       ++ip;
+//       // //       DISPATCH(); // fettisch
+//       // // }
+//       // // else
+//       // // // now the slow string mode >>>>>>>>>>>>>>>>>>>
+//       // // if (iter.mMode == 1) {
+//       // //       const char* str = iter.mData.mStr.mString;
+//       // //
+//       // //       U32 startIndex = iter.mData.mStr.mIndex;
+//       // //       U32 endIndex = startIndex;
+//       // //
+//       // //       // Break if at end.
+//       // //
+//       // //       if (!str[startIndex])
+//       // //       {
+//       // //             ip = breakIp;
+//       // //             DISPATCH(); // continue;
+//       // //       }
+//       // //
+//       // //       // Find right end of current component.
+//       // //
+//       // //       if (!dIsspace(str[endIndex])) {
+//       // //             while (str[endIndex] && !dIsspace(str[endIndex])) {
+//       // //                   ++endIndex;
+//       // //             }
+//       // //       }
+//       // //
+//       // //
+//       // //       // Extract component.
+//       // //
+//       // //       if (endIndex != startIndex)
+//       // //       {
+//       // //             char savedChar = str[endIndex];
+//       // //             const_cast<char*>(str)[endIndex] = '\0'; // We are on the string stack so this is okay.
+//       // //
+//       // //             iter.mConsoleValue->setString(&str[startIndex]);
+//       // //             const_cast<char*>(str)[endIndex] = savedChar;
+//       // //       }
+//       // //       else
+//       // //       {
+//       // //             iter.mConsoleValue->setString("");
+//       // //       }
+//       // //
+//       // //       // Skip separator.
+//       // //       if (str[endIndex] != '\0')
+//       // //             ++endIndex;
+//       // //
+//       // //       iter.mData.mStr.mIndex = endIndex;
+//       // //
+//       // //       //
+//       // //       ++ip;
+//       // //       DISPATCH();
+//       // // } //string end
+//       // // else {
+//       // //       Con::errorf("NO valid Foreach mode --- something is really wrong here!!");
+//       // //       ip = breakIp;
+//       // //       DISPATCH();
+//       // // }
+// }
 
 // handle_OP_ITER:
 // {

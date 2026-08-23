@@ -1,5 +1,8 @@
 # ElfScript Simple Speed Test:
 
+## Version 0.6f : 
+- splitted the foreach / for range OP codes but i had it fully optimized in 0.6d
+
 ## Version 0.6e : 
 - removed cvString and only using cvSTEntry
 
@@ -88,7 +91,8 @@ Componentfields
 
 ### docu/speedtest/elf/test_for.elf
 - 0.6c : 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
-- 0.6e : 1.410u 0.006s 0:01.43 98.6%     0+0k 0+0io 0pf+0w
+- 0.6e : 1.374u 0.007s 0:01.39 98.5%     0+0k 0+0io 0pf+0w
+
 
 ### Crazy Elf: assets/modules/StarField.elf 
 - 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak

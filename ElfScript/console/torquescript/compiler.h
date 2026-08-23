@@ -163,7 +163,12 @@ namespace Compiler
       OP_BREAK,
 
       OP_ITER_BEGIN,       ///< Prepare foreach iterator.
-      OP_ITER,             ///< Enter foreach loop.
+      // // obsolete OP_ITER,             ///< Enter foreach loop.
+      // Elfscript 0.6f
+      OP_ITER_STRING,
+      OP_ITER_SIMOBJECT,
+      OP_ITER_FOR_INT,
+
       OP_ITER_END,         ///< End foreach loop.
 
 

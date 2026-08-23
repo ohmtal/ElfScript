@@ -355,15 +355,19 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
    const U32 startIp = ip;
 
+   U32 iterOPCode = OP_ITER_SIMOBJECT;
+
    switch (mode) {
          case 1:
             startExpr->compile(codeStream, startIp, TypeReqString);
+            iterOPCode = OP_ITER_STRING;
             break;
          case 102: //same as 2 but  for %i in range START..STOP
             TORQUE_CASE_FALLTHROUGH;
          case 2: // for i in FIRST..LAST
             startExpr->compile(codeStream, startIp, TypeReqUInt);
             endExpr->compile(codeStream, startIp, TypeReqUInt);
+            iterOPCode = OP_ITER_FOR_INT;
             break;
          case 103: //same as 3 but  for %i in range START..STOP
             TORQUE_CASE_FALLTHROUGH;
@@ -371,17 +375,47 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
             startExpr->compile(codeStream, startIp, TypeReqUInt);
             endExpr->compile(codeStream, startIp, TypeReqUInt);
             stepExpr->compile(codeStream, startIp, TypeReqUInt);
+            iterOPCode = OP_ITER_FOR_INT;
+            // works fine but i did not think about: foreach( %i  in range 3..1) { print(%i); } /* print: 3 2*/
+            // NOTE use something like this somewhere else ;)) - was hard to fiddle out how this works
+            // // // // hack fest ;)
+            // // // {
+            // // //       bool isNegative = false;
+            // // //       FloatUnaryExprNode* unaryNode = dynamic_cast<FloatUnaryExprNode*>(stepExpr);
+            // // //       if (unaryNode != nullptr)
+            // // //       {
+            // // //             isNegative = true;
+            // // //             ip = unaryNode->expr->compile(codeStream, startIp, TypeReqUInt);
+            // // //       }
+            // // //       else
+            // // //       {
+            // // //             ip = stepExpr->compile(codeStream, startIp, TypeReqUInt);
+            // // //       }
+            // // //
+            // // //       if (isNegative) {
+            // // //             Con::errorf("NEGATIVE STEP!!!");
+            // // //             iterOPCode = OP_ITER_FOR_NEGSTEP;
+            // // //       } else {
+            // // //             Con::errorf("POSITIVE STEP!!!");
+            // // //             iterOPCode = OP_ITER_FOR;
+            // // //       }
+            // // // }
+
+
             break;
 
          // 4 does not exits!
          case 104: // for i in range 10 (only one parameter)
             startExpr->compile(codeStream, startIp, TypeReqUInt);
+            iterOPCode = OP_ITER_FOR_INT;
             break;
 
          default:
             startExpr->compile(codeStream, startIp, TypeReqString);
+            iterOPCode =OP_ITER_SIMOBJECT;
             break;
    }
+
 
    codeStream.emit(OP_ITER_BEGIN);
    codeStream.emit(mode); //instead of different OP_ codes i emmit the mode
@@ -392,7 +426,17 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
    else
       codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName, varType, dbgLineNumber));
    const U32 finalFix = codeStream.emit(0);
-   const U32 continueIp = codeStream.emit(OP_ITER);
+
+   // ElfScript 0.6f
+   /*
+      OP_ITER_STRING,
+      OP_ITER_SIMOBJECT,
+      OP_ITER_FOR
+    */
+   const U32 continueIp = codeStream.emit(iterOPCode);
+   // const U32 continueIp = codeStream.emit(OP_ITER);
+
+
    codeStream.emitFix(CodeStream::FIXTYPE_BREAK);
    const U32 bodyIp = codeStream.tell();
 

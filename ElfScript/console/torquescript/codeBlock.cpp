@@ -1484,16 +1484,33 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       //    break;
       // }
 
-      case OP_ITER:
+      case OP_ITER_STRING:
       {
          U32 breakIp = code[ip];
 
-         Con::printf("%i: OP_ITER stk=0 breakIp=%i", ip - 1, breakIp);
+         Con::printf("%i: OP_ITER_STRING stk=0 breakIp=%i", ip - 1, breakIp);
 
          ++ip;
          break;
       }
+      case OP_ITER_SIMOBJECT:
+      {
+            U32 breakIp = code[ip];
 
+            Con::printf("%i: OP_ITER_SIMOBJECT stk=0 breakIp=%i", ip - 1, breakIp);
+
+            ++ip;
+            break;
+      }
+      case OP_ITER_FOR_INT:
+      {
+            U32 breakIp = code[ip];
+
+            Con::printf("%i: OP_ITER_FOR_INT stk=0 breakIp=%i", ip - 1, breakIp);
+
+            ++ip;
+            break;
+      }
       case OP_ITER_END:
       {
          Con::printf("%i: OP_ITER_END stk=-1", ip - 1);
