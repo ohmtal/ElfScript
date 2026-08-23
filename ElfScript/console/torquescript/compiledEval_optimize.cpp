@@ -2378,7 +2378,8 @@ handle_OP_LOADFIELD_FASTPATH:
             *cacheSlot = cachePtr;
             cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
             if (cachePtr->cacheFailed) {
-                  Con::errorf("error invalid field detected : %s", curField);
+                  Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
+                  stackPtr->setString("");
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2388,7 +2389,8 @@ handle_OP_LOADFIELD_FASTPATH:
       // double safety
       if (cachePtr) {
             if (cachePtr->cacheFailed) {
-                  Con::warnf("we have a cache (type:%d) for field: %s ! But it failed to fetch a field or component!!", (S32)cachePtr->type, curField);
+                  Con::warnf("LOAD: we have a cache (type:%d) for field: %s ! But it failed to fetch a field or component!! object:%d"
+                  , (S32)cachePtr->type, curField, curObject ? curObject->getId() : 0);
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2425,6 +2427,11 @@ handle_OP_LOADFIELD_FASTPATH:
                          );
                         break;
                   }
+                  case dynamicField_WithArray: {
+                        curObject->stackDynamicField(curField, curFieldArray, &stack[_STK + 1]);
+                        break;
+                  }
+
                   case dynamicField:
                   {
                         switch (cachePtr->fieldValuePtr->type)  {
@@ -2448,7 +2455,9 @@ handle_OP_LOADFIELD_FASTPATH:
                         break;
                   }
                   default: {
-                        Con::printf("We have a special field ... ignored");
+                        Con::printf("LOAD: We have a special field (%s object:%d)... ignored"
+                              ,curField,  curObject ? curObject->getId() : 0
+                        );
                         break;
                   }
 
@@ -2456,7 +2465,7 @@ handle_OP_LOADFIELD_FASTPATH:
 
 
       } else {
-            Con::errorf("FIXME something failed here !!!!!!");
+            Con::errorf("LOAD: FIXME something failed here !!!!!! (%s object:%d)",  curField, curObject ? curObject->getId() : 0);
       }
 
       PUSH_STK();
@@ -2587,7 +2596,7 @@ handle_OP_SAVEFIELD_FASTPATH:
 
                   if (cachePtr->cacheFailed) {
                         Con::printSeparator();
-                        Con::errorf("error invalid field detected : %s[%s]", curField, curFieldArray);
+                        Con::errorf("SAVE: error invalid field detected : %s[%s] object:%d", curField, curFieldArray, curObject ? curObject->getId() : 0 );
                         Con::printSeparator();
 
                         DISPATCH();
@@ -2598,10 +2607,11 @@ handle_OP_SAVEFIELD_FASTPATH:
                         switch(cachePtr->type) {
                               case  staticField: typeName = "static Field"; break;
                               case  staticField_NoFastPath: typeName = "static Field but no fast path available"; break;
+                              case  dynamicField_WithArray: typeName = "dynamic Field but with array available"; break;
                               case  dynamicField: typeName = "dynamic field"; break;
                               default: typeName = "ERROR ?!! check fillFieldCache!!!!"; break;
                         }
-                        Con::printf("cached field: %s[%s] type: %s (%d)", curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
+                        Con::printf("SAVE: object: %d cached field: %s[%s] type: %s (%d)", curObject ? curObject->getId() : 0 , curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
 #endif
                   }
       } //if not cachePtr
@@ -2609,7 +2619,9 @@ handle_OP_SAVEFIELD_FASTPATH:
       // double safety
       if (cachePtr) {
             if (cachePtr->cacheFailed) {
-                  Con::warnf("we have a cache but it failed to fetch a field or component!!");
+                  Con::warnf("SAVE: we have a cache but it failed to fetch a field or component, fallback to old method (%s object:%d)"
+                             ,  curField, curObject ? curObject->getId() : 0 );
+                  curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
                   DISPATCH();
             }
 
@@ -2627,6 +2639,10 @@ handle_OP_SAVEFIELD_FASTPATH:
                         // FIXME 2 why is array index a problem on fast path?
                         // curObject->setDataField(curField, cachePtr->staticArrayIndex, stack[_STK].getString());
                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+                        break;
+                  }
+                  case dynamicField_WithArray: {
+                        curObject->pushDynamicField(curField, curFieldArray, &stack[_STK]);
                         break;
                   }
                   case dynamicField: {
@@ -2650,7 +2666,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                         break;
                   }
                   default: {
-                        Con::printf("We have a special field ... ignored");
+                        Con::printf("SAVE: We have a special field ... ignored (%s object:%d)" ,  curField, curObject ? curObject->getId() : 0 );
                         break;
                   }
 
@@ -2658,7 +2674,7 @@ handle_OP_SAVEFIELD_FASTPATH:
 
 
       } else {
-            Con::errorf("FIXME something failed here !!!!!!");
+            Con::errorf("SAVE: Something failed here - fix this !!!!!! (%s object:%d)", curField, curObject ? curObject->getId() : 0 );
       }
 
       DISPATCH();

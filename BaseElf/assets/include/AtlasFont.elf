@@ -16,8 +16,8 @@ function AtlasFont::onAdd(%this) {
     %this.CharWidth = 16;
     %this.CharHeight = 32;
 
-    if (!%this.rowCount) %this.rowCount = 10;
-    if (!%this.colCount) %this.colCount = 10;
+    if (!%this.isField("rowCount")) %this.rowCount = 10;
+    if (!%this.isField("colCount")) %this.colCount = 10;
     %size = %this.getSize();
     %this.FrameWidth = %size.x / %this.rowCount;
     %this.FrameHeight = %size.y / %this.colCount;

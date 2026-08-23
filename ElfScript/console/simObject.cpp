@@ -1072,59 +1072,60 @@ bool SimObject::pushDataField(StringTableEntry slotName, const char *array, Cons
 
       // ~~~~~~~~~ DYNAMIC FIELDS ~~~~~~~~~~
       // IT MUST BE A DYNAMIC FIELD ???!!! if(mFlags.test(canModDynamicFields()))
-      {
-            StringTableEntry dynamicFieldName = nullptr;
-
-
-            if(arrayEmpty) {
-                  dynamicFieldName = slotName;
-            } else {
-                  char buf[256];
-                  dStrcpy(buf, slotName, 256);
-                  dStrcat(buf, array, 256);
-                  dynamicFieldName = StringTable->insert(buf);
-            }
-
-            SimFieldDictionary::Entry* entry = nullptr;
-            if(!mFieldDictionary) {
-                  mFieldDictionary = new SimFieldDictionary;
-            } else {
-                  entry = mFieldDictionary->findDynamicField(dynamicFieldName);
-            }
-
-
-            // let fetch the entry directly ::::: FIXME ConsoleBaseType ?!
-            if (!entry) {
-                  entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
-                  if (stackP) {
-                        entry->mValue.bufferLen = 0; // else we get in trouble on clean
-                        entry->mValue.type = stackP->type;
-                  }
-            }
-
-            // ConsoleValueType
-            switch (entry->mValue.type)  {
-                  case ConsoleValueType::cvInteger:
-                        entry->mValue.setInt( stackP->getInt());
-                        // entry->mValue.setFastInt( stackP->getInt());
-                        break;
-                  case ConsoleValueType::cvFloat:
-                        entry->mValue.setFloat(stackP->getFloat());
-                        // entry->mValue.setFastFloat(stackP->getFloat());
-                        break;
-#ifdef ENABLE_CONSOLE_VECTOR
-                  case ConsoleValueType::cvVector:
-                        entry->mValue.setVector(stackP->getVector());
-                        // entry->mValue.setFastFloat(stackP->getFloat());
-                        break;
-#endif
-                  default:
-                        entry->mValue.setString(stackP->getString());
-                        break;
-            }
-
-            return true;
-      }
+      return this->pushDynamicField(slotName,  array, stackP);
+//       {
+//             StringTableEntry dynamicFieldName = nullptr;
+//
+//
+//             if(arrayEmpty) {
+//                   dynamicFieldName = slotName;
+//             } else {
+//                   char buf[256];
+//                   dStrcpy(buf, slotName, 256);
+//                   dStrcat(buf, array, 256);
+//                   dynamicFieldName = StringTable->insert(buf);
+//             }
+//
+//             SimFieldDictionary::Entry* entry = nullptr;
+//             if(!mFieldDictionary) {
+//                   mFieldDictionary = new SimFieldDictionary;
+//             } else {
+//                   entry = mFieldDictionary->findDynamicField(dynamicFieldName);
+//             }
+//
+//
+//             // let fetch the entry directly ::::: FIXME ConsoleBaseType ?!
+//             if (!entry) {
+//                   entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
+//                   if (stackP) {
+//                         entry->mValue.bufferLen = 0; // else we get in trouble on clean
+//                         entry->mValue.type = stackP->type;
+//                   }
+//             }
+//
+//             // ConsoleValueType
+//             switch (entry->mValue.type)  {
+//                   case ConsoleValueType::cvInteger:
+//                         entry->mValue.setInt( stackP->getInt());
+//                         // entry->mValue.setFastInt( stackP->getInt());
+//                         break;
+//                   case ConsoleValueType::cvFloat:
+//                         entry->mValue.setFloat(stackP->getFloat());
+//                         // entry->mValue.setFastFloat(stackP->getFloat());
+//                         break;
+// #ifdef ENABLE_CONSOLE_VECTOR
+//                   case ConsoleValueType::cvVector:
+//                         entry->mValue.setVector(stackP->getVector());
+//                         // entry->mValue.setFastFloat(stackP->getFloat());
+//                         break;
+// #endif
+//                   default:
+//                         entry->mValue.setString(stackP->getString());
+//                         break;
+//             }
+//
+//             return true;
+//       }
 }
 
 // ----------------------------------------------------------------------------
@@ -1551,56 +1552,57 @@ bool SimObject::stackDataField(StringTableEntry slotName, const char *array, Con
       // ~~~~~~~~~ DYNAMIC FIELDS ~~~~~~~~~~
       if(mFlags.test(ModDynamicFields))
       {
-            StringTableEntry dynamicFieldName = nullptr;
-            if(arrayEmpty) {
-                  dynamicFieldName = slotName;
-            } else {
-                  char buf[256];
-                  dStrcpy(buf, slotName, 256);
-                  dStrcat(buf, array, 256);
-                  dynamicFieldName = StringTable->insert(buf);
-            }
-
-
-            SimFieldDictionary::Entry* entry = nullptr;
-            if ( mFieldDictionary ) {
-                  entry = mFieldDictionary->findDynamicField(dynamicFieldName);
-            }
-
-            if (entry)
-            {
-
-
-                  // switch (stackP->getType()) {
-                  switch(entry->mValue.getType()) //TEST
-                  {
-                        case ConsoleValueType::cvInteger:
-                              // switch(entry->mValue.getType()) {
-                              switch(stackP->getType()) { //TEST
-                                    case ConsoleValueType::cvInteger: stackP->setFastInt(entry->mValue.getFastInt()); break;
-                                    case ConsoleValueType::cvFloat: stackP->setInt(entry->mValue.getInt()); break;
-                                    default: stackP->setInt(entry->mValue.getInt()); break;
-                              }
-                              break;
-                              case ConsoleValueType::cvFloat:
-                                    stackP->setFloat(entry->mValue.getFloat());
-                                    // stackP->setFastFloat(entry->mValue.getFloat());
-                                    break;
-#ifdef ENABLE_CONSOLE_VECTOR
-                              case ConsoleValueType::cvVector:
-                                    stackP->setVector(entry->mValue.getVector());
-                                    break;
-#endif
-                              default: {
-                                    const char* str = entry->mValue.getString();
-                                    if (str) stackP->setString(str);
-                                    else stackP->setString("");
-                                    break;
-                              }
-                              break;
-                  }
-                  return true;
-            }
+            return this->stackDynamicField(slotName, array, stackP);
+//             StringTableEntry dynamicFieldName = nullptr;
+//             if(arrayEmpty) {
+//                   dynamicFieldName = slotName;
+//             } else {
+//                   char buf[256];
+//                   dStrcpy(buf, slotName, 256);
+//                   dStrcat(buf, array, 256);
+//                   dynamicFieldName = StringTable->insert(buf);
+//             }
+//
+//
+//             SimFieldDictionary::Entry* entry = nullptr;
+//             if ( mFieldDictionary ) {
+//                   entry = mFieldDictionary->findDynamicField(dynamicFieldName);
+//             }
+//
+//             if (entry)
+//             {
+//
+//
+//                   // switch (stackP->getType()) {
+//                   switch(entry->mValue.getType()) //TEST
+//                   {
+//                         case ConsoleValueType::cvInteger:
+//                               // switch(entry->mValue.getType()) {
+//                               switch(stackP->getType()) { //TEST
+//                                     case ConsoleValueType::cvInteger: stackP->setFastInt(entry->mValue.getFastInt()); break;
+//                                     case ConsoleValueType::cvFloat: stackP->setInt(entry->mValue.getInt()); break;
+//                                     default: stackP->setInt(entry->mValue.getInt()); break;
+//                               }
+//                               break;
+//                               case ConsoleValueType::cvFloat:
+//                                     stackP->setFloat(entry->mValue.getFloat());
+//                                     // stackP->setFastFloat(entry->mValue.getFloat());
+//                                     break;
+// #ifdef ENABLE_CONSOLE_VECTOR
+//                               case ConsoleValueType::cvVector:
+//                                     stackP->setVector(entry->mValue.getVector());
+//                                     break;
+// #endif
+//                               default: {
+//                                     const char* str = entry->mValue.getString();
+//                                     if (str) stackP->setString(str);
+//                                     else stackP->setString("");
+//                                     break;
+//                               }
+//                               break;
+//                   }
+//                   return true;
+//             }
       }
 
 

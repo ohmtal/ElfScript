@@ -46,6 +46,7 @@ exec ("include/GuiTool.elf");
 function createAquarium() {
     %obj = new ScriptGroup(Aquarium) {
         // class = "Aquarium";
+        TypeS32 mouseObject = 0;
     };
 
     return %obj;
@@ -59,6 +60,7 @@ function Aquarium::onAdd(%this) {
 
     %this.Spritesheet = loadTextureAtlas("texture/kenney_fish-pack_2/Spritesheet/", "spritesheet-double.xml", 0.5);
     %this.Spritesheet.name = "SpriteSheet";
+    %this.Spritesheet.backRect = "";
     %this.add(%this.Spritesheet);
 
     %this.showSheet = true;
@@ -113,14 +115,15 @@ function Aquarium::onAdd(%this) {
     %this.SelectObjectMenu = new SimObject() {
         class = "GuiToolMenu";
         MenuCaption = "select";
-        MenuFontScale = 1.2;
+        TypeF32 MenuFontScale = 1.2;
         OnMenuObject = %this;
         OnMenuMethod = "onSelectObject";
         MenuTextureAtlas = %this.SpriteSheet;
-        MenuTextureAtlasSize = { 24, 24 };
+        TypeVector MenuTextureAtlasSize = { 24, 24 };
         MenuEntries = "";
         MenuTextureRects = "";
-        NoDarkenOverlay = true;
+        TypeBool NoDarkenOverlay = true;
+        TypeVector position = {0};
     };
     %this.add(%this.SelectObjectMenu);
 

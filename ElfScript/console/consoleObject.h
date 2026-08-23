@@ -1394,6 +1394,7 @@ enum FieldCacheType {
       staticField,
       staticField_NoFastPath,
       dynamicField,
+      dynamicField_WithArray,
       ARCFirstCustomField //skip this
 };
 
