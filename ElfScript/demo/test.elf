@@ -264,7 +264,81 @@ function cp() {
     %result.update();
 }
 
-$Debug::DumpByteCode=1;
+
+printSeparator();
+print("--- component test ---");
+$globalVec = {1,2,3,4};
+%localVec = {5,6,7,8};
+%obj = new Object() { TypeVector vec = {9,10,11,12}; TypeString strVec = "13 14 15 16";};
+
+for (%i in range 10) {
+    $globalVec.x ++;
+    %localVec.x ++;
+    %obj.vec.x ++;
+    %obj.strVec.x++;
+}
+if ($globalVec.x != 11) error("$globalVec.x failed!"); else print("* global passed");
+if (%localVec.x != 15) error("%localVec.x failed!"); else   print("* local passed");
+if (%obj.vec.x != 19) error("%obj.vec.x failed!"); else    print("* field passed");
+if (%obj.strVec.x != 23) error("%obj.strVec.x failed!"); else print("* strfieled passed");
+
+vardump("$globalVec");
+vardump("%localVec");
+vardumpField("%obj.vec");
+vardumpField("%obj.strVec");
+
+%obj.vec.y = $globalVec.y + %localVec.y + %obj.vec.y + %obj.strVec.y; //
+echo("%obj.vec.y should be 32:" SPC %obj.vec.y);
+
+%obj.delete();
+
+
+printSeparator();
+echo("---- Array + component test ----");
+
+print(" ---  INIT ---");
+$bla = {0};
+for(%i in range 10) {
+    $Arr[%i] = {0};
+}
+print(" --- SET ---");
+$bla.x = 1;
+for(%i in range 10) {
+    $Arr[%i].x = 1;
+}
+print(" --- OP  ---");
+$bla.x += 1;
+for(%i in range 10) { $Arr[%i].x +=  %i; }
+print(" ---  PRINT ---");
+echo("BLA.X = " SPC $bla.x);
+for(%i in range 10) {
+
+    echo( formatString( "$Arr[%d].x=%5.2f [%s]" , %i, $Arr[%i].x ,$Arr[%i]));
+}
+
+printSeparator();
+
+print (" ----- FIELD TEST ----- ");
+%obj1 = new PointStorageObject() {
+    TypeF32 myX = 0.0;
+    TypeS32 myI = 0;
+};
+%obj2 = %obj1.clone();
+// %obj2.dumpFields();
+
+for (%i in range 10) {
+    %obj1.myX = %i;
+    %obj1.x = %obj1.myX * 1.0;
+    %obj2.x = %obj1.x * 2.0;
+}
+
+print("%obj1.x 9 == ", %obj1.x, " %obj2.x 18 == ",%obj2.x);
+
+printSeparator();
+
+
+
+// // $Debug::DumpByteCode=1;
 
 
 

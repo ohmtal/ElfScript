@@ -922,68 +922,68 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 
 //-----------------------------------------------------------------------------
 //ElfScript XXTH Speed  FastPath
-bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
-
-      if (fld->type == TypeF32) {
-            F32* target = (F32*)(((const char*)this) + fld->offset);
-            *target = (F32)value;
-            return true;
-      }
-      if (fld->type == TypeS32) {
-            S32* target = (S32*)(((const char*)this) + fld->offset);
-            *target = (S32)value;
-            return true;
-      }
-
-      if (fld->type == TypeBool) {
-            bool* target = (bool*)(((const char*)this) + fld->offset);
-            *target = (value != 0.0);
-            return true;
-      }
-      if (fld->type == TypeF64) {
-            F64* target = (F64*)(((const char*)this) + fld->offset);
-            *target = value;
-            return true ;
-      }
-
-
-      if (fld->type == TypeS8) {
-            S8* target = (S8*)(((const char*)this) + fld->offset);
-            *target = (S8)value;
-            return true;
-      }
-      if (fld->type == TypeU8) {
-            U8* target = (U8*)(((const char*)this) + fld->offset);
-            *target = (U8)value;
-            return true;
-      }
-      if (fld->type == TypeS16) {
-            S16* target = (S16*)(((const char*)this) + fld->offset);
-            *target = (S16)value;
-            return true;
-      }
-
-
-
-      if (fld->type == TypeU32) {
-            U32* target = (U32*)(((const char*)this) + fld->offset);
-            *target = (U32)value;
-            return true;
-      }
-
-      if (fld->type == TypeS64) {
-            S64* target = (S64*)(((const char*)this) + fld->offset);
-            *target = (S64)value;
-            return true;
-      }
-
-      if (fld->type == TypeU64) {
-            U64* target = (U64*)(((const char*)this) + fld->offset);
-            *target = (U64)value;
-            return true;
-      }
-      return false;
-}
+// bool SimObject::setDataField(const AbstractClassRep::Field *fld, F64 value) {
+//
+//       if (fld->type == TypeF32) {
+//             F32* target = (F32*)(((const char*)this) + fld->offset);
+//             *target = (F32)value;
+//             return true;
+//       }
+//       if (fld->type == TypeS32) {
+//             S32* target = (S32*)(((const char*)this) + fld->offset);
+//             *target = (S32)value;
+//             return true;
+//       }
+//
+//       if (fld->type == TypeBool) {
+//             bool* target = (bool*)(((const char*)this) + fld->offset);
+//             *target = (value != 0.0);
+//             return true;
+//       }
+//       if (fld->type == TypeF64) {
+//             F64* target = (F64*)(((const char*)this) + fld->offset);
+//             *target = value;
+//             return true ;
+//       }
+//
+//
+//       if (fld->type == TypeS8) {
+//             S8* target = (S8*)(((const char*)this) + fld->offset);
+//             *target = (S8)value;
+//             return true;
+//       }
+//       if (fld->type == TypeU8) {
+//             U8* target = (U8*)(((const char*)this) + fld->offset);
+//             *target = (U8)value;
+//             return true;
+//       }
+//       if (fld->type == TypeS16) {
+//             S16* target = (S16*)(((const char*)this) + fld->offset);
+//             *target = (S16)value;
+//             return true;
+//       }
+//
+//
+//
+//       if (fld->type == TypeU32) {
+//             U32* target = (U32*)(((const char*)this) + fld->offset);
+//             *target = (U32)value;
+//             return true;
+//       }
+//
+//       if (fld->type == TypeS64) {
+//             S64* target = (S64*)(((const char*)this) + fld->offset);
+//             *target = (S64)value;
+//             return true;
+//       }
+//
+//       if (fld->type == TypeU64) {
+//             U64* target = (U64*)(((const char*)this) + fld->offset);
+//             *target = (U64)value;
+//             return true;
+//       }
+//       return false;
+// }
 
 // <<<< fastpath version
 
@@ -1302,179 +1302,179 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 }
 
 //-----------------------------------------------------------------------------
-// XXTH Fastpath  version
-bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
-      if (fld->type == TypeF64) {
-            F64* source = (F64*)(((const char*)this) + fld->offset);
-            outValue = *source;
-            return true;
-      }
-      if (fld->type == TypeF32) {
-            F32* source = (F32*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-
-
-      if (fld->type == TypeS32) {
-            S32* source = (S32*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-      if (fld->type == TypeS8) {
-            S8* source = (S8*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-      if (fld->type == TypeU8) {
-            U8* source = (U8*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-
-      if (fld->type == TypeS16) {
-            S16* source = (S16*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-
-
-
-      if (fld->type == TypeBool) {
-            bool* source = (bool*)(((const char*)this) + fld->offset);
-            outValue = *source ? 1.0f : 0.0f;
-            return true;
-      }
-
-
-      if (fld->type == TypeU32)
-      {
-            U32* source = (U32*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-
-      if (fld->type == TypeS64)
-      {
-            S64* source = (S64*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-
-      if (fld->type == TypeU64)
-      {
-            U64* source = (U64*)(((const char*)this) + fld->offset);
-            outValue = (F64)(*source);
-            return true;
-      }
-      return false;
-}
+// // XXTH Fastpath  version
+// bool SimObject::getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
+//       if (fld->type == TypeF64) {
+//             F64* source = (F64*)(((const char*)this) + fld->offset);
+//             outValue = *source;
+//             return true;
+//       }
+//       if (fld->type == TypeF32) {
+//             F32* source = (F32*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//
+//
+//       if (fld->type == TypeS32) {
+//             S32* source = (S32*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//       if (fld->type == TypeS8) {
+//             S8* source = (S8*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//       if (fld->type == TypeU8) {
+//             U8* source = (U8*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//
+//       if (fld->type == TypeS16) {
+//             S16* source = (S16*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//
+//
+//
+//       if (fld->type == TypeBool) {
+//             bool* source = (bool*)(((const char*)this) + fld->offset);
+//             outValue = *source ? 1.0f : 0.0f;
+//             return true;
+//       }
+//
+//
+//       if (fld->type == TypeU32)
+//       {
+//             U32* source = (U32*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//
+//       if (fld->type == TypeS64)
+//       {
+//             S64* source = (S64*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//
+//       if (fld->type == TypeU64)
+//       {
+//             U64* source = (U64*)(((const char*)this) + fld->offset);
+//             outValue = (F64)(*source);
+//             return true;
+//       }
+//       return false;
+// }
 
 //-----------------------------------------------------------------------------
 // XXTH FieldCache
 // NOTE: lot of redundant code to stackDataField
-bool SimObject::fillFieldCache(StringTableEntry slotName, const char* array, FieldCache* cacheP,  ConsoleValue* stackP, bool isLoad)
-{
-      bool arrayEmpty = (!array || array[0] == '\0');
-
-      if(mFlags.test(ModStaticFields))
-      {
-            const AbstractClassRep::Field *fld = findField(slotName);
-            cacheP->staticFieldPtr = fld;
-            if(fld) {
-                  if ( fld->type >= AbstractClassRep::ARCFirstCustomField ) {
-                        cacheP->type = FieldCacheType::ARCFirstCustomField;
-                        return true;
-                  }
-                  S32 array1;
-                  if (arrayEmpty) {
-                        array1 = 0;
-                  }
-                  else if ((static_cast<unsigned char>(array[0]) - '0') < 10) {
-                        array1 = dAtoi(array);
-                  }
-                  else {
-                        Con::warnf("Static field %s : array '%s' index invalid! value not set!", slotName, array);
-                        return false;
-                  }
-
-                  if (static_cast<U32>(array1) >= static_cast<U32>(fld->elementCount)) {
-                        Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
-                        return false;
-                  }
-                  if (array1 >= fld->elementCount || fld->elementCount <= 0 ) {
-                        Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
-                        return false;
-                  }
-                  // <<<<<<<<<
-
-                  // FIXME array1 could by also in the fast path ... maybe
-                  if (  arrayEmpty
-                        && fld->writeDataFn == &defaultProtectedWriteFn
-                        && fld->setDataFn == &defaultProtectedSetFn
-                        && fld->flag == 0
-                        && (
-                        fld->type == TypeF32
-                        || fld->type == TypeF64
-                        || fld->type == TypeBool
-                        || fld->type == TypeS8
-                        || fld->type == TypeU8
-                        || fld->type == TypeS16
-                        || fld->type == TypeS32
-                        || fld->type == TypeU32
-                        || fld->type == TypeS64
-                        || fld->type == TypeU64
-                        #ifdef ENABLE_CONSOLE_VECTOR
-                        || fld->type == TypeVector
-                        #endif
-                  )) {
-                        cacheP->type = staticField;
-                  } else {
-                        cacheP->staticArrayIndex = array1;
-                        cacheP->type = staticField_NoFastPath;
-                  }
-                  return true;
-            }
-      }
-
-      // Dynamic Fields
-      if(mFlags.test(ModDynamicFields))
-      {
-            StringTableEntry dynamicFieldName = nullptr;
-            if(arrayEmpty) {
-                  dynamicFieldName = slotName;
-            } else {
-                  char buf[256];
-                  dStrcpy(buf, slotName, 256);
-                  dStrcat(buf, array, 256);
-                  dynamicFieldName = StringTable->insert(buf);
-            }
-
-            SimFieldDictionary::Entry* entry = nullptr;
-            if(!mFieldDictionary) {
-
-                  if (isLoad) return false;
-
-                  mFieldDictionary = new SimFieldDictionary;
-            } else {
-                  entry = mFieldDictionary->findDynamicField(dynamicFieldName);
-            }
-
-            if (!entry) {
-                  if (isLoad) return false;
-                  entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
-                  entry->mValue.bufferLen = 0; // else we get in trouble on clean
-                  entry->mValue.type = stackP->type;
-            }
-            if (entry)
-            {
-                   cacheP->type = dynamicField;
-                   cacheP->fieldValuePtr = &entry->mValue;
-                   return true;
-            }
-      }
-      return false;
-}
+// bool SimObject::fillFieldCache(StringTableEntry slotName, const char* array, FieldCache* cacheP,  ConsoleValue* stackP, bool isLoad)
+// {
+//       bool arrayEmpty = (!array || array[0] == '\0');
+//
+//       if(mFlags.test(ModStaticFields))
+//       {
+//             const AbstractClassRep::Field *fld = findField(slotName);
+//             cacheP->staticFieldPtr = fld;
+//             if(fld) {
+//                   if ( fld->type >= AbstractClassRep::ARCFirstCustomField ) {
+//                         cacheP->type = FieldCacheType::ARCFirstCustomField;
+//                         return true;
+//                   }
+//                   S32 array1;
+//                   if (arrayEmpty) {
+//                         array1 = 0;
+//                   }
+//                   else if ((static_cast<unsigned char>(array[0]) - '0') < 10) {
+//                         array1 = dAtoi(array);
+//                   }
+//                   else {
+//                         Con::warnf("Static field %s : array '%s' index invalid! value not set!", slotName, array);
+//                         return false;
+//                   }
+//
+//                   if (static_cast<U32>(array1) >= static_cast<U32>(fld->elementCount)) {
+//                         Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+//                         return false;
+//                   }
+//                   if (array1 >= fld->elementCount || fld->elementCount <= 0 ) {
+//                         Con::warnf("Static field %s : array '%s' index overflow! value not set!", slotName, array);
+//                         return false;
+//                   }
+//                   // <<<<<<<<<
+//
+//                   // FIXME array1 could by also in the fast path ... maybe
+//                   if (  arrayEmpty
+//                         && fld->writeDataFn == &defaultProtectedWriteFn
+//                         && fld->setDataFn == &defaultProtectedSetFn
+//                         && fld->flag == 0
+//                         && (
+//                         fld->type == TypeF32
+//                         || fld->type == TypeF64
+//                         || fld->type == TypeBool
+//                         || fld->type == TypeS8
+//                         || fld->type == TypeU8
+//                         || fld->type == TypeS16
+//                         || fld->type == TypeS32
+//                         || fld->type == TypeU32
+//                         || fld->type == TypeS64
+//                         || fld->type == TypeU64
+//                         #ifdef ENABLE_CONSOLE_VECTOR
+//                         || fld->type == TypeVector
+//                         #endif
+//                   )) {
+//                         cacheP->type = staticField;
+//                   } else {
+//                         cacheP->staticArrayIndex = array1;
+//                         cacheP->type = staticField_NoFastPath;
+//                   }
+//                   return true;
+//             }
+//       }
+//
+//       // Dynamic Fields
+//       if(mFlags.test(ModDynamicFields))
+//       {
+//             StringTableEntry dynamicFieldName = nullptr;
+//             if(arrayEmpty) {
+//                   dynamicFieldName = slotName;
+//             } else {
+//                   char buf[256];
+//                   dStrcpy(buf, slotName, 256);
+//                   dStrcat(buf, array, 256);
+//                   dynamicFieldName = StringTable->insert(buf);
+//             }
+//
+//             SimFieldDictionary::Entry* entry = nullptr;
+//             if(!mFieldDictionary) {
+//
+//                   if (isLoad) return false;
+//
+//                   mFieldDictionary = new SimFieldDictionary;
+//             } else {
+//                   entry = mFieldDictionary->findDynamicField(dynamicFieldName);
+//             }
+//
+//             if (!entry) {
+//                   if (isLoad) return false;
+//                   entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
+//                   entry->mValue.bufferLen = 0; // else we get in trouble on clean
+//                   entry->mValue.type = stackP->type;
+//             }
+//             if (entry)
+//             {
+//                    cacheP->type = dynamicField;
+//                    cacheP->fieldValuePtr = &entry->mValue;
+//                    return true;
+//             }
+//       }
+//       return false;
+// }
 
 
 //-----------------------------------------------------------------------------

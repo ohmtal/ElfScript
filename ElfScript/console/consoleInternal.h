@@ -254,7 +254,22 @@ public:
       unlinkClass(NULL);
    }
 
-   Entry *lookup(StringTableEntry name);
+   // Entry *lookup(StringTableEntry name);
+   inline Entry* lookup(StringTableEntry name)
+   {
+         if (mHashSequence != mCacheSequence)
+               buildHashTable();
+
+         U32 index = HashPointer(name) % mHashSize;
+         while (mHashTable[index] && mHashTable[index]->mFunctionName != name)
+         {
+               index++;
+               if (index >= mHashSize)
+                     index = 0;
+         }
+         return mHashTable[index];
+   }
+
    Entry *lookupRecursive(StringTableEntry name);
    Entry *createLocalEntry(StringTableEntry name);
    void buildHashTable();

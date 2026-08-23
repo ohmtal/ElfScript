@@ -3,6 +3,7 @@ function createNativSDL(%renderer, %window) {
         class = "NativSDL";
         TypeS32 renderer = %renderer;
         TypeS32 window   = %window;
+        TypeBool EnteredLogo = false;
     };
 
     return %obj;

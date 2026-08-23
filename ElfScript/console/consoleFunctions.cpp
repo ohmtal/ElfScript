@@ -2068,6 +2068,12 @@ DefineEngineStringlyVariadicFunction( echo, void, 2, 0, "( string message... ) "
    ret[0] = 0;
 }
 
+//ElfScript 0.6c
+DefineEngineFunction(printSeparator, void, (), , "Print a separator line") {
+      Con::printSeparator();
+}
+
+
 DefineEngineStringlyVariadicFunction( print, void, 2, 0, "( string message... ) "
 "@brief Logs a message to the console see also echo \n"
 "Concatenates all given arguments to a single string and prints the string to the console.\n"

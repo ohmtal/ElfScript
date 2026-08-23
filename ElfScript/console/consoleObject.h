@@ -1394,8 +1394,6 @@ enum FieldCacheType {
       staticField,
       staticField_NoFastPath,
       dynamicField,
-      componentField,
-      componentFieldFallBack, // need to fallback :/
       ARCFirstCustomField //skip this
 };
 
@@ -1405,10 +1403,8 @@ struct FieldCache {
       const SimObject* objectPtr = nullptr;
       const AbstractClassRep::Field* staticFieldPtr = nullptr;
       S32 staticArrayIndex = 0;
-      // FieldValuePtr can be used for dynamicField or Component Variable??
+      // FieldValuePtr for dynamicField
       ConsoleValue* fieldValuePtr = nullptr;
-      S32 componentIndex = -1;
-
 };
 // <<<<<<<<<<< FieldCache
 

@@ -978,20 +978,20 @@ Namespace::Entry *Namespace::lookupRecursive(StringTableEntry name)
    return NULL;
 }
 
-Namespace::Entry *Namespace::lookup(StringTableEntry name)
-{
-   if (mHashSequence != mCacheSequence)
-      buildHashTable();
-
-   U32 index = HashPointer(name) % mHashSize;
-   while (mHashTable[index] && mHashTable[index]->mFunctionName != name)
-   {
-      index++;
-      if (index >= mHashSize)
-         index = 0;
-   }
-   return mHashTable[index];
-}
+// Namespace::Entry *Namespace::lookup(StringTableEntry name)
+// {
+//    if (mHashSequence != mCacheSequence)
+//       buildHashTable();
+//
+//    U32 index = HashPointer(name) % mHashSize;
+//    while (mHashTable[index] && mHashTable[index]->mFunctionName != name)
+//    {
+//       index++;
+//       if (index >= mHashSize)
+//          index = 0;
+//    }
+//    return mHashTable[index];
+// }
 
 static S32 QSORT_CALLBACK compareEntries(const void* a, const void* b)
 {

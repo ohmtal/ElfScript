@@ -429,6 +429,11 @@ SimObject* findObject(ConsoleValue* val)
 {
    if (val->getType() == ConsoleValueType::cvInteger)
       return findObject((SimObjectId)val->getFastInt());
+#ifdef ENABLE_CONSOLE_VECTOR
+      // it's not an object it's an Vector
+      if (val->getType() == ConsoleValueType::cvVector)
+            return nullptr;
+#endif
    return findObject(val->getString());
 }
 

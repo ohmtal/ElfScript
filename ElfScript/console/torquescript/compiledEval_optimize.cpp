@@ -340,76 +340,6 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
 
 }
 // -----------------------------------------------------------------------------
-static void stackFieldComponent(ConsoleValue *srcValue, S32 componentIndex, ConsoleValue* pStack)
-{
-
-      if (componentIndex < 0) {
-            pStack->setEmptyString();
-            return;
-      }
-      F32 targetValue = 0.f;
-      #ifdef  ENABLE_CONSOLE_VECTOR
-      if (srcValue->type == cvVector) {
-            targetValue = (F64)srcValue->v.points[componentIndex];
-      } else
-            #endif
-      {
-            const char* srcStr = srcValue->getString();
-            const char* pStr = srcStr;
-            int compCount = 0;
-
-            const char* tokenStart = nullptr;
-            size_t tokenLen = 0;
-
-            while (*pStr != '\0') {
-                  while (*pStr == ' ' || *pStr == '\t' || *pStr == '\n' || *pStr == '\r') {
-                        pStr++;
-                  }
-                  if (*pStr == '\0') break;
-
-                  if (compCount == componentIndex) {
-                        tokenStart = pStr;
-                  }
-
-                  while (*pStr != '\0' && *pStr != ' ' && *pStr != '\t' && *pStr != '\n' && *pStr != '\r') {
-                        pStr++;
-                  }
-
-                  if (compCount == componentIndex) {
-                        tokenLen = pStr - tokenStart;
-                        break;
-                  }
-
-                  compCount++;
-            }
-
-            if (tokenLen > 0) {
-                  char tokenBuffer[32];
-                  if (tokenLen >= 32) tokenLen = 31;
-
-                  memcpy(tokenBuffer, tokenStart, tokenLen);
-                  tokenBuffer[tokenLen] = '\0';
-
-                  targetValue = dAtof(tokenBuffer);
-            } else {
-                  targetValue = 0.0;
-            }
-
-      }
-
-      switch (  pStack->type ) {
-            // case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
-            #ifdef  ENABLE_CONSOLE_VECTOR
-            case cvVector: TORQUE_CASE_FALLTHROUGH;
-            #endif
-            case cvInteger: TORQUE_CASE_FALLTHROUGH;
-            case cvFloat: pStack->setFastFloat(targetValue); break;
-            default: pStack->setFloat(targetValue); break;
-      }
-
-}
-
-// -----------------------------------------------------------------------------
 
 // replaced by stackFieldComponent
 // static void getFieldComponent(SimObject* object, StringTableEntry field, const char* array, StringTableEntry subField, char val[], S32 currentLocalRegister)
@@ -471,70 +401,6 @@ static void stackFieldComponent(ConsoleValue *srcValue, S32 componentIndex, Cons
 //       val[0] = 0;
 // }
 
-// -----------------------------------------------------------------------------
-static bool FillComponentCache(StringTableEntry subField, FieldCache* CachePtr, S32 currentLocalRegister) {
-
-      //FIXME ?? Component does not work !!!
-      CachePtr->type = FieldCacheType::componentFieldFallBack;
-      return true;
-
-      static ConsoleValue dstStoreValue = {};
-      ConsoleValue *dstValue = nullptr;
-
-      if (currentLocalRegister != -1) {
-            dstValue = Script::gEvalState.getLocalConsoleValue(currentLocalRegister);
-      } else if (Script::gEvalState.currentVariable) {
-
-
-
-            dstValue = Script::gEvalState.getConsoleValue();
-      }
-
-      // no dstValue nothing to do here
-      if (!dstValue) {
-            return false;
-      }
-      CachePtr->type = FieldCacheType::componentField;
-      CachePtr->fieldValuePtr = dstValue;
-
-      // ----
-      static const StringTableEntry xyzw[] =
-      {
-            StringTable->insert("x"),
-            StringTable->insert("y"),
-            StringTable->insert("z"),
-            StringTable->insert("w")
-      };
-
-      static const StringTableEntry wh[] =
-      {
-            StringTable->insert("width"),
-            StringTable->insert("height")
-      };
-
-
-      static const StringTableEntry rgba[] =
-      {
-            StringTable->insert("r"),
-            StringTable->insert("g"),
-            StringTable->insert("b"),
-            StringTable->insert("a")
-      };
-      // ----
-
-      int componentIndex = -1;
-      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
-      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
-      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
-      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
-
-
-      // // its not a fail i must handle it if (componentIndex < 0) return false;
-
-      CachePtr->componentIndex = componentIndex;
-
-      return true;
-}
 // -----------------------------------------------------------------------------
 // called at %foo.x = 1.0;
 static void pushFieldComponent(SimObject* object, StringTableEntry field, const char* array
@@ -693,108 +559,6 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
       if (object && field) {
             object->pushDataField(field,array,dstValue);
       }
-
-}
-// -----------------------------------------------------------------------------
-// called at %foo.x = 1.0;
-static void pushFieldComponent(ConsoleValue *dstValue, S32 componentIndex, ConsoleValue* pSrcStack)
-{
-
-      #ifdef  ENABLE_CONSOLE_VECTOR
-      if ( dstValue->type != ConsoleValueType::cvVector )
-      {
-            dstValue->setVector(dstValue->getVector());
-      }
-
-      if (dstValue->type == ConsoleValueType::cvVector)
-      {
-            dstValue->v.points[componentIndex] = (F32)pSrcStack->getFloat();
-      }
-      else  //slow string ....
-      #endif
-      {
-            String currentStr = dstValue->getString();
-
-            // -----------------------------------
-            // only get ONE number:
-            // -----------------------------------
-            const char *s = pSrcStack->getString();
-            const char *p = s;
-            if (*p == '-' || *p == '+') p++;
-            bool seen_point = false;
-            while (*p != '\0') {
-                  if (*p >= '0' && *p <= '9') {
-                        p++;
-                  } else if (*p == '.' && !seen_point) {
-                        seen_point = true;
-                        p++;
-                  } else {
-                        break;
-                  }
-            }
-            size_t len = p - s;
-            if (len >= 32) len = 31;
-            static char buffer[32];
-            if (len > 0) {
-                  memcpy(buffer, s, len);
-                  buffer[len] = '\0';
-            } else {
-                  buffer[0] = '0';
-                  buffer[1] = '\0';
-            }
-
-            // -----------------------------------
-            //
-            //  speed up :D
-            //
-
-            const char* compStart[4] = { nullptr, nullptr, nullptr, nullptr };
-            size_t compLen[4] = { 0, 0, 0, 0 };
-            int compCount = 0;
-
-            const char* pStr = currentStr.c_str();
-
-            while (*pStr != '\0' && compCount < 4) {
-                  while (*pStr == ' ' || *pStr == '\t' || *pStr == '\n' || *pStr == '\r') {
-                        pStr++;
-                  }
-                  if (*pStr == '\0') break;
-
-                  compStart[compCount] = pStr;
-
-                  while (*pStr != '\0' && *pStr != ' ' && *pStr != '\t' && *pStr != '\n' && *pStr != '\r') {
-                        pStr++;
-                  }
-
-                  compLen[compCount] = pStr - compStart[compCount];
-                  compCount++;
-            }
-
-            char finalResult[128];
-            char* out = finalResult;
-            size_t bufferLen = strlen(buffer);
-
-            for (int i = 0; i < 4; i++) {
-                  if (i == componentIndex) {
-                        memcpy(out, buffer, bufferLen);
-                        out += bufferLen;
-                  } else if (i < compCount) {
-                        memcpy(out, compStart[i], compLen[i]);
-                        out += compLen[i];
-                  } else {
-                        *out++ = '0';
-                  }
-
-                  if (i < 3) {
-                        *out++ = ' ';
-                  }
-            }
-            *out = '\0';
-
-            dstValue->setString(finalResult);
-
-      }
-
 
 }
 // -----------------------------------------------------------------------------
@@ -2589,45 +2353,39 @@ handle_OP_LOADFIELD_FASTPATH:
 
 #ifdef ENABLE_INLINE_CACHE_LOAD
       ConsoleValue* stackPtr = &stack[_STK + 1];
-      // XXTH FieldCache prepare: FIXME redundant !!!!!
+
+      // we got a component which cant be cached
+      if (!curObject) {
+            ip+=2; //FieldCache emitted ...
+            stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+
+            PUSH_STK();
+            DISPATCH();
+      }
+
+      // FieldCache for Objects
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ip+=2;
       FieldCache* cachePtr = *cacheSlot;
 
-      if (!cachePtr || (curObject && cachePtr->objectPtr != curObject) ) {
+      if (!cachePtr || cachePtr->objectPtr != curObject ) {
             cachePtr = new FieldCache();
-            if (curObject) cachePtr->objectPtr = curObject;
+            cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
-            if (curObject) {
-                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
-                  if (cachePtr->cacheFailed) {
-                        Con::errorf("error invalid field detected : %s", curField);
-                        PUSH_STK();
-                        DISPATCH();
-                  }
-            } else {
-                  if (prevObject && prevField) {
-
-                        cachePtr->type = componentFieldFallBack;
-                        cachePtr->cacheFailed = false;
-                  } else {
-                        cachePtr->cacheFailed = !FillComponentCache(curField, cachePtr, currentRegister);
-                        if ( cachePtr->cacheFailed) {
-                              Con::errorf("error invalid component detected : %s", curField);
-                              PUSH_STK();
-                              DISPATCH();
-                        }
-                  }
+            cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
+            if (cachePtr->cacheFailed) {
+                  Con::errorf("error invalid field detected : %s", curField);
+                  PUSH_STK();
+                  DISPATCH();
             }
-
       } //if not cachePtr
 
 
       // double safety
       if (cachePtr) {
             if (cachePtr->cacheFailed) {
-                  Con::warnf("we have a cache but it failed to fetch a field or component!!");
+                  Con::warnf("we have a cache (type:%d) for field: %s ! But it failed to fetch a field or component!!", (S32)cachePtr->type, curField);
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2684,15 +2442,6 @@ handle_OP_LOADFIELD_FASTPATH:
                                     else stackPtr->setString("");
                                     break;
                         }
-                        break;
-                  }
-                  case componentFieldFallBack: {
-                        // to bad need to fallback
-                       stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
-                       break;
-                  }
-                  case componentField: {
-                        stackFieldComponent( cachePtr->fieldValuePtr,  cachePtr->componentIndex, stackPtr);
                         break;
                   }
                   default: {
@@ -2808,20 +2557,28 @@ handle_OP_SAVEFIELD_FASTPATH:
 {
 
 #ifdef ENABLE_INLINE_CACHE_SAVE
-      // XXTH FieldCache prepare:
+
+      // We have no object so it's a component which can't be cached!
+      if (!curObject) {
+            ip+=2; // skip FieldCache
+            // The field is not being set on an object. Maybe it's a special accessor?
+            pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+            prevObject = NULL;
+            DISPATCH();
+      }
+
+
+      // FieldCache prepare:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ++ip; ++ip;
-
       // Con::printf("Cache-Slot RAM : %p", (void*)cacheSlot);
-
       FieldCache* cachePtr = *cacheSlot;
 
-      if (!cachePtr || (curObject && cachePtr->objectPtr != curObject) ) {
+      if (!cachePtr || cachePtr->objectPtr != curObject ) {
             cachePtr = new FieldCache();
             if (curObject) cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
-            if (curObject) {
                   // is is static or dynamic and we need to fill it
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
 
@@ -2844,30 +2601,6 @@ handle_OP_SAVEFIELD_FASTPATH:
                         Con::printf("cached field: %s[%s] type: %s (%d)", curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
 #endif
                   }
-
-            } else {
-                  if (prevObject && prevField) {
-
-                        cachePtr->type = componentFieldFallBack;
-                        cachePtr->cacheFailed = false;
-                        #ifdef TORQUE_DEBUG
-                        Con::printf("cached component: %s with object!  ", curField);
-                        #endif
-
-                  } else {
-                        cachePtr->cacheFailed = !FillComponentCache(curField, cachePtr, currentRegister);
-                        if ( cachePtr->cacheFailed) {
-                        Con::printf("error invalid component detected : %s", curField);
-                        DISPATCH();
-                        } else {
-                        #ifdef TORQUE_DEBUG
-                              Con::printf("cached component: %s index: %d ", curField, cachePtr->componentIndex);
-                        #endif
-                        }
-                  }
-
-            }
-
       } //if not cachePtr
 
       // double safety
@@ -2913,19 +2646,6 @@ handle_OP_SAVEFIELD_FASTPATH:
                         }
                         break;
                   }
-                  case componentFieldFallBack: {
-                        // to bad need to fallback
-                        pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
-                        prevObject = NULL;
-                        break;
-                  }
-                  case componentField: {
-                        if (cachePtr->componentIndex >= 0) {
-                              pushFieldComponent( cachePtr->fieldValuePtr,  cachePtr->componentIndex, &stack[_STK]);
-                        }
-                        prevObject = NULL;
-                        break;
-                  }
                   default: {
                         Con::printf("We have a special field ... ignored");
                         break;
@@ -2940,9 +2660,7 @@ handle_OP_SAVEFIELD_FASTPATH:
 
       DISPATCH();
 #else
-
-      // XXTH FieldCache prepare:
-      ip += 2;
+      ip += 2; // Skip field cache
 
       if (curObject) {
             curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
