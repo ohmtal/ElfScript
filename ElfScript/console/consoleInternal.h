@@ -352,6 +352,7 @@ public:
       void reset();
 
       inline ConsoleValue& getValue() { return (value); }
+      inline ConsoleValue* getValuePtr() { return (&value); }
 
       //ElfScript !
       // inline U32 getIntValue()

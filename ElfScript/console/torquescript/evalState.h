@@ -53,8 +53,12 @@ public:
    ConsoleVector getVectorVariable();
 #endif
 
-   TORQUE_FORCEINLINE ConsoleValue* getLocalConsoleValue(S32 reg) {
+   TORQUE_FORCEINLINE ConsoleValue* getLocalConsoleValuePtr(S32 reg) {
       return &currentRegisterArray->values[reg];
+   }
+
+   TORQUE_FORCEINLINE ConsoleValue& getLocalConsoleValue(S32 reg) {
+      return currentRegisterArray->values[reg];
    }
 
 

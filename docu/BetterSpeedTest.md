@@ -1,5 +1,7 @@
 # ElfScript Simple Speed Test:
 
+## Version 0.6d (RelWithDebug) : 
+- revisit and optimize foreach/for range
 
 ## Version 0.6c (RelWithDebug) : 
 - revisited inline cache. removed components from cache. 
@@ -22,6 +24,7 @@ Componentfields
 - 0.6a : 2.857u 0.004s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
 - 0.6b : 2.892u 0.007s 0:02.91 99.3%     0+0k 0+0io 0pf+0w
 - 0.6c : 2.754u 0.002s 0:02.76 99.6%     0+0k 0+0io 0pf+0w 
+- 0.6d : 2.418u 0.002s 0:02.43 99.1%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
 - OGE3D* (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
@@ -29,6 +32,9 @@ Componentfields
 - 0.6a : 4.571u 0.003s 0:04.59 99.5%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.479u 0.002s 0:04.49 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 4.712u 0.006s 0:04.74 99.3%     0+0k 0+0io 0pf+0w
+- 0.6d : 4.169u 0.004s 0:04.19 99.2%     0+0k 0+0io 0pf+0w
+
+
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
 - OGE3D* using ScriptObject: 137.226u 0.296s 2:17.73 99.8% 0+0k 0+136io 0pf+0w
@@ -36,6 +42,8 @@ Componentfields
 - 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
 - 0.6b : 6.268u 0.002s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.417u 0.003s 0:05.43 99.6%     0+0k 0+0io 0pf+0w
+- 0.6d : 5.122u 0.004s 0:05.15 99.4%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
 - OGE3D* using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
@@ -43,6 +51,8 @@ Componentfields
 - 0.6a : 11.753u 0.003s 0:11.79 99.6%    0+0k 0+0io 0pf+0w
 - 0.6b : 6.853u 0.009s 0:06.89 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.274u 0.004s 0:05.29 99.6%     0+0k 0+0io 0pf+0w
+- 0.6d : 5.189u 0.002s 0:05.21 99.4%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_vector_components.elf
 - OGE3D* (current 26-08-05) :: 140.183u 0.322s 2:20.84 99.7% 0+0k 0+48io 0pf+0w
@@ -50,20 +60,26 @@ Componentfields
 - 0.6a : 7.372u 0.004s 0:07.40 99.5%     0+0k 0+0io 0pf+0w
 - 0.6b : 7.985u 0.001s 0:08.01 99.6%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.312u 0.004s 0:07.34 99.5%     0+0k 0+0io 0pf+0w
+- 0.6d : 7.205u 0.006s 0:07.24 99.4%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components_global.elf
 - 0.6a ENABLE_INLINE_CACHE: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 8.119u 0.005s 0:08.14 99.6%     0+0k 0+0io 0pf+0w
 - 0.6b : 8.669u 0.006s 0:08.71 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.636u 0.005s 0:07.66 99.6%     0+0k 0+0io 0pf+0w
+- 0.6d : 7.588u 0.002s 0:07.62 99.4%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
 - 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
+- 0.6d : 2.957u 0.001s 0:02.96 99.6%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_for.elf
-- 0.6c: 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
+- 0.6c : 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
+- 0.6d : 1.114u 0.003s 0:01.12 99.1%     0+0k 0+0io 0pf+0w
 
 
 ### Crazy Elf: assets/modules/StarField.elf 

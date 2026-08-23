@@ -620,127 +620,129 @@ class SimObject: public ConsoleObject
                   *target = (F32)value;
                   return true;
             }
+            else
             if (fld->type == TypeS32) {
                   S32* target = (S32*)(((const char*)this) + fld->offset);
                   *target = (S32)value;
                   return true;
             }
-
+            else
             if (fld->type == TypeBool) {
                   bool* target = (bool*)(((const char*)this) + fld->offset);
                   *target = (value != 0.0);
                   return true;
             }
-            if (fld->type == TypeF64) {
-                  F64* target = (F64*)(((const char*)this) + fld->offset);
-                  *target = value;
-                  return true ;
-            }
-
-
-            if (fld->type == TypeS8) {
-                  S8* target = (S8*)(((const char*)this) + fld->offset);
-                  *target = (S8)value;
-                  return true;
-            }
-            if (fld->type == TypeU8) {
-                  U8* target = (U8*)(((const char*)this) + fld->offset);
-                  *target = (U8)value;
-                  return true;
-            }
-            if (fld->type == TypeS16) {
-                  S16* target = (S16*)(((const char*)this) + fld->offset);
-                  *target = (S16)value;
-                  return true;
-            }
-
-
-
+            else
             if (fld->type == TypeU32) {
                   U32* target = (U32*)(((const char*)this) + fld->offset);
                   *target = (U32)value;
                   return true;
             }
-
+            else
+            if (fld->type == TypeF64) {
+                  F64* target = (F64*)(((const char*)this) + fld->offset);
+                  *target = value;
+                  return true ;
+            }
+            else
+            if (fld->type == TypeS8) {
+                  S8* target = (S8*)(((const char*)this) + fld->offset);
+                  *target = (S8)value;
+                  return true;
+            }
+            else
+            if (fld->type == TypeU8) {
+                  U8* target = (U8*)(((const char*)this) + fld->offset);
+                  *target = (U8)value;
+                  return true;
+            }
+            else
+            if (fld->type == TypeS16) {
+                  S16* target = (S16*)(((const char*)this) + fld->offset);
+                  *target = (S16)value;
+                  return true;
+            }
+            else
             if (fld->type == TypeS64) {
                   S64* target = (S64*)(((const char*)this) + fld->offset);
                   *target = (S64)value;
                   return true;
             }
-
+            else
             if (fld->type == TypeU64) {
                   U64* target = (U64*)(((const char*)this) + fld->offset);
                   *target = (U64)value;
                   return true;
             }
+            else
             return false;
       }
 
       // XXTH Fastpath  version
       inline bool getDataField(const AbstractClassRep::Field *fld, F64 &outValue) {
-            if (fld->type == TypeF64) {
-                  F64* source = (F64*)(((const char*)this) + fld->offset);
-                  outValue = *source;
-                  return true;
-            }
             if (fld->type == TypeF32) {
                   F32* source = (F32*)(((const char*)this) + fld->offset);
                   outValue = (F64)(*source);
                   return true;
             }
-
-
+            else
             if (fld->type == TypeS32) {
                   S32* source = (S32*)(((const char*)this) + fld->offset);
                   outValue = (F64)(*source);
                   return true;
             }
-            if (fld->type == TypeS8) {
-                  S8* source = (S8*)(((const char*)this) + fld->offset);
-                  outValue = (F64)(*source);
-                  return true;
-            }
-            if (fld->type == TypeU8) {
-                  U8* source = (U8*)(((const char*)this) + fld->offset);
-                  outValue = (F64)(*source);
-                  return true;
-            }
-
-            if (fld->type == TypeS16) {
-                  S16* source = (S16*)(((const char*)this) + fld->offset);
-                  outValue = (F64)(*source);
-                  return true;
-            }
-
-
-
+            else
             if (fld->type == TypeBool) {
                   bool* source = (bool*)(((const char*)this) + fld->offset);
                   outValue = *source ? 1.0f : 0.0f;
                   return true;
             }
-
-
+            else
             if (fld->type == TypeU32)
             {
                   U32* source = (U32*)(((const char*)this) + fld->offset);
                   outValue = (F64)(*source);
                   return true;
             }
-
+            else
+            if (fld->type == TypeF64) {
+                  F64* source = (F64*)(((const char*)this) + fld->offset);
+                  outValue = *source;
+                  return true;
+            }
+            else
+            if (fld->type == TypeS8) {
+                  S8* source = (S8*)(((const char*)this) + fld->offset);
+                  outValue = (F64)(*source);
+                  return true;
+            }
+            else
+            if (fld->type == TypeU8) {
+                  U8* source = (U8*)(((const char*)this) + fld->offset);
+                  outValue = (F64)(*source);
+                  return true;
+            }
+            else
+            if (fld->type == TypeS16) {
+                  S16* source = (S16*)(((const char*)this) + fld->offset);
+                  outValue = (F64)(*source);
+                  return true;
+            }
+            else
             if (fld->type == TypeS64)
             {
                   S64* source = (S64*)(((const char*)this) + fld->offset);
                   outValue = (F64)(*source);
                   return true;
             }
-
+            else
             if (fld->type == TypeU64)
             {
                   U64* source = (U64*)(((const char*)this) + fld->offset);
                   outValue = (F64)(*source);
                   return true;
             }
+            else
             return false;
       }
 
