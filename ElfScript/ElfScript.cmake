@@ -2,6 +2,7 @@
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 add_compile_definitions(ELFSCRIPT_VERSION_0_5)
+add_compile_definitions(ELFSCRIPT_VERSION_0_6)
 
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)
@@ -13,7 +14,7 @@ option(ELF_ENABLE_DSO_GENERATION "ElfScript: Enable generation of byte code dso 
 set(ELF_FILE_EXTENSION "elf" CACHE STRING "ElfScript: File extension")
 set(ELF_APP_NAME "ElfApp" CACHE STRING "ElfScript: App-Name used in scripts")
 set(ELF_APP_VERSION "500" CACHE STRING "ElfScript: App-Version used in scripts")
-set(ELF_APP_VERSION_STRING "Version 0.5j" CACHE STRING "ElfScript: App-Version String used in scripts")
+set(ELF_APP_VERSION_STRING "Version 0.6" CACHE STRING "ElfScript: App-Version String used in scripts")
 
 
 # overwrite example:  set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)

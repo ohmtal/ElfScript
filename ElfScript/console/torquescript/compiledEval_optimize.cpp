@@ -2352,10 +2352,10 @@ handle_OP_SETCURFIELD_TYPE:
 handle_OP_LOADFIELD_FASTPATH:
 {
       if (code[ip] < U32_MAX) {
-            if (stack[_STK + 1].type != (S32) code[ip]) {
-                  stack[_STK + 1].cleanupData();
-                  stack[_STK + 1].type = (S32) code[ip];
-            }
+            // if (stack[_STK + 1].type != (S32) code[ip]) {
+            //       stack[_STK + 1].cleanupData();
+            // }
+            stack[_STK + 1].type = (S32) code[ip];
       }
       ip++;
 
@@ -3688,10 +3688,10 @@ handle_OP_BUILD_VECTOR_STRING: {
 
 
       if (matchVectorFields) {
-            if (stack[_STK].type != ConsoleValueType::cvVector) {
-                  stack[_STK].cleanupData();
-                  stack[_STK].type = ConsoleValueType::cvVector;
-            }
+            // if (stack[_STK].type != ConsoleValueType::cvVector) {
+            //       stack[_STK].cleanupData();
+            // }
+            stack[_STK].type = ConsoleValueType::cvVector;
 
             // Con::debugf("Set value type to ConsoleValueType::cvVector");
             // copy  to stack

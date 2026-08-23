@@ -1,6 +1,9 @@
 # ElfScript Simple Speed Test:
 
-## Version 0.6d (RelWithDebug) : 
+## Version 0.6e : 
+- removed cvString and only using cvSTEntry
+
+## Version 0.6d : 
 - revisit and optimize foreach/for range
 
 ### Summery ElfScript 0.6d vs TorqueScript
@@ -12,17 +15,17 @@
 - Global Float Variable:  8 times faster 
 
 
-## Version 0.6c (RelWithDebug) : 
+## Version 0.6c : 
 - revisited inline cache. removed components from cache. 
 - fastpath setDataField/getDataField/fillFieldCache moved inline to header << over a second faster! 
 
-## Version 0.6b (RelWithDebug) : 
+## Version 0.6b : 
 - restored StringTable - there is a bug in the new implemenation, i saved it to 
 unstable folder
 - ENABLE_INLINE_CACHE_LOAD/ENABLE_INLINE_CACHE_SAVE enabled again but disabled
 Componentfields
 
-## Version 0.6a (RelWithDebug) : 
+## Version 0.6a : 
 - rewrote StringTable but did not really speed up
 - added initial inline field cache ... thats an rocket in loops but need more cleanup and testing
 - with #define ENABLE_INLINE_CACHE but unstable on real test so ifdef'd!!! 
@@ -33,7 +36,7 @@ Componentfields
 - 0.6a : 2.857u 0.004s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
 - 0.6b : 2.892u 0.007s 0:02.91 99.3%     0+0k 0+0io 0pf+0w
 - 0.6c : 2.754u 0.002s 0:02.76 99.6%     0+0k 0+0io 0pf+0w 
-- 0.6d : 2.418u 0.002s 0:02.43 99.1%     0+0k 0+0io 0pf+0w
+- 0.6e : 2.244u 0.004s 0:02.25 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
 - OGE3D* (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
@@ -41,8 +44,7 @@ Componentfields
 - 0.6a : 4.571u 0.003s 0:04.59 99.5%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.479u 0.002s 0:04.49 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 4.712u 0.006s 0:04.74 99.3%     0+0k 0+0io 0pf+0w
-- 0.6d : 4.169u 0.004s 0:04.19 99.2%     0+0k 0+0io 0pf+0w
-
+- 0.6e : 3.450u 0.005s 0:03.47 99.4%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
@@ -52,7 +54,7 @@ Componentfields
 - 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
 - 0.6b : 6.268u 0.002s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.417u 0.003s 0:05.43 99.6%     0+0k 0+0io 0pf+0w
-- 0.6d : 5.122u 0.004s 0:05.15 99.4%     0+0k 0+0io 0pf+0w
+- 0.6e : 4.441u 0.004s 0:04.47 99.3%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
@@ -61,8 +63,7 @@ Componentfields
 - 0.6a : 11.753u 0.003s 0:11.79 99.6%    0+0k 0+0io 0pf+0w
 - 0.6b : 6.853u 0.009s 0:06.89 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.274u 0.004s 0:05.29 99.6%     0+0k 0+0io 0pf+0w
-- 0.6d : 5.189u 0.002s 0:05.21 99.4%     0+0k 0+0io 0pf+0w
-
+- 0.6e : 4.634u 0.008s 0:04.67 99.1%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components.elf
 - OGE3D* (current 26-08-05) :: 140.183u 0.322s 2:20.84 99.7% 0+0k 0+48io 0pf+0w
@@ -70,27 +71,24 @@ Componentfields
 - 0.6a : 7.372u 0.004s 0:07.40 99.5%     0+0k 0+0io 0pf+0w
 - 0.6b : 7.985u 0.001s 0:08.01 99.6%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.312u 0.004s 0:07.34 99.5%     0+0k 0+0io 0pf+0w
-- 0.6d : 7.205u 0.006s 0:07.24 99.4%     0+0k 0+0io 0pf+0w
+- 0.6e : 6.169u 0.006s 0:06.19 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components_global.elf
 - 0.6a ENABLE_INLINE_CACHE: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 8.119u 0.005s 0:08.14 99.6%     0+0k 0+0io 0pf+0w
 - 0.6b : 8.669u 0.006s 0:08.71 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.636u 0.005s 0:07.66 99.6%     0+0k 0+0io 0pf+0w
-- 0.6d : 7.588u 0.002s 0:07.62 99.4%     0+0k 0+0io 0pf+0w
-
+- 0.6e : 7.298u 0.003s 0:07.33 99.4%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
 - 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
-- 0.6d : 2.957u 0.001s 0:02.96 99.6%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/test_for.elf
 - 0.6c : 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
-- 0.6d : 1.114u 0.003s 0:01.12 99.1%     0+0k 0+0io 0pf+0w
-
+- 0.6e : 1.410u 0.006s 0:01.43 98.6%     0+0k 0+0io 0pf+0w
 
 ### Crazy Elf: assets/modules/StarField.elf 
 - 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak

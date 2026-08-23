@@ -105,7 +105,7 @@ SimFieldDictionary::~SimFieldDictionary()
          walk = temp->next;
 
          // ElfScript:
-          temp->mValue.cleanupData();
+          // // temp->mValue.cleanupData();
          // orig
          // if (temp->value)
          //    dFree(temp->value);
@@ -230,7 +230,7 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
          mVersion++;
 
          // ElfScript:
-         field->mValue.cleanupData();
+         // // field->mValue.cleanupData();
          // orig:
          // if (field->value)
          //    dFree(field->value);

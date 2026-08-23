@@ -185,23 +185,23 @@ public:
 
 
 
-   TORQUE_FORCEINLINE void cleanupData()
-   {
-      // ElfScript 0.6e OBSOLETE!
-
-      // // Only cvString strings are heap-allocated and owned by this value.
-      // // cvSTEntry points into the StringTable (managed externally).
-      // // Numeric types use the f/i union fields — s is not valid for them.
-      //
-      // if (type == ConsoleValueType::cvString && bufferLen > 0)
-      // {
-      //    dFree(s);
-      //    bufferLen = 0;
-      // }
-      //
-      // s = const_cast<char*>(StringTable->EmptyString());
-      // type = ConsoleValueType::cvNULL;
-   }
+   // TORQUE_FORCEINLINE void cleanupData()
+   // {
+   //    // ElfScript 0.6e OBSOLETE!
+   //
+   //    // // Only cvString strings are heap-allocated and owned by this value.
+   //    // // cvSTEntry points into the StringTable (managed externally).
+   //    // // Numeric types use the f/i union fields — s is not valid for them.
+   //    //
+   //    // if (type == ConsoleValueType::cvString && bufferLen > 0)
+   //    // {
+   //    //    dFree(s);
+   //    //    bufferLen = 0;
+   //    // }
+   //    //
+   //    // s = const_cast<char*>(StringTable->EmptyString());
+   //    // type = ConsoleValueType::cvNULL;
+   // }
 
    ConsoleValue()
    {
@@ -235,7 +235,7 @@ public:
    {
       if (this != &other)
       {
-            cleanupData();
+            // cleanupData();
             copyFrom(other);
       }
 
@@ -246,7 +246,7 @@ public:
    {
       if (this != &other)
       {
-         cleanupData();
+         // cleanupData();
          type = other.type;
 
          bufferLen = other.bufferLen;
@@ -257,7 +257,7 @@ public:
 
    TORQUE_FORCEINLINE ~ConsoleValue()
    {
-      cleanupData();
+      // cleanupData();
    }
 
    TORQUE_FORCEINLINE void reset()
@@ -400,38 +400,30 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
-      if (type != ConsoleValueType::cvVector) {
-         cleanupData();
-         type = ConsoleValueType::cvVector;
-      }
+      // cleanupData();
+      type = ConsoleValueType::cvVector;
       v = vec;
    }
 #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
-      if (type != ConsoleValueType::cvFloat) {
-            cleanupData();
-            type = ConsoleValueType::cvFloat;
-      }
+      // cleanupData();
+      type = ConsoleValueType::cvFloat;
       f = val;
    }
 
    TORQUE_FORCEINLINE void setInt(S64 val)
    {
-      if (type != ConsoleValueType::cvInteger) {
-            cleanupData();
-            type = ConsoleValueType::cvInteger;
-      }
+      // cleanupData();
+      type = ConsoleValueType::cvInteger;
 
       i = val;
    }
 
    TORQUE_FORCEINLINE void setBool(bool val)
    {
-      if (type != ConsoleValueType::cvInteger) {
-            cleanupData();
-            type = ConsoleValueType::cvInteger;
-      }
+      // cleanupData();
+      type = ConsoleValueType::cvInteger;
       i = val ? S64(1) : S64(0);
    }
 
@@ -499,7 +491,7 @@ public:
 
    TORQUE_FORCEINLINE void setStringTableEntry(StringTableEntry val)
    {
-      cleanupData();
+      // cleanupData();
       type = ConsoleValueType::cvSTEntry;
 
       // StringTable::insert accepts NULL and returns EmptyString
@@ -512,13 +504,15 @@ public:
       // cleanupData already sets s = EmptyString and type = cvNULL.
       // We then promote the type to cvSTEntry so queries return a valid
       // empty string rather than having to special-case cvNULL everywhere.
-         cleanupData();
+         // cleanupData();
+
          type = ConsoleValueType::cvSTEntry;
+         s = const_cast<char*>(StringTable->EmptyString());
    }
 
    TORQUE_FORCEINLINE void setConsoleData(S32 inType, void* inDataPtr, const EnumTable* inEnumTable)
    {
-      cleanupData();
+      // cleanupData();
       type = inType;
       dataPtr = inDataPtr;
       enumTable = const_cast<EnumTable*>(inEnumTable);
