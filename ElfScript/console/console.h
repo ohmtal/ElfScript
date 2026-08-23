@@ -182,32 +182,31 @@ public:
 
    const char* getConsoleData() const;
 
+   TORQUE_FORCEINLINE void cleanupSetType(S32 newType)
+   {
+         if (type == ConsoleValueType::cvString && bufferLen > 0)
+         {
+               dFree(s);
+               bufferLen = 0;
+         }
+
+         s = const_cast<char*>(StringTable->EmptyString());
+         type = newType;
+   }
+
    TORQUE_FORCEINLINE void cleanupData()
    {
-      // Only cvString strings are heap-allocated and owned by this value.
-      // cvSTEntry points into the StringTable (managed externally).
-      // Numeric types use the f/i union fields — s is not valid for them.
-
-#ifndef ENABLE_CONSOLE_VECTOR
-      if (type == ConsoleValueType::cvString && bufferLen > 0)
-#else
-      if ((type == ConsoleValueType::cvString || type == ConsoleValueType::cvVector)  && bufferLen > 0)
-#endif
-      {
-         dFree(s);
-         bufferLen = 0;
-      }
-
-      s = const_cast<char*>(StringTable->EmptyString());
-      type = ConsoleValueType::cvNULL;
+       cleanupSetType(ConsoleValueType::cvNULL);
    }
+
    ConsoleValue()
    {
       type = ConsoleValueType::cvSTEntry;
       s = const_cast<char*>(StringTable->EmptyString());
       bufferLen = 0;
 #ifdef ENABLE_CONSOLE_VECTOR
-      for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
+      // for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
+      dMemset(v.points, 0, sizeof(ConsoleVector::points));
 #endif
    }
 
@@ -243,8 +242,7 @@ public:
    {
       if (this != &other)
       {
-         cleanupData();
-         type = other.type;
+         cleanupSetType( other.type );
          bufferLen = other.bufferLen;
          transferFrom(other);
       }
@@ -386,29 +384,25 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
-         cleanupData();
-         type =  ConsoleValueType::cvVector;
+         if (type != ConsoleValueType::cvVector) cleanupSetType(ConsoleValueType::cvVector);
          v = vec;
    }
 #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvFloat;
+      if (type != ConsoleValueType::cvFloat) cleanupSetType(ConsoleValueType::cvFloat);
       f = val;
    }
 
    TORQUE_FORCEINLINE void setInt(S64 val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvInteger;
+      if (type != ConsoleValueType::cvInteger) cleanupSetType(type = ConsoleValueType::cvInteger);
       i = val;
    }
 
    TORQUE_FORCEINLINE void setBool(bool val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvInteger;
+      if (type != ConsoleValueType::cvInteger) cleanupSetType( ConsoleValueType::cvInteger);
       i = val ? S64(1) : S64(0);
    }
 
@@ -424,8 +418,8 @@ public:
          setEmptyString();
          return;
       }
-      cleanupData();
-      type = ConsoleValueType::cvString;
+
+      cleanupSetType( ConsoleValueType::cvString);
       bufferLen = static_cast<U32>(len) + 1u;   // allocation size, always > 0
       s = static_cast<char*>(dMalloc(bufferLen));
       s[len] = '\0';
@@ -442,8 +436,7 @@ public:
    ///                   because bufferLen is stored as len+1.
    TORQUE_FORCEINLINE void setStringOwned(char* ownedBuf, S32 len)
    {
-      cleanupData();
-      type = ConsoleValueType::cvString;
+      cleanupSetType( ConsoleValueType::cvString );
       bufferLen = static_cast<U32>(len) + 1;   // always > 0 → cleanupData will free
       s = ownedBuf;
    }
@@ -458,8 +451,7 @@ public:
 
    TORQUE_FORCEINLINE void setStringTableEntry(StringTableEntry val)
    {
-      cleanupData();
-      type = ConsoleValueType::cvSTEntry;
+      cleanupSetType(ConsoleValueType::cvSTEntry);
       // StringTable::insert accepts NULL and returns EmptyString
       s = const_cast<char*>(StringTable->insert(val ? val : ""));
       bufferLen = 0;   // NOT owned — StringTable manages this memory
@@ -470,8 +462,7 @@ public:
       // cleanupData already sets s = EmptyString and type = cvNULL.
       // We then promote the type to cvSTEntry so queries return a valid
       // empty string rather than having to special-case cvNULL everywhere.
-      cleanupData();
-      type = ConsoleValueType::cvSTEntry;
+      cleanupSetType( ConsoleValueType::cvSTEntry );
    }
 
    TORQUE_FORCEINLINE void setConsoleData(S32 inType, void* inDataPtr, const EnumTable* inEnumTable)

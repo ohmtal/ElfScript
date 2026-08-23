@@ -35,7 +35,7 @@ Componentfields
 - 0.6a ENABLE_INLINE_CACHE: 5.571u 0.004s 0:05.60 99.4%     0+0k 0+0io 0pf+0w
 - 0.6a : 14.364u 0.005s 0:14.41 99.6%    0+0k 0+0io 0pf+0w
 - 0.6b : 6.268u 0.002s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
-- 0.6c : 6.264u 0.006s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
+- 0.6c : 5.417u 0.003s 0:05.43 99.6%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
 - OGE3D* using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
@@ -61,6 +61,9 @@ Componentfields
 - 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
+
+### docu/speedtest/elf/test_for.elf
+- 0.6c: 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
 
 
 ### Crazy Elf: assets/modules/StarField.elf 

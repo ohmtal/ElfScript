@@ -1,0 +1,15 @@
+#define JLOOPS 100
+#define ILOOPS 1000000
+#define HALF_ILOOPS 500000
+
+for(%j in range JLOOPS)  {
+    print(%j, "%");
+    for(%i in range ILOOPS)  {
+    }
+    for(%i in range ILOOPS)  {
+    }
+    for(%i in range ILOOPS)  {
+    }
+    for(%i in range HALF_ILOOPS)  {
+    }
+}
