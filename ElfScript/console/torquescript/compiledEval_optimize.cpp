@@ -1378,7 +1378,10 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
          &&handle_OP_INLINE_COMMAND,
          &&handle_OP_PRINT,
-         &&handle_OP_RANDOMF,
+
+         &&handle_OP_MATH_RANDOMF,
+         &&handle_OP_MATH_RANDOMF_1,
+         &&handle_OP_MATH_RANDOMF_2,
 
          &&handle_OP_INVALID
    };
@@ -3977,9 +3980,28 @@ handle_OP_PRINT:
       PUSH_STK();
       DISPATCH();
 }
-handle_OP_RANDOMF:
+
+handle_OP_MATH_RANDOMF_2:
 {
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f2 = stack[_STK].getFastFloat();POP_STK();
+      stack[_STK + 1].setFastFloat(ElfMath::mRandF64(f1,f2));
+      PUSH_STK();
+      DISPATCH();
+}
+
+handle_OP_MATH_RANDOMF_1:
+{
+      F64 f2 = stack[_STK].getFastFloat();POP_STK();
+      stack[_STK + 1].setFastFloat(ElfMath::mRandF64(0.0,f2));
+      PUSH_STK();
+      DISPATCH();
+}
+handle_OP_MATH_RANDOMF:
+{
+
       stack[_STK + 1].setFastFloat(ElfMath::mRandF64());
+
       PUSH_STK();
       DISPATCH();
 }

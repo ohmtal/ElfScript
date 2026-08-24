@@ -1,8 +1,3 @@
-Nonterminals useless in grammar
-
-    expr_list_decl
-
-
 Terminals unused in grammar
 
     rwENDDEF
@@ -16,13 +11,7 @@ Terminals unused in grammar
     opCAT
 
 
-Rules useless in grammar
-
-  189 expr_list_decl: ε
-  190               | expr_list
-
-
-State 260 conflicts: 1 shift/reduce
+State 262 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -239,27 +228,28 @@ Grammar
 
   171 inline_command_expr: rwPRINT '(' expr_list ')'
   172                    | rwRANDOMF '(' ')'
+  173                    | rwRANDOMF '(' expr_list ')'
 
-  173 expr_list: expr
-  174          | expr_list ',' expr
+  174 expr_list: expr
+  175          | expr_list ',' expr
 
-  175 slot_assign_list_opt: ε
-  176                     | slot_assign_list
+  176 slot_assign_list_opt: ε
+  177                     | slot_assign_list
 
-  177 slot_assign_list: slot_assign
-  178                 | slot_assign_list slot_assign
+  178 slot_assign_list: slot_assign
+  179                 | slot_assign_list slot_assign
 
-  179 slot_assign: IDENT '=' expr ';'
-  180            | IDENT '=' '{' expr_list '}' ';'
-  181            | TYPEIDENT IDENT '=' expr ';'
-  182            | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
-  183            | rwDATABLOCK '=' expr ';'
-  184            | IDENT '[' aidx_expr ']' '=' expr ';'
-  185            | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
-  186            | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
+  180 slot_assign: IDENT '=' expr ';'
+  181            | IDENT '=' '{' expr_list '}' ';'
+  182            | TYPEIDENT IDENT '=' expr ';'
+  183            | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
+  184            | rwDATABLOCK '=' expr ';'
+  185            | IDENT '[' aidx_expr ']' '=' expr ';'
+  186            | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
+  187            | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
 
-  187 aidx_expr: expr
-  188          | aidx_expr ',' expr
+  188 aidx_expr: expr
+  189          | aidx_expr ',' expr
 
 
 Terminals, with rules where they appear
@@ -268,27 +258,27 @@ Terminals, with rules where they appear
     '!' <i> (33) 117
     '%' <i> (37) 93
     '&' <i> (38) 94
-    '(' <i> (40) 27 28 37 38 39 40 41 42 43 58 59 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 91 134 160 161 162 169 170 171 172
-    ')' <i> (41) 27 28 37 38 39 40 41 42 43 58 59 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 91 134 160 161 162 169 170 171 172
+    '(' <i> (40) 27 28 37 38 39 40 41 42 43 58 59 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 91 134 160 161 162 169 170 171 172 173
+    ')' <i> (41) 27 28 37 38 39 40 41 42 43 58 59 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 91 134 160 161 162 169 170 171 172 173
     '*' <i> (42) 98 101
     '+' <i> (43) 96
-    ',' <i> (44) 25 32 49 166 170 174 188
+    ',' <i> (44) 25 32 49 166 170 175 189
     '-' <i> (45) 97 100
     '.' <i> (46) 129 130 162
     '/' <i> (47) 99
     ':' <i> (58) 45 60 61 62 103
-    ';' <i> (59) 7 18 19 20 21 22 23 24 25 37 54 55 69 70 71 72 73 74 75 76 179 180 181 182 183 184 185 186
+    ';' <i> (59) 7 18 19 20 21 22 23 24 25 37 54 55 69 70 71 72 73 74 75 76 180 181 182 183 184 185 186 187
     '<' <i> (60) 104
-    '=' <i> (61) 24 25 35 36 151 152 153 154 158 159 179 180 181 182 183 184 185 186
+    '=' <i> (61) 24 25 35 36 151 152 153 154 158 159 180 181 182 183 184 185 186 187
     '>' <i> (62) 105
     '?' (63) 34 36 103
     '@' <i> (64) 116
-    '[' (91) 40 41 128 130 153 154 156 184 185 186
-    ']' (93) 40 41 128 130 153 154 156 184 185 186
+    '[' (91) 40 41 128 130 153 154 156 185 186 187
+    ']' (93) 40 41 128 130 153 154 156 185 186 187
     '^' <i> (94) 92
-    '{' <i> (123) 7 22 27 28 37 38 40 42 56 58 59 152 154 159 164 180 182 185
+    '{' <i> (123) 7 22 27 28 37 38 40 42 56 58 59 152 154 159 164 181 183 186
     '|' <i> (124) 95
-    '}' <i> (125) 7 22 27 28 37 38 40 42 56 58 59 152 154 159 164 180 182 185
+    '}' <i> (125) 7 22 27 28 37 38 40 42 56 58 59 152 154 159 164 181 183 186
     '~' <i> (126) 118
     error (256)
     rwDEFINE <i> (258) 27 28
@@ -312,7 +302,7 @@ Terminals, with rules where they appear
     rwFOREACH <i> (276) 82 84 85 86 87 88
     rwFOREACHSTR <i> (277) 83
     rwIN <i> (278) 77 78 79 80 81 82 83 84 85 86 87 88
-    rwDATABLOCK <i> (279) 37 183
+    rwDATABLOCK <i> (279) 37 184
     rwSWITCH <i> (280) 58
     rwCASE <i> (281) 60 61 62
     rwSWITCHSTR <i> (282) 59
@@ -324,8 +314,8 @@ Terminals, with rules where they appear
     INTCONST <i> (288) 121
     TTAG <s> (289) 24 25 102
     VAR <s> (290) 33 34 35 36 77 78 79 80 81 82 83 84 85 86 87 88 127 128 151 152 153 154 155 156
-    IDENT <s> (291) 7 27 28 45 125 129 130 133 160 161 162 179 180 181 182 184 185 186
-    TYPEIDENT <i> (292) 181 182 186
+    IDENT <s> (291) 7 27 28 45 125 129 130 133 160 161 162 180 181 182 183 185 186 187
+    TYPEIDENT <i> (292) 182 183 187
     DOCBLOCK <str> (293) 26
     STRATOM <str> (294) 126 170
     TAGATOM <str> (295) 119
@@ -360,7 +350,7 @@ Terminals, with rules where they appear
     rwRANGE <i> (324) 78 80 81 85 87 88
     rwSTEP <i> (325) 79 80 86 87
     rwPRINT <i> (326) 171
-    rwRANDOMF <i> (327) 172
+    rwRANDOMF <i> (327) 172 173
     UNARY (328)
 
 
@@ -451,7 +441,7 @@ Nonterminals, with rules where they appear
         on right: 23
     expr <expr> (127)
         on left: 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128
-        on right: 21 24 25 35 36 37 47 58 59 63 64 65 66 67 68 69 70 71 72 73 74 75 77 78 79 80 81 82 83 84 85 86 87 88 91 92 93 94 95 96 97 98 99 100 101 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 129 130 131 132 134 137 138 139 140 141 142 143 144 145 146 151 153 158 162 163 169 170 173 174 179 181 183 184 186 187 188
+        on right: 21 24 25 35 36 37 47 58 59 63 64 65 66 67 68 69 70 71 72 73 74 75 77 78 79 80 81 82 83 84 85 86 87 88 91 92 93 94 95 96 97 98 99 100 101 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 129 130 131 132 134 137 138 139 140 141 142 143 144 145 146 151 153 158 162 163 169 170 174 175 180 182 184 185 187 188 189
     slot_acc <slot> (128)
         on left: 129 130
         on right: 123 157 158 159
@@ -483,23 +473,23 @@ Nonterminals, with rules where they appear
         on left: 169 170
         on right: 148
     inline_command_expr <expr> (138)
-        on left: 171 172
+        on left: 171 172 173
         on right: 149
     expr_list <expr> (139)
-        on left: 173 174
-        on right: 22 49 152 154 159 164 171 174 180 182 185
+        on left: 174 175
+        on right: 22 49 152 154 159 164 171 173 175 181 183 186
     slot_assign_list_opt <slist> (140)
-        on left: 175 176
+        on left: 176 177
         on right: 37
     slot_assign_list <slist> (141)
-        on left: 177 178
-        on right: 51 53 176 178
+        on left: 178 179
+        on right: 51 53 177 179
     slot_assign <slist> (142)
-        on left: 179 180 181 182 183 184 185 186
-        on right: 177 178
+        on left: 180 181 182 183 184 185 186 187
+        on right: 178 179
     aidx_expr <expr> (143)
-        on left: 187 188
-        on right: 128 130 153 154 156 184 185 186 188
+        on left: 188 189
+        on right: 128 130 153 154 156 185 186 187 189
 
 
 State 0
@@ -1084,6 +1074,7 @@ State 34
 State 35
 
   172 inline_command_expr: rwRANDOMF • '(' ')'
+  173                    | rwRANDOMF • '(' expr_list ')'
 
     '('  shift, and go to state 105
 
@@ -2514,8 +2505,37 @@ State 104
 State 105
 
   172 inline_command_expr: rwRANDOMF '(' • ')'
+  173                    | rwRANDOMF '(' • expr_list ')'
 
-    ')'  shift, and go to state 179
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    ')'                 shift, and go to state 179
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 140
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+    expr_list            go to state 180
 
 
 State 106
@@ -2549,7 +2569,7 @@ State 107
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 180
+    expr                 go to state 181
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2582,7 +2602,7 @@ State 108
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 181
+    expr                 go to state 182
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2615,7 +2635,7 @@ State 109
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 182
+    expr                 go to state 183
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2648,7 +2668,7 @@ State 110
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 183
+    expr                 go to state 184
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2681,7 +2701,7 @@ State 111
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 184
+    expr                 go to state 185
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2714,7 +2734,7 @@ State 112
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 185
+    expr                 go to state 186
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2729,7 +2749,7 @@ State 113
   130         | expr '.' • IDENT '[' aidx_expr ']'
   162 funcall_expr: expr '.' • IDENT '(' func_arg_list_decl ')'
 
-    IDENT  shift, and go to state 186
+    IDENT  shift, and go to state 187
 
 
 State 114
@@ -2756,7 +2776,7 @@ State 114
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 187
+    expr                 go to state 188
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2789,7 +2809,7 @@ State 115
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 188
+    expr                 go to state 189
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2822,7 +2842,7 @@ State 116
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 189
+    expr                 go to state 190
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2855,7 +2875,7 @@ State 117
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 190
+    expr                 go to state 191
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2888,7 +2908,7 @@ State 118
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 191
+    expr                 go to state 192
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2904,7 +2924,7 @@ State 119
     IDENT  shift, and go to state 56
     '('    shift, and go to state 57
 
-    class_name_expr  go to state 192
+    class_name_expr  go to state 193
 
 
 State 120
@@ -2914,7 +2934,7 @@ State 120
     IDENT  shift, and go to state 56
     '('    shift, and go to state 57
 
-    class_name_expr  go to state 193
+    class_name_expr  go to state 194
 
 
 State 121
@@ -2941,7 +2961,7 @@ State 121
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 194
+    expr                 go to state 195
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -2974,7 +2994,7 @@ State 122
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 195
+    expr                 go to state 196
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3007,7 +3027,7 @@ State 123
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 196
+    expr                 go to state 197
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3040,7 +3060,7 @@ State 124
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 197
+    expr                 go to state 198
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3073,7 +3093,7 @@ State 125
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 198
+    expr                 go to state 199
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3106,7 +3126,7 @@ State 126
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 199
+    expr                 go to state 200
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3139,7 +3159,7 @@ State 127
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 200
+    expr                 go to state 201
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3172,7 +3192,7 @@ State 128
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 201
+    expr                 go to state 202
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3205,7 +3225,7 @@ State 129
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 202
+    expr                 go to state 203
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3238,7 +3258,7 @@ State 130
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 203
+    expr                 go to state 204
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3271,7 +3291,7 @@ State 131
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 204
+    expr                 go to state 205
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3299,14 +3319,14 @@ State 132
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '{'                 shift, and go to state 205
+    '{'                 shift, and go to state 206
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 206
+    expr                 go to state 207
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3326,20 +3346,20 @@ State 134
 
    27 fn_decl_stmt: rwDEFINE IDENT '(' • var_list_decl ')' '{' statement_list '}'
 
-    VAR  shift, and go to state 207
+    VAR  shift, and go to state 208
 
     $default  reduce using rule 29 (var_list_decl)
 
-    var_list_decl  go to state 208
-    var_list       go to state 209
-    param          go to state 210
+    var_list_decl  go to state 209
+    var_list       go to state 210
+    param          go to state 211
 
 
 State 135
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON • IDENT '(' var_list_decl ')' '{' statement_list '}'
 
-    IDENT  shift, and go to state 211
+    IDENT  shift, and go to state 212
 
 
 State 136
@@ -3383,7 +3403,7 @@ State 136
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 212
+    ')'         shift, and go to state 213
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -3426,13 +3446,13 @@ State 137
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
-    '['                 shift, and go to state 213
+    '['                 shift, and go to state 214
 
     $default  reduce using rule 46 (object_name)
 
     object_decl          go to state 41
-    object_name          go to state 214
-    expr                 go to state 215
+    object_name          go to state 215
+    expr                 go to state 216
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3468,8 +3488,8 @@ State 138
     $default  reduce using rule 46 (object_name)
 
     object_decl          go to state 41
-    object_name          go to state 216
-    expr                 go to state 215
+    object_name          go to state 217
+    expr                 go to state 216
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3520,7 +3540,7 @@ State 139
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 217
+    ')'         shift, and go to state 218
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -3567,7 +3587,7 @@ State 140
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  173 expr_list: expr •
+  174 expr_list: expr •
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -3595,16 +3615,16 @@ State 140
     opSTRNE     shift, and go to state 130
     '?'         shift, and go to state 131
 
-    $default  reduce using rule 173 (expr_list)
+    $default  reduce using rule 174 (expr_list)
 
 
 State 141
 
    22 stmt: rwRETURN '{' expr_list • '}' ';'
-  174 expr_list: expr_list • ',' expr
+  175 expr_list: expr_list • ',' expr
 
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 219
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 220
 
 
 State 142
@@ -3655,7 +3675,7 @@ State 143
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 220
+    ')'         shift, and go to state 221
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -3704,13 +3724,13 @@ State 144
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '}'                 shift, and go to state 221
+    '}'                 shift, and go to state 222
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
-    stmt                 go to state 222
+    stmt                 go to state 223
     datablock_decl       go to state 40
     object_decl          go to state 41
     switch_stmt          go to state 42
@@ -3732,7 +3752,7 @@ State 145
 
    68 while_stmt: rwDO stmt_block rwWHILE • '(' expr ')'
 
-    '('  shift, and go to state 223
+    '('  shift, and go to state 224
 
 
 State 146
@@ -3751,7 +3771,7 @@ State 146
   155          | VAR • assign_op_struct
   156          | VAR • '[' aidx_expr ']' assign_op_struct
 
-    rwIN          shift, and go to state 224
+    rwIN          shift, and go to state 225
     '='           shift, and go to state 82
     opMINUSMINUS  shift, and go to state 83
     opPLUSPLUS    shift, and go to state 84
@@ -3793,14 +3813,14 @@ State 147
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    ';'                 shift, and go to state 225
+    ';'                 shift, and go to state 226
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 226
+    expr                 go to state 227
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3853,7 +3873,7 @@ State 148
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 227
+    ';'         shift, and go to state 228
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -3880,14 +3900,14 @@ State 149
    87             | rwFOREACH '(' VAR • rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' stmt_block
    88             | rwFOREACH '(' VAR • rwIN rwRANGE expr ')' stmt_block
 
-    rwIN  shift, and go to state 228
+    rwIN  shift, and go to state 229
 
 
 State 150
 
    83 foreach_stmt: rwFOREACHSTR '(' VAR • rwIN expr ')' stmt_block
 
-    rwIN  shift, and go to state 229
+    rwIN  shift, and go to state 230
 
 
 State 151
@@ -3914,7 +3934,7 @@ State 151
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 230
+    expr                 go to state 231
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -3964,7 +3984,7 @@ State 152
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 231
+    ')'         shift, and go to state 232
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -4023,7 +4043,7 @@ State 153
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 232
+    ')'         shift, and go to state 233
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -4047,8 +4067,8 @@ State 154
 
     rwDEFINE  shift, and go to state 4
 
-    fn_decl_list  go to state 233
-    fn_decl_stmt  go to state 234
+    fn_decl_list  go to state 234
+    fn_decl_stmt  go to state 235
 
 
 State 155
@@ -4093,8 +4113,8 @@ State 155
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 235
-    ','         shift, and go to state 236
+    ')'         shift, and go to state 236
+    ','         shift, and go to state 237
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -4154,8 +4174,8 @@ State 156
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ','         shift, and go to state 237
-    ';'         shift, and go to state 238
+    ','         shift, and go to state 238
+    ';'         shift, and go to state 239
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -4204,7 +4224,7 @@ State 157
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 239
+    expr_list            go to state 240
 
 
 State 158
@@ -4896,7 +4916,7 @@ State 169
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  187 aidx_expr: expr •
+  188 aidx_expr: expr •
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -4924,7 +4944,7 @@ State 169
     opSTRNE     shift, and go to state 130
     '?'         shift, and go to state 131
 
-    $default  reduce using rule 187 (aidx_expr)
+    $default  reduce using rule 188 (aidx_expr)
 
 
 State 170
@@ -4933,10 +4953,10 @@ State 170
   153 stmt_expr: VAR '[' aidx_expr • ']' '=' expr
   154          | VAR '[' aidx_expr • ']' '=' '{' expr_list '}'
   156          | VAR '[' aidx_expr • ']' assign_op_struct
-  188 aidx_expr: aidx_expr • ',' expr
+  189 aidx_expr: aidx_expr • ',' expr
 
-    ','  shift, and go to state 240
-    ']'  shift, and go to state 241
+    ','  shift, and go to state 241
+    ']'  shift, and go to state 242
 
 
 State 171
@@ -4970,7 +4990,7 @@ State 171
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 242
+    expr_list            go to state 243
 
 
 State 172
@@ -5045,7 +5065,7 @@ State 174
   166 func_arg_list: func_arg_list • ',' func_arg_item
   168 func_arg_list_decl: func_arg_list •
 
-    ','  shift, and go to state 243
+    ','  shift, and go to state 244
 
     $default  reduce using rule 168 (func_arg_list_decl)
 
@@ -5054,14 +5074,14 @@ State 175
 
   160 funcall_expr: IDENT '(' func_arg_list_decl • ')'
 
-    ')'  shift, and go to state 244
+    ')'  shift, and go to state 245
 
 
 State 176
 
   161 funcall_expr: IDENT opCOLONCOLON IDENT • '(' func_arg_list_decl ')'
 
-    '('  shift, and go to state 245
+    '('  shift, and go to state 246
 
 
 State 177
@@ -5074,10 +5094,10 @@ State 177
 State 178
 
   171 inline_command_expr: rwPRINT '(' expr_list • ')'
-  174 expr_list: expr_list • ',' expr
+  175 expr_list: expr_list • ',' expr
 
-    ')'  shift, and go to state 246
-    ','  shift, and go to state 218
+    ')'  shift, and go to state 247
+    ','  shift, and go to state 219
 
 
 State 179
@@ -5088,6 +5108,15 @@ State 179
 
 
 State 180
+
+  173 inline_command_expr: rwRANDOMF '(' expr_list • ')'
+  175 expr_list: expr_list • ',' expr
+
+    ')'  shift, and go to state 248
+    ','  shift, and go to state 219
+
+
+State 181
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5128,7 +5157,7 @@ State 180
     $default  reduce using rule 96 (expr)
 
 
-State 181
+State 182
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5169,7 +5198,7 @@ State 181
     $default  reduce using rule 97 (expr)
 
 
-State 182
+State 183
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5207,7 +5236,7 @@ State 182
     $default  reduce using rule 98 (expr)
 
 
-State 183
+State 184
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5245,7 +5274,7 @@ State 183
     $default  reduce using rule 99 (expr)
 
 
-State 184
+State 185
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5293,7 +5322,7 @@ State 184
     $default  reduce using rule 104 (expr)
 
 
-State 185
+State 186
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5341,19 +5370,19 @@ State 185
     $default  reduce using rule 105 (expr)
 
 
-State 186
+State 187
 
   129 slot_acc: expr '.' IDENT •
   130         | expr '.' IDENT • '[' aidx_expr ']'
   162 funcall_expr: expr '.' IDENT • '(' func_arg_list_decl ')'
 
-    '('  shift, and go to state 247
-    '['  shift, and go to state 248
+    '('  shift, and go to state 249
+    '['  shift, and go to state 250
 
     $default  reduce using rule 129 (slot_acc)
 
 
-State 187
+State 188
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5409,7 +5438,7 @@ State 187
     $default  reduce using rule 95 (expr)
 
 
-State 188
+State 189
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5463,7 +5492,7 @@ State 188
     $default  reduce using rule 94 (expr)
 
 
-State 189
+State 190
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5501,7 +5530,7 @@ State 189
     $default  reduce using rule 93 (expr)
 
 
-State 190
+State 191
 
    92 expr: expr • '^' expr
    92     | expr '^' expr •
@@ -5556,7 +5585,7 @@ State 190
     $default  reduce using rule 92 (expr)
 
 
-State 191
+State 192
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5601,21 +5630,21 @@ State 191
     $default  reduce using rule 116 (expr)
 
 
-State 192
+State 193
 
   131 intslot_acc: expr opINTNAME class_name_expr •
 
     $default  reduce using rule 131 (intslot_acc)
 
 
-State 193
+State 194
 
   132 intslot_acc: expr opINTNAMER class_name_expr •
 
     $default  reduce using rule 132 (intslot_acc)
 
 
-State 194
+State 195
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5658,7 +5687,7 @@ State 194
     $default  reduce using rule 111 (expr)
 
 
-State 195
+State 196
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5701,7 +5730,7 @@ State 195
     $default  reduce using rule 112 (expr)
 
 
-State 196
+State 197
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5753,7 +5782,7 @@ State 196
     $default  reduce using rule 108 (expr)
 
 
-State 197
+State 198
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5805,7 +5834,7 @@ State 197
     $default  reduce using rule 109 (expr)
 
 
-State 198
+State 199
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5853,7 +5882,7 @@ State 198
     $default  reduce using rule 106 (expr)
 
 
-State 199
+State 200
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5901,7 +5930,7 @@ State 199
     $default  reduce using rule 107 (expr)
 
 
-State 200
+State 201
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -5958,7 +5987,7 @@ State 200
     $default  reduce using rule 113 (expr)
 
 
-State 201
+State 202
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -6016,7 +6045,7 @@ State 201
     $default  reduce using rule 110 (expr)
 
 
-State 202
+State 203
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -6061,7 +6090,7 @@ State 202
     $default  reduce using rule 114 (expr)
 
 
-State 203
+State 204
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -6106,7 +6135,7 @@ State 203
     $default  reduce using rule 115 (expr)
 
 
-State 204
+State 205
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -6147,7 +6176,7 @@ State 204
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ':'         shift, and go to state 249
+    ':'         shift, and go to state 251
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -6165,7 +6194,7 @@ State 204
     '?'         shift, and go to state 131
 
 
-State 205
+State 206
 
   159 stmt_expr: slot_acc '=' '{' • expr_list '}'
 
@@ -6196,10 +6225,10 @@ State 205
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 250
+    expr_list            go to state 252
 
 
-State 206
+State 207
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -6259,58 +6288,58 @@ State 206
     $default  reduce using rule 158 (stmt_expr)
 
 
-State 207
+State 208
 
    33 param: VAR •
    34      | VAR • '?'
    35      | VAR • '=' expr
    36      | VAR • '?' '=' expr
 
-    '='  shift, and go to state 251
-    '?'  shift, and go to state 252
+    '='  shift, and go to state 253
+    '?'  shift, and go to state 254
 
     $default  reduce using rule 33 (param)
 
 
-State 208
+State 209
 
    27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl • ')' '{' statement_list '}'
 
-    ')'  shift, and go to state 253
+    ')'  shift, and go to state 255
 
 
-State 209
+State 210
 
    30 var_list_decl: var_list •
    32 var_list: var_list • ',' param
 
-    ','  shift, and go to state 254
+    ','  shift, and go to state 256
 
     $default  reduce using rule 30 (var_list_decl)
 
 
-State 210
+State 211
 
    31 var_list: param •
 
     $default  reduce using rule 31 (var_list)
 
 
-State 211
+State 212
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT • '(' var_list_decl ')' '{' statement_list '}'
 
-    '('  shift, and go to state 255
+    '('  shift, and go to state 257
 
 
-State 212
+State 213
 
   134 class_name_expr: '(' expr ')' •
 
     $default  reduce using rule 134 (class_name_expr)
 
 
-State 213
+State 214
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' • object_name ']' parent_block object_args ')' '{' object_declare_block '}'
    41            | rwDECLARE class_name_expr '(' '[' • object_name ']' parent_block object_args ')'
@@ -6337,8 +6366,8 @@ State 213
     $default  reduce using rule 46 (object_name)
 
     object_decl          go to state 41
-    object_name          go to state 256
-    expr                 go to state 215
+    object_name          go to state 258
+    expr                 go to state 216
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6347,19 +6376,19 @@ State 213
     inline_command_expr  go to state 54
 
 
-State 214
+State 215
 
    38 object_decl: rwDECLARE class_name_expr '(' object_name • parent_block object_args ')' '{' object_declare_block '}'
    39            | rwDECLARE class_name_expr '(' object_name • parent_block object_args ')'
 
-    ':'  shift, and go to state 257
+    ':'  shift, and go to state 259
 
     $default  reduce using rule 44 (parent_block)
 
-    parent_block  go to state 258
+    parent_block  go to state 260
 
 
-State 215
+State 216
 
    47 object_name: expr •
    92 expr: expr • '^' expr
@@ -6419,19 +6448,19 @@ State 215
     $default  reduce using rule 47 (object_name)
 
 
-State 216
+State 217
 
    42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name • parent_block object_args ')' '{' object_declare_block '}'
    43            | rwDECLARESINGLETON class_name_expr '(' object_name • parent_block object_args ')'
 
-    ':'  shift, and go to state 257
+    ':'  shift, and go to state 259
 
     $default  reduce using rule 44 (parent_block)
 
-    parent_block  go to state 259
+    parent_block  go to state 261
 
 
-State 217
+State 218
 
    65 if_stmt: rwIF '(' expr ')' • stmt_block
    66        | rwIF '(' expr ')' • stmt_block rwELSE stmt_block
@@ -6471,7 +6500,7 @@ State 217
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 260
+    stmt_block           go to state 262
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -6487,9 +6516,9 @@ State 217
     inline_command_expr  go to state 54
 
 
-State 218
+State 219
 
-  174 expr_list: expr_list ',' • expr
+  175 expr_list: expr_list ',' • expr
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -6511,7 +6540,7 @@ State 218
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 261
+    expr                 go to state 263
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6520,14 +6549,14 @@ State 218
     inline_command_expr  go to state 54
 
 
-State 219
+State 220
 
    22 stmt: rwRETURN '{' expr_list '}' • ';'
 
-    ';'  shift, and go to state 262
+    ';'  shift, and go to state 264
 
 
-State 220
+State 221
 
    67 while_stmt: rwWHILE '(' expr ')' • stmt_block
 
@@ -6566,7 +6595,7 @@ State 220
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 263
+    stmt_block           go to state 265
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -6582,21 +6611,21 @@ State 220
     inline_command_expr  go to state 54
 
 
-State 221
+State 222
 
    56 stmt_block: '{' statement_list '}' •
 
     $default  reduce using rule 56 (stmt_block)
 
 
-State 222
+State 223
 
    11 statement_list: statement_list stmt •
 
     $default  reduce using rule 11 (statement_list)
 
 
-State 223
+State 224
 
    68 while_stmt: rwDO stmt_block rwWHILE '(' • expr ')'
 
@@ -6620,7 +6649,7 @@ State 223
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 264
+    expr                 go to state 266
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6629,7 +6658,7 @@ State 223
     inline_command_expr  go to state 54
 
 
-State 224
+State 225
 
    77 for_stmt: rwFOR '(' VAR rwIN • expr opDOTDOT expr ')' stmt_block
    78         | rwFOR '(' VAR rwIN • rwRANGE expr opDOTDOT expr ')' stmt_block
@@ -6653,12 +6682,12 @@ State 224
     '('                 shift, and go to state 31
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
-    rwRANGE             shift, and go to state 265
+    rwRANGE             shift, and go to state 267
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 266
+    expr                 go to state 268
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6667,7 +6696,7 @@ State 224
     inline_command_expr  go to state 54
 
 
-State 225
+State 226
 
    75 for_stmt: rwFOR '(' ';' ';' • expr ')' stmt_block
    76         | rwFOR '(' ';' ';' • ')' stmt_block
@@ -6686,14 +6715,14 @@ State 225
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    ')'                 shift, and go to state 267
+    ')'                 shift, and go to state 269
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 268
+    expr                 go to state 270
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6702,7 +6731,7 @@ State 225
     inline_command_expr  go to state 54
 
 
-State 226
+State 227
 
    73 for_stmt: rwFOR '(' ';' expr • ';' expr ')' stmt_block
    74         | rwFOR '(' ';' expr • ';' ')' stmt_block
@@ -6744,7 +6773,7 @@ State 226
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 269
+    ';'         shift, and go to state 271
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -6762,7 +6791,7 @@ State 226
     '?'         shift, and go to state 131
 
 
-State 227
+State 228
 
    69 for_stmt: rwFOR '(' expr ';' • expr ';' expr ')' stmt_block
    70         | rwFOR '(' expr ';' • expr ';' ')' stmt_block
@@ -6783,14 +6812,14 @@ State 227
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    ';'                 shift, and go to state 270
+    ';'                 shift, and go to state 272
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 271
+    expr                 go to state 273
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6799,7 +6828,7 @@ State 227
     inline_command_expr  go to state 54
 
 
-State 228
+State 229
 
    82 foreach_stmt: rwFOREACH '(' VAR rwIN • expr ')' stmt_block
    84             | rwFOREACH '(' VAR rwIN • expr opDOTDOT expr ')' stmt_block
@@ -6824,12 +6853,12 @@ State 228
     '('                 shift, and go to state 31
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
-    rwRANGE             shift, and go to state 272
+    rwRANGE             shift, and go to state 274
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 273
+    expr                 go to state 275
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6838,7 +6867,7 @@ State 228
     inline_command_expr  go to state 54
 
 
-State 229
+State 230
 
    83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN • expr ')' stmt_block
 
@@ -6862,7 +6891,7 @@ State 229
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 274
+    expr                 go to state 276
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -6871,7 +6900,7 @@ State 229
     inline_command_expr  go to state 54
 
 
-State 230
+State 231
 
    37 datablock_decl: rwDATABLOCK class_name_expr '(' expr • parent_block ')' '{' slot_assign_list_opt '}' ';'
    92 expr: expr • '^' expr
@@ -6912,7 +6941,7 @@ State 230
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ':'         shift, and go to state 257
+    ':'         shift, and go to state 259
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -6931,107 +6960,58 @@ State 230
 
     $default  reduce using rule 44 (parent_block)
 
-    parent_block  go to state 275
-
-
-State 231
-
-   58 switch_stmt: rwSWITCH '(' expr ')' • '{' case_block '}'
-
-    '{'  shift, and go to state 276
+    parent_block  go to state 277
 
 
 State 232
 
-   59 switch_stmt: rwSWITCHSTR '(' expr ')' • '{' case_block '}'
+   58 switch_stmt: rwSWITCH '(' expr ')' • '{' case_block '}'
 
-    '{'  shift, and go to state 277
+    '{'  shift, and go to state 278
 
 
 State 233
+
+   59 switch_stmt: rwSWITCHSTR '(' expr ')' • '{' case_block '}'
+
+    '{'  shift, and go to state 279
+
+
+State 234
 
     7 package_decl: rwPACKAGE IDENT '{' fn_decl_list • '}' ';'
     9 fn_decl_list: fn_decl_list • fn_decl_stmt
 
     rwDEFINE  shift, and go to state 4
-    '}'       shift, and go to state 278
+    '}'       shift, and go to state 280
 
-    fn_decl_stmt  go to state 279
+    fn_decl_stmt  go to state 281
 
 
-State 234
+State 235
 
     8 fn_decl_list: fn_decl_stmt •
 
     $default  reduce using rule 8 (fn_decl_list)
 
 
-State 235
+State 236
 
   169 assert_expr: rwASSERT '(' expr ')' •
 
     $default  reduce using rule 169 (assert_expr)
 
 
-State 236
+State 237
 
   170 assert_expr: rwASSERT '(' expr ',' • STRATOM ')'
 
-    STRATOM  shift, and go to state 280
-
-
-State 237
-
-   25 stmt: TTAG '=' expr ',' • expr ';'
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 281
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
+    STRATOM  shift, and go to state 282
 
 
 State 238
 
-   24 stmt: TTAG '=' expr ';' •
-
-    $default  reduce using rule 24 (stmt)
-
-
-State 239
-
-  152 stmt_expr: VAR '=' '{' expr_list • '}'
-  174 expr_list: expr_list • ',' expr
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 282
-
-
-State 240
-
-  188 aidx_expr: aidx_expr ',' • expr
+   25 stmt: TTAG '=' expr ',' • expr ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -7062,14 +7042,63 @@ State 240
     inline_command_expr  go to state 54
 
 
+State 239
+
+   24 stmt: TTAG '=' expr ';' •
+
+    $default  reduce using rule 24 (stmt)
+
+
+State 240
+
+  152 stmt_expr: VAR '=' '{' expr_list • '}'
+  175 expr_list: expr_list • ',' expr
+
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 284
+
+
 State 241
+
+  189 aidx_expr: aidx_expr ',' • expr
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 285
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 242
 
   128 expr: VAR '[' aidx_expr ']' •
   153 stmt_expr: VAR '[' aidx_expr ']' • '=' expr
   154          | VAR '[' aidx_expr ']' • '=' '{' expr_list '}'
   156          | VAR '[' aidx_expr ']' • assign_op_struct
 
-    '='           shift, and go to state 284
+    '='           shift, and go to state 286
     opMINUSMINUS  shift, and go to state 83
     opPLUSPLUS    shift, and go to state 84
     opPLASN       shift, and go to state 85
@@ -7085,19 +7114,19 @@ State 241
 
     $default  reduce using rule 128 (expr)
 
-    assign_op_struct  go to state 285
-
-
-State 242
-
-  164 func_arg_item: '{' expr_list • '}'
-  174 expr_list: expr_list • ',' expr
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 286
+    assign_op_struct  go to state 287
 
 
 State 243
+
+  164 func_arg_item: '{' expr_list • '}'
+  175 expr_list: expr_list • ',' expr
+
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 288
+
+
+State 244
 
   166 func_arg_list: func_arg_list ',' • func_arg_item
 
@@ -7127,19 +7156,19 @@ State 243
     intslot_acc          go to state 50
     stmt_expr            go to state 68
     funcall_expr         go to state 52
-    func_arg_item        go to state 287
+    func_arg_item        go to state 289
     assert_expr          go to state 53
     inline_command_expr  go to state 54
 
 
-State 244
+State 245
 
   160 funcall_expr: IDENT '(' func_arg_list_decl ')' •
 
     $default  reduce using rule 160 (funcall_expr)
 
 
-State 245
+State 246
 
   161 funcall_expr: IDENT opCOLONCOLON IDENT '(' • func_arg_list_decl ')'
 
@@ -7173,19 +7202,26 @@ State 245
     funcall_expr         go to state 52
     func_arg_item        go to state 173
     func_arg_list        go to state 174
-    func_arg_list_decl   go to state 288
+    func_arg_list_decl   go to state 290
     assert_expr          go to state 53
     inline_command_expr  go to state 54
 
 
-State 246
+State 247
 
   171 inline_command_expr: rwPRINT '(' expr_list ')' •
 
     $default  reduce using rule 171 (inline_command_expr)
 
 
-State 247
+State 248
+
+  173 inline_command_expr: rwRANDOMF '(' expr_list ')' •
+
+    $default  reduce using rule 173 (inline_command_expr)
+
+
+State 249
 
   162 funcall_expr: expr '.' IDENT '(' • func_arg_list_decl ')'
 
@@ -7219,12 +7255,12 @@ State 247
     funcall_expr         go to state 52
     func_arg_item        go to state 173
     func_arg_list        go to state 174
-    func_arg_list_decl   go to state 289
+    func_arg_list_decl   go to state 291
     assert_expr          go to state 53
     inline_command_expr  go to state 54
 
 
-State 248
+State 250
 
   130 slot_acc: expr '.' IDENT '[' • aidx_expr ']'
 
@@ -7255,54 +7291,12 @@ State 248
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    aidx_expr            go to state 290
-
-
-State 249
-
-  103 expr: expr '?' expr ':' • expr
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 291
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 250
-
-  159 stmt_expr: slot_acc '=' '{' expr_list • '}'
-  174 expr_list: expr_list • ',' expr
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 292
+    aidx_expr            go to state 292
 
 
 State 251
 
-   35 param: VAR '=' • expr
+  103 expr: expr '?' expr ':' • expr
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -7335,94 +7329,136 @@ State 251
 
 State 252
 
-   34 param: VAR '?' •
-   36      | VAR '?' • '=' expr
+  159 stmt_expr: slot_acc '=' '{' expr_list • '}'
+  175 expr_list: expr_list • ',' expr
 
-    '='  shift, and go to state 294
-
-    $default  reduce using rule 34 (param)
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 294
 
 
 State 253
 
-   27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl ')' • '{' statement_list '}'
+   35 param: VAR '=' • expr
 
-    '{'  shift, and go to state 295
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 295
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
 
 
 State 254
 
-   32 var_list: var_list ',' • param
+   34 param: VAR '?' •
+   36      | VAR '?' • '=' expr
 
-    VAR  shift, and go to state 207
+    '='  shift, and go to state 296
 
-    param  go to state 296
+    $default  reduce using rule 34 (param)
 
 
 State 255
 
-   28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' • var_list_decl ')' '{' statement_list '}'
+   27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl ')' • '{' statement_list '}'
 
-    VAR  shift, and go to state 207
-
-    $default  reduce using rule 29 (var_list_decl)
-
-    var_list_decl  go to state 297
-    var_list       go to state 209
-    param          go to state 210
+    '{'  shift, and go to state 297
 
 
 State 256
 
-   40 object_decl: rwDECLARE class_name_expr '(' '[' object_name • ']' parent_block object_args ')' '{' object_declare_block '}'
-   41            | rwDECLARE class_name_expr '(' '[' object_name • ']' parent_block object_args ')'
+   32 var_list: var_list ',' • param
 
-    ']'  shift, and go to state 298
+    VAR  shift, and go to state 208
+
+    param  go to state 298
 
 
 State 257
 
-   45 parent_block: ':' • IDENT
+   28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' • var_list_decl ')' '{' statement_list '}'
 
-    IDENT  shift, and go to state 299
+    VAR  shift, and go to state 208
+
+    $default  reduce using rule 29 (var_list_decl)
+
+    var_list_decl  go to state 299
+    var_list       go to state 210
+    param          go to state 211
 
 
 State 258
 
-   38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block • object_args ')' '{' object_declare_block '}'
-   39            | rwDECLARE class_name_expr '(' object_name parent_block • object_args ')'
+   40 object_decl: rwDECLARE class_name_expr '(' '[' object_name • ']' parent_block object_args ')' '{' object_declare_block '}'
+   41            | rwDECLARE class_name_expr '(' '[' object_name • ']' parent_block object_args ')'
 
-    ','  shift, and go to state 300
-
-    $default  reduce using rule 48 (object_args)
-
-    object_args  go to state 301
+    ']'  shift, and go to state 300
 
 
 State 259
 
-   42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block • object_args ')' '{' object_declare_block '}'
-   43            | rwDECLARESINGLETON class_name_expr '(' object_name parent_block • object_args ')'
+   45 parent_block: ':' • IDENT
 
-    ','  shift, and go to state 300
-
-    $default  reduce using rule 48 (object_args)
-
-    object_args  go to state 302
+    IDENT  shift, and go to state 301
 
 
 State 260
 
+   38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block • object_args ')' '{' object_declare_block '}'
+   39            | rwDECLARE class_name_expr '(' object_name parent_block • object_args ')'
+
+    ','  shift, and go to state 302
+
+    $default  reduce using rule 48 (object_args)
+
+    object_args  go to state 303
+
+
+State 261
+
+   42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block • object_args ')' '{' object_declare_block '}'
+   43            | rwDECLARESINGLETON class_name_expr '(' object_name parent_block • object_args ')'
+
+    ','  shift, and go to state 302
+
+    $default  reduce using rule 48 (object_args)
+
+    object_args  go to state 304
+
+
+State 262
+
    65 if_stmt: rwIF '(' expr ')' stmt_block •
    66        | rwIF '(' expr ')' stmt_block • rwELSE stmt_block
 
-    rwELSE  shift, and go to state 303
+    rwELSE  shift, and go to state 305
 
     rwELSE    [reduce using rule 65 (if_stmt)]
     $default  reduce using rule 65 (if_stmt)
 
 
-State 261
+State 263
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -7451,7 +7487,7 @@ State 261
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  174 expr_list: expr_list ',' expr •
+  175 expr_list: expr_list ',' expr •
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -7479,24 +7515,24 @@ State 261
     opSTRNE     shift, and go to state 130
     '?'         shift, and go to state 131
 
-    $default  reduce using rule 174 (expr_list)
+    $default  reduce using rule 175 (expr_list)
 
 
-State 262
+State 264
 
    22 stmt: rwRETURN '{' expr_list '}' ';' •
 
     $default  reduce using rule 22 (stmt)
 
 
-State 263
+State 265
 
    67 while_stmt: rwWHILE '(' expr ')' stmt_block •
 
     $default  reduce using rule 67 (while_stmt)
 
 
-State 264
+State 266
 
    68 while_stmt: rwDO stmt_block rwWHILE '(' expr • ')'
    92 expr: expr • '^' expr
@@ -7537,7 +7573,7 @@ State 264
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 304
+    ')'         shift, and go to state 306
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -7555,7 +7591,7 @@ State 264
     '?'         shift, and go to state 131
 
 
-State 265
+State 267
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE • expr opDOTDOT expr ')' stmt_block
    80         | rwFOR '(' VAR rwIN rwRANGE • expr opDOTDOT expr rwSTEP expr ')' stmt_block
@@ -7581,7 +7617,7 @@ State 265
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 305
+    expr                 go to state 307
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -7590,7 +7626,7 @@ State 265
     inline_command_expr  go to state 54
 
 
-State 266
+State 268
 
    77 for_stmt: rwFOR '(' VAR rwIN expr • opDOTDOT expr ')' stmt_block
    79         | rwFOR '(' VAR rwIN expr • opDOTDOT expr rwSTEP expr ')' stmt_block
@@ -7646,11 +7682,11 @@ State 266
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    opDOTDOT    shift, and go to state 306
+    opDOTDOT    shift, and go to state 308
     '?'         shift, and go to state 131
 
 
-State 267
+State 269
 
    76 for_stmt: rwFOR '(' ';' ';' ')' • stmt_block
 
@@ -7689,7 +7725,7 @@ State 267
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 307
+    stmt_block           go to state 309
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -7705,7 +7741,7 @@ State 267
     inline_command_expr  go to state 54
 
 
-State 268
+State 270
 
    75 for_stmt: rwFOR '(' ';' ';' expr • ')' stmt_block
    92 expr: expr • '^' expr
@@ -7746,7 +7782,7 @@ State 268
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 308
+    ')'         shift, and go to state 310
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -7764,45 +7800,10 @@ State 268
     '?'         shift, and go to state 131
 
 
-State 269
+State 271
 
    73 for_stmt: rwFOR '(' ';' expr ';' • expr ')' stmt_block
    74         | rwFOR '(' ';' expr ';' • ')' stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    ')'                 shift, and go to state 309
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 310
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 270
-
-   71 for_stmt: rwFOR '(' expr ';' ';' • expr ')' stmt_block
-   72         | rwFOR '(' expr ';' ';' • ')' stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -7834,7 +7835,42 @@ State 270
     inline_command_expr  go to state 54
 
 
-State 271
+State 272
+
+   71 for_stmt: rwFOR '(' expr ';' ';' • expr ')' stmt_block
+   72         | rwFOR '(' expr ';' ';' • ')' stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    ')'                 shift, and go to state 313
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 314
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 273
 
    69 for_stmt: rwFOR '(' expr ';' expr • ';' expr ')' stmt_block
    70         | rwFOR '(' expr ';' expr • ';' ')' stmt_block
@@ -7876,7 +7912,7 @@ State 271
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 313
+    ';'         shift, and go to state 315
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -7894,7 +7930,7 @@ State 271
     '?'         shift, and go to state 131
 
 
-State 272
+State 274
 
    85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE • expr opDOTDOT expr ')' stmt_block
    87             | rwFOREACH '(' VAR rwIN rwRANGE • expr opDOTDOT expr rwSTEP expr ')' stmt_block
@@ -7920,7 +7956,7 @@ State 272
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 314
+    expr                 go to state 316
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -7929,71 +7965,11 @@ State 272
     inline_command_expr  go to state 54
 
 
-State 273
+State 275
 
    82 foreach_stmt: rwFOREACH '(' VAR rwIN expr • ')' stmt_block
    84             | rwFOREACH '(' VAR rwIN expr • opDOTDOT expr ')' stmt_block
    86             | rwFOREACH '(' VAR rwIN expr • opDOTDOT expr rwSTEP expr ')' stmt_block
-   92 expr: expr • '^' expr
-   93     | expr • '%' expr
-   94     | expr • '&' expr
-   95     | expr • '|' expr
-   96     | expr • '+' expr
-   97     | expr • '-' expr
-   98     | expr • '*' expr
-   99     | expr • '/' expr
-  103     | expr • '?' expr ':' expr
-  104     | expr • '<' expr
-  105     | expr • '>' expr
-  106     | expr • opGE expr
-  107     | expr • opLE expr
-  108     | expr • opEQ expr
-  109     | expr • opNE expr
-  110     | expr • opOR expr
-  111     | expr • opSHL expr
-  112     | expr • opSHR expr
-  113     | expr • opAND expr
-  114     | expr • opSTREQ expr
-  115     | expr • opSTRNE expr
-  116     | expr • '@' expr
-  129 slot_acc: expr • '.' IDENT
-  130         | expr • '.' IDENT '[' aidx_expr ']'
-  131 intslot_acc: expr • opINTNAME class_name_expr
-  132            | expr • opINTNAMER class_name_expr
-  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-
-    '+'         shift, and go to state 107
-    '-'         shift, and go to state 108
-    '*'         shift, and go to state 109
-    '/'         shift, and go to state 110
-    '<'         shift, and go to state 111
-    '>'         shift, and go to state 112
-    '.'         shift, and go to state 113
-    '|'         shift, and go to state 114
-    '&'         shift, and go to state 115
-    '%'         shift, and go to state 116
-    ')'         shift, and go to state 315
-    '^'         shift, and go to state 117
-    '@'         shift, and go to state 118
-    opINTNAME   shift, and go to state 119
-    opINTNAMER  shift, and go to state 120
-    opSHL       shift, and go to state 121
-    opSHR       shift, and go to state 122
-    opEQ        shift, and go to state 123
-    opNE        shift, and go to state 124
-    opGE        shift, and go to state 125
-    opLE        shift, and go to state 126
-    opAND       shift, and go to state 127
-    opOR        shift, and go to state 128
-    opSTREQ     shift, and go to state 129
-    opSTRNE     shift, and go to state 130
-    opDOTDOT    shift, and go to state 316
-    '?'         shift, and go to state 131
-
-
-State 274
-
-   83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN expr • ')' stmt_block
    92 expr: expr • '^' expr
    93     | expr • '%' expr
    94     | expr • '&' expr
@@ -8047,56 +8023,116 @@ State 274
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
+    opDOTDOT    shift, and go to state 318
     '?'         shift, and go to state 131
-
-
-State 275
-
-   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block • ')' '{' slot_assign_list_opt '}' ';'
-
-    ')'  shift, and go to state 318
 
 
 State 276
 
-   58 switch_stmt: rwSWITCH '(' expr ')' '{' • case_block '}'
+   83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN expr • ')' stmt_block
+   92 expr: expr • '^' expr
+   93     | expr • '%' expr
+   94     | expr • '&' expr
+   95     | expr • '|' expr
+   96     | expr • '+' expr
+   97     | expr • '-' expr
+   98     | expr • '*' expr
+   99     | expr • '/' expr
+  103     | expr • '?' expr ':' expr
+  104     | expr • '<' expr
+  105     | expr • '>' expr
+  106     | expr • opGE expr
+  107     | expr • opLE expr
+  108     | expr • opEQ expr
+  109     | expr • opNE expr
+  110     | expr • opOR expr
+  111     | expr • opSHL expr
+  112     | expr • opSHR expr
+  113     | expr • opAND expr
+  114     | expr • opSTREQ expr
+  115     | expr • opSTRNE expr
+  116     | expr • '@' expr
+  129 slot_acc: expr • '.' IDENT
+  130         | expr • '.' IDENT '[' aidx_expr ']'
+  131 intslot_acc: expr • opINTNAME class_name_expr
+  132            | expr • opINTNAMER class_name_expr
+  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
 
-    rwCASE  shift, and go to state 319
-
-    case_block  go to state 320
+    '+'         shift, and go to state 107
+    '-'         shift, and go to state 108
+    '*'         shift, and go to state 109
+    '/'         shift, and go to state 110
+    '<'         shift, and go to state 111
+    '>'         shift, and go to state 112
+    '.'         shift, and go to state 113
+    '|'         shift, and go to state 114
+    '&'         shift, and go to state 115
+    '%'         shift, and go to state 116
+    ')'         shift, and go to state 319
+    '^'         shift, and go to state 117
+    '@'         shift, and go to state 118
+    opINTNAME   shift, and go to state 119
+    opINTNAMER  shift, and go to state 120
+    opSHL       shift, and go to state 121
+    opSHR       shift, and go to state 122
+    opEQ        shift, and go to state 123
+    opNE        shift, and go to state 124
+    opGE        shift, and go to state 125
+    opLE        shift, and go to state 126
+    opAND       shift, and go to state 127
+    opOR        shift, and go to state 128
+    opSTREQ     shift, and go to state 129
+    opSTRNE     shift, and go to state 130
+    '?'         shift, and go to state 131
 
 
 State 277
 
-   59 switch_stmt: rwSWITCHSTR '(' expr ')' '{' • case_block '}'
+   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block • ')' '{' slot_assign_list_opt '}' ';'
 
-    rwCASE  shift, and go to state 319
-
-    case_block  go to state 321
+    ')'  shift, and go to state 320
 
 
 State 278
 
-    7 package_decl: rwPACKAGE IDENT '{' fn_decl_list '}' • ';'
+   58 switch_stmt: rwSWITCH '(' expr ')' '{' • case_block '}'
 
-    ';'  shift, and go to state 322
+    rwCASE  shift, and go to state 321
+
+    case_block  go to state 322
 
 
 State 279
+
+   59 switch_stmt: rwSWITCHSTR '(' expr ')' '{' • case_block '}'
+
+    rwCASE  shift, and go to state 321
+
+    case_block  go to state 323
+
+
+State 280
+
+    7 package_decl: rwPACKAGE IDENT '{' fn_decl_list '}' • ';'
+
+    ';'  shift, and go to state 324
+
+
+State 281
 
     9 fn_decl_list: fn_decl_list fn_decl_stmt •
 
     $default  reduce using rule 9 (fn_decl_list)
 
 
-State 280
+State 282
 
   170 assert_expr: rwASSERT '(' expr ',' STRATOM • ')'
 
-    ')'  shift, and go to state 323
+    ')'  shift, and go to state 325
 
 
-State 281
+State 283
 
    25 stmt: TTAG '=' expr ',' expr • ';'
    92 expr: expr • '^' expr
@@ -8137,7 +8173,7 @@ State 281
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 324
+    ';'         shift, and go to state 326
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -8155,14 +8191,14 @@ State 281
     '?'         shift, and go to state 131
 
 
-State 282
+State 284
 
   152 stmt_expr: VAR '=' '{' expr_list '}' •
 
     $default  reduce using rule 152 (stmt_expr)
 
 
-State 283
+State 285
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -8191,7 +8227,7 @@ State 283
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  188 aidx_expr: aidx_expr ',' expr •
+  189 aidx_expr: aidx_expr ',' expr •
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -8219,10 +8255,10 @@ State 283
     opSTRNE     shift, and go to state 130
     '?'         shift, and go to state 131
 
-    $default  reduce using rule 188 (aidx_expr)
+    $default  reduce using rule 189 (aidx_expr)
 
 
-State 284
+State 286
 
   153 stmt_expr: VAR '[' aidx_expr ']' '=' • expr
   154          | VAR '[' aidx_expr ']' '=' • '{' expr_list '}'
@@ -8241,14 +8277,14 @@ State 284
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '{'                 shift, and go to state 325
+    '{'                 shift, and go to state 327
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 326
+    expr                 go to state 328
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -8257,51 +8293,51 @@ State 284
     inline_command_expr  go to state 54
 
 
-State 285
+State 287
 
   156 stmt_expr: VAR '[' aidx_expr ']' assign_op_struct •
 
     $default  reduce using rule 156 (stmt_expr)
 
 
-State 286
+State 288
 
   164 func_arg_item: '{' expr_list '}' •
 
     $default  reduce using rule 164 (func_arg_item)
 
 
-State 287
+State 289
 
   166 func_arg_list: func_arg_list ',' func_arg_item •
 
     $default  reduce using rule 166 (func_arg_list)
 
 
-State 288
+State 290
 
   161 funcall_expr: IDENT opCOLONCOLON IDENT '(' func_arg_list_decl • ')'
 
-    ')'  shift, and go to state 327
-
-
-State 289
-
-  162 funcall_expr: expr '.' IDENT '(' func_arg_list_decl • ')'
-
-    ')'  shift, and go to state 328
-
-
-State 290
-
-  130 slot_acc: expr '.' IDENT '[' aidx_expr • ']'
-  188 aidx_expr: aidx_expr • ',' expr
-
-    ','  shift, and go to state 240
-    ']'  shift, and go to state 329
+    ')'  shift, and go to state 329
 
 
 State 291
+
+  162 funcall_expr: expr '.' IDENT '(' func_arg_list_decl • ')'
+
+    ')'  shift, and go to state 330
+
+
+State 292
+
+  130 slot_acc: expr '.' IDENT '[' aidx_expr • ']'
+  189 aidx_expr: aidx_expr • ',' expr
+
+    ','  shift, and go to state 241
+    ']'  shift, and go to state 331
+
+
+State 293
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -8360,14 +8396,14 @@ State 291
     $default  reduce using rule 103 (expr)
 
 
-State 292
+State 294
 
   159 stmt_expr: slot_acc '=' '{' expr_list '}' •
 
     $default  reduce using rule 159 (stmt_expr)
 
 
-State 293
+State 295
 
    35 param: VAR '=' expr •
    92 expr: expr • '^' expr
@@ -8427,7 +8463,7 @@ State 293
     $default  reduce using rule 35 (param)
 
 
-State 294
+State 296
 
    36 param: VAR '?' '=' • expr
 
@@ -8451,7 +8487,7 @@ State 294
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 330
+    expr                 go to state 332
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -8460,49 +8496,49 @@ State 294
     inline_command_expr  go to state 54
 
 
-State 295
+State 297
 
    27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl ')' '{' • statement_list '}'
 
     $default  reduce using rule 10 (statement_list)
 
-    statement_list  go to state 331
+    statement_list  go to state 333
 
 
-State 296
+State 298
 
    32 var_list: var_list ',' param •
 
     $default  reduce using rule 32 (var_list)
 
 
-State 297
+State 299
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl • ')' '{' statement_list '}'
 
-    ')'  shift, and go to state 332
+    ')'  shift, and go to state 334
 
 
-State 298
+State 300
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' • parent_block object_args ')' '{' object_declare_block '}'
    41            | rwDECLARE class_name_expr '(' '[' object_name ']' • parent_block object_args ')'
 
-    ':'  shift, and go to state 257
+    ':'  shift, and go to state 259
 
     $default  reduce using rule 44 (parent_block)
 
-    parent_block  go to state 333
+    parent_block  go to state 335
 
 
-State 299
+State 301
 
    45 parent_block: ':' IDENT •
 
     $default  reduce using rule 45 (parent_block)
 
 
-State 300
+State 302
 
    49 object_args: ',' • expr_list
 
@@ -8533,26 +8569,26 @@ State 300
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 334
+    expr_list            go to state 336
 
 
-State 301
+State 303
 
    38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args • ')' '{' object_declare_block '}'
    39            | rwDECLARE class_name_expr '(' object_name parent_block object_args • ')'
 
-    ')'  shift, and go to state 335
+    ')'  shift, and go to state 337
 
 
-State 302
+State 304
 
    42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args • ')' '{' object_declare_block '}'
    43            | rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args • ')'
 
-    ')'  shift, and go to state 336
+    ')'  shift, and go to state 338
 
 
-State 303
+State 305
 
    66 if_stmt: rwIF '(' expr ')' stmt_block rwELSE • stmt_block
 
@@ -8591,7 +8627,7 @@ State 303
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 337
+    stmt_block           go to state 339
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -8607,14 +8643,14 @@ State 303
     inline_command_expr  go to state 54
 
 
-State 304
+State 306
 
    68 while_stmt: rwDO stmt_block rwWHILE '(' expr ')' •
 
     $default  reduce using rule 68 (while_stmt)
 
 
-State 305
+State 307
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr • opDOTDOT expr ')' stmt_block
    80         | rwFOR '(' VAR rwIN rwRANGE expr • opDOTDOT expr rwSTEP expr ')' stmt_block
@@ -8657,7 +8693,7 @@ State 305
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 338
+    ')'         shift, and go to state 340
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -8672,11 +8708,11 @@ State 305
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    opDOTDOT    shift, and go to state 339
+    opDOTDOT    shift, and go to state 341
     '?'         shift, and go to state 131
 
 
-State 306
+State 308
 
    77 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT • expr ')' stmt_block
    79         | rwFOR '(' VAR rwIN expr opDOTDOT • expr rwSTEP expr ')' stmt_block
@@ -8701,7 +8737,7 @@ State 306
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 340
+    expr                 go to state 342
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -8710,14 +8746,14 @@ State 306
     inline_command_expr  go to state 54
 
 
-State 307
+State 309
 
    76 for_stmt: rwFOR '(' ';' ';' ')' stmt_block •
 
     $default  reduce using rule 76 (for_stmt)
 
 
-State 308
+State 310
 
    75 for_stmt: rwFOR '(' ';' ';' expr ')' • stmt_block
 
@@ -8756,7 +8792,7 @@ State 308
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 341
+    stmt_block           go to state 343
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -8770,125 +8806,11 @@ State 308
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-
-
-State 309
-
-   74 for_stmt: rwFOR '(' ';' expr ';' ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 342
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 310
-
-   73 for_stmt: rwFOR '(' ';' expr ';' expr • ')' stmt_block
-   92 expr: expr • '^' expr
-   93     | expr • '%' expr
-   94     | expr • '&' expr
-   95     | expr • '|' expr
-   96     | expr • '+' expr
-   97     | expr • '-' expr
-   98     | expr • '*' expr
-   99     | expr • '/' expr
-  103     | expr • '?' expr ':' expr
-  104     | expr • '<' expr
-  105     | expr • '>' expr
-  106     | expr • opGE expr
-  107     | expr • opLE expr
-  108     | expr • opEQ expr
-  109     | expr • opNE expr
-  110     | expr • opOR expr
-  111     | expr • opSHL expr
-  112     | expr • opSHR expr
-  113     | expr • opAND expr
-  114     | expr • opSTREQ expr
-  115     | expr • opSTRNE expr
-  116     | expr • '@' expr
-  129 slot_acc: expr • '.' IDENT
-  130         | expr • '.' IDENT '[' aidx_expr ']'
-  131 intslot_acc: expr • opINTNAME class_name_expr
-  132            | expr • opINTNAMER class_name_expr
-  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-
-    '+'         shift, and go to state 107
-    '-'         shift, and go to state 108
-    '*'         shift, and go to state 109
-    '/'         shift, and go to state 110
-    '<'         shift, and go to state 111
-    '>'         shift, and go to state 112
-    '.'         shift, and go to state 113
-    '|'         shift, and go to state 114
-    '&'         shift, and go to state 115
-    '%'         shift, and go to state 116
-    ')'         shift, and go to state 343
-    '^'         shift, and go to state 117
-    '@'         shift, and go to state 118
-    opINTNAME   shift, and go to state 119
-    opINTNAMER  shift, and go to state 120
-    opSHL       shift, and go to state 121
-    opSHR       shift, and go to state 122
-    opEQ        shift, and go to state 123
-    opNE        shift, and go to state 124
-    opGE        shift, and go to state 125
-    opLE        shift, and go to state 126
-    opAND       shift, and go to state 127
-    opOR        shift, and go to state 128
-    opSTREQ     shift, and go to state 129
-    opSTRNE     shift, and go to state 130
-    '?'         shift, and go to state 131
 
 
 State 311
 
-   72 for_stmt: rwFOR '(' expr ';' ';' ')' • stmt_block
+   74 for_stmt: rwFOR '(' ';' expr ';' ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -8943,7 +8865,7 @@ State 311
 
 State 312
 
-   71 for_stmt: rwFOR '(' expr ';' ';' expr • ')' stmt_block
+   73 for_stmt: rwFOR '(' ';' expr ';' expr • ')' stmt_block
    92 expr: expr • '^' expr
    93     | expr • '%' expr
    94     | expr • '&' expr
@@ -9002,6 +8924,120 @@ State 312
 
 State 313
 
+   72 for_stmt: rwFOR '(' expr ';' ';' ')' • stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 22
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    stmt                 go to state 71
+    datablock_decl       go to state 40
+    object_decl          go to state 41
+    stmt_block           go to state 346
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 51
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 314
+
+   71 for_stmt: rwFOR '(' expr ';' ';' expr • ')' stmt_block
+   92 expr: expr • '^' expr
+   93     | expr • '%' expr
+   94     | expr • '&' expr
+   95     | expr • '|' expr
+   96     | expr • '+' expr
+   97     | expr • '-' expr
+   98     | expr • '*' expr
+   99     | expr • '/' expr
+  103     | expr • '?' expr ':' expr
+  104     | expr • '<' expr
+  105     | expr • '>' expr
+  106     | expr • opGE expr
+  107     | expr • opLE expr
+  108     | expr • opEQ expr
+  109     | expr • opNE expr
+  110     | expr • opOR expr
+  111     | expr • opSHL expr
+  112     | expr • opSHR expr
+  113     | expr • opAND expr
+  114     | expr • opSTREQ expr
+  115     | expr • opSTRNE expr
+  116     | expr • '@' expr
+  129 slot_acc: expr • '.' IDENT
+  130         | expr • '.' IDENT '[' aidx_expr ']'
+  131 intslot_acc: expr • opINTNAME class_name_expr
+  132            | expr • opINTNAMER class_name_expr
+  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
+
+    '+'         shift, and go to state 107
+    '-'         shift, and go to state 108
+    '*'         shift, and go to state 109
+    '/'         shift, and go to state 110
+    '<'         shift, and go to state 111
+    '>'         shift, and go to state 112
+    '.'         shift, and go to state 113
+    '|'         shift, and go to state 114
+    '&'         shift, and go to state 115
+    '%'         shift, and go to state 116
+    ')'         shift, and go to state 347
+    '^'         shift, and go to state 117
+    '@'         shift, and go to state 118
+    opINTNAME   shift, and go to state 119
+    opINTNAMER  shift, and go to state 120
+    opSHL       shift, and go to state 121
+    opSHR       shift, and go to state 122
+    opEQ        shift, and go to state 123
+    opNE        shift, and go to state 124
+    opGE        shift, and go to state 125
+    opLE        shift, and go to state 126
+    opAND       shift, and go to state 127
+    opOR        shift, and go to state 128
+    opSTREQ     shift, and go to state 129
+    opSTRNE     shift, and go to state 130
+    '?'         shift, and go to state 131
+
+
+State 315
+
    69 for_stmt: rwFOR '(' expr ';' expr ';' • expr ')' stmt_block
    70         | rwFOR '(' expr ';' expr ';' • ')' stmt_block
 
@@ -9019,14 +9055,14 @@ State 313
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    ')'                 shift, and go to state 346
+    ')'                 shift, and go to state 348
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 347
+    expr                 go to state 349
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -9035,7 +9071,7 @@ State 313
     inline_command_expr  go to state 54
 
 
-State 314
+State 316
 
    85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr • opDOTDOT expr ')' stmt_block
    87             | rwFOREACH '(' VAR rwIN rwRANGE expr • opDOTDOT expr rwSTEP expr ')' stmt_block
@@ -9078,7 +9114,7 @@ State 314
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 348
+    ')'         shift, and go to state 350
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -9093,102 +9129,13 @@ State 314
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    opDOTDOT    shift, and go to state 349
+    opDOTDOT    shift, and go to state 351
     '?'         shift, and go to state 131
-
-
-State 315
-
-   82 foreach_stmt: rwFOREACH '(' VAR rwIN expr ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 350
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 316
-
-   84 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT • expr ')' stmt_block
-   86             | rwFOREACH '(' VAR rwIN expr opDOTDOT • expr rwSTEP expr ')' stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 351
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
 
 
 State 317
 
-   83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN expr ')' • stmt_block
+   82 foreach_stmt: rwFOREACH '(' VAR rwIN expr ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -9243,12 +9190,101 @@ State 317
 
 State 318
 
-   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' • '{' slot_assign_list_opt '}' ';'
+   84 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT • expr ')' stmt_block
+   86             | rwFOREACH '(' VAR rwIN expr opDOTDOT • expr rwSTEP expr ')' stmt_block
 
-    '{'  shift, and go to state 353
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 353
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
 
 
 State 319
+
+   83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN expr ')' • stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 22
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    stmt                 go to state 71
+    datablock_decl       go to state 40
+    object_decl          go to state 41
+    stmt_block           go to state 354
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 51
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 320
+
+   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' • '{' slot_assign_list_opt '}' ';'
+
+    '{'  shift, and go to state 355
+
+
+State 321
 
    60 case_block: rwCASE • case_expr ':' statement_list
    61           | rwCASE • case_expr ':' statement_list rwDEFAULT ':' statement_list
@@ -9274,8 +9310,8 @@ State 319
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    case_expr            go to state 354
-    expr                 go to state 355
+    case_expr            go to state 356
+    expr                 go to state 357
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -9284,42 +9320,42 @@ State 319
     inline_command_expr  go to state 54
 
 
-State 320
+State 322
 
    58 switch_stmt: rwSWITCH '(' expr ')' '{' case_block • '}'
 
-    '}'  shift, and go to state 356
+    '}'  shift, and go to state 358
 
 
-State 321
+State 323
 
    59 switch_stmt: rwSWITCHSTR '(' expr ')' '{' case_block • '}'
 
-    '}'  shift, and go to state 357
+    '}'  shift, and go to state 359
 
 
-State 322
+State 324
 
     7 package_decl: rwPACKAGE IDENT '{' fn_decl_list '}' ';' •
 
     $default  reduce using rule 7 (package_decl)
 
 
-State 323
+State 325
 
   170 assert_expr: rwASSERT '(' expr ',' STRATOM ')' •
 
     $default  reduce using rule 170 (assert_expr)
 
 
-State 324
+State 326
 
    25 stmt: TTAG '=' expr ',' expr ';' •
 
     $default  reduce using rule 25 (stmt)
 
 
-State 325
+State 327
 
   154 stmt_expr: VAR '[' aidx_expr ']' '=' '{' • expr_list '}'
 
@@ -9350,10 +9386,10 @@ State 325
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 358
+    expr_list            go to state 360
 
 
-State 326
+State 328
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -9413,28 +9449,28 @@ State 326
     $default  reduce using rule 153 (stmt_expr)
 
 
-State 327
+State 329
 
   161 funcall_expr: IDENT opCOLONCOLON IDENT '(' func_arg_list_decl ')' •
 
     $default  reduce using rule 161 (funcall_expr)
 
 
-State 328
+State 330
 
   162 funcall_expr: expr '.' IDENT '(' func_arg_list_decl ')' •
 
     $default  reduce using rule 162 (funcall_expr)
 
 
-State 329
+State 331
 
   130 slot_acc: expr '.' IDENT '[' aidx_expr ']' •
 
     $default  reduce using rule 130 (slot_acc)
 
 
-State 330
+State 332
 
    36 param: VAR '?' '=' expr •
    92 expr: expr • '^' expr
@@ -9494,7 +9530,7 @@ State 330
     $default  reduce using rule 36 (param)
 
 
-State 331
+State 333
 
    11 statement_list: statement_list • stmt
    27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl ')' '{' statement_list • '}'
@@ -9525,13 +9561,13 @@ State 331
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '}'                 shift, and go to state 359
+    '}'                 shift, and go to state 361
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
-    stmt                 go to state 222
+    stmt                 go to state 223
     datablock_decl       go to state 40
     object_decl          go to state 41
     switch_stmt          go to state 42
@@ -9549,63 +9585,63 @@ State 331
     inline_command_expr  go to state 54
 
 
-State 332
+State 334
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl ')' • '{' statement_list '}'
 
-    '{'  shift, and go to state 360
-
-
-State 333
-
-   40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block • object_args ')' '{' object_declare_block '}'
-   41            | rwDECLARE class_name_expr '(' '[' object_name ']' parent_block • object_args ')'
-
-    ','  shift, and go to state 300
-
-    $default  reduce using rule 48 (object_args)
-
-    object_args  go to state 361
-
-
-State 334
-
-   49 object_args: ',' expr_list •
-  174 expr_list: expr_list • ',' expr
-
-    ','  shift, and go to state 218
-
-    $default  reduce using rule 49 (object_args)
+    '{'  shift, and go to state 362
 
 
 State 335
 
-   38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args ')' • '{' object_declare_block '}'
-   39            | rwDECLARE class_name_expr '(' object_name parent_block object_args ')' •
+   40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block • object_args ')' '{' object_declare_block '}'
+   41            | rwDECLARE class_name_expr '(' '[' object_name ']' parent_block • object_args ')'
 
-    '{'  shift, and go to state 362
+    ','  shift, and go to state 302
 
-    $default  reduce using rule 39 (object_decl)
+    $default  reduce using rule 48 (object_args)
+
+    object_args  go to state 363
 
 
 State 336
 
+   49 object_args: ',' expr_list •
+  175 expr_list: expr_list • ',' expr
+
+    ','  shift, and go to state 219
+
+    $default  reduce using rule 49 (object_args)
+
+
+State 337
+
+   38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args ')' • '{' object_declare_block '}'
+   39            | rwDECLARE class_name_expr '(' object_name parent_block object_args ')' •
+
+    '{'  shift, and go to state 364
+
+    $default  reduce using rule 39 (object_decl)
+
+
+State 338
+
    42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' • '{' object_declare_block '}'
    43            | rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' •
 
-    '{'  shift, and go to state 363
+    '{'  shift, and go to state 365
 
     $default  reduce using rule 43 (object_decl)
 
 
-State 337
+State 339
 
    66 if_stmt: rwIF '(' expr ')' stmt_block rwELSE stmt_block •
 
     $default  reduce using rule 66 (if_stmt)
 
 
-State 338
+State 340
 
    81 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr ')' • stmt_block
 
@@ -9644,7 +9680,7 @@ State 338
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 364
+    stmt_block           go to state 366
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -9660,7 +9696,7 @@ State 338
     inline_command_expr  go to state 54
 
 
-State 339
+State 341
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT • expr ')' stmt_block
    80         | rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT • expr rwSTEP expr ')' stmt_block
@@ -9685,7 +9721,7 @@ State 339
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 365
+    expr                 go to state 367
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -9694,7 +9730,7 @@ State 339
     inline_command_expr  go to state 54
 
 
-State 340
+State 342
 
    77 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr • ')' stmt_block
    79         | rwFOR '(' VAR rwIN expr opDOTDOT expr • rwSTEP expr ')' stmt_block
@@ -9736,7 +9772,7 @@ State 340
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 366
+    ')'         shift, and go to state 368
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -9751,144 +9787,27 @@ State 340
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    rwSTEP      shift, and go to state 367
+    rwSTEP      shift, and go to state 369
     '?'         shift, and go to state 131
 
 
-State 341
+State 343
 
    75 for_stmt: rwFOR '(' ';' ';' expr ')' stmt_block •
 
     $default  reduce using rule 75 (for_stmt)
 
 
-State 342
+State 344
 
    74 for_stmt: rwFOR '(' ';' expr ';' ')' stmt_block •
 
     $default  reduce using rule 74 (for_stmt)
 
 
-State 343
-
-   73 for_stmt: rwFOR '(' ';' expr ';' expr ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 368
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 344
-
-   72 for_stmt: rwFOR '(' expr ';' ';' ')' stmt_block •
-
-    $default  reduce using rule 72 (for_stmt)
-
-
 State 345
 
-   71 for_stmt: rwFOR '(' expr ';' ';' expr ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 369
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 346
-
-   70 for_stmt: rwFOR '(' expr ';' expr ';' ')' • stmt_block
+   73 for_stmt: rwFOR '(' ';' expr ';' expr ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -9941,68 +9860,71 @@ State 346
     inline_command_expr  go to state 54
 
 
+State 346
+
+   72 for_stmt: rwFOR '(' expr ';' ';' ')' stmt_block •
+
+    $default  reduce using rule 72 (for_stmt)
+
+
 State 347
 
-   69 for_stmt: rwFOR '(' expr ';' expr ';' expr • ')' stmt_block
-   92 expr: expr • '^' expr
-   93     | expr • '%' expr
-   94     | expr • '&' expr
-   95     | expr • '|' expr
-   96     | expr • '+' expr
-   97     | expr • '-' expr
-   98     | expr • '*' expr
-   99     | expr • '/' expr
-  103     | expr • '?' expr ':' expr
-  104     | expr • '<' expr
-  105     | expr • '>' expr
-  106     | expr • opGE expr
-  107     | expr • opLE expr
-  108     | expr • opEQ expr
-  109     | expr • opNE expr
-  110     | expr • opOR expr
-  111     | expr • opSHL expr
-  112     | expr • opSHR expr
-  113     | expr • opAND expr
-  114     | expr • opSTREQ expr
-  115     | expr • opSTRNE expr
-  116     | expr • '@' expr
-  129 slot_acc: expr • '.' IDENT
-  130         | expr • '.' IDENT '[' aidx_expr ']'
-  131 intslot_acc: expr • opINTNAME class_name_expr
-  132            | expr • opINTNAMER class_name_expr
-  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
+   71 for_stmt: rwFOR '(' expr ';' ';' expr ')' • stmt_block
 
-    '+'         shift, and go to state 107
-    '-'         shift, and go to state 108
-    '*'         shift, and go to state 109
-    '/'         shift, and go to state 110
-    '<'         shift, and go to state 111
-    '>'         shift, and go to state 112
-    '.'         shift, and go to state 113
-    '|'         shift, and go to state 114
-    '&'         shift, and go to state 115
-    '%'         shift, and go to state 116
-    ')'         shift, and go to state 371
-    '^'         shift, and go to state 117
-    '@'         shift, and go to state 118
-    opINTNAME   shift, and go to state 119
-    opINTNAMER  shift, and go to state 120
-    opSHL       shift, and go to state 121
-    opSHR       shift, and go to state 122
-    opEQ        shift, and go to state 123
-    opNE        shift, and go to state 124
-    opGE        shift, and go to state 125
-    opLE        shift, and go to state 126
-    opAND       shift, and go to state 127
-    opOR        shift, and go to state 128
-    opSTREQ     shift, and go to state 129
-    opSTRNE     shift, and go to state 130
-    '?'         shift, and go to state 131
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 22
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    stmt                 go to state 71
+    datablock_decl       go to state 40
+    object_decl          go to state 41
+    stmt_block           go to state 371
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 51
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
 
 
 State 348
 
-   88 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr ')' • stmt_block
+   70 for_stmt: rwFOR '(' expr ';' expr ';' ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -10057,6 +9979,120 @@ State 348
 
 State 349
 
+   69 for_stmt: rwFOR '(' expr ';' expr ';' expr • ')' stmt_block
+   92 expr: expr • '^' expr
+   93     | expr • '%' expr
+   94     | expr • '&' expr
+   95     | expr • '|' expr
+   96     | expr • '+' expr
+   97     | expr • '-' expr
+   98     | expr • '*' expr
+   99     | expr • '/' expr
+  103     | expr • '?' expr ':' expr
+  104     | expr • '<' expr
+  105     | expr • '>' expr
+  106     | expr • opGE expr
+  107     | expr • opLE expr
+  108     | expr • opEQ expr
+  109     | expr • opNE expr
+  110     | expr • opOR expr
+  111     | expr • opSHL expr
+  112     | expr • opSHR expr
+  113     | expr • opAND expr
+  114     | expr • opSTREQ expr
+  115     | expr • opSTRNE expr
+  116     | expr • '@' expr
+  129 slot_acc: expr • '.' IDENT
+  130         | expr • '.' IDENT '[' aidx_expr ']'
+  131 intslot_acc: expr • opINTNAME class_name_expr
+  132            | expr • opINTNAMER class_name_expr
+  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
+
+    '+'         shift, and go to state 107
+    '-'         shift, and go to state 108
+    '*'         shift, and go to state 109
+    '/'         shift, and go to state 110
+    '<'         shift, and go to state 111
+    '>'         shift, and go to state 112
+    '.'         shift, and go to state 113
+    '|'         shift, and go to state 114
+    '&'         shift, and go to state 115
+    '%'         shift, and go to state 116
+    ')'         shift, and go to state 373
+    '^'         shift, and go to state 117
+    '@'         shift, and go to state 118
+    opINTNAME   shift, and go to state 119
+    opINTNAMER  shift, and go to state 120
+    opSHL       shift, and go to state 121
+    opSHR       shift, and go to state 122
+    opEQ        shift, and go to state 123
+    opNE        shift, and go to state 124
+    opGE        shift, and go to state 125
+    opLE        shift, and go to state 126
+    opAND       shift, and go to state 127
+    opOR        shift, and go to state 128
+    opSTREQ     shift, and go to state 129
+    opSTRNE     shift, and go to state 130
+    '?'         shift, and go to state 131
+
+
+State 350
+
+   88 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr ')' • stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 22
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    stmt                 go to state 71
+    datablock_decl       go to state 40
+    object_decl          go to state 41
+    stmt_block           go to state 374
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 51
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 351
+
    85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT • expr ')' stmt_block
    87             | rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT • expr rwSTEP expr ')' stmt_block
 
@@ -10080,7 +10116,7 @@ State 349
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 373
+    expr                 go to state 375
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -10089,14 +10125,14 @@ State 349
     inline_command_expr  go to state 54
 
 
-State 350
+State 352
 
    82 foreach_stmt: rwFOREACH '(' VAR rwIN expr ')' stmt_block •
 
     $default  reduce using rule 82 (foreach_stmt)
 
 
-State 351
+State 353
 
    84 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr • ')' stmt_block
    86             | rwFOREACH '(' VAR rwIN expr opDOTDOT expr • rwSTEP expr ')' stmt_block
@@ -10138,7 +10174,7 @@ State 351
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 374
+    ')'         shift, and go to state 376
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -10153,44 +10189,44 @@ State 351
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    rwSTEP      shift, and go to state 375
+    rwSTEP      shift, and go to state 377
     '?'         shift, and go to state 131
 
 
-State 352
+State 354
 
    83 foreach_stmt: rwFOREACHSTR '(' VAR rwIN expr ')' stmt_block •
 
     $default  reduce using rule 83 (foreach_stmt)
 
 
-State 353
+State 355
 
    37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' • slot_assign_list_opt '}' ';'
 
-    rwDATABLOCK  shift, and go to state 376
-    IDENT        shift, and go to state 377
-    TYPEIDENT    shift, and go to state 378
+    rwDATABLOCK  shift, and go to state 378
+    IDENT        shift, and go to state 379
+    TYPEIDENT    shift, and go to state 380
 
-    $default  reduce using rule 175 (slot_assign_list_opt)
+    $default  reduce using rule 176 (slot_assign_list_opt)
 
-    slot_assign_list_opt  go to state 379
-    slot_assign_list      go to state 380
-    slot_assign           go to state 381
+    slot_assign_list_opt  go to state 381
+    slot_assign_list      go to state 382
+    slot_assign           go to state 383
 
 
-State 354
+State 356
 
    60 case_block: rwCASE case_expr • ':' statement_list
    61           | rwCASE case_expr • ':' statement_list rwDEFAULT ':' statement_list
    62           | rwCASE case_expr • ':' statement_list case_block
    64 case_expr: case_expr • rwCASEOR expr
 
-    rwCASEOR  shift, and go to state 382
-    ':'       shift, and go to state 383
+    rwCASEOR  shift, and go to state 384
+    ':'       shift, and go to state 385
 
 
-State 355
+State 357
 
    63 case_expr: expr •
    92 expr: expr • '^' expr
@@ -10250,99 +10286,99 @@ State 355
     $default  reduce using rule 63 (case_expr)
 
 
-State 356
+State 358
 
    58 switch_stmt: rwSWITCH '(' expr ')' '{' case_block '}' •
 
     $default  reduce using rule 58 (switch_stmt)
 
 
-State 357
+State 359
 
    59 switch_stmt: rwSWITCHSTR '(' expr ')' '{' case_block '}' •
 
     $default  reduce using rule 59 (switch_stmt)
 
 
-State 358
+State 360
 
   154 stmt_expr: VAR '[' aidx_expr ']' '=' '{' expr_list • '}'
-  174 expr_list: expr_list • ',' expr
+  175 expr_list: expr_list • ',' expr
 
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 384
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 386
 
 
-State 359
+State 361
 
    27 fn_decl_stmt: rwDEFINE IDENT '(' var_list_decl ')' '{' statement_list '}' •
 
     $default  reduce using rule 27 (fn_decl_stmt)
 
 
-State 360
+State 362
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl ')' '{' • statement_list '}'
 
     $default  reduce using rule 10 (statement_list)
 
-    statement_list  go to state 385
+    statement_list  go to state 387
 
 
-State 361
+State 363
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args • ')' '{' object_declare_block '}'
    41            | rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args • ')'
 
-    ')'  shift, and go to state 386
+    ')'  shift, and go to state 388
 
 
-State 362
+State 364
 
    38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args ')' '{' • object_declare_block '}'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
-    rwDATABLOCK         shift, and go to state 376
-    IDENT               shift, and go to state 377
-    TYPEIDENT           shift, and go to state 378
+    rwDATABLOCK         shift, and go to state 378
+    IDENT               shift, and go to state 379
+    TYPEIDENT           shift, and go to state 380
 
     $default  reduce using rule 50 (object_declare_block)
 
-    object_decl           go to state 387
-    object_declare_block  go to state 388
-    object_decl_list      go to state 389
-    slot_assign_list      go to state 390
-    slot_assign           go to state 381
+    object_decl           go to state 389
+    object_declare_block  go to state 390
+    object_decl_list      go to state 391
+    slot_assign_list      go to state 392
+    slot_assign           go to state 383
 
 
-State 363
+State 365
 
    42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' '{' • object_declare_block '}'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
-    rwDATABLOCK         shift, and go to state 376
-    IDENT               shift, and go to state 377
-    TYPEIDENT           shift, and go to state 378
+    rwDATABLOCK         shift, and go to state 378
+    IDENT               shift, and go to state 379
+    TYPEIDENT           shift, and go to state 380
 
     $default  reduce using rule 50 (object_declare_block)
 
-    object_decl           go to state 387
-    object_declare_block  go to state 391
-    object_decl_list      go to state 389
-    slot_assign_list      go to state 390
-    slot_assign           go to state 381
+    object_decl           go to state 389
+    object_declare_block  go to state 393
+    object_decl_list      go to state 391
+    slot_assign_list      go to state 392
+    slot_assign           go to state 383
 
 
-State 364
+State 366
 
    81 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr ')' stmt_block •
 
     $default  reduce using rule 81 (for_stmt)
 
 
-State 365
+State 367
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr • ')' stmt_block
    80         | rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr • rwSTEP expr ')' stmt_block
@@ -10384,7 +10420,7 @@ State 365
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 392
+    ')'         shift, and go to state 394
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -10399,122 +10435,13 @@ State 365
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    rwSTEP      shift, and go to state 393
+    rwSTEP      shift, and go to state 395
     '?'         shift, and go to state 131
-
-
-State 366
-
-   77 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 394
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 367
-
-   79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP • expr ')' stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 395
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
 
 
 State 368
 
-   73 for_stmt: rwFOR '(' ';' expr ';' expr ')' stmt_block •
-
-    $default  reduce using rule 73 (for_stmt)
-
-
-State 369
-
-   71 for_stmt: rwFOR '(' expr ';' ';' expr ')' stmt_block •
-
-    $default  reduce using rule 71 (for_stmt)
-
-
-State 370
-
-   70 for_stmt: rwFOR '(' expr ';' expr ';' ')' stmt_block •
-
-    $default  reduce using rule 70 (for_stmt)
-
-
-State 371
-
-   69 for_stmt: rwFOR '(' expr ';' expr ';' expr ')' • stmt_block
+   77 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -10567,14 +10494,123 @@ State 371
     inline_command_expr  go to state 54
 
 
+State 369
+
+   79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP • expr ')' stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 397
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 370
+
+   73 for_stmt: rwFOR '(' ';' expr ';' expr ')' stmt_block •
+
+    $default  reduce using rule 73 (for_stmt)
+
+
+State 371
+
+   71 for_stmt: rwFOR '(' expr ';' ';' expr ')' stmt_block •
+
+    $default  reduce using rule 71 (for_stmt)
+
+
 State 372
+
+   70 for_stmt: rwFOR '(' expr ';' expr ';' ')' stmt_block •
+
+    $default  reduce using rule 70 (for_stmt)
+
+
+State 373
+
+   69 for_stmt: rwFOR '(' expr ';' expr ';' expr ')' • stmt_block
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 22
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    stmt                 go to state 71
+    datablock_decl       go to state 40
+    object_decl          go to state 41
+    stmt_block           go to state 398
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 51
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 374
 
    88 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr ')' stmt_block •
 
     $default  reduce using rule 88 (foreach_stmt)
 
 
-State 373
+State 375
 
    85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr • ')' stmt_block
    87             | rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr • rwSTEP expr ')' stmt_block
@@ -10616,7 +10652,7 @@ State 373
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 397
+    ')'         shift, and go to state 399
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -10631,11 +10667,11 @@ State 373
     opOR        shift, and go to state 128
     opSTREQ     shift, and go to state 129
     opSTRNE     shift, and go to state 130
-    rwSTEP      shift, and go to state 398
+    rwSTEP      shift, and go to state 400
     '?'         shift, and go to state 131
 
 
-State 374
+State 376
 
    84 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr ')' • stmt_block
 
@@ -10674,7 +10710,7 @@ State 374
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 399
+    stmt_block           go to state 401
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -10690,7 +10726,7 @@ State 374
     inline_command_expr  go to state 54
 
 
-State 375
+State 377
 
    86 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP • expr ')' stmt_block
 
@@ -10714,7 +10750,7 @@ State 375
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 400
+    expr                 go to state 402
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -10723,62 +10759,62 @@ State 375
     inline_command_expr  go to state 54
 
 
-State 376
-
-  183 slot_assign: rwDATABLOCK • '=' expr ';'
-
-    '='  shift, and go to state 401
-
-
-State 377
-
-  179 slot_assign: IDENT • '=' expr ';'
-  180            | IDENT • '=' '{' expr_list '}' ';'
-  184            | IDENT • '[' aidx_expr ']' '=' expr ';'
-  185            | IDENT • '[' aidx_expr ']' '=' '{' expr_list '}' ';'
-
-    '='  shift, and go to state 402
-    '['  shift, and go to state 403
-
-
 State 378
 
-  181 slot_assign: TYPEIDENT • IDENT '=' expr ';'
-  182            | TYPEIDENT • IDENT '=' '{' expr_list '}' ';'
-  186            | TYPEIDENT • IDENT '[' aidx_expr ']' '=' expr ';'
+  184 slot_assign: rwDATABLOCK • '=' expr ';'
 
-    IDENT  shift, and go to state 404
+    '='  shift, and go to state 403
 
 
 State 379
 
-   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt • '}' ';'
+  180 slot_assign: IDENT • '=' expr ';'
+  181            | IDENT • '=' '{' expr_list '}' ';'
+  185            | IDENT • '[' aidx_expr ']' '=' expr ';'
+  186            | IDENT • '[' aidx_expr ']' '=' '{' expr_list '}' ';'
 
-    '}'  shift, and go to state 405
+    '='  shift, and go to state 404
+    '['  shift, and go to state 405
 
 
 State 380
 
-  176 slot_assign_list_opt: slot_assign_list •
-  178 slot_assign_list: slot_assign_list • slot_assign
+  182 slot_assign: TYPEIDENT • IDENT '=' expr ';'
+  183            | TYPEIDENT • IDENT '=' '{' expr_list '}' ';'
+  187            | TYPEIDENT • IDENT '[' aidx_expr ']' '=' expr ';'
 
-    rwDATABLOCK  shift, and go to state 376
-    IDENT        shift, and go to state 377
-    TYPEIDENT    shift, and go to state 378
-
-    $default  reduce using rule 176 (slot_assign_list_opt)
-
-    slot_assign  go to state 406
+    IDENT  shift, and go to state 406
 
 
 State 381
 
-  177 slot_assign_list: slot_assign •
+   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt • '}' ';'
 
-    $default  reduce using rule 177 (slot_assign_list)
+    '}'  shift, and go to state 407
 
 
 State 382
+
+  177 slot_assign_list_opt: slot_assign_list •
+  179 slot_assign_list: slot_assign_list • slot_assign
+
+    rwDATABLOCK  shift, and go to state 378
+    IDENT        shift, and go to state 379
+    TYPEIDENT    shift, and go to state 380
+
+    $default  reduce using rule 177 (slot_assign_list_opt)
+
+    slot_assign  go to state 408
+
+
+State 383
+
+  178 slot_assign_list: slot_assign •
+
+    $default  reduce using rule 178 (slot_assign_list)
+
+
+State 384
 
    64 case_expr: case_expr rwCASEOR • expr
 
@@ -10802,7 +10838,7 @@ State 382
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 407
+    expr                 go to state 409
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -10811,7 +10847,7 @@ State 382
     inline_command_expr  go to state 54
 
 
-State 383
+State 385
 
    60 case_block: rwCASE case_expr ':' • statement_list
    61           | rwCASE case_expr ':' • statement_list rwDEFAULT ':' statement_list
@@ -10819,17 +10855,17 @@ State 383
 
     $default  reduce using rule 10 (statement_list)
 
-    statement_list  go to state 408
+    statement_list  go to state 410
 
 
-State 384
+State 386
 
   154 stmt_expr: VAR '[' aidx_expr ']' '=' '{' expr_list '}' •
 
     $default  reduce using rule 154 (stmt_expr)
 
 
-State 385
+State 387
 
    11 statement_list: statement_list • stmt
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl ')' '{' statement_list • '}'
@@ -10860,13 +10896,13 @@ State 385
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '}'                 shift, and go to state 409
+    '}'                 shift, and go to state 411
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
-    stmt                 go to state 222
+    stmt                 go to state 223
     datablock_decl       go to state 40
     object_decl          go to state 41
     switch_stmt          go to state 42
@@ -10884,31 +10920,31 @@ State 385
     inline_command_expr  go to state 54
 
 
-State 386
+State 388
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args ')' • '{' object_declare_block '}'
    41            | rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args ')' •
 
-    '{'  shift, and go to state 410
+    '{'  shift, and go to state 412
 
     $default  reduce using rule 41 (object_decl)
 
 
-State 387
+State 389
 
    54 object_decl_list: object_decl • ';'
 
-    ';'  shift, and go to state 411
+    ';'  shift, and go to state 413
 
 
-State 388
+State 390
 
    38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args ')' '{' object_declare_block • '}'
 
-    '}'  shift, and go to state 412
+    '}'  shift, and go to state 414
 
 
-State 389
+State 391
 
    52 object_declare_block: object_decl_list •
    55 object_decl_list: object_decl_list • object_decl ';'
@@ -10918,36 +10954,36 @@ State 389
 
     $default  reduce using rule 52 (object_declare_block)
 
-    object_decl  go to state 413
-
-
-State 390
-
-   51 object_declare_block: slot_assign_list •
-   53                     | slot_assign_list • object_decl_list
-  178 slot_assign_list: slot_assign_list • slot_assign
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwDATABLOCK         shift, and go to state 376
-    IDENT               shift, and go to state 377
-    TYPEIDENT           shift, and go to state 378
-
-    $default  reduce using rule 51 (object_declare_block)
-
-    object_decl       go to state 387
-    object_decl_list  go to state 414
-    slot_assign       go to state 406
-
-
-State 391
-
-   42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' '{' object_declare_block • '}'
-
-    '}'  shift, and go to state 415
+    object_decl  go to state 415
 
 
 State 392
+
+   51 object_declare_block: slot_assign_list •
+   53                     | slot_assign_list • object_decl_list
+  179 slot_assign_list: slot_assign_list • slot_assign
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwDATABLOCK         shift, and go to state 378
+    IDENT               shift, and go to state 379
+    TYPEIDENT           shift, and go to state 380
+
+    $default  reduce using rule 51 (object_declare_block)
+
+    object_decl       go to state 389
+    object_decl_list  go to state 416
+    slot_assign       go to state 408
+
+
+State 393
+
+   42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' '{' object_declare_block • '}'
+
+    '}'  shift, and go to state 417
+
+
+State 394
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' • stmt_block
 
@@ -10986,7 +11022,7 @@ State 392
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 416
+    stmt_block           go to state 418
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -11002,7 +11038,7 @@ State 392
     inline_command_expr  go to state 54
 
 
-State 393
+State 395
 
    80 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP • expr ')' stmt_block
 
@@ -11026,7 +11062,7 @@ State 393
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 417
+    expr                 go to state 419
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -11035,14 +11071,14 @@ State 393
     inline_command_expr  go to state 54
 
 
-State 394
+State 396
 
    77 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr ')' stmt_block •
 
     $default  reduce using rule 77 (for_stmt)
 
 
-State 395
+State 397
 
    79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP expr • ')' stmt_block
    92 expr: expr • '^' expr
@@ -11083,7 +11119,7 @@ State 395
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 418
+    ')'         shift, and go to state 420
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -11101,14 +11137,14 @@ State 395
     '?'         shift, and go to state 131
 
 
-State 396
+State 398
 
    69 for_stmt: rwFOR '(' expr ';' expr ';' expr ')' stmt_block •
 
     $default  reduce using rule 69 (for_stmt)
 
 
-State 397
+State 399
 
    85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' • stmt_block
 
@@ -11147,7 +11183,7 @@ State 397
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 419
+    stmt_block           go to state 421
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -11163,7 +11199,7 @@ State 397
     inline_command_expr  go to state 54
 
 
-State 398
+State 400
 
    87 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP • expr ')' stmt_block
 
@@ -11187,7 +11223,7 @@ State 398
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 420
+    expr                 go to state 422
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -11196,14 +11232,14 @@ State 398
     inline_command_expr  go to state 54
 
 
-State 399
+State 401
 
    84 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr ')' stmt_block •
 
     $default  reduce using rule 84 (foreach_stmt)
 
 
-State 400
+State 402
 
    86 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP expr • ')' stmt_block
    92 expr: expr • '^' expr
@@ -11244,7 +11280,7 @@ State 400
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ')'         shift, and go to state 421
+    ')'         shift, and go to state 423
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -11262,43 +11298,9 @@ State 400
     '?'         shift, and go to state 131
 
 
-State 401
+State 403
 
-  183 slot_assign: rwDATABLOCK '=' • expr ';'
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    object_decl          go to state 41
-    expr                 go to state 422
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 68
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
-State 402
-
-  179 slot_assign: IDENT '=' • expr ';'
-  180            | IDENT '=' • '{' expr_list '}' ';'
+  184 slot_assign: rwDATABLOCK '=' • expr ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -11314,7 +11316,6 @@ State 402
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '{'                 shift, and go to state 423
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
@@ -11330,10 +11331,45 @@ State 402
     inline_command_expr  go to state 54
 
 
-State 403
+State 404
 
-  184 slot_assign: IDENT '[' • aidx_expr ']' '=' expr ';'
-  185            | IDENT '[' • aidx_expr ']' '=' '{' expr_list '}' ';'
+  180 slot_assign: IDENT '=' • expr ';'
+  181            | IDENT '=' • '{' expr_list '}' ';'
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 425
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 426
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+
+
+State 405
+
+  185 slot_assign: IDENT '[' • aidx_expr ']' '=' expr ';'
+  186            | IDENT '[' • aidx_expr ']' '=' '{' expr_list '}' ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -11362,34 +11398,34 @@ State 403
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    aidx_expr            go to state 425
-
-
-State 404
-
-  181 slot_assign: TYPEIDENT IDENT • '=' expr ';'
-  182            | TYPEIDENT IDENT • '=' '{' expr_list '}' ';'
-  186            | TYPEIDENT IDENT • '[' aidx_expr ']' '=' expr ';'
-
-    '='  shift, and go to state 426
-    '['  shift, and go to state 427
-
-
-State 405
-
-   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt '}' • ';'
-
-    ';'  shift, and go to state 428
+    aidx_expr            go to state 427
 
 
 State 406
 
-  178 slot_assign_list: slot_assign_list slot_assign •
+  182 slot_assign: TYPEIDENT IDENT • '=' expr ';'
+  183            | TYPEIDENT IDENT • '=' '{' expr_list '}' ';'
+  187            | TYPEIDENT IDENT • '[' aidx_expr ']' '=' expr ';'
 
-    $default  reduce using rule 178 (slot_assign_list)
+    '='  shift, and go to state 428
+    '['  shift, and go to state 429
 
 
 State 407
+
+   37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt '}' • ';'
+
+    ';'  shift, and go to state 430
+
+
+State 408
+
+  179 slot_assign_list: slot_assign_list slot_assign •
+
+    $default  reduce using rule 179 (slot_assign_list)
+
+
+State 409
 
    64 case_expr: case_expr rwCASEOR expr •
    92 expr: expr • '^' expr
@@ -11449,7 +11485,7 @@ State 407
     $default  reduce using rule 64 (case_expr)
 
 
-State 408
+State 410
 
    11 statement_list: statement_list • stmt
    60 case_block: rwCASE case_expr ':' statement_list •
@@ -11464,13 +11500,13 @@ State 408
     rwRETURN            shift, and go to state 10
     rwWHILE             shift, and go to state 11
     rwDO                shift, and go to state 12
-    rwDEFAULT           shift, and go to state 429
+    rwDEFAULT           shift, and go to state 431
     rwFOR               shift, and go to state 13
     rwFOREACH           shift, and go to state 14
     rwFOREACHSTR        shift, and go to state 15
     rwDATABLOCK         shift, and go to state 16
     rwSWITCH            shift, and go to state 17
-    rwCASE              shift, and go to state 319
+    rwCASE              shift, and go to state 321
     rwSWITCHSTR         shift, and go to state 18
     rwASSERT            shift, and go to state 20
     INTCONST            shift, and go to state 21
@@ -11491,11 +11527,11 @@ State 408
 
     $default  reduce using rule 60 (case_block)
 
-    stmt                 go to state 222
+    stmt                 go to state 223
     datablock_decl       go to state 40
     object_decl          go to state 41
     switch_stmt          go to state 42
-    case_block           go to state 430
+    case_block           go to state 432
     if_stmt              go to state 43
     while_stmt           go to state 44
     for_stmt             go to state 45
@@ -11510,54 +11546,54 @@ State 408
     inline_command_expr  go to state 54
 
 
-State 409
+State 411
 
    28 fn_decl_stmt: rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl ')' '{' statement_list '}' •
 
     $default  reduce using rule 28 (fn_decl_stmt)
 
 
-State 410
+State 412
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args ')' '{' • object_declare_block '}'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
-    rwDATABLOCK         shift, and go to state 376
-    IDENT               shift, and go to state 377
-    TYPEIDENT           shift, and go to state 378
+    rwDATABLOCK         shift, and go to state 378
+    IDENT               shift, and go to state 379
+    TYPEIDENT           shift, and go to state 380
 
     $default  reduce using rule 50 (object_declare_block)
 
-    object_decl           go to state 387
-    object_declare_block  go to state 431
-    object_decl_list      go to state 389
-    slot_assign_list      go to state 390
-    slot_assign           go to state 381
+    object_decl           go to state 389
+    object_declare_block  go to state 433
+    object_decl_list      go to state 391
+    slot_assign_list      go to state 392
+    slot_assign           go to state 383
 
 
-State 411
+State 413
 
    54 object_decl_list: object_decl ';' •
 
     $default  reduce using rule 54 (object_decl_list)
 
 
-State 412
+State 414
 
    38 object_decl: rwDECLARE class_name_expr '(' object_name parent_block object_args ')' '{' object_declare_block '}' •
 
     $default  reduce using rule 38 (object_decl)
 
 
-State 413
+State 415
 
    55 object_decl_list: object_decl_list object_decl • ';'
 
-    ';'  shift, and go to state 432
+    ';'  shift, and go to state 434
 
 
-State 414
+State 416
 
    53 object_declare_block: slot_assign_list object_decl_list •
    55 object_decl_list: object_decl_list • object_decl ';'
@@ -11567,147 +11603,26 @@ State 414
 
     $default  reduce using rule 53 (object_declare_block)
 
-    object_decl  go to state 413
+    object_decl  go to state 415
 
 
-State 415
+State 417
 
    42 object_decl: rwDECLARESINGLETON class_name_expr '(' object_name parent_block object_args ')' '{' object_declare_block '}' •
 
     $default  reduce using rule 42 (object_decl)
 
 
-State 416
+State 418
 
    78 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block •
 
     $default  reduce using rule 78 (for_stmt)
 
 
-State 417
-
-   80 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr • ')' stmt_block
-   92 expr: expr • '^' expr
-   93     | expr • '%' expr
-   94     | expr • '&' expr
-   95     | expr • '|' expr
-   96     | expr • '+' expr
-   97     | expr • '-' expr
-   98     | expr • '*' expr
-   99     | expr • '/' expr
-  103     | expr • '?' expr ':' expr
-  104     | expr • '<' expr
-  105     | expr • '>' expr
-  106     | expr • opGE expr
-  107     | expr • opLE expr
-  108     | expr • opEQ expr
-  109     | expr • opNE expr
-  110     | expr • opOR expr
-  111     | expr • opSHL expr
-  112     | expr • opSHR expr
-  113     | expr • opAND expr
-  114     | expr • opSTREQ expr
-  115     | expr • opSTRNE expr
-  116     | expr • '@' expr
-  129 slot_acc: expr • '.' IDENT
-  130         | expr • '.' IDENT '[' aidx_expr ']'
-  131 intslot_acc: expr • opINTNAME class_name_expr
-  132            | expr • opINTNAMER class_name_expr
-  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-
-    '+'         shift, and go to state 107
-    '-'         shift, and go to state 108
-    '*'         shift, and go to state 109
-    '/'         shift, and go to state 110
-    '<'         shift, and go to state 111
-    '>'         shift, and go to state 112
-    '.'         shift, and go to state 113
-    '|'         shift, and go to state 114
-    '&'         shift, and go to state 115
-    '%'         shift, and go to state 116
-    ')'         shift, and go to state 433
-    '^'         shift, and go to state 117
-    '@'         shift, and go to state 118
-    opINTNAME   shift, and go to state 119
-    opINTNAMER  shift, and go to state 120
-    opSHL       shift, and go to state 121
-    opSHR       shift, and go to state 122
-    opEQ        shift, and go to state 123
-    opNE        shift, and go to state 124
-    opGE        shift, and go to state 125
-    opLE        shift, and go to state 126
-    opAND       shift, and go to state 127
-    opOR        shift, and go to state 128
-    opSTREQ     shift, and go to state 129
-    opSTRNE     shift, and go to state 130
-    '?'         shift, and go to state 131
-
-
-State 418
-
-   79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' • stmt_block
-
-    rwDECLARE           shift, and go to state 5
-    rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 7
-    rwCONTINUE          shift, and go to state 8
-    rwIF                shift, and go to state 9
-    rwRETURN            shift, and go to state 10
-    rwWHILE             shift, and go to state 11
-    rwDO                shift, and go to state 12
-    rwFOR               shift, and go to state 13
-    rwFOREACH           shift, and go to state 14
-    rwFOREACHSTR        shift, and go to state 15
-    rwDATABLOCK         shift, and go to state 16
-    rwSWITCH            shift, and go to state 17
-    rwSWITCHSTR         shift, and go to state 18
-    rwASSERT            shift, and go to state 20
-    INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 22
-    VAR                 shift, and go to state 23
-    IDENT               shift, and go to state 24
-    DOCBLOCK            shift, and go to state 25
-    STRATOM             shift, and go to state 26
-    TAGATOM             shift, and go to state 27
-    FLTCONST            shift, and go to state 28
-    '-'                 shift, and go to state 29
-    '*'                 shift, and go to state 30
-    '('                 shift, and go to state 31
-    '{'                 shift, and go to state 70
-    '~'                 shift, and go to state 32
-    '!'                 shift, and go to state 33
-    rwPRINT             shift, and go to state 34
-    rwRANDOMF           shift, and go to state 35
-
-    stmt                 go to state 71
-    datablock_decl       go to state 40
-    object_decl          go to state 41
-    stmt_block           go to state 434
-    switch_stmt          go to state 42
-    if_stmt              go to state 43
-    while_stmt           go to state 44
-    for_stmt             go to state 45
-    foreach_stmt         go to state 46
-    expression_stmt      go to state 47
-    expr                 go to state 48
-    slot_acc             go to state 49
-    intslot_acc          go to state 50
-    stmt_expr            go to state 51
-    funcall_expr         go to state 52
-    assert_expr          go to state 53
-    inline_command_expr  go to state 54
-
-
 State 419
 
-   85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block •
-
-    $default  reduce using rule 85 (foreach_stmt)
-
-
-State 420
-
-   87 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr • ')' stmt_block
+   80 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr • ')' stmt_block
    92 expr: expr • '^' expr
    93     | expr • '%' expr
    94     | expr • '&' expr
@@ -11764,9 +11679,9 @@ State 420
     '?'         shift, and go to state 131
 
 
-State 421
+State 420
 
-   86 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' • stmt_block
+   79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -11819,8 +11734,16 @@ State 421
     inline_command_expr  go to state 54
 
 
+State 421
+
+   85 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr ')' stmt_block •
+
+    $default  reduce using rule 85 (foreach_stmt)
+
+
 State 422
 
+   87 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr • ')' stmt_block
    92 expr: expr • '^' expr
    93     | expr • '%' expr
    94     | expr • '&' expr
@@ -11848,7 +11771,6 @@ State 422
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  183 slot_assign: rwDATABLOCK '=' expr • ';'
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -11860,7 +11782,7 @@ State 422
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 437
+    ')'         shift, and go to state 437
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -11880,36 +11802,57 @@ State 422
 
 State 423
 
-  180 slot_assign: IDENT '=' '{' • expr_list '}' ';'
+   86 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' • stmt_block
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
-    rwBREAK             shift, and go to state 63
+    rwBREAK             shift, and go to state 7
+    rwCONTINUE          shift, and go to state 8
+    rwIF                shift, and go to state 9
+    rwRETURN            shift, and go to state 10
+    rwWHILE             shift, and go to state 11
+    rwDO                shift, and go to state 12
+    rwFOR               shift, and go to state 13
+    rwFOREACH           shift, and go to state 14
+    rwFOREACHSTR        shift, and go to state 15
+    rwDATABLOCK         shift, and go to state 16
+    rwSWITCH            shift, and go to state 17
+    rwSWITCHSTR         shift, and go to state 18
     rwASSERT            shift, and go to state 20
     INTCONST            shift, and go to state 21
-    TTAG                shift, and go to state 64
+    TTAG                shift, and go to state 22
     VAR                 shift, and go to state 23
     IDENT               shift, and go to state 24
+    DOCBLOCK            shift, and go to state 25
     STRATOM             shift, and go to state 26
     TAGATOM             shift, and go to state 27
     FLTCONST            shift, and go to state 28
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
+    '{'                 shift, and go to state 70
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
+    stmt                 go to state 71
+    datablock_decl       go to state 40
     object_decl          go to state 41
-    expr                 go to state 140
+    stmt_block           go to state 438
+    switch_stmt          go to state 42
+    if_stmt              go to state 43
+    while_stmt           go to state 44
+    for_stmt             go to state 45
+    foreach_stmt         go to state 46
+    expression_stmt      go to state 47
+    expr                 go to state 48
     slot_acc             go to state 49
     intslot_acc          go to state 50
-    stmt_expr            go to state 68
+    stmt_expr            go to state 51
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 438
 
 
 State 424
@@ -11941,7 +11884,7 @@ State 424
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  179 slot_assign: IDENT '=' expr • ';'
+  184 slot_assign: rwDATABLOCK '=' expr • ';'
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -11973,18 +11916,7 @@ State 424
 
 State 425
 
-  184 slot_assign: IDENT '[' aidx_expr • ']' '=' expr ';'
-  185            | IDENT '[' aidx_expr • ']' '=' '{' expr_list '}' ';'
-  188 aidx_expr: aidx_expr • ',' expr
-
-    ','  shift, and go to state 240
-    ']'  shift, and go to state 440
-
-
-State 426
-
-  181 slot_assign: TYPEIDENT IDENT '=' • expr ';'
-  182            | TYPEIDENT IDENT '=' • '{' expr_list '}' ';'
+  181 slot_assign: IDENT '=' '{' • expr_list '}' ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12000,14 +11932,118 @@ State 426
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '{'                 shift, and go to state 441
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 442
+    expr                 go to state 140
+    slot_acc             go to state 49
+    intslot_acc          go to state 50
+    stmt_expr            go to state 68
+    funcall_expr         go to state 52
+    assert_expr          go to state 53
+    inline_command_expr  go to state 54
+    expr_list            go to state 440
+
+
+State 426
+
+   92 expr: expr • '^' expr
+   93     | expr • '%' expr
+   94     | expr • '&' expr
+   95     | expr • '|' expr
+   96     | expr • '+' expr
+   97     | expr • '-' expr
+   98     | expr • '*' expr
+   99     | expr • '/' expr
+  103     | expr • '?' expr ':' expr
+  104     | expr • '<' expr
+  105     | expr • '>' expr
+  106     | expr • opGE expr
+  107     | expr • opLE expr
+  108     | expr • opEQ expr
+  109     | expr • opNE expr
+  110     | expr • opOR expr
+  111     | expr • opSHL expr
+  112     | expr • opSHR expr
+  113     | expr • opAND expr
+  114     | expr • opSTREQ expr
+  115     | expr • opSTRNE expr
+  116     | expr • '@' expr
+  129 slot_acc: expr • '.' IDENT
+  130         | expr • '.' IDENT '[' aidx_expr ']'
+  131 intslot_acc: expr • opINTNAME class_name_expr
+  132            | expr • opINTNAMER class_name_expr
+  162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
+  180 slot_assign: IDENT '=' expr • ';'
+
+    '+'         shift, and go to state 107
+    '-'         shift, and go to state 108
+    '*'         shift, and go to state 109
+    '/'         shift, and go to state 110
+    '<'         shift, and go to state 111
+    '>'         shift, and go to state 112
+    '.'         shift, and go to state 113
+    '|'         shift, and go to state 114
+    '&'         shift, and go to state 115
+    '%'         shift, and go to state 116
+    ';'         shift, and go to state 441
+    '^'         shift, and go to state 117
+    '@'         shift, and go to state 118
+    opINTNAME   shift, and go to state 119
+    opINTNAMER  shift, and go to state 120
+    opSHL       shift, and go to state 121
+    opSHR       shift, and go to state 122
+    opEQ        shift, and go to state 123
+    opNE        shift, and go to state 124
+    opGE        shift, and go to state 125
+    opLE        shift, and go to state 126
+    opAND       shift, and go to state 127
+    opOR        shift, and go to state 128
+    opSTREQ     shift, and go to state 129
+    opSTRNE     shift, and go to state 130
+    '?'         shift, and go to state 131
+
+
+State 427
+
+  185 slot_assign: IDENT '[' aidx_expr • ']' '=' expr ';'
+  186            | IDENT '[' aidx_expr • ']' '=' '{' expr_list '}' ';'
+  189 aidx_expr: aidx_expr • ',' expr
+
+    ','  shift, and go to state 241
+    ']'  shift, and go to state 442
+
+
+State 428
+
+  182 slot_assign: TYPEIDENT IDENT '=' • expr ';'
+  183            | TYPEIDENT IDENT '=' • '{' expr_list '}' ';'
+
+    rwDECLARE           shift, and go to state 5
+    rwDECLARESINGLETON  shift, and go to state 6
+    rwBREAK             shift, and go to state 63
+    rwASSERT            shift, and go to state 20
+    INTCONST            shift, and go to state 21
+    TTAG                shift, and go to state 64
+    VAR                 shift, and go to state 23
+    IDENT               shift, and go to state 24
+    STRATOM             shift, and go to state 26
+    TAGATOM             shift, and go to state 27
+    FLTCONST            shift, and go to state 28
+    '-'                 shift, and go to state 29
+    '*'                 shift, and go to state 30
+    '('                 shift, and go to state 31
+    '{'                 shift, and go to state 443
+    '~'                 shift, and go to state 32
+    '!'                 shift, and go to state 33
+    rwPRINT             shift, and go to state 34
+    rwRANDOMF           shift, and go to state 35
+
+    object_decl          go to state 41
+    expr                 go to state 444
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -12016,9 +12052,9 @@ State 426
     inline_command_expr  go to state 54
 
 
-State 427
+State 429
 
-  186 slot_assign: TYPEIDENT IDENT '[' • aidx_expr ']' '=' expr ';'
+  187 slot_assign: TYPEIDENT IDENT '[' • aidx_expr ']' '=' expr ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12047,45 +12083,45 @@ State 427
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    aidx_expr            go to state 443
+    aidx_expr            go to state 445
 
 
-State 428
+State 430
 
    37 datablock_decl: rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt '}' ';' •
 
     $default  reduce using rule 37 (datablock_decl)
 
 
-State 429
+State 431
 
    61 case_block: rwCASE case_expr ':' statement_list rwDEFAULT • ':' statement_list
 
-    ':'  shift, and go to state 444
+    ':'  shift, and go to state 446
 
 
-State 430
+State 432
 
    62 case_block: rwCASE case_expr ':' statement_list case_block •
 
     $default  reduce using rule 62 (case_block)
 
 
-State 431
+State 433
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args ')' '{' object_declare_block • '}'
 
-    '}'  shift, and go to state 445
+    '}'  shift, and go to state 447
 
 
-State 432
+State 434
 
    55 object_decl_list: object_decl_list object_decl ';' •
 
     $default  reduce using rule 55 (object_decl_list)
 
 
-State 433
+State 435
 
    80 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' • stmt_block
 
@@ -12124,7 +12160,7 @@ State 433
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 446
+    stmt_block           go to state 448
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -12140,14 +12176,14 @@ State 433
     inline_command_expr  go to state 54
 
 
-State 434
+State 436
 
    79 for_stmt: rwFOR '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' stmt_block •
 
     $default  reduce using rule 79 (for_stmt)
 
 
-State 435
+State 437
 
    87 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' • stmt_block
 
@@ -12186,7 +12222,7 @@ State 435
     stmt                 go to state 71
     datablock_decl       go to state 40
     object_decl          go to state 41
-    stmt_block           go to state 447
+    stmt_block           go to state 449
     switch_stmt          go to state 42
     if_stmt              go to state 43
     while_stmt           go to state 44
@@ -12202,47 +12238,47 @@ State 435
     inline_command_expr  go to state 54
 
 
-State 436
+State 438
 
    86 foreach_stmt: rwFOREACH '(' VAR rwIN expr opDOTDOT expr rwSTEP expr ')' stmt_block •
 
     $default  reduce using rule 86 (foreach_stmt)
 
 
-State 437
-
-  183 slot_assign: rwDATABLOCK '=' expr ';' •
-
-    $default  reduce using rule 183 (slot_assign)
-
-
-State 438
-
-  174 expr_list: expr_list • ',' expr
-  180 slot_assign: IDENT '=' '{' expr_list • '}' ';'
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 448
-
-
 State 439
 
-  179 slot_assign: IDENT '=' expr ';' •
+  184 slot_assign: rwDATABLOCK '=' expr ';' •
 
-    $default  reduce using rule 179 (slot_assign)
+    $default  reduce using rule 184 (slot_assign)
 
 
 State 440
 
-  184 slot_assign: IDENT '[' aidx_expr ']' • '=' expr ';'
-  185            | IDENT '[' aidx_expr ']' • '=' '{' expr_list '}' ';'
+  175 expr_list: expr_list • ',' expr
+  181 slot_assign: IDENT '=' '{' expr_list • '}' ';'
 
-    '='  shift, and go to state 449
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 450
 
 
 State 441
 
-  182 slot_assign: TYPEIDENT IDENT '=' '{' • expr_list '}' ';'
+  180 slot_assign: IDENT '=' expr ';' •
+
+    $default  reduce using rule 180 (slot_assign)
+
+
+State 442
+
+  185 slot_assign: IDENT '[' aidx_expr ']' • '=' expr ';'
+  186            | IDENT '[' aidx_expr ']' • '=' '{' expr_list '}' ';'
+
+    '='  shift, and go to state 451
+
+
+State 443
+
+  183 slot_assign: TYPEIDENT IDENT '=' '{' • expr_list '}' ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12271,10 +12307,10 @@ State 441
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 450
+    expr_list            go to state 452
 
 
-State 442
+State 444
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -12303,7 +12339,7 @@ State 442
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  181 slot_assign: TYPEIDENT IDENT '=' expr • ';'
+  182 slot_assign: TYPEIDENT IDENT '=' expr • ';'
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -12315,7 +12351,7 @@ State 442
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 451
+    ';'         shift, and go to state 453
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -12333,56 +12369,56 @@ State 442
     '?'         shift, and go to state 131
 
 
-State 443
+State 445
 
-  186 slot_assign: TYPEIDENT IDENT '[' aidx_expr • ']' '=' expr ';'
-  188 aidx_expr: aidx_expr • ',' expr
+  187 slot_assign: TYPEIDENT IDENT '[' aidx_expr • ']' '=' expr ';'
+  189 aidx_expr: aidx_expr • ',' expr
 
-    ','  shift, and go to state 240
-    ']'  shift, and go to state 452
+    ','  shift, and go to state 241
+    ']'  shift, and go to state 454
 
 
-State 444
+State 446
 
    61 case_block: rwCASE case_expr ':' statement_list rwDEFAULT ':' • statement_list
 
     $default  reduce using rule 10 (statement_list)
 
-    statement_list  go to state 453
+    statement_list  go to state 455
 
 
-State 445
+State 447
 
    40 object_decl: rwDECLARE class_name_expr '(' '[' object_name ']' parent_block object_args ')' '{' object_declare_block '}' •
 
     $default  reduce using rule 40 (object_decl)
 
 
-State 446
+State 448
 
    80 for_stmt: rwFOR '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' stmt_block •
 
     $default  reduce using rule 80 (for_stmt)
 
 
-State 447
+State 449
 
    87 foreach_stmt: rwFOREACH '(' VAR rwIN rwRANGE expr opDOTDOT expr rwSTEP expr ')' stmt_block •
 
     $default  reduce using rule 87 (foreach_stmt)
 
 
-State 448
+State 450
 
-  180 slot_assign: IDENT '=' '{' expr_list '}' • ';'
+  181 slot_assign: IDENT '=' '{' expr_list '}' • ';'
 
-    ';'  shift, and go to state 454
+    ';'  shift, and go to state 456
 
 
-State 449
+State 451
 
-  184 slot_assign: IDENT '[' aidx_expr ']' '=' • expr ';'
-  185            | IDENT '[' aidx_expr ']' '=' • '{' expr_list '}' ';'
+  185 slot_assign: IDENT '[' aidx_expr ']' '=' • expr ';'
+  186            | IDENT '[' aidx_expr ']' '=' • '{' expr_list '}' ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12398,14 +12434,14 @@ State 449
     '-'                 shift, and go to state 29
     '*'                 shift, and go to state 30
     '('                 shift, and go to state 31
-    '{'                 shift, and go to state 455
+    '{'                 shift, and go to state 457
     '~'                 shift, and go to state 32
     '!'                 shift, and go to state 33
     rwPRINT             shift, and go to state 34
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 456
+    expr                 go to state 458
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -12414,30 +12450,30 @@ State 449
     inline_command_expr  go to state 54
 
 
-State 450
-
-  174 expr_list: expr_list • ',' expr
-  182 slot_assign: TYPEIDENT IDENT '=' '{' expr_list • '}' ';'
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 457
-
-
-State 451
-
-  181 slot_assign: TYPEIDENT IDENT '=' expr ';' •
-
-    $default  reduce using rule 181 (slot_assign)
-
-
 State 452
 
-  186 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' • '=' expr ';'
+  175 expr_list: expr_list • ',' expr
+  183 slot_assign: TYPEIDENT IDENT '=' '{' expr_list • '}' ';'
 
-    '='  shift, and go to state 458
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 459
 
 
 State 453
+
+  182 slot_assign: TYPEIDENT IDENT '=' expr ';' •
+
+    $default  reduce using rule 182 (slot_assign)
+
+
+State 454
+
+  187 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' • '=' expr ';'
+
+    '='  shift, and go to state 460
+
+
+State 455
 
    11 statement_list: statement_list • stmt
    61 case_block: rwCASE case_expr ':' statement_list rwDEFAULT ':' statement_list •
@@ -12475,7 +12511,7 @@ State 453
 
     $default  reduce using rule 61 (case_block)
 
-    stmt                 go to state 222
+    stmt                 go to state 223
     datablock_decl       go to state 40
     object_decl          go to state 41
     switch_stmt          go to state 42
@@ -12493,16 +12529,16 @@ State 453
     inline_command_expr  go to state 54
 
 
-State 454
+State 456
 
-  180 slot_assign: IDENT '=' '{' expr_list '}' ';' •
+  181 slot_assign: IDENT '=' '{' expr_list '}' ';' •
 
-    $default  reduce using rule 180 (slot_assign)
+    $default  reduce using rule 181 (slot_assign)
 
 
-State 455
+State 457
 
-  185 slot_assign: IDENT '[' aidx_expr ']' '=' '{' • expr_list '}' ';'
+  186 slot_assign: IDENT '[' aidx_expr ']' '=' '{' • expr_list '}' ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12531,10 +12567,10 @@ State 455
     funcall_expr         go to state 52
     assert_expr          go to state 53
     inline_command_expr  go to state 54
-    expr_list            go to state 459
+    expr_list            go to state 461
 
 
-State 456
+State 458
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -12563,7 +12599,7 @@ State 456
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  184 slot_assign: IDENT '[' aidx_expr ']' '=' expr • ';'
+  185 slot_assign: IDENT '[' aidx_expr ']' '=' expr • ';'
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -12575,7 +12611,7 @@ State 456
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 460
+    ';'         shift, and go to state 462
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -12593,16 +12629,16 @@ State 456
     '?'         shift, and go to state 131
 
 
-State 457
+State 459
 
-  182 slot_assign: TYPEIDENT IDENT '=' '{' expr_list '}' • ';'
+  183 slot_assign: TYPEIDENT IDENT '=' '{' expr_list '}' • ';'
 
-    ';'  shift, and go to state 461
+    ';'  shift, and go to state 463
 
 
-State 458
+State 460
 
-  186 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' • expr ';'
+  187 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' • expr ';'
 
     rwDECLARE           shift, and go to state 5
     rwDECLARESINGLETON  shift, and go to state 6
@@ -12624,7 +12660,7 @@ State 458
     rwRANDOMF           shift, and go to state 35
 
     object_decl          go to state 41
-    expr                 go to state 462
+    expr                 go to state 464
     slot_acc             go to state 49
     intslot_acc          go to state 50
     stmt_expr            go to state 68
@@ -12633,30 +12669,30 @@ State 458
     inline_command_expr  go to state 54
 
 
-State 459
-
-  174 expr_list: expr_list • ',' expr
-  185 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list • '}' ';'
-
-    ','  shift, and go to state 218
-    '}'  shift, and go to state 463
-
-
-State 460
-
-  184 slot_assign: IDENT '[' aidx_expr ']' '=' expr ';' •
-
-    $default  reduce using rule 184 (slot_assign)
-
-
 State 461
 
-  182 slot_assign: TYPEIDENT IDENT '=' '{' expr_list '}' ';' •
+  175 expr_list: expr_list • ',' expr
+  186 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list • '}' ';'
 
-    $default  reduce using rule 182 (slot_assign)
+    ','  shift, and go to state 219
+    '}'  shift, and go to state 465
 
 
 State 462
+
+  185 slot_assign: IDENT '[' aidx_expr ']' '=' expr ';' •
+
+    $default  reduce using rule 185 (slot_assign)
+
+
+State 463
+
+  183 slot_assign: TYPEIDENT IDENT '=' '{' expr_list '}' ';' •
+
+    $default  reduce using rule 183 (slot_assign)
+
+
+State 464
 
    92 expr: expr • '^' expr
    93     | expr • '%' expr
@@ -12685,7 +12721,7 @@ State 462
   131 intslot_acc: expr • opINTNAME class_name_expr
   132            | expr • opINTNAMER class_name_expr
   162 funcall_expr: expr • '.' IDENT '(' func_arg_list_decl ')'
-  186 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' expr • ';'
+  187 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' expr • ';'
 
     '+'         shift, and go to state 107
     '-'         shift, and go to state 108
@@ -12697,7 +12733,7 @@ State 462
     '|'         shift, and go to state 114
     '&'         shift, and go to state 115
     '%'         shift, and go to state 116
-    ';'         shift, and go to state 464
+    ';'         shift, and go to state 466
     '^'         shift, and go to state 117
     '@'         shift, and go to state 118
     opINTNAME   shift, and go to state 119
@@ -12715,22 +12751,22 @@ State 462
     '?'         shift, and go to state 131
 
 
-State 463
-
-  185 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list '}' • ';'
-
-    ';'  shift, and go to state 465
-
-
-State 464
-
-  186 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';' •
-
-    $default  reduce using rule 186 (slot_assign)
-
-
 State 465
 
-  185 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';' •
+  186 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list '}' • ';'
 
-    $default  reduce using rule 185 (slot_assign)
+    ';'  shift, and go to state 467
+
+
+State 466
+
+  187 slot_assign: TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';' •
+
+    $default  reduce using rule 187 (slot_assign)
+
+
+State 467
+
+  186 slot_assign: IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';' •
+
+    $default  reduce using rule 186 (slot_assign)

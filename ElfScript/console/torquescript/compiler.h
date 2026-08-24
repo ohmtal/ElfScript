@@ -192,7 +192,9 @@ namespace Compiler
       // Elfscript 0.6g - now i get mad ;)
       OP_INLINE_COMMAND,
       OP_PRINT,
-      OP_RANDOMF,
+      OP_MATH_RANDOMF,
+      OP_MATH_RANDOMF_1,
+      OP_MATH_RANDOMF_2,
 
       OP_INVALID,   //
 

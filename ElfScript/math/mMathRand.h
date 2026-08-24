@@ -59,4 +59,11 @@ inline F64 mRandF64() {
     return mRandDist64(mRandGen64);
 }
 
+inline F64 mRandF64(F64 min ,F64 max) {
+    auto range = std::minmax(min, max);
+    static std::mt19937_64 mRandGen64{ std::random_device{}() };
+    static std::uniform_real_distribution<F64> mRandDist64;
+    return mRandDist64(mRandGen64,  std::uniform_real_distribution<F64>::param_type{range.first, range.second});
+}
+
 }

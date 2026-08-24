@@ -13,8 +13,14 @@
     
 - [X] Bytecode Commands:
     - [X] OP_PRINT
-    - [X] OP_RANDOMF
+    - [X] OP_MATH_RANDOMF
     - => IP0 1.677u 0.003s 0:01.68 99.4%     0+0k 0+0io 0pf+0w
+    - [X] OP_MATH_RANDOMF_1
+    - [X] OP_MATH_RANDOMF_2
+    - => IP0 1.746u 0.002s 0:01.75 99.4%     0+0k 0+0io 0pf+0w
+    - => 1.725u 0.002s 0:01.73 99.4%     0+0k 0+0io 0pf+0w - i lost 100ms again ?!
+
+
 
 - [ ] Short path local var:  *= , += , -= , /= ....
     - [ ] = as float default

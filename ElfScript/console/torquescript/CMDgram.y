@@ -144,7 +144,7 @@ struct Token
 %type <stmt>   statement_list
 %type <stmt>   stmt
 %type <expr>   expr_list
-%type <expr>   expr_list_decl
+// %type <expr>   expr_list_decl
 %type <expr>   aidx_expr
 %type <expr>   funcall_expr
 %type <expr>   inline_command_expr
@@ -782,14 +782,16 @@ inline_command_expr
       { $$ = CommandStmtNode::alloc( $1.lineNumber, 0, $3); }
    | rwRANDOMF '('  ')'
       { $$ = CommandStmtNode::alloc( $1.lineNumber, 1, NULL); }
+   | rwRANDOMF '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, 2, $3); }
    ;
 
-expr_list_decl
-   :
-      { $$ = NULL; }
-   | expr_list
-      { $$ = $1; }
-   ;
+// expr_list_decl
+//    :
+//       { $$ = NULL; }
+//    | expr_list
+//       { $$ = $1; }
+//    ;
 
 expr_list
    : expr

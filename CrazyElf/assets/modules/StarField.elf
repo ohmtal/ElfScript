@@ -44,7 +44,8 @@ function StarField::OnAdd(%this) {
 
     for(%i in range STAR_COUNT)
     {
-        starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
+        // starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
+        starPoints.setPoint(%i, math::randomf($minH , $maxH),math::randomf($minW , $maxW), 1.0 );
     }
 
     return true;
@@ -70,6 +71,11 @@ function StarField::Render(%this) {
 
     %lStarPoints = starPoints.getId(); // slightly faster
 
+    %ranMinH = $minH;
+    %ranMaxH = $maxH;
+    %ranMinW = $minW;
+    %ranMaxW = $maxW;
+
     // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
     {
@@ -88,8 +94,10 @@ function StarField::Render(%this) {
         if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
             || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
         {
-            %pointX = GetRandomF($minH, $maxH);
-            %pointY = GetRandomF($minH, $maxH);
+            %pointX = math::randomf(%ranMinH, %ranMaxH);
+            %pointY = math::randomf(%ranMinW, %ranMaxW);
+            // %pointX = GetRandomF($minH, $maxH);
+            // %pointY = GetRandomF($minW, $maxW);
             %pointZ = 1.0;
             %screenPos_X = $hW +  %pointX;
             %screenPos_Y = $hH +  %pointY;

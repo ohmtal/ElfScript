@@ -639,7 +639,8 @@ struct CommandStmtNode : ExprNode
    U32 commandID;
    enum {
       PRINT,
-      RANDOMF
+      RANDOMF,
+      RANDOMF_P
    };
   // look at FuncCallExprNode
    static CommandStmtNode* alloc(S32 lineNumber, U32 commandType, ExprNode* args);

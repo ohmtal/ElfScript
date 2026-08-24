@@ -523,29 +523,49 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       if (args) {
             for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)
             {
-                  ip = expr->compile(codeStream, ip, TypeReqString);
+                  // ip = expr->compile(codeStream, ip, TypeReqString);
                   elementCount++;
             }
       }
-
-
 
 
       // FIXME would be faster calling different OP CODES!!
       switch (commandID) {
             case CommandStmtNode::PRINT:
             {
+                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
                   codeStream.emit(OP_PRINT);
                   codeStream.emit(elementCount);
                   break;
             }
             case CommandStmtNode::RANDOMF:
             {
-                  codeStream.emit(OP_RANDOMF); break;
+                   codeStream.emit(OP_MATH_RANDOMF);
+                   break;
+
+            }
+            case CommandStmtNode::RANDOMF_P:
+            {
+                  ExprNode* expr = nullptr;
+                  if (elementCount > 0) {
+                        expr = args;
+                        ip = expr->compile(codeStream, ip, TypeReqFloat);
+                  }
+                  if (elementCount > 1) {
+                        expr = (ExprNode*)expr->next;
+                        ip = expr->compile(codeStream, ip, TypeReqFloat);
+                  }
+
+                  switch (elementCount) {
+                        case 1: codeStream.emit(OP_MATH_RANDOMF_1);break;
+                        case 0: codeStream.emit(OP_MATH_RANDOMF);break;
+                        default: codeStream.emit(OP_MATH_RANDOMF_2);break;
+                  }
                   break;
             }
 
             default:  {
+                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
                   codeStream.emit(OP_INLINE_COMMAND);
                   codeStream.emit(elementCount);
                   codeStream.emit(commandID);

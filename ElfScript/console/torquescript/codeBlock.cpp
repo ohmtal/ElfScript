@@ -1523,11 +1523,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
-      case OP_INLINE_COMMAND: {
-            Con::printf("%i: OP_INLINE_COMMAND stk=-1 mode:%u", ip - 1, ip);
-            ++ip;
-            break;
-      }
+
 
       case OP_LOADFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];
@@ -1536,6 +1532,20 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             Con::printf("%i: OP_LOADFIELD_FASTPATH stk=-1 (type: %d, curCodeIP: %u)",  ip - 1, consoleValueType, curCodeIP);
             break;
       }
+
+      case OP_INLINE_COMMAND: {
+            Con::printf("%i: OP_INLINE_COMMAND stk=-1 mode:%u", ip - 1, ip);
+            ++ip;
+            break;
+      }
+      case OP_PRINT: {
+            Con::printf("%i: OP_PRINT stk=-1 mode:%u", ip - 1, ip);
+            ++ip;
+            break;
+      }
+      case OP_MATH_RANDOMF:  Con::printf("%i: OP_MATH_RANDOMF stk=-1",  ip - 1); break;
+      case OP_MATH_RANDOMF_1: Con::printf("%i: OP_MATH_RANDOMF_1 stk=-1",  ip - 1); break;
+      case OP_MATH_RANDOMF_2: Con::printf("%i: OP_MATH_RANDOMF_2 stk=-1",  ip - 1); break;
 
       case OP_SAVEFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];
