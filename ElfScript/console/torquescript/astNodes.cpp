@@ -1825,3 +1825,6 @@ U32 FunctionDeclStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
    return ip;
 }
+
+
+

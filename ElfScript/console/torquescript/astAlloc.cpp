@@ -500,5 +500,66 @@ TypeReq VectorConstructorNode::getPreferredType()
 {
       return TypeReqString;
 }
+// -----------------------------------------------------------------------------
+// Elfscript 0.6e Commands! (XXTH) ---------------------------------------------
+// -----------------------------------------------------------------------------
+CommandStmtNode* CommandStmtNode::alloc(S32 lineNumber, U32 commandID, ExprNode* args)
+{
+      CommandStmtNode* ret = (CommandStmtNode*)consoleAlloc(sizeof(CommandStmtNode));
+      constructInPlace(ret);
 
-// -----------------------------------------------------------------
+      ret->dbgLineNumber = lineNumber;
+      ret->commandID = commandID;
+      ret->args = args;
+      return ret;
+}
+
+
+U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
+{
+
+      U32 elementCount = 0;
+
+      if (args) {
+            for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)
+            {
+                  ip = expr->compile(codeStream, ip, TypeReqString);
+                  elementCount++;
+            }
+      }
+
+
+
+
+      // FIXME would be faster calling different OP CODES!!
+      switch (commandID) {
+            case CommandStmtNode::PRINT:
+            {
+                  codeStream.emit(OP_PRINT);
+                  codeStream.emit(elementCount);
+                  break;
+            }
+            case CommandStmtNode::RANDOMF:
+            {
+                  codeStream.emit(OP_RANDOMF); break;
+                  break;
+            }
+
+            default:  {
+                  codeStream.emit(OP_INLINE_COMMAND);
+                  codeStream.emit(elementCount);
+                  codeStream.emit(commandID);
+                  break;
+            }
+
+      }
+
+      return codeStream.tell();
+}
+
+TypeReq CommandStmtNode::getPreferredType()
+{
+      return TypeReqString;
+}
+
+// -----------------------------------------------------------------------------

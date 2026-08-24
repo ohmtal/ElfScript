@@ -1523,6 +1523,12 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
+      case OP_INLINE_COMMAND: {
+            Con::printf("%i: OP_INLINE_COMMAND stk=-1 mode:%u", ip - 1, ip);
+            ++ip;
+            break;
+      }
+
       case OP_LOADFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];
             S32 consoleValueType = (S32)code[ip]; ip++;
@@ -1536,6 +1542,16 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             ++ip;++ip; //XXTH FieldCache
          Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u)", ip - 1, curCodeIP);
          break;
+      }
+      case OP_CMPLT_UINT:
+      case OP_CMPGR_UINT:
+      case OP_CMPGE_UINT:
+      case OP_CMPLE_UINT:
+      case OP_CMPEQ_UINT:
+      case OP_CMPNE_UINT:
+      case OP_INC_UINT: {
+            Con::printf("%i: OP_XXXXX_UINT stk=-1 ", ip - 1);
+            break;
       }
 
       default:

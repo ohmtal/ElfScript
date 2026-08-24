@@ -111,6 +111,8 @@ struct Token
 // ElfScript foreach
 %token <i> opDOTDOT rwRANGE rwSTEP
 
+//ElfScript 0.6 TODO
+%token <i> rwPRINT rwRANDOMF
 
 %union {
    Token< char >           c;
@@ -130,6 +132,7 @@ struct Token
    IfStmtNode*             ifnode;
 }
 
+
 %type <s>      parent_block
 %type <ifnode> case_block
 %type <stmt>   switch_stmt
@@ -144,6 +147,7 @@ struct Token
 %type <expr>   expr_list_decl
 %type <expr>   aidx_expr
 %type <expr>   funcall_expr
+%type <expr>   inline_command_expr
 %type <expr>   assert_expr
 %type <expr>   object_name
 %type <expr>   object_args
@@ -641,6 +645,8 @@ stmt_expr
       { $$ = $1; }
    | assert_expr
       { $$ = $1; }
+   | inline_command_expr
+      { $$ = $1; }
    | object_decl
       { $$ = $1; }
    | VAR '=' expr
@@ -767,6 +773,15 @@ assert_expr
       { $$ = AssertCallExprNode::alloc( $1.lineNumber, $3, NULL ); }
    | rwASSERT '(' expr ',' STRATOM ')'
       { $$ = AssertCallExprNode::alloc( $1.lineNumber, $3, $5.value ); }
+   ;
+
+
+// ElfScript 0.6d TODO
+inline_command_expr
+   : rwPRINT '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, 0, $3); }
+   | rwRANDOMF '('  ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, 1, NULL); }
    ;
 
 expr_list_decl

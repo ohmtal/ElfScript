@@ -1,5 +1,51 @@
 # ElfScript Simple Speed Test:
 
+## Goal: get the (nearly or better) speed  test speed as vanilla lua on localvar test
+- Goal: Lua: 1.298u 0.002s 0:01.31 98.4%     0+0k 0+0io 0pf+0w
+- Elfscript 0.6e on the same speed as PHP: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
+- ElfScript 0.5 beat python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
+
+## Version 0.6g..z (TODO):
+- [X] OP_INLINE_COMMAND (first attempt)
+    - randomf
+    - print
+    - => 1.853u 0.005s 0:01.86 99.4%     0+0k 0+0io 0pf+0w
+    
+- [X] Bytecode Commands:
+    - [X] OP_PRINT
+    - [X] OP_RANDOMF
+    - => 1.756u 0.003s 0:01.76 99.4%     0+0k 0+0io 0pf+0w
+
+    
+- [ ] ConsoleVector to pointer - but it's not faster when i remove it ... mhhh 
+    - setup pool for Vectors
+    - set/get || clean ??
+    
+- [ ] default functions to Bytecode:
+    - [ ] OP_MATH_CLAMP
+    - [ ] OP_MATH_LERP
+    - [ ] OP_MATH_SIN
+    - [ ] OP_MATH_COS
+    - [ ] OP_MATH_TAN
+    - [ ] OP_MATH_ASIN
+    - [ ] OP_MATH_ACOS
+    - [ ] OP_MATH_ATAN (2)
+    - [ ] OP_MATH_SQRT
+    - [ ] OP_MATH_ABS
+    - [ ] OP_MATH_POW
+    - [ ] OP_MATH_EXP
+    - [ ] OP_MATH_LOG
+    - [ ] OP_MATH_FLOOR
+    - [ ] OP_MATH_CEIL
+    - [ ] OP_MATH_ROUND
+    
+    - [ ] OP_FORMATSTR 
+    
+    - ,,, need a list ;)
+    
+- [ ] Short path for *= , += , -= , /= ....
+
+
 ## Version 0.6f : 
 - splitted the foreach / for range OP codes but i had it fully optimized in 0.6d
 
@@ -40,6 +86,7 @@ Componentfields
 - 0.6b : 2.892u 0.007s 0:02.91 99.3%     0+0k 0+0io 0pf+0w
 - 0.6c : 2.754u 0.002s 0:02.76 99.6%     0+0k 0+0io 0pf+0w 
 - 0.6e : 2.244u 0.004s 0:02.25 99.5%     0+0k 0+0io 0pf+0w
+- 0.6f : 2.107u 0.004s 0:02.12 99.0%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
 - OGE3D* (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w
@@ -48,7 +95,7 @@ Componentfields
 - 0.6b : 4.479u 0.002s 0:04.49 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 4.712u 0.006s 0:04.74 99.3%     0+0k 0+0io 0pf+0w
 - 0.6e : 3.450u 0.005s 0:03.47 99.4%     0+0k 0+0io 0pf+0w
-
+- 0.6f : 3.342u 0.004s 0:03.36 99.4%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
 
@@ -58,6 +105,7 @@ Componentfields
 - 0.6b : 6.268u 0.002s 0:06.29 99.5%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.417u 0.003s 0:05.43 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 4.441u 0.004s 0:04.47 99.3%     0+0k 0+0io 0pf+0w
+- 0.6f : 4.208u 0.000s 0:04.22 99.5%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
@@ -67,6 +115,7 @@ Componentfields
 - 0.6b : 6.853u 0.009s 0:06.89 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 5.274u 0.004s 0:05.29 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 4.634u 0.008s 0:04.67 99.1%     0+0k 0+0io 0pf+0w
+- 0.6f : 4.500u 0.005s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_vector_components.elf
 - OGE3D* (current 26-08-05) :: 140.183u 0.322s 2:20.84 99.7% 0+0k 0+48io 0pf+0w
@@ -75,6 +124,8 @@ Componentfields
 - 0.6b : 7.985u 0.001s 0:08.01 99.6%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.312u 0.004s 0:07.34 99.5%     0+0k 0+0io 0pf+0w
 - 0.6e : 6.169u 0.006s 0:06.19 99.5%     0+0k 0+0io 0pf+0w
+- 0.6f : 6.199u 0.002s 0:06.22 99.5%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_vector_components_global.elf
 - 0.6a ENABLE_INLINE_CACHE: 7.474u 0.004s 0:07.51 99.4%     0+0k 0+0io 0pf+0w
@@ -82,21 +133,24 @@ Componentfields
 - 0.6b : 8.669u 0.006s 0:08.71 99.4%     0+0k 0+0io 0pf+0w
 - 0.6c : 7.636u 0.005s 0:07.66 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 7.298u 0.003s 0:07.33 99.4%     0+0k 0+0io 0pf+0w
+- 0.6f : 7.036u 0.005s 0:07.06 99.5%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
 - 0.6a ENABLE_INLINE_CACHE: 5.016u 0.001s 0:05.03 99.6%     0+0k 0+0io 0pf+0w
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
-
+- 0.6f : 2.939u 0.003s 0:02.95 99.3%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_for.elf
 - 0.6c : 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
 - 0.6e : 1.374u 0.007s 0:01.39 98.5%     0+0k 0+0io 0pf+0w
-
+- 0.6f : 1.090u 0.004s 0:01.10 99.0%     0+0k 0+0io 0pf+0w
 
 ### Crazy Elf: assets/modules/StarField.elf 
-- 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak
-- 0.6b : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak
+- 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak ? 
+- 0.6b : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) 
+- 0.6b : ~ 1450 FPS (GPU: 72%) falling down to 1050 FPS (GPU: 54%)
 
 OGE3D* Release Build - cant test the same scripts since it does not have the Extensions from ElfScript (for range/preprocessor/..).
 ---

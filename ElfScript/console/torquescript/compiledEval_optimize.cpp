@@ -41,6 +41,7 @@
 
 #include "console/returnBuffer.h"
 #include "console/consoleValueStack.h"
+#include <math/mMathRand.h>
 // #include "console/telnetDebugger.h"
 
 
@@ -226,7 +227,7 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
 #ifdef ENABLE_CONSOLE_VECTOR
             srcStoreValue.type = ConsoleValueType::cvVector;
 #else
-            srcStoreValue.type = ConsoleValueType::cvString;
+            srcStoreValue.type = ConsoleValueType::cvSTEntry;
 #endif
             srcValue = &srcStoreValue;
             object->stackDataField(field, array, srcValue); //get the current
@@ -881,7 +882,7 @@ enum class IntegerOperation
 
    LogicalAnd,
    LogicalOr
-   #ifdef ELFSCRIPT_INT_HACK
+   // // #ifdef ELFSCRIPT_INT_HACK
    // ElfScript:
    ,LT,  // Less Than (<)
    GT,  // Greater Than (>)
@@ -889,7 +890,7 @@ enum class IntegerOperation
    GE,  // Greater Equal (>=)
    EQ,  // Equal (==)
    NE   // Not Equal (!=)
-#endif
+// // #endif
 
 };
 
@@ -946,36 +947,36 @@ TORQUE_FORCEINLINE inline void doIntOperation()
       if constexpr (Op == IntegerOperation::LogicalOr)
          stack[_STK - 1].setBool(a.getFastInt() || b.getFastInt());
 
-#ifdef ELFSCRIPT_INT_HACK
+// // #ifdef ELFSCRIPT_INT_HACK
       // ElfScript ==============================>>>>>>
          // Less Than (<)
-         if constexpr (Op == IntegerOperation::LT) {
-               // Con::printf("a:%d; b:%d", a.getFastInt(), b.getFastInt());
-               stack[_STK - 1].setFastInt(a.getFastInt() < b.getFastInt() ? 1 : 0);
-         }
+      if constexpr (Op == IntegerOperation::LT) {
+            // Con::printf("a:%d; b:%d", a.getFastInt(), b.getFastInt());
+            stack[_STK - 1].setFastInt(a.getFastInt() < b.getFastInt() ? 1 : 0);
+      }
 
-         // Greater Than (>)
-         else if constexpr (Op == IntegerOperation::GT)
-               stack[_STK - 1].setFastInt(a.getFastInt() > b.getFastInt() ? 1 : 0);
+      // Greater Than (>)
+      else if constexpr (Op == IntegerOperation::GT)
+            stack[_STK - 1].setFastInt(a.getFastInt() > b.getFastInt() ? 1 : 0);
 
-         // Less Equal (<=)
-         else if constexpr (Op == IntegerOperation::LE)
-               stack[_STK - 1].setFastInt(a.getFastInt() <= b.getFastInt() ? 1 : 0);
+      // Less Equal (<=)
+      else if constexpr (Op == IntegerOperation::LE)
+            stack[_STK - 1].setFastInt(a.getFastInt() <= b.getFastInt() ? 1 : 0);
 
-         // Greater Equal (>=)
-         else if constexpr (Op == IntegerOperation::GE)
-               stack[_STK - 1].setFastInt(a.getFastInt() >= b.getFastInt() ? 1 : 0);
+      // Greater Equal (>=)
+      else if constexpr (Op == IntegerOperation::GE)
+            stack[_STK - 1].setFastInt(a.getFastInt() >= b.getFastInt() ? 1 : 0);
 
-         // Equal (==)
-         else if constexpr (Op == IntegerOperation::EQ)
-               stack[_STK - 1].setFastInt(a.getFastInt() == b.getFastInt() ? 1 : 0);
+      // Equal (==)
+      else if constexpr (Op == IntegerOperation::EQ)
+            stack[_STK - 1].setFastInt(a.getFastInt() == b.getFastInt() ? 1 : 0);
 
-         // Not Equal (!=)
-         else if constexpr (Op == IntegerOperation::NE)
-               stack[_STK - 1].setFastInt(a.getFastInt() != b.getFastInt() ? 1 : 0);
+      // Not Equal (!=)
+      else if constexpr (Op == IntegerOperation::NE)
+            stack[_STK - 1].setFastInt(a.getFastInt() != b.getFastInt() ? 1 : 0);
 
       // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#endif
+// // #endif
       POP_STK();
    }
    else
@@ -1365,18 +1366,19 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_SAVEFIELD_FASTPATH,
          &&handle_OP_LOADFIELD_FASTPATH,
 
-#ifdef ELFSCRIPT_INT_HACK
          &&handle_OP_CMPLT_UINT,
          &&handle_OP_CMPGR_UINT,
          &&handle_OP_CMPGE_UINT,
          &&handle_OP_CMPLE_UINT,
          &&handle_OP_CMPEQ_UINT,
          &&handle_OP_CMPNE_UINT,
-
          &&handle_OP_INC_UINT,
-#endif
 
          &&handle_OP_DEC,
+
+         &&handle_OP_INLINE_COMMAND,
+         &&handle_OP_PRINT,
+         &&handle_OP_RANDOMF,
 
          &&handle_OP_INVALID
    };
@@ -3861,7 +3863,7 @@ handle_OP_BUILD_VECTOR_STRING: {
 // NOTE placed under handle_OP_SAVEFIELD_FLT:
 
 // ~~~~~~~~~~~~~~~~~ EXPERIMENTAL UNIT
-#ifdef ELFSCRIPT_INT_HACK
+// #ifdef ELFSCRIPT_INT_HACK
 handle_OP_CMPLT_UINT:
       doIntOperation<IntegerOperation::LT>();
       DISPATCH();
@@ -3887,7 +3889,106 @@ handle_OP_INC_UINT:
       Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1.0);
       DISPATCH();
 
-#endif
+// #endif
+
+// --------------- ELFSCRIPT 0.6g  << TODO: inline_command_expr >>----------------
+handle_OP_INLINE_COMMAND:
+{
+      U32 count = code[ip++];
+      U32 commandID = code[ip++];
+
+
+      // FIXME TEST ONLY >>>>>>>>>>>>>>>>>>>>>>>
+      const U32 MAX_ELEMENTS = 16;
+      const char* stringValues[MAX_ELEMENTS];
+
+      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+
+
+      for (S32 i = count - 1; i >= 0; i--) {
+            stringValues[i] = stack[_STK].getString();
+            POP_STK();
+      }
+      // <<<<<<<<<<<<<<<<<<<<<<< FIXME
+
+
+
+      switch(commandID) {
+            case CommandStmtNode::PRINT: {
+//FIXME!!
+                  U32 len = 0;
+                  S32 i;
+                  for(i = 0; i < count; i++)
+                        len += dStrlen(stringValues[i]) + 1;
+                  static char buff[256];
+                  dMemset(buff, 0, 256);
+                  if (len > 255) len = 255;
+                  for(i = 0; i < count; i++) {
+                        dStrcat(buff, stringValues[i], (U64)(len + 1));
+                        dStrcat(buff, " ", (U64)(len + 1));
+                  }
+
+                  Con::printf("%s", buff);
+
+                  stack[_STK + 1].setEmptyString();
+                  break;
+            }
+            case CommandStmtNode::RANDOMF: stack[_STK + 1].setFastFloat(ElfMath::mRandF64()); break;
+            default: stack[_STK + 1].setEmptyString(); break;
+      }
+
+
+
+      PUSH_STK();
+      DISPATCH();
+}
+handle_OP_PRINT:
+{
+      U32 count = code[ip++];
+      // FIXME TEST ONLY >>>>>>>>>>>>>>>>>>>>>>>
+      const U32 MAX_ELEMENTS = 16;
+      const char* stringValues[MAX_ELEMENTS];
+
+      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+
+
+      for (S32 i = count - 1; i >= 0; i--) {
+            stringValues[i] = stack[_STK].getString();
+            POP_STK();
+      }
+      // <<<<<<<<<<<<<<<<<<<<<<< FIXME
+
+      //FIXME!!
+      U32 len = 0;
+      S32 i;
+      for(i = 0; i < count; i++)
+            len += dStrlen(stringValues[i]) + 1;
+      static char buff[256];
+      dMemset(buff, 0, 256);
+      if (len > 255) len = 255;
+      for(i = 0; i < count; i++) {
+            dStrcat(buff, stringValues[i], (U64)(len + 1));
+            dStrcat(buff, " ", (U64)(len + 1));
+      }
+
+      Con::printf("%s", buff);
+
+      stack[_STK + 1].setEmptyString();
+
+      PUSH_STK();
+      DISPATCH();
+}
+handle_OP_RANDOMF:
+{
+      stack[_STK + 1].setFastFloat(ElfMath::mRandF64());
+      PUSH_STK();
+      DISPATCH();
+}
+
+
+
+
+
 
 // ~~~~~~~~~~~~~~~~~ INVALID
 handle_OP_INVALID:

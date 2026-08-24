@@ -176,7 +176,7 @@ namespace Compiler
       OP_SAVEFIELD_FASTPATH,
       OP_LOADFIELD_FASTPATH,
 
-#ifdef ELFSCRIPT_INT_HACK
+// #ifdef ELFSCRIPT_INT_HACK
       OP_CMPLT_UINT,
       OP_CMPGR_UINT,
       OP_CMPGE_UINT,
@@ -185,9 +185,14 @@ namespace Compiler
       OP_CMPNE_UINT,
 
       OP_INC_UINT,
-#endif
+// #endif
 
       OP_DEC,
+
+      // Elfscript 0.6g - now i get mad ;)
+      OP_INLINE_COMMAND,
+      OP_PRINT,
+      OP_RANDOMF,
 
       OP_INVALID,   //
 

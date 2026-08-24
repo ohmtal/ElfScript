@@ -633,4 +633,21 @@ struct VectorConstructorNode : ExprNode
 };
 // ---------------------------------------------------------------
 
+struct CommandStmtNode : ExprNode
+{
+   ExprNode* args;
+   U32 commandID;
+   enum {
+      PRINT,
+      RANDOMF
+   };
+  // look at FuncCallExprNode
+   static CommandStmtNode* alloc(S32 lineNumber, U32 commandType, ExprNode* args);
+
+   U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
+   TypeReq getPreferredType() override;
+   DBG_STMT_TYPE(CommandStmtNode);
+};
+// ---------------------------------------------------------------
+
 #endif

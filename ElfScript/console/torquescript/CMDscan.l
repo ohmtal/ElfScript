@@ -270,6 +270,8 @@ HEXDIGIT [a-fA-F0-9]
 "switch"    { CMDlval.i = MakeToken<int>(rwSWITCH,           yylineno); return rwSWITCH;           }
 "default"   { CMDlval.i = MakeToken<int>(rwDEFAULT,          yylineno); return rwDEFAULT;          }
 "package"   { CMDlval.i = MakeToken<int>(rwPACKAGE,          yylineno); return rwPACKAGE;          }
+"print"     { CMDlval.i = MakeToken<int>(rwPRINT,            yylineno); return rwPRINT;          }
+"math::randomf"   { CMDlval.i = MakeToken<int>(rwRANDOMF,          yylineno); return rwRANDOMF;          }
 %{
 // Boolean literals — return INTCONST so the parser treats them as integers.
 %}
