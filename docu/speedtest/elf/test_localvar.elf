@@ -21,7 +21,7 @@ for (%j = 0; %j < JLOOPS; %j++) {
     }
     echo("SUM (*/ %i+1) IS:" SPC %localX);
     for (%i = 0; %i < ILOOPS / 2.0; %i++) {
-        %ran = getRandomF() * %i;
+        %ran = getRandomF(%i) ;
         %localX -= %ran;
         %localX += %ran;
     }

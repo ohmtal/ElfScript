@@ -3947,6 +3947,13 @@ handle_OP_INLINE_COMMAND:
 handle_OP_PRINT:
 {
       U32 count = code[ip++];
+
+      if (count == 1) {
+            Con::printf("%s", stack[_STK--].getString());
+            stack[++_STK].setEmptyString();
+            DISPATCH();
+      }
+
       // FIXME TEST ONLY >>>>>>>>>>>>>>>>>>>>>>>
       const U32 MAX_ELEMENTS = 16;
       const char* stringValues[MAX_ELEMENTS];
