@@ -1063,14 +1063,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
-#ifdef ELFSCRIPT_INT_HACK
-      case OP_INC_UINT: //ElfScript
-      {
-            Con::printf("%i: OP_INC_UINT stk=0 reg=%i", ip - 1, code[ip]);
-            ++ip;
-            break;
-      }
-#endif
+
       case OP_INC:
       {
          Con::printf("%i: OP_INC stk=0 reg=%i", ip - 1, code[ip]);
@@ -1553,16 +1546,12 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u)", ip - 1, curCodeIP);
          break;
       }
-      case OP_CMPLT_UINT:
-      case OP_CMPGR_UINT:
-      case OP_CMPGE_UINT:
-      case OP_CMPLE_UINT:
-      case OP_CMPEQ_UINT:
-      case OP_CMPNE_UINT:
-      case OP_INC_UINT: {
-            Con::printf("%i: OP_XXXXX_UINT stk=-1 ", ip - 1);
-            break;
-      }
+      case OP_CMPLT_UINT: Con::printf("%i: OP_CMPLT_UINT stk=-1 ", ip - 1); break;
+      case OP_CMPGR_UINT: Con::printf("%i: OP_CMPGR_UINT stk=-1 ", ip - 1); break;
+      case OP_CMPGE_UINT: Con::printf("%i: OP_CMPGE_UINT stk=-1 ", ip - 1); break;
+      case OP_CMPLE_UINT: Con::printf("%i: OP_CMPLE_UINT stk=-1 ", ip - 1); break;
+      case OP_CMPEQ_UINT: Con::printf("%i: OP_CMPEQ_UINT stk=-1 ", ip - 1); break;
+      case OP_CMPNE_UINT: Con::printf("%i: OP_CMPNE_UINT stk=-1 ", ip - 1); break;
 
       default:
          U32 curCodeIP = code[ip];

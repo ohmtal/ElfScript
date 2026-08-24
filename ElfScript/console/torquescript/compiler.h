@@ -176,16 +176,14 @@ namespace Compiler
       OP_SAVEFIELD_FASTPATH,
       OP_LOADFIELD_FASTPATH,
 
-// #ifdef ELFSCRIPT_INT_HACK
+      // ----
       OP_CMPLT_UINT,
       OP_CMPGR_UINT,
       OP_CMPGE_UINT,
       OP_CMPLE_UINT,
       OP_CMPEQ_UINT,
       OP_CMPNE_UINT,
-
-      OP_INC_UINT,
-// #endif
+      // ----
 
       OP_DEC,
 

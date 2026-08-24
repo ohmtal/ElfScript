@@ -71,7 +71,8 @@ private:
    static Entry   *smFreeList;
 
    void           freeEntry(Entry *entry);
-   Entry*         addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
+   // ElfScript 0.6 orig: Entry*         addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
+   Entry*         addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, const char* value = nullptr);
 
    static U32     getHashValue(StringTableEntry slotName);
    static U32     getHashValue(const String& fieldName);
@@ -106,7 +107,7 @@ public:
    void assignFrom(SimFieldDictionary *dict, const char* filter, bool no_replace);
 
    // ElfScript
-   Entry*         addEntry(StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
+   Entry*         addEntry(StringTableEntry slotName, ConsoleBaseType* type, const char* value = nullptr);
 };
 
 class SimFieldDictionaryIterator

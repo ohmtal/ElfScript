@@ -46,11 +46,12 @@ U32 SimFieldDictionary::getHashValue(const String& fieldName)
    return getHashValue(StringTable->insert(fieldName));
 }
 
-SimFieldDictionary::Entry *SimFieldDictionary::addEntry(StringTableEntry slotName, ConsoleBaseType* type, char* value) {
+SimFieldDictionary::Entry *SimFieldDictionary::addEntry(StringTableEntry slotName, ConsoleBaseType* type, const char* value) {
       return addEntry(getHashValue(slotName), slotName, type, value);
 }
 
-SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value)
+// SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value)
+SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, const char* value)
 {
    Entry* ret;
    if (smFreeList)
@@ -245,15 +246,17 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
       {
 
             //ElfScript
-            //FIXME strdup ?
          field->mValue.setString(value);
          // if (field->value)
          //    dFree(field->value);
          //
          // field->value = dStrdup(value);
       }
-      else
-         addEntry(bucket, slotName, 0, dStrdup(value));
+      else {
+
+         // orig: memleak since i removed heap string from console value : addEntry(bucket, slotName, 0, dStrdup(value));
+         addEntry(bucket, slotName, 0, value);
+      }
    }
 }
 
@@ -450,7 +453,8 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
    if (field)
       return;
 
-   addEntry(bucket, slotName, type, dStrdup(value));
+   // Elfscript 0.6 orig: addEntry(bucket, slotName, type, dStrdup(value));
+   addEntry(bucket, slotName, type, value);
 }
 // A variation of the stock SimFieldDictionary::assignFrom(), this method adds <no_replace>
 // and <filter> arguments. When true, <no_replace> prohibits the replacement of fields that already

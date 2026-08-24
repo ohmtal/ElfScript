@@ -789,20 +789,6 @@ TORQUE_NOINLINE void doSlowMathOp()
    else if constexpr (Op == FloatOperation::Sub)
       stack[_STK - 1].setFloat(a.getFloat() - b.getFloat());
    else if constexpr (Op == FloatOperation::Mul) {
-// #ifndef ENABLE_CONSOLE_VECTOR
-//          // TESTING b cast as a float :P
-//          // ok get parse error and *= is not here so i keep it but it's
-//          // never called.
-//       if ( b.type == ConsoleValueType::cvVector) {
-//             F64 aFloat = a.getFloat();
-//             for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT)
-//                   b.v[i] *= aFloat;
-//             // But i cant see it since i use it as string  which is not updated here^^
-//             Con::printf("test setting scale on vector: %f,%f,%f,%f",
-//                         b.v[0], b.v[1], b.v[2], b.v[3]);
-//       }
-//       else
-// #endif
       stack[_STK - 1].setFloat(a.getFloat() * b.getFloat());
    }
    else if constexpr (Op == FloatOperation::Div)
@@ -882,7 +868,6 @@ enum class IntegerOperation
 
    LogicalAnd,
    LogicalOr
-   // // #ifdef ELFSCRIPT_INT_HACK
    // ElfScript:
    ,LT,  // Less Than (<)
    GT,  // Greater Than (>)
@@ -890,7 +875,6 @@ enum class IntegerOperation
    GE,  // Greater Equal (>=)
    EQ,  // Equal (==)
    NE   // Not Equal (!=)
-// // #endif
 
 };
 
@@ -917,6 +901,35 @@ TORQUE_NOINLINE void doSlowIntegerOp()
       stack[_STK - 1].setBool(a.getInt() && b.getInt());
    if constexpr (Op == IntegerOperation::LogicalOr)
       stack[_STK - 1].setBool(a.getInt() || b.getInt());
+
+      // ElfScript ==============================>>>>>>
+   // Less Than (<)
+   if constexpr (Op == IntegerOperation::LT) {
+         // Con::printf("a:%d; b:%d", a.getInt(), b.getInt());
+         stack[_STK - 1].setInt(a.getInt() < b.getInt() ? 1 : 0);
+   }
+
+   // Greater Than (>)
+   else if constexpr (Op == IntegerOperation::GT)
+         stack[_STK - 1].setInt(a.getInt() > b.getInt() ? 1 : 0);
+
+   // Less Equal (<=)
+   else if constexpr (Op == IntegerOperation::LE)
+         stack[_STK - 1].setInt(a.getInt() <= b.getInt() ? 1 : 0);
+
+   // Greater Equal (>=)
+   else if constexpr (Op == IntegerOperation::GE)
+         stack[_STK - 1].setInt(a.getInt() >= b.getInt() ? 1 : 0);
+
+   // Equal (==)
+   else if constexpr (Op == IntegerOperation::EQ)
+         stack[_STK - 1].setInt(a.getInt() == b.getInt() ? 1 : 0);
+
+   // Not Equal (!=)
+   else if constexpr (Op == IntegerOperation::NE)
+         stack[_STK - 1].setInt(a.getInt() != b.getInt() ? 1 : 0);
+
+   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
    POP_STK();
 }
@@ -947,7 +960,6 @@ TORQUE_FORCEINLINE inline void doIntOperation()
       if constexpr (Op == IntegerOperation::LogicalOr)
          stack[_STK - 1].setBool(a.getFastInt() || b.getFastInt());
 
-// // #ifdef ELFSCRIPT_INT_HACK
       // ElfScript ==============================>>>>>>
          // Less Than (<)
       if constexpr (Op == IntegerOperation::LT) {
@@ -976,7 +988,6 @@ TORQUE_FORCEINLINE inline void doIntOperation()
             stack[_STK - 1].setFastInt(a.getFastInt() != b.getFastInt() ? 1 : 0);
 
       // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-// // #endif
       POP_STK();
    }
    else
@@ -1372,7 +1383,6 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_CMPLE_UINT,
          &&handle_OP_CMPEQ_UINT,
          &&handle_OP_CMPNE_UINT,
-         &&handle_OP_INC_UINT,
 
          &&handle_OP_DEC,
 
@@ -3885,14 +3895,6 @@ handle_OP_CMPEQ_UINT:
 handle_OP_CMPNE_UINT:
       doIntOperation<IntegerOperation::NE>();
       DISPATCH();
-
-handle_OP_INC_UINT:
-      reg = code[ip++];
-      currentRegister = reg;
-      Script::gEvalState.setLocalIntVariable(reg, Script::gEvalState.getLocalIntVariable(reg) + 1.0);
-      DISPATCH();
-
-// #endif
 
 // --------------- ELFSCRIPT 0.6g  << TODO: inline_command_expr >>----------------
 handle_OP_INLINE_COMMAND:

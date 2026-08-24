@@ -539,7 +539,7 @@ TypeReq FloatBinaryExprNode::getPreferredType()
 
 //------------------------------------------------------------
 // ElfScript: interger optimize
-#ifdef ELFSCRIPT_INT_HACK
+#ifndef ELFSCRIPT_OLD_INT_MATH
 void IntBinaryExprNode::getSubTypeOperand()
 {
       // default to int
@@ -1195,15 +1195,9 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    {
 
       if (op == opPLUSPLUS) {
-            #ifdef ELFSCRIPT_INT_HACK //NOT WORTH !!!
-            const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqUInt, dbgLineNumber);
-            codeStream.emit(OP_INC_UINT);
-            codeStream.emit(varIdx);
-            #else
             const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
             codeStream.emit(OP_INC); //ElfScript orig
             codeStream.emit(varIdx);
-            #endif
       } else {
             const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
             codeStream.emit(OP_DEC);
