@@ -207,7 +207,7 @@ public:
    {
       type = ConsoleValueType::cvSTEntry;
       s = const_cast<char*>(StringTable->EmptyString());
-      bufferLen = 0;
+      // bufferLen = 0;
 #ifdef ENABLE_CONSOLE_VECTOR
       // for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
       dMemset(v.points, 0, sizeof(ConsoleVector::points));
@@ -216,7 +216,7 @@ public:
 
    ConsoleValue(const ConsoleValue& other)
       : type(ConsoleValueType::cvSTEntry)
-      , bufferLen(0)
+      // , bufferLen(0)
    {
       s = const_cast<char*>(StringTable->EmptyString());
       copyFrom(other);
@@ -226,7 +226,7 @@ public:
    /// After the move, `other` is left as an empty-string value.
    ConsoleValue(ConsoleValue&& other) noexcept
       : type(other.type)
-      , bufferLen(other.bufferLen)
+      // // , bufferLen(other.bufferLen)
    {
       transferFrom(other);
    }
@@ -249,7 +249,7 @@ public:
          // cleanupData();
          type = other.type;
 
-         bufferLen = other.bufferLen;
+         // // bufferLen = other.bufferLen;
          transferFrom(other);
       }
       return *this;
@@ -496,7 +496,7 @@ public:
 
       // StringTable::insert accepts NULL and returns EmptyString
       s = const_cast<char*>(StringTable->insert(val ? val : ""));
-      bufferLen = 0;   // NOT owned — StringTable manages this memory
+      // // bufferLen = 0;   // NOT owned — StringTable manages this memory
    }
 
    TORQUE_FORCEINLINE void setEmptyString()
@@ -516,7 +516,7 @@ public:
       type = inType;
       dataPtr = inDataPtr;
       enumTable = const_cast<EnumTable*>(inEnumTable);
-      bufferLen = 0;
+      // // bufferLen = 0;
    }
 
    TORQUE_FORCEINLINE void setFastFloat(F64 val) { type = ConsoleValueType::cvFloat;   f = val; }
@@ -642,7 +642,7 @@ private:
       // non-zero bufferLen, or its destructor will double-free.
       other.s = const_cast<char*>(StringTable->EmptyString());
       other.type = ConsoleValueType::cvSTEntry;
-      other.bufferLen = 0;
+      // // other.bufferLen = 0;
    }
 }; // end of console value
 

@@ -65,8 +65,8 @@ SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableE
    ret->slotName = slotName;
    ret->type = type;
 
-   ret->mValue.type = 0;
-   ret->mValue.bufferLen = 0;
+   ret->mValue.type = cvNULL;
+   // // ret->mValue.bufferLen = 0;
    ret->mValue.f = 0.f;
    ret->mValue.i = 0;
    ret->mValue.setString(value);

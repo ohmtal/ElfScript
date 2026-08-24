@@ -582,7 +582,7 @@ class SimObject: public ConsoleObject
                   if (!entry) {
                         if (isLoad) return false;
                         entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
-                        entry->mValue.bufferLen = 0; // else we get in trouble on clean
+                        // // entry->mValue.bufferLen = 0; // else we get in trouble on clean
                         entry->mValue.type = stackP->type;
                   }
                   if (entry)
@@ -685,7 +685,7 @@ class SimObject: public ConsoleObject
             if (!entry) {
                   entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
                   if (stackP) {
-                        entry->mValue.bufferLen = 0; // else we get in trouble on clean
+                        // // entry->mValue.bufferLen = 0; // else we get in trouble on clean
                         entry->mValue.type = stackP->type;
                   }
             }
