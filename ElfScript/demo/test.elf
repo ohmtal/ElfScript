@@ -365,7 +365,25 @@ vardump("%x");
 print ("4.5 - 4.5 =1?");
 vardump("%x");
 
-// // $Debug::DumpByteCode=1;
+printSeparator();
+%sto = sto.getId();
+%sto.myX  = 1.0;
+%sto.myX += 2.0;
+print ("1+2=3?");
+vardumpField("%sto.myX");
+%sto.myX /= 2.0;
+print ("3/2=1.5?");
+vardumpField("%sto.myX");
+%sto.myX *= 3.0;
+print ("1.5 * 3=4.5?");
+vardumpField("%sto.myX");
+%sto.myX -= 3.5;
+print ("4.5 - 4.5 =1?");
+vardumpField("%sto.myX");
+
+
+
+$Debug::DumpByteCode=1;
 
 
 

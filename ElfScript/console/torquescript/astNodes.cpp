@@ -539,50 +539,50 @@ TypeReq FloatBinaryExprNode::getPreferredType()
 
 //------------------------------------------------------------
 // ElfScript: interger optimize
-#ifndef ELFSCRIPT_OLD_FLOAT_COMPARE
-void IntBinaryExprNode::getSubTypeOperand()
-{
-      // default to float
-      subType = TypeReqUInt;
-
-      ExprNode* exprLeft  = dynamic_cast<ExprNode*>(left);
-      ExprNode* exprRight = dynamic_cast<ExprNode*>(right);
-
-      bool rightIsPureInt = (exprRight && exprRight->getPreferredType() == TypeReqUInt);
-
-      bool leftCanBeInt = true;
-      if (exprLeft) {
-            if (exprLeft->getPreferredType() == TypeReqFloat)
-            {
-                  leftCanBeInt = false;
-            }
-      }
-
-      bool bothAreInt = rightIsPureInt && leftCanBeInt;
-
-      // Con::printf("BOTH ARE INT (OPTIMIZED): %d", bothAreInt);
-      if (!bothAreInt)  subType = TypeReqFloat;
-
-      switch (op)
-      {
-            case '<':  operand = bothAreInt ? OP_CMPLT_UINT : OP_CMPLT; break;
-            case '>':  operand = bothAreInt ? OP_CMPGR_UINT : OP_CMPGR; break;
-            case opGE: operand = bothAreInt ? OP_CMPGE_UINT : OP_CMPGE; break;
-            case opLE: operand = bothAreInt ? OP_CMPLE_UINT : OP_CMPLE; break;
-            case opEQ: operand = bothAreInt ? OP_CMPEQ_UINT : OP_CMPEQ; break;
-            case opNE: operand = bothAreInt ? OP_CMPNE_UINT : OP_CMPNE; break;
-
-            case '^':  operand = OP_XOR;    subType = TypeReqUInt; break;
-            case '%':  operand = OP_MOD;    subType = TypeReqUInt; break;
-            case '&':  operand = OP_BITAND; subType = TypeReqUInt; break;
-            case '|':  operand = OP_BITOR;  subType = TypeReqUInt; break;
-            case opOR:  operand = OP_OR;    subType = TypeReqUInt; break;
-            case opAND: operand = OP_AND;   subType = TypeReqUInt; break;
-            case opSHR: operand = OP_SHR;   subType = TypeReqUInt; break;
-            case opSHL: operand = OP_SHL;   subType = TypeReqUInt; break;
-      }
-}
-#else //ELFSCRIPT_INT_HACK
+// // // #ifndef ELFSCRIPT_OLD_FLOAT_COMPARE
+// // // void IntBinaryExprNode::getSubTypeOperand()
+// // // {
+// // //       // default to float
+// // //       subType = TypeReqUInt;
+// // //
+// // //       ExprNode* exprLeft  = dynamic_cast<ExprNode*>(left);
+// // //       ExprNode* exprRight = dynamic_cast<ExprNode*>(right);
+// // //
+// // //       bool rightIsPureInt = (exprRight && exprRight->getPreferredType() == TypeReqUInt);
+// // //
+// // //       bool leftCanBeInt = true;
+// // //       if (exprLeft) {
+// // //             if (exprLeft->getPreferredType() == TypeReqFloat)
+// // //             {
+// // //                   leftCanBeInt = false;
+// // //             }
+// // //       }
+// // //
+// // //       bool bothAreInt = rightIsPureInt && leftCanBeInt;
+// // //
+// // //       // Con::printf("BOTH ARE INT (OPTIMIZED): %d", bothAreInt);
+// // //       if (!bothAreInt)  subType = TypeReqFloat;
+// // //
+// // //       switch (op)
+// // //       {
+// // //             case '<':  operand = bothAreInt ? OP_CMPLT_UINT : OP_CMPLT; break;
+// // //             case '>':  operand = bothAreInt ? OP_CMPGR_UINT : OP_CMPGR; break;
+// // //             case opGE: operand = bothAreInt ? OP_CMPGE_UINT : OP_CMPGE; break;
+// // //             case opLE: operand = bothAreInt ? OP_CMPLE_UINT : OP_CMPLE; break;
+// // //             case opEQ: operand = bothAreInt ? OP_CMPEQ_UINT : OP_CMPEQ; break;
+// // //             case opNE: operand = bothAreInt ? OP_CMPNE_UINT : OP_CMPNE; break;
+// // //
+// // //             case '^':  operand = OP_XOR;    subType = TypeReqUInt; break;
+// // //             case '%':  operand = OP_MOD;    subType = TypeReqUInt; break;
+// // //             case '&':  operand = OP_BITAND; subType = TypeReqUInt; break;
+// // //             case '|':  operand = OP_BITOR;  subType = TypeReqUInt; break;
+// // //             case opOR:  operand = OP_OR;    subType = TypeReqUInt; break;
+// // //             case opAND: operand = OP_AND;   subType = TypeReqUInt; break;
+// // //             case opSHR: operand = OP_SHR;   subType = TypeReqUInt; break;
+// // //             case opSHL: operand = OP_SHL;   subType = TypeReqUInt; break;
+// // //       }
+// // // }
+// // // #else //ELFSCRIPT_INT_HACK
 
 void IntBinaryExprNode::getSubTypeOperand()
 {
@@ -640,7 +640,7 @@ void IntBinaryExprNode::getSubTypeOperand()
       break;
    }
 }
-#endif
+// // // #endif
 U32 IntBinaryExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    if (optimize())

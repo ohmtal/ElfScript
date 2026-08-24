@@ -1076,6 +1076,23 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             ++ip;
             break;
       }
+      case OP_ASSIGN_ADD: {
+            Con::printf("%i: OP_ASSIGN_ADD stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip; break;
+      }
+      case OP_ASSIGN_SUB: {
+            Con::printf("%i: OP_ASSIGN_SUB stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip; break;
+      }
+      case OP_ASSIGN_MUL: {
+            Con::printf("%i: OP_ASSIGN_MUL stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip; break;
+      }
+      case OP_ASSIGN_DIV: {
+            Con::printf("%i: OP_ASSIGN_DIV stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip; break;
+      }
+
       case OP_SETCURVAR:
       {
          StringTableEntry var = CodeToSTE(code, ip);
@@ -1521,19 +1538,19 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_LOADFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];
             S32 consoleValueType = (S32)code[ip]; ip++;
+            Con::printf("%i: OP_LOADFIELD_FASTPATH stk=-1 (type: %d, curCodeIP: %i)",  ip - 1, consoleValueType, curCodeIP);
             ip+=2; //XXTH FieldCache
-            Con::printf("%i: OP_LOADFIELD_FASTPATH stk=-1 (type: %d, curCodeIP: %u)",  ip - 1, consoleValueType, curCodeIP);
             break;
       }
 
       case OP_INLINE_COMMAND: {
             Con::printf("%i: OP_INLINE_COMMAND stk=-1 mode:%u", ip - 1, ip);
-            ++ip;
+            ip+=2;
             break;
       }
       case OP_PRINT: {
             Con::printf("%i: OP_PRINT stk=-1 mode:%u", ip - 1, ip);
-            ++ip;
+            ip++;
             break;
       }
       case OP_MATH_RANDOMF:  Con::printf("%i: OP_MATH_RANDOMF stk=-1",  ip - 1); break;
@@ -1541,9 +1558,11 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_MATH_RANDOMF_2: Con::printf("%i: OP_MATH_RANDOMF_2 stk=-1",  ip - 1); break;
 
       case OP_SAVEFIELD_FASTPATH: {
+            S32 desiredType = (S32) code[ip]; ip++;
             U32 curCodeIP = code[ip];
-            ++ip;++ip; //XXTH FieldCache
-         Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u)", ip - 1, curCodeIP);
+            Con::printf("%i: OP_SAVEFIELD_FASTPATH stk=-1 (curCodeIP: %u) desiredType:%u"
+            , ip - 1, curCodeIP, desiredType);
+            ip+=2; //XXTH FieldCache
          break;
       }
       case OP_CMPLT_UINT: Con::printf("%i: OP_CMPLT_UINT stk=-1 ", ip - 1); break;

@@ -169,7 +169,7 @@ public:
             S64   i;
             char* s;
             void* dataPtr;
-      }; // 8 Byte
+      };
 
 // union
    // {
@@ -188,6 +188,9 @@ public:
    // };
 #pragma warning(pop)
 
+//NOTE  i did move it to dataPtr - was a mess ! and the bad is it was not a bit faster than before
+//      with exaclty 16 bytes - also with the 2 structs (32byte) it was not slower than without
+//      we do not have the problem here stop fiddle with the ConsoleValue
 #ifdef ENABLE_CONSOLE_VECTOR
   ConsoleVector v;      // 16 Byte
 #endif

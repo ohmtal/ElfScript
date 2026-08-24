@@ -476,7 +476,7 @@ public:
                   char* returnBuffer = Con::getReturnBuffer(bufSize);
                   dSprintf(returnBuffer, bufSize, "%g %g %g %g", vec.points[0], vec.points[1],vec.points[2], vec.points[3]);
                   const char* val = returnBuffer;
-                  Con::setData(value.type, value.dataPtr, 0, 1, &val, value.enumTable);
+                  Con::setData(value.type, value.dataPtr, 0, 1, &val, /*FIXME value.enumTable*/ nullptr);
             }
             else
             {

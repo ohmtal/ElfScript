@@ -2675,7 +2675,7 @@ handle_OP_SAVEFIELD_FASTPATH:
 
       // FieldCache prepare:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
-      ++ip; ++ip;
+      ip+=2;
       // Con::printf("Cache-Slot RAM : %p", (void*)cacheSlot);
       FieldCache* cachePtr = *cacheSlot;
 
@@ -4019,8 +4019,10 @@ handle_OP_PRINT:
       U32 count = code[ip++];
 
       if (count == 1) {
-            Con::printf("%s", stack[_STK--].getString());
-            stack[++_STK].setEmptyString();
+            Con::printf("%s", stack[_STK].getString());
+            POP_STK();
+            stack[_STK + 1 ].setEmptyString();
+            PUSH_STK();
             DISPATCH();
       }
 
