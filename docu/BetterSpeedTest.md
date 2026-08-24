@@ -19,8 +19,9 @@
     - [X] OP_MATH_RANDOMF_2
     - => IP0 1.746u 0.002s 0:01.75 99.4%     0+0k 0+0io 0pf+0w
     - => 1.725u 0.002s 0:01.73 99.4%     0+0k 0+0io 0pf+0w - i lost 100ms again ?!
-
-
+    
+- [X] Activated UINT Math
+    - => 1.804u 0.004s 0:01.82 98.9%     0+0k 0+0io 0pf+0w ??? ok .. 
 
 - [ ] Short path local var:  *= , += , -= , /= ....
     - [ ] = as float default

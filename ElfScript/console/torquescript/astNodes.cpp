@@ -539,7 +539,7 @@ TypeReq FloatBinaryExprNode::getPreferredType()
 
 //------------------------------------------------------------
 // ElfScript: interger optimize
-#ifndef ELFSCRIPT_OLD_INT_MATH
+#ifndef ELFSCRIPT_OLD_FLOAT_COMPARE
 void IntBinaryExprNode::getSubTypeOperand()
 {
       // default to int
