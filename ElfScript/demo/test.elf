@@ -335,7 +335,6 @@ for (%i in range 10) {
 print("%obj1.x 9 == ", %obj1.x, " %obj2.x 18 == ",%obj2.x);
 
 printSeparator();
-
 print (" ----- FIELD COMPONENT TEST ----- ");
 %foo = new Object();
 %foo.lineCount = 3;
@@ -350,6 +349,21 @@ for( %i in range %foo.lineCount) {
     echo("LINE " SPC %i SPC "=" SPC %foo.line[%i]);
 }
 
+printSeparator();
+print (" ----- NEW ASSIGN TEST ----- ");
+%x  = 1.0;
+%x += 2.0;
+print ("1+2=3?");
+vardump("%x");
+%x /= 2.0;
+print ("3/2=1.5?");
+vardump("%x");
+%x *= 3.0;
+print ("1.5 * 3=4.5?");
+vardump("%x");
+%x -= 3.5;
+print ("4.5 - 4.5 =1?");
+vardump("%x");
 
 // // $Debug::DumpByteCode=1;
 

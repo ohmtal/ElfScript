@@ -827,24 +827,33 @@ TORQUE_FORCEINLINE inline void doFloatMathOperation()
       // Arithmetic
       if constexpr (Op == FloatOperation::Add)
          stack[_STK - 1].setFastFloat(a.getFastFloat() + b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::Sub)
          stack[_STK - 1].setFastFloat(a.getFastFloat() - b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::Mul)
          stack[_STK - 1].setFastFloat(a.getFastFloat() * b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::Div)
          stack[_STK - 1].setFastFloat(a.getFastFloat() / b.getFastFloat());
+      else
 
       // Logical
       if constexpr (Op == FloatOperation::LT)
          stack[_STK - 1].setFastInt(a.getFastFloat() < b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::LE)
          stack[_STK - 1].setFastInt(a.getFastFloat() <= b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::GR)
          stack[_STK - 1].setFastInt(a.getFastFloat() > b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::GE)
          stack[_STK - 1].setFastInt(a.getFastFloat() >= b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::EQ)
          stack[_STK - 1].setFastInt(a.getFastFloat() == b.getFastFloat());
+      else
       if constexpr (Op == FloatOperation::NE)
          stack[_STK - 1].setFastInt(a.getFastFloat() != b.getFastFloat());
 
@@ -1385,6 +1394,10 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_CMPNE_UINT,
 
          &&handle_OP_DEC,
+         &&handle_OP_ASSIGN_ADD,
+         &&handle_OP_ASSIGN_SUB,
+         &&handle_OP_ASSIGN_MUL,
+         &&handle_OP_ASSIGN_DIV,
 
          &&handle_OP_INLINE_COMMAND,
          &&handle_OP_PRINT,
@@ -2012,6 +2025,61 @@ handle_OP_DEC: { // 0.5a OP_DEC fast path
             // stackRef.setFloat(stackRef.getFloat() - 1.0f);
       }
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) - 1.0);
+      DISPATCH();
+}
+
+handle_OP_ASSIGN_ADD:{
+      reg = code[ip++];
+      currentRegister = reg;
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      ConsoleValue& extrVal = stack[_STK];
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            stackRef.f += extrVal.getFloat();
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() + extrVal.getFloat());
+      }
+      DISPATCH();
+}
+
+handle_OP_ASSIGN_SUB: {
+      reg = code[ip++];
+      currentRegister = reg;
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      ConsoleValue& extrVal = stack[_STK];
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            stackRef.f -= extrVal.getFloat();
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() - extrVal.getFloat());
+      }
+      DISPATCH();
+}
+handle_OP_ASSIGN_MUL: {
+      reg = code[ip++];
+      currentRegister = reg;
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      ConsoleValue& extrVal = stack[_STK];
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            stackRef.f *= extrVal.getFloat();
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() * extrVal.getFloat());
+      }
+      DISPATCH();
+}
+handle_OP_ASSIGN_DIV: {
+      reg = code[ip++];
+      currentRegister = reg;
+      ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
+      ConsoleValue& extrVal = stack[_STK];
+      F64 f = extrVal.getFloat();
+      if (f == 0.0f) {
+            Con::errorf("Error division by zero!!");
+            DISPATCH();
+      }
+      if ( stackRef.type == ConsoleValueType::cvFloat) {
+            stackRef.f /= f;
+      } else {
+            stackRef.setFastFloat(stackRef.getFloat() / f);
+      }
       DISPATCH();
 }
 

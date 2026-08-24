@@ -5,31 +5,7 @@
 - Elfscript 0.6e on the same speed as PHP: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
 - ElfScript 0.5 beat python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 
-## Version 0.6g..z (TODO):
-- [X] OP_INLINE_COMMAND (first attempt)
-    - randomf
-    - print
-    - => 1.853u 0.005s 0:01.86 99.4%     0+0k 0+0io 0pf+0w
-    
-- [X] Bytecode Commands:
-    - [X] OP_PRINT
-    - [X] OP_MATH_RANDOMF
-    - => IP0 1.677u 0.003s 0:01.68 99.4%     0+0k 0+0io 0pf+0w
-    - [X] OP_MATH_RANDOMF_1
-    - [X] OP_MATH_RANDOMF_2
-    - => IP0 1.746u 0.002s 0:01.75 99.4%     0+0k 0+0io 0pf+0w
-    - => 1.725u 0.002s 0:01.73 99.4%     0+0k 0+0io 0pf+0w - i lost 100ms again ?!
-    
-- [X] Activated UINT Math
-    - => 1.804u 0.004s 0:01.82 98.9%     0+0k 0+0io 0pf+0w ??? ok .. 
-
-- [ ] Short path local var:  *= , += , -= , /= ....
-    - [ ] = as float default
-    - [ ] *= 
-    - [ ] += 
-    - [ ] -= 
-    - [ ] /=
-    
+## Version 0.6f..z (TODO):
 - [ ] ConsoleVector to pointer - but it's not faster when i remove it ... mhhh 
     - setup pool for Vectors
     - set/get || clean ??
@@ -52,10 +28,33 @@
     - [ ] OP_MATH_CEIL
     - [ ] OP_MATH_ROUND
     
-    - [ ] OP_FORMATSTR 
-    
     - ,,, need a list ;)
+
+## Version 0.6g:
+- [X] OP_INLINE_COMMAND (first attempt)
+    - randomf
+    - print
+    - => 1.853u 0.005s 0:01.86 99.4%     0+0k 0+0io 0pf+0w
     
+- [X] Bytecode Commands:
+    - [X] OP_PRINT
+    - [X] OP_MATH_RANDOMF
+    - => IP0 1.677u 0.003s 0:01.68 99.4%     0+0k 0+0io 0pf+0w
+    - [X] OP_MATH_RANDOMF_1
+    - [X] OP_MATH_RANDOMF_2
+    - => IP0 1.746u 0.002s 0:01.75 99.4%     0+0k 0+0io 0pf+0w
+    - => 1.725u 0.002s 0:01.73 99.4%     0+0k 0+0io 0pf+0w - i lost 100ms again ?!
+    
+- [X] Activated UINT Math
+    - => 1.804u 0.004s 0:01.82 98.9%     0+0k 0+0io 0pf+0w ??? ok .. 
+
+- [X] Short path local var:  *= , += , -= , /= ....
+    - [X] *= 
+    - [X] += 
+    - [X] -= 
+    - [X] /=
+    => 1.450u 0.004s 0:01.46 99.3%     0+0k 0+0io 0pf+0w
+
 
 
 
@@ -92,6 +91,9 @@ Componentfields
 - added initial inline field cache ... thats an rocket in loops but need more cleanup and testing
 - with #define ENABLE_INLINE_CACHE but unstable on real test so ifdef'd!!! 
 
+### docu/speedtest/elf/test_localvar_v6.elf
+- 0.6g : 1.447u 0.005s 0:01.46 98.6%     0+0k 0+0io 0pf+0w
+
 ### docu/speedtest/elf/test_localvar_foreach.elf
 - OGE3D* (current 26-08-05) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 - 0.6a ENABLE_INLINE_CACHE : 2.855u 0.003s 0:02.87 99.3%     0+0k 0+0io 0pf+0w
@@ -100,6 +102,8 @@ Componentfields
 - 0.6c : 2.754u 0.002s 0:02.76 99.6%     0+0k 0+0io 0pf+0w 
 - 0.6e : 2.244u 0.004s 0:02.25 99.5%     0+0k 0+0io 0pf+0w
 - 0.6f : 2.107u 0.004s 0:02.12 99.0%     0+0k 0+0io 0pf+0w
+- 0.6g : 1.916u 0.003s 0:01.93 98.9%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_globalvar_forrange.elf
 - OGE3D* (current 26-08-05) : 34.477u 0.299s 0:34.82 99.8%  0+0k 0+56io 0pf+0w

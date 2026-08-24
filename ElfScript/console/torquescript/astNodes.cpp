@@ -1239,11 +1239,37 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
          const bool isFloat = subType == TypeReqFloat;
          const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber);
 
-         codeStream.emit(isFloat ? OP_LOAD_LOCAL_VAR_FLT : OP_LOAD_LOCAL_VAR_UINT);
-         codeStream.emit(varIdx);
-         codeStream.emit(operand);
-         codeStream.emit(isFloat ? OP_SAVE_LOCAL_VAR_FLT : OP_SAVE_LOCAL_VAR_UINT);
-         codeStream.emit(varIdx);
+         switch(operand) {
+            case OP_ADD: {
+                  codeStream.emit(OP_ASSIGN_ADD);
+                  codeStream.emit(varIdx);
+                  break;
+            }
+            case OP_SUB: {
+                  codeStream.emit(OP_ASSIGN_SUB);
+                  codeStream.emit(varIdx);
+                  break;
+            }
+            case OP_MUL: {
+                  codeStream.emit(OP_ASSIGN_MUL);
+                  codeStream.emit(varIdx);
+                  break;
+            }
+            case OP_DIV: {
+                  codeStream.emit(OP_ASSIGN_DIV);
+                  codeStream.emit(varIdx);
+                  break;
+            }
+            default:
+            {
+                  codeStream.emit(isFloat ? OP_LOAD_LOCAL_VAR_FLT : OP_LOAD_LOCAL_VAR_UINT);
+                  codeStream.emit(varIdx);
+                  codeStream.emit(operand);
+                  codeStream.emit(isFloat ? OP_SAVE_LOCAL_VAR_FLT : OP_SAVE_LOCAL_VAR_UINT);
+                  codeStream.emit(varIdx);
+            }
+         }
+
       }
 
       if (type == TypeReqNone)

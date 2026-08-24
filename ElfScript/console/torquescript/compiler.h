@@ -186,6 +186,10 @@ namespace Compiler
       // ----
 
       OP_DEC,
+      OP_ASSIGN_ADD,
+      OP_ASSIGN_SUB,
+      OP_ASSIGN_MUL,
+      OP_ASSIGN_DIV,
 
       // Elfscript 0.6g - now i get mad ;)
       OP_INLINE_COMMAND,
