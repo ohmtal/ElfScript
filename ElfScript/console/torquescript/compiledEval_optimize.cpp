@@ -3938,7 +3938,6 @@ handle_OP_INLINE_COMMAND:
       }
 
 
-
       PUSH_STK();
       DISPATCH();
 }

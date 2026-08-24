@@ -14,8 +14,14 @@
 - [X] Bytecode Commands:
     - [X] OP_PRINT
     - [X] OP_RANDOMF
-    - => 1.756u 0.003s 0:01.76 99.4%     0+0k 0+0io 0pf+0w
+    - => IP0 1.677u 0.003s 0:01.68 99.4%     0+0k 0+0io 0pf+0w
 
+- [ ] Short path local var:  *= , += , -= , /= ....
+    - [ ] = as float default
+    - [ ] *= 
+    - [ ] += 
+    - [ ] -= 
+    - [ ] /=
     
 - [ ] ConsoleVector to pointer - but it's not faster when i remove it ... mhhh 
     - setup pool for Vectors
@@ -43,7 +49,7 @@
     
     - ,,, need a list ;)
     
-- [ ] Short path for *= , += , -= , /= ....
+
 
 
 ## Version 0.6f : 
