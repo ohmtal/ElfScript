@@ -88,9 +88,34 @@ void MyLogger(U32 level, const char *consoleLine) {
 #endif
 }
 
+struct StrTesto {
 
-DefineEngineFunction(MINUS1, S32, (), ,"get a int :P"){
-   return -1;
+    union
+    {
+        struct
+        {
+            F64   f;
+            S64   i;
+            char* s;
+        } val;                // 8 Byte
+
+        struct
+        {
+            void* dataPtr;
+            EnumTable* enumTable;
+        } ptrval;
+    };
+};
+
+DefineEngineFunction(testo, F32, (), ,"test for anything i like ;)"){
+    Con::printSeparator();
+    Con::printf("test size: %d cur size: %d", sizeof(ConsoleValueTest),sizeof(ConsoleValue));
+    Con::printf("console vector: %d  Test.val: %d", sizeof(ConsoleVector), sizeof(ConsoleValueTest::val));
+    Con::printf("size of char *: %d, void*: %d", sizeof(char*),sizeof(void*));
+    Con::printf("size of StrTesto: %d, va/ptrval: %d/%d", sizeof(StrTesto),sizeof(StrTesto::val), sizeof(StrTesto::ptrval));
+    Con::printSeparator();
+
+    return 0.f;
 }
 // ----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {

@@ -542,7 +542,7 @@ TypeReq FloatBinaryExprNode::getPreferredType()
 #ifndef ELFSCRIPT_OLD_FLOAT_COMPARE
 void IntBinaryExprNode::getSubTypeOperand()
 {
-      // default to int
+      // default to float
       subType = TypeReqUInt;
 
       ExprNode* exprLeft  = dynamic_cast<ExprNode*>(left);
@@ -561,15 +561,7 @@ void IntBinaryExprNode::getSubTypeOperand()
       bool bothAreInt = rightIsPureInt && leftCanBeInt;
 
       // Con::printf("BOTH ARE INT (OPTIMIZED): %d", bothAreInt);
-
-      if (bothAreInt)
-      {
-            subType = TypeReqUInt;
-      }
-      else
-      {
-            subType = TypeReqFloat;
-      }
+      if (!bothAreInt)  subType = TypeReqFloat;
 
       switch (op)
       {

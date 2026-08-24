@@ -20,7 +20,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+#pragma once
 
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
@@ -145,7 +145,17 @@ struct ConsoleVector {
 };
 // #endif
 
+struct alignas(16) ConsoleValueTest {
+      union {
+            F64 f;
+            S64 i;
+            void* ptr;
+      } val;                  // 8 Byte
 
+      S32 type;               // 4 byte
+      unsigned char flags;    // 1 byte
+      char padding[3];        // 4 byte
+};
 
 
 class ConsoleValue
@@ -153,29 +163,36 @@ class ConsoleValue
 public:
 #pragma warning( push )
 #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
-   union
-   {
-      struct
+      union
       {
-         F64   f;
-         S64   i;
-         char* s;
-      };
+            F64   f;
+            S64   i;
+            char* s;
+            void* dataPtr;
+      }; // 8 Byte
 
-      struct
-      {
-         void* dataPtr;
-         EnumTable* enumTable;
-      };
-   };
+// union
+   // {
+   //    struct
+   //    {
+   //       F64   f;
+   //       S64   i;
+   //       char* s;
+   //    };                // 8 Byte
+   //
+   //    struct
+   //    {
+   //       void* dataPtr;
+   //       EnumTable* enumTable;
+   //    };
+   // };
 #pragma warning(pop)
 
 #ifdef ENABLE_CONSOLE_VECTOR
-  ConsoleVector v;
+  ConsoleVector v;      // 16 Byte
 #endif
 
-   S32 type;
-   // U32 bufferLen;
+   S32 type;            // 4 Byte
 
    static DataChunker sConversionAllocator;
 
@@ -515,7 +532,7 @@ public:
       // cleanupData();
       type = inType;
       dataPtr = inDataPtr;
-      enumTable = const_cast<EnumTable*>(inEnumTable);
+      //XXTH FIXME enumTable = const_cast<EnumTable*>(inEnumTable);
       // // bufferLen = 0;
    }
 
@@ -602,7 +619,7 @@ private:
       // // }
 
       default:
-         setConsoleData(other.type, other.dataPtr, other.enumTable);
+         setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
          break;
       }
    }
@@ -633,7 +650,7 @@ private:
          break;
       default:
          dataPtr = other.dataPtr;
-         enumTable = other.enumTable;
+         //FIXME enumTable = other.enumTable;
          break;
       }
 

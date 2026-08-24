@@ -113,6 +113,7 @@ Componentfields
 - 0.6c : 4.712u 0.006s 0:04.74 99.3%     0+0k 0+0io 0pf+0w
 - 0.6e : 3.450u 0.005s 0:03.47 99.4%     0+0k 0+0io 0pf+0w
 - 0.6f : 3.342u 0.004s 0:03.36 99.4%     0+0k 0+0io 0pf+0w
+- 0.6g : 3.327u 0.002s 0:03.35 99.1%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_dynamic_fields_forrange.elf
 
@@ -123,7 +124,7 @@ Componentfields
 - 0.6c : 5.417u 0.003s 0:05.43 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 4.441u 0.004s 0:04.47 99.3%     0+0k 0+0io 0pf+0w
 - 0.6f : 4.208u 0.000s 0:04.22 99.5%     0+0k 0+0io 0pf+0w
-
+- 0.6g : 4.254u 0.002s 0:04.27 99.5%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_static_fields_localvar_forrange.elf
 - OGE3D* using tom2DSprite: 192.723u 0.302s 3:13.28 99.8% 0+0k 0+248io 0pf+0w
@@ -133,6 +134,8 @@ Componentfields
 - 0.6c : 5.274u 0.004s 0:05.29 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 4.634u 0.008s 0:04.67 99.1%     0+0k 0+0io 0pf+0w
 - 0.6f : 4.500u 0.005s 0:04.52 99.5%     0+0k 0+0io 0pf+0w
+- 0.6g : 4.486u 0.002s 0:04.50 99.5%     0+0k 0+0io 0pf+0w
+
 
 ### docu/speedtest/elf/test_vector_components.elf
 - OGE3D* (current 26-08-05) :: 140.183u 0.322s 2:20.84 99.7% 0+0k 0+48io 0pf+0w
@@ -142,6 +145,7 @@ Componentfields
 - 0.6c : 7.312u 0.004s 0:07.34 99.5%     0+0k 0+0io 0pf+0w
 - 0.6e : 6.169u 0.006s 0:06.19 99.5%     0+0k 0+0io 0pf+0w
 - 0.6f : 6.199u 0.002s 0:06.22 99.5%     0+0k 0+0io 0pf+0w
+- 0.6g : 6.434u 0.002s 0:06.45 99.6%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/test_vector_components_global.elf
@@ -151,6 +155,7 @@ Componentfields
 - 0.6c : 7.636u 0.005s 0:07.66 99.6%     0+0k 0+0io 0pf+0w
 - 0.6e : 7.298u 0.003s 0:07.33 99.4%     0+0k 0+0io 0pf+0w
 - 0.6f : 7.036u 0.005s 0:07.06 99.5%     0+0k 0+0io 0pf+0w
+- 0.6g : 7.286u 0.004s 0:07.31 99.5%     0+0k 0+0io 0pf+0w
 
 
 ### docu/speedtest/elf/counter.elf << says nothing, just for fun ;)
@@ -158,16 +163,20 @@ Componentfields
 - 0.6a : 5.180u 0.003s 0:05.19 99.8%     0+0k 0+0io 0pf+0w
 - 0.6b : 4.877u 0.001s 0:04.89 99.5%     0+0k 0+0io 0pf+0w
 - 0.6f : 2.939u 0.003s 0:02.95 99.3%     0+0k 0+0io 0pf+0w
+- 0.6g : 2.927u 0.001s 0:02.93 99.6%     0+0k 0+0io 0pf+0w
 
 ### docu/speedtest/elf/test_for.elf
 - 0.6c : 2.084u 0.002s 0:02.09 99.5%     0+0k 0+0io 0pf+0w
 - 0.6e : 1.374u 0.007s 0:01.39 98.5%     0+0k 0+0io 0pf+0w
 - 0.6f : 1.090u 0.004s 0:01.10 99.0%     0+0k 0+0io 0pf+0w
+- 0.6g : 1.318u 0.004s 0:01.34 97.7%     0+0k 0+0io 0pf+0w
+
 
 ### Crazy Elf: assets/modules/StarField.elf 
 - 0.6a : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) Notebook handbreak ? 
 - 0.6b : ~ 1300 FPS (GPU: 67%) falling down to 1000 FPS (GPU: 50%) 
 - 0.6b : ~ 1450 FPS (GPU: 72%) falling down to 1050 FPS (GPU: 54%)
+- 0.6g : 
 
 OGE3D* Release Build - cant test the same scripts since it does not have the Extensions from ElfScript (for range/preprocessor/..).
 ---

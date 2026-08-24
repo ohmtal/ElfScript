@@ -83,7 +83,7 @@ char* ConsoleValue::convertToBuffer() const
 
 const char* ConsoleValue::getConsoleData() const
 {
-   return Con::getData(type, dataPtr, 0, enumTable);
+   return Con::getData(type, dataPtr, 0, /* FIXME enumTable*/ nullptr);
 }
 
 ConsoleDocFragment* ConsoleDocFragment::smFirst;

@@ -388,7 +388,7 @@ public:
             // ElfScript !
             // const char* dptr = Con::getData(TypeS32, &val, 0);
             const char* dptr = Con::getData(TypeS64, &val, 0);
-            Con::setData(value.type, value.dataPtr, 0, 1, &dptr, value.enumTable);
+            Con::setData(value.type, value.dataPtr, 0, 1, &dptr, /*FIXME value.enumTable*/ nullptr);
          }
          else
          {
@@ -415,7 +415,7 @@ public:
                // ElfScript !
             // const char* dptr = Con::getData(TypeF32, &val, 0);
             const char* dptr = Con::getData(TypeF64, &val, 0);
-            Con::setData(value.type, value.dataPtr, 0, 1, &dptr, value.enumTable);
+            Con::setData(value.type, value.dataPtr, 0, 1, &dptr, /* FIXME value.enumTable*/ nullptr);
          }
          else
          {
@@ -438,7 +438,7 @@ public:
 
          if (value.isConsoleType())
          {
-            Con::setData(value.type, value.dataPtr, 0, 1, &val, value.enumTable);
+            Con::setData(value.type, value.dataPtr, 0, 1, &val, /*FIXME value.enumTable*/ nullptr);
          }
          else
          {
