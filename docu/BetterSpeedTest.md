@@ -50,10 +50,11 @@
     - [X] HelloElf Tests. 
     - [X] CrazyELF
     - [X] BaseElf
-    - [ ] raylib-elfScript
-    - [ ] ElfFlux
+    - [X] raylib-elfScript
+    - [X] ElfFlux
     - [ ] OhmFlux/ElfTest
-- [ ] Tag
+- [ ] Tag 
+    - [ ] git tag -a 0.6 -m "ElfScript 0.6"; git push --tags
     
 
 ## Version 0.6g:

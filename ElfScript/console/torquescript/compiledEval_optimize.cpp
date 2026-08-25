@@ -1,5 +1,7 @@
+#ifdef ELFSCRIPT_ENABLE_FIELDCACHE
 #define ENABLE_INLINE_CACHE_LOAD
 #define ENABLE_INLINE_CACHE_SAVE
+#endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
