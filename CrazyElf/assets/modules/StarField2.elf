@@ -1,0 +1,157 @@
+// -----------------------------------------------------------------------------
+// ported from raylib-elfScript to BaseElf / NativSDL to CrazyElf
+// -----------------------------------------------------------------------------
+// Benchmark dynamic and static fields instead of local variable
+// only a bit slower ! great result.
+// -----------------------------------------------------------------------------
+
+// orig 420
+#define STAR_COUNT 420
+#define START_DIV 0.03125
+
+function createStarField2() {
+    %obj = new ScriptGroup() {
+        class = "StarField";
+        TypeF32 speed = 0.4;
+        TypeBool drawLines = false;
+        TypeF32 screenHeight = 0.0;
+        TypeF32 screenWidth = 0.0;
+        TypeF32 minH = 0.0;
+        TypeF32 maxH = 0.0;
+        TypeF32 minW = 0.0;
+        TypeF32 maxW = 0.0;
+        TypeF32 halfW = 0.0;
+        TypeF32 halfH = 0.0;
+
+    };
+    return %obj;
+}
+// -----------------------------------------------------------------------------
+function StarField::UpdateSize(%this) {
+    %this.screenWidth  = $Global::ScreenSize.x;
+    %this.screenHeight = $Global::ScreenSize.y ;
+
+    // save as min/max
+    %this.minW = -%this.screenWidth / 2.0;
+    %this.maxW = %this.screenWidth / 2.0;
+
+    %this.minH = -%this.screenHeight / 2.0;
+    %this.maxH = %this.screenHeight / 2.0;
+
+    %this.halfW = %this.maxW;
+    %this.halfH = %this.maxH;
+
+    %this.dumpFields();
+
+}
+// -----------------------------------------------------------------------------
+function StarField::OnAdd(%this) {
+
+
+    %this.updateSize();
+
+    %this.add( new PointStorageObject(starPoints) {
+        storageSize = STAR_COUNT;
+    });
+
+
+    for(%i in range STAR_COUNT)
+    {
+        starPoints.setPoint(%i,
+                math::randomf(%this.minH , %this.maxH),
+                math::randomf(%this.minW , %this.maxW),
+                1.0 );
+    }
+
+    return true;
+}
+// -----------------------------------------------------------------------------
+function StarField::onRemove(%this) {
+
+}
+
+// -----------------------------------------------------------------------------
+function StarField::Render(%this) {
+
+     %dt = $Global::FrameTime;
+    %renderer = $Main.renderer;
+
+     SDL_SetRenderDrawColor(%renderer, 20, 60, 20);
+     SDL_RenderClear(%renderer);
+
+
+    SDL_SetRenderDrawColor(%renderer, 255,255,255);
+
+    %lStarPoints = starPoints.getId(); //faster! int lookup
+
+
+    // using local vars maximum attempt:
+    for( %i in range STAR_COUNT )
+    {
+        %lStarPoints.fetchPoint(%i);
+        %lStarPoints.z -= %dt * %this.speed;
+
+        // Calculate the screen position
+        %invZ = 1.0 /  %lStarPoints.z;
+        %screenPos_X = %this.halfW + (%lStarPoints.x * %invZ);
+        %screenPos_Y = %this.halfH + (%lStarPoints.y * %invZ);
+
+        if ( %lStarPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+            || %screenPos_X > %this.screenWidth || %screenPos_Y > %this.screenHeight)
+        {
+            %lStarPoints.x = math::randomf(%this.minW , %this.maxW);
+            %lStarPoints.y =  math::randomf(%this.minH , %this.maxH);
+            %lStarPoints.z = 1.0;
+            %screenPos_X = %this.halfW + %lStarPoints.x;
+            %screenPos_Y = %this.halfH + %lStarPoints.y;
+        }
+        // <<<<<<<<<<<<<<<<<<<<<
+        if (%this.drawLines)
+        {
+            %t = mClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
+
+            if ( (%t - %lStarPoints.z) > 1e-3)
+            {
+                %invT = 1.0 / %t;
+                %startX = %this.halfW  + ( %lStarPoints.x * %invT);
+                %startY = %this.halfH  + (  %lStarPoints.y * %invT);
+
+                SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
+            }
+        }
+        else
+        {
+            %radius = mLerp(2.0, 0.3, %lStarPoints.z);
+            SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
+        }
+
+        %lStarPoints.storePoint(%i);
+    }
+
+
+    %fontScale = 0.7;
+    SDL_SetRenderDrawColor(%renderer, 128,20,255);
+    SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
+    %scale10 = 10 / %fontScale;
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , $Global::FPS SPC "FPS" );
+    SDL_RenderDebugText(%renderer, %scale10 , %scale10,"[MOUSE WHEEL] Current Speed:" SPC  strFormat("%.2f",%this.speed));
+    SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale,"[SPACE] Current draw mode:"
+        SPC  ( %this.drawLines ? "Lines" : "Rectangle" ));
+    SDL_SetRenderScale(%renderer); //reset
+
+}
+// -----------------------------------------------------------------------------
+function StarField::OnUpdate(%this, %dt) { }
+function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+
+    if (!%isDown) return;
+    switch (%scancode) {
+        case SDL_SCANCODE_SPACE:
+            %this.drawLines = !%this.drawLines;
+            echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
+    }
+}
+function StarField::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function StarField::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
+    %this.speed = mClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
+}
