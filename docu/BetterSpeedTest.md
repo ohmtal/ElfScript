@@ -44,6 +44,8 @@
             *disabled*
 - [X] So the change is i modified console value data and it seams to give a small kick
   
+- [X] removed int math operation from compiler again, did not work as expected.  
+  
 - [ ] Testing
     - [X] HelloElf Tests. 
     - [X] CrazyELF

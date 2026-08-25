@@ -2470,7 +2470,11 @@ handle_OP_LOADFIELD_FASTPATH:
             *cacheSlot = cachePtr;
             cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
             if (cachePtr->cacheFailed) {
+                  #ifdef TORQUE_DEBUG
                   Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
+                  #endif
+                  // simply delete the cache again .. it's a bad practice to not init field variables but ...
+                  delete cachePtr;cachePtr=nullptr;
                   stackPtr->setString("");
                   PUSH_STK();
                   DISPATCH();
@@ -2481,8 +2485,13 @@ handle_OP_LOADFIELD_FASTPATH:
       // double safety
       if (cachePtr) {
             if (cachePtr->cacheFailed) {
+                  #ifdef TORQUE_DEBUG
                   Con::warnf("LOAD: we have a cache (type:%d) for field: %s ! But it failed to fetch a field or component!! object:%d"
                   , (S32)cachePtr->type, curField, curObject ? curObject->getId() : 0);
+                  #endif
+                  stackPtr->setString("");
+                  // simply delete the cache again .. it's a bad practice to not init field variables but ...
+                  delete cachePtr;cachePtr=nullptr;
                   PUSH_STK();
                   DISPATCH();
             }
