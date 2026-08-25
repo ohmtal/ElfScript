@@ -168,6 +168,8 @@ namespace Compiler
       OP_ITER_STRING,
       OP_ITER_SIMOBJECT,
       OP_ITER_FOR_INT,
+      OP_ITER_FOR_INT_RANGE,
+      OP_ITER_FOR_INT_RANGE_NEG,
 
       OP_ITER_END,         ///< End foreach loop.
 

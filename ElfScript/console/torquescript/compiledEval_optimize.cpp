@@ -1380,6 +1380,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_ITER_STRING,
          &&handle_OP_ITER_SIMOBJECT,
          &&handle_OP_ITER_FOR_INT,
+         &&handle_OP_ITER_FOR_INT_RANGE,
+         &&handle_OP_ITER_FOR_INT_RANGE_NEG,
 
          &&handle_OP_ITER_END,
 
@@ -3405,18 +3407,25 @@ handle_OP_ITER_BEGIN:
             }
             break;
 
-            case 104: //for i in range 10 only one parameter . does 0..9
+            case 4: //for i in range -10 only one parameter . does 0..-9 ==> OP_ITER_FOR_INT_RANGE_NEG
+            {
+                  iter.mData.mRange.mEnd   = stack[_STK].getInt() * - 1;
+                  iter.mData.mRange.mStart = 0;
+
+                  iter.mData.mRange.mInc = -1;
+                  iter.mData.mRange.mStop = iter.mData.mRange.mEnd;
+                  iter.mConsoleValue->setInt(0);
+                  iter.mData.mRange.isPositive = false;
+            }
+            break;
+            case 104: //for i in range 10 only one parameter . does 0..9 == OP_ITER_FOR_INT_RANGE
             {
                   iter.mData.mRange.mEnd   = stack[_STK].getInt();
                   iter.mData.mRange.mStart = 0;
-
-                  if (iter.mData.mRange.mStart > iter.mData.mRange.mEnd) iter.mData.mRange.mInc = -1;
-                  else iter.mData.mRange.mInc = 1;
+                  iter.mData.mRange.mInc = 1;
                   iter.mData.mRange.mStop = iter.mData.mRange.mEnd;
-                  // iter.mMode = 2; // overwrite to mode 2 .. same calulation only with variable inrement
-
                   iter.mConsoleValue->setInt(0);
-                  iter.mData.mRange.isPositive = iter.mData.mRange.mInc > 0;
+                  iter.mData.mRange.isPositive = true;
             }
             break;
 
@@ -3562,6 +3571,41 @@ handle_OP_ITER_FOR_INT:
             DISPATCH(); // fettisch
       }
 
+}
+
+handle_OP_ITER_FOR_INT_RANGE:{
+      U32 breakIp = code[ip];
+      IterStackRecord& iter = iterStack[_ITER - 1];
+      S32 needle = iter.mData.mRange.mStart;
+      S32 stop   = iter.mData.mRange.mStop;
+
+      if (needle >= stop) {
+            ip = breakIp;
+            DISPATCH();
+      }
+      iter.mConsoleValue->i = needle;
+      iter.mData.mRange.mStart = needle + iter.mData.mRange.mInc;
+
+      ++ip;
+      DISPATCH(); // fettisch
+}
+
+
+handle_OP_ITER_FOR_INT_RANGE_NEG: {
+      U32 breakIp = code[ip];
+      IterStackRecord& iter = iterStack[_ITER - 1];
+      S32 needle = iter.mData.mRange.mStart;
+      S32 stop   = iter.mData.mRange.mStop;
+
+      if (needle <= stop) {
+            ip = breakIp;
+            DISPATCH();
+      }
+      iter.mConsoleValue->i = needle;
+      iter.mData.mRange.mStart = needle + iter.mData.mRange.mInc;
+
+      ++ip;
+      DISPATCH(); // fettisch
 }
 
 // handle_OP_ITER:

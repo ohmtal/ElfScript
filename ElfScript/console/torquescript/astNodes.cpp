@@ -404,10 +404,32 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
             break;
 
-         // 4 does not exits!
          case 104: // for i in range 10 (only one parameter)
-            startExpr->compile(codeStream, startIp, TypeReqUInt);
-            iterOPCode = OP_ITER_FOR_INT;
+            {
+                  // NOTE replaced by hackfest: startExpr->compile(codeStream, startIp, TypeReqUInt);
+                  // ~~~~~ hackfest ;) ~~~~~~
+                  // NOTE startExpr is also positve on RANGE_NEG!!!!
+                  bool isNegative = false;
+                  FloatUnaryExprNode* unaryNode = dynamic_cast<FloatUnaryExprNode*>(startExpr);
+                  if (unaryNode != nullptr)
+                  {
+                        isNegative = true;
+                        ip = unaryNode->expr->compile(codeStream, startIp, TypeReqUInt);
+                  }
+                  else
+                  {
+                        ip = startExpr->compile(codeStream, startIp, TypeReqUInt);
+                  }
+
+                  if (isNegative) {
+                        // Con::errorf("NEGATIVE STEP!!!");
+                        iterOPCode = OP_ITER_FOR_INT_RANGE_NEG;
+                        mode = 4; //overwrite !!
+                  } else {
+                        // Con::errorf("POSITIVE STEP!!!");
+                        iterOPCode = OP_ITER_FOR_INT_RANGE;
+                  }
+            }
             break;
 
          default:

@@ -1515,12 +1515,25 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_ITER_FOR_INT:
       {
             U32 breakIp = code[ip];
-
             Con::printf("%i: OP_ITER_FOR_INT stk=0 breakIp=%i", ip - 1, breakIp);
-
             ++ip;
             break;
       }
+      case OP_ITER_FOR_INT_RANGE:
+      {
+            U32 breakIp = code[ip];
+            Con::printf("%i: OP_ITER_FOR_INT_RANGE stk=0 breakIp=%i", ip - 1, breakIp);
+            ++ip;
+            break;
+      }
+      case OP_ITER_FOR_INT_RANGE_NEG:
+      {
+            U32 breakIp = code[ip];
+            Con::printf("%i: OP_ITER_FOR_INT_RANGE_NEG stk=0 breakIp=%i", ip - 1, breakIp);
+            ++ip;
+            break;
+      }
+
       case OP_ITER_END:
       {
          Con::printf("%i: OP_ITER_END stk=-1", ip - 1);
