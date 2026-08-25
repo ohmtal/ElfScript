@@ -2473,8 +2473,8 @@ handle_OP_LOADFIELD_FASTPATH:
                   #ifdef TORQUE_DEBUG
                   Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
                   #endif
-                  // simply delete the cache again .. it's a bad practice to not init field variables but ...
-                  delete cachePtr;cachePtr=nullptr;
+                  // simply reset the cache again .. it's a bad practice to not init field variables but ...
+                  cachePtr->objectPtr = nullptr;
                   stackPtr->setString("");
                   PUSH_STK();
                   DISPATCH();
@@ -2490,8 +2490,8 @@ handle_OP_LOADFIELD_FASTPATH:
                   , (S32)cachePtr->type, curField, curObject ? curObject->getId() : 0);
                   #endif
                   stackPtr->setString("");
-                  // simply delete the cache again .. it's a bad practice to not init field variables but ...
-                  delete cachePtr;cachePtr=nullptr;
+                  // simply reset the cache again .. it's a bad practice to not init field variables but ...
+                  cachePtr->objectPtr = nullptr;
                   PUSH_STK();
                   DISPATCH();
             }
