@@ -1,0 +1,36 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+%stoObj = new PointStorageObject();
+
+%stoObj.x = 0.0;
+for (%j in range JLOOPS) {
+    for (%i  in range ILOOPS) {
+        %stoObj.x ++;
+    }
+    print("SUM (++) IS:" SPC %stoObj.x);
+    for (%i  in range ILOOPS) {
+        %stoObj.x --;
+    }
+    print("SUM (--) IS:" SPC %stoObj.x);
+    %stoObj.x = 66;
+    print("set Sum to 66 == " SPC %stoObj.x * 1);
+    for (%i  in range ILOOPS) {
+        %stoObj.x *= %i + 1;
+        %stoObj.x /= %i + 1;
+    }
+    print("SUM (*/ %i+1) IS:" SPC %stoObj.x);
+    for (%i in range ILOOPS / 2.0) {
+        // %ran = getRandomF(%i);
+        %ran = math::randomf() * %i;
+        %stoObj.x -= %ran;
+        %stoObj.x += %ran;
+    }
+    print("SUM (rand +-) IS:" SPC %stoObj.x);
+}
+%stoObj.x -= 66.0 ;
+print("---------------------");
+print("---------------------");
+print("Final sum should be 0 == ", %stoObj.x);
+print("---------------------");
+print("---------------------");

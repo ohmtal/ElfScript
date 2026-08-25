@@ -7,6 +7,7 @@ great job in my SpeedTest. I guess I'll never reach under 5sec at test I.
 
 - LuaJit (2.1.1784580905): 0.355u 0.003s 0:00.35 100.0%    0+0k 0+0io 0pf+0w
 - Node.js v26.4.0 0.520u 0.016s 0:00.53 100.0%    0+0k 0+0io 0pf+0w
+- 📌🚀 ElfScript 0.7a: 2.688u 0.003s 0:02.69 99.6%     0+0k 0+0io 0pf+0w
 - Lua (5.5.0): 3.504u 0.003s 0:03.52 99.4%     0+0k 0+0io 0pf+0w
 - PHP (8.5.8): 3.644u 0.019s 0:03.66 99.7%     0+0k 0+0io 0pf+0w
 - 📌 ElfScript 0.5c (using foreach range)): 4.637u 0.004s 0:04.65 99.5%     0+0k 0+0io 0pf+0w
