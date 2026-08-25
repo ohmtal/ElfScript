@@ -1,10 +1,19 @@
 # ElfScript
 
-***~~Probably~~ The [fasted](docu/BetterSpeedTest.md) TorqueScript on Earth ;)*** Easy to embed scripting language with a amazing - hot reload - and - modify while running - capabilities. I use TorqueScript in my Game Auteria for almost 20 years and now i can embed it to any C++ project I like. It's not the fastest which is easy to bind - this is lua i would say - but it's also not the slowest. In some tests it outperforms python 3 and was much faster than some other interpreted embeded languages i tested. 
+***~~Probably~~ The [fasted](docu/BetterSpeedTest.md) TorqueScript on Earth ;)*** 
+
+Easy to embed fast scripting language with a amazing - hot reload - and - 
+modify while running - capabilities. 
+
+I use TorqueScript in my Game Auteria for almost 20 years and now i can embed 
+it to any C++ project I like. It's not the fastest which is easy to bind - this 
+is lua i would say - but it's also not the slowest. In some tests it outperforms 
+python 3 and php and was much faster and more stable than some other small 
+interpreted embeded languages i tested. 
+
+Don't miss my [Why?](docu/why.md) Story where I explain why I work on this project. 
 
 Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
-
-
 
 ## Folder: ElfScript
 

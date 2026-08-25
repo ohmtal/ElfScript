@@ -1,8 +1,6 @@
 local JLOOPS = 25
 local ILOOPS = 1000000
 
-
-
 local localX = 0
 for j = 0, JLOOPS - 1 do
     for i = 0, ILOOPS - 1 do
