@@ -17,9 +17,7 @@ Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 
 ## Folder: ElfScript
 
-The current codebase i use with the latest changes and fixes. 
-Like the stuff in the TorqueScript folder but more cleanup unused Files and
-Functions. 
+The folder where the beast lives: 
 
 - [ElfScript](./ElfScript/)
 

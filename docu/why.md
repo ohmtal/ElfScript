@@ -65,6 +65,7 @@ So i realized i had to look at:
 - global variables
 - static fields <<< this was the slowest part of all
 - dynamic fields 
+
 Looking at the OP-Codes of the virual machine most times it call load string 
 save string. The ConsoleValue which hold the data is good but it does not 
 use it potential. I don't know how many nights i have spend to get it in the 
