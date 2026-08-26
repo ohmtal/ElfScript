@@ -8,7 +8,20 @@
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
+
 ## Version 0.7 a 
+
+- TestResult (best of 3 tests) in /docu/speedtest/elf_v6:
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.421u 0.003s 0:01.42 100.0%    0+0k 0+0io 0pf+0w |
+| test_global.elf       | 3.009u 0.004s 0:03.03 99.0%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.176u 0.006s 0:04.20 99.2%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.872u 0.005s 0:03.89 99.4%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 5.594u 0.005s 0:05.62 99.4%     0+0k 0+0io 0pf+0w |
+
+**NOTE** Vector Component and Static Field are float. Math::randomF is double. The 
+ConsoleValue is also double. When it float/double is converted there are rounding errors.
 
 - [X] special OP_CODES for "for in in range VALUE" -- seams not to be faster in -O2
     - IPO active: 1.354u 0.004s 0:01.36 99.2%     0+0k 0+0io 0pf+0w
