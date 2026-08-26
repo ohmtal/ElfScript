@@ -677,7 +677,7 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
 TypeReq CommandStmtNode::getPreferredType()
 {
-      return TypeReqString; //string!!
+      return TypeReqString; //sprintf + math::Clamp :/ - but it's not slower !! fastpath :D
 }
 
 // -----------------------------------------------------------------------------
