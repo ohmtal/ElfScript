@@ -58,8 +58,8 @@ function StarField::OnAdd(%this) {
     for(%i in range STAR_COUNT)
     {
         %this.starPoints.setPoint(%i,
-                math::randomf(%this.minW , %this.maxW),
-                math::randomf(%this.minH , %this.maxH),
+                math.randomf(%this.minW , %this.maxW),
+                math.randomf(%this.minH , %this.maxH),
                 1.0 );
     }
 
@@ -99,8 +99,8 @@ function StarField::Render(%this) {
         if ( %lStarPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
             || %screenPos_X > %this.screenWidth || %screenPos_Y > %this.screenHeight)
         {
-            %lStarPoints.x = math::randomf(%this.minW , %this.maxW);
-            %lStarPoints.y =  math::randomf(%this.minH , %this.maxH);
+            %lStarPoints.x = math.randomf(%this.minW , %this.maxW);
+            %lStarPoints.y =  math.randomf(%this.minH , %this.maxH);
             %lStarPoints.z = 1.0;
             %screenPos_X = %this.halfW + %lStarPoints.x;
             %screenPos_Y = %this.halfH + %lStarPoints.y;
@@ -108,7 +108,7 @@ function StarField::Render(%this) {
         // <<<<<<<<<<<<<<<<<<<<<
         if (%this.drawLines)
         {
-            %t = math::ClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
+            %t = math.ClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
 
             if ( (%t - %lStarPoints.z) > 1e-3)
             {
@@ -121,7 +121,7 @@ function StarField::Render(%this) {
         }
         else
         {
-            %radius = math::Lerp(2.0, 0.3, %lStarPoints.z);
+            %radius = math.Lerp(2.0, 0.3, %lStarPoints.z);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
@@ -133,7 +133,7 @@ function StarField::Render(%this) {
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
     SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("Test with static fields - %d FPS",$Global::FPS));
-    SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%speed));
+    SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%this.speed));
     SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
     ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));
     SDL_SetRenderScale(%renderer); //reset
@@ -152,5 +152,5 @@ function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %is
 }
 function StarField::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
 function StarField::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
-    %this.speed = math::ClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
+    %this.speed = math.ClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
 }

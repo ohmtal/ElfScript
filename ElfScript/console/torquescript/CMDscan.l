@@ -274,28 +274,28 @@ HEXDIGIT [a-fA-F0-9]
 "print"     { CMDlval.i = MakeToken<int>(rwPRINT,            yylineno); return rwPRINT;          }
 "printf"   { CMDlval.i = MakeToken<int>(rwPRINTF,            yylineno); return rwPRINTF;          }
 "sprintf"   { CMDlval.i = MakeToken<int>(rwSPRINTF,            yylineno); return rwSPRINTF;          }
-"math::randomf"   { CMDlval.i = MakeToken<int>(rwRANDOMF,          yylineno); return rwRANDOMF;          }
+"math.randomf"   { CMDlval.i = MakeToken<int>(rwRANDOMF,          yylineno); return rwRANDOMF;          }
 
-"math::floor"     { CMDlval.i = MakeToken<int>(rwFLOOR,            yylineno); return rwFLOOR;          }
-"math::ceil"      { CMDlval.i = MakeToken<int>(rwCEIL,             yylineno); return rwCEIL;          }
-"math::fabs"      { CMDlval.i = MakeToken<int>(rwFABS,             yylineno); return rwFABS;          }
-"math::sin"       { CMDlval.i = MakeToken<int>(rwSIN,              yylineno); return rwSIN;          }
-"math::cos"       { CMDlval.i = MakeToken<int>(rwCOS,              yylineno); return rwCOS;          }
-"math::atan"      { CMDlval.i = MakeToken<int>(rwATAN,             yylineno); return rwATAN;          }
-"math::tanh"      { CMDlval.i = MakeToken<int>(rwTANH,             yylineno); return rwTANH;          }
-"math::sqrt"      { CMDlval.i = MakeToken<int>(rwSQRT,             yylineno); return rwSQRT;          }
-"math::iszero"    { CMDlval.i = MakeToken<int>(rwISZERO,           yylineno); return rwISZERO;          }
+"math.floor"     { CMDlval.i = MakeToken<int>(rwFLOOR,            yylineno); return rwFLOOR;          }
+"math.ceil"      { CMDlval.i = MakeToken<int>(rwCEIL,             yylineno); return rwCEIL;          }
+"math.fabs"      { CMDlval.i = MakeToken<int>(rwFABS,             yylineno); return rwFABS;          }
+"math.sin"       { CMDlval.i = MakeToken<int>(rwSIN,              yylineno); return rwSIN;          }
+"math.cos"       { CMDlval.i = MakeToken<int>(rwCOS,              yylineno); return rwCOS;          }
+"math.atan"      { CMDlval.i = MakeToken<int>(rwATAN,             yylineno); return rwATAN;          }
+"math.tanh"      { CMDlval.i = MakeToken<int>(rwTANH,             yylineno); return rwTANH;          }
+"math.sqrt"      { CMDlval.i = MakeToken<int>(rwSQRT,             yylineno); return rwSQRT;          }
+"math.iszero"    { CMDlval.i = MakeToken<int>(rwISZERO,           yylineno); return rwISZERO;          }
 
-"math::fmod"      { CMDlval.i = MakeToken<int>(rwFMOD,             yylineno); return rwFMOD;          }
-"math::min"       { CMDlval.i = MakeToken<int>(rwMIN,              yylineno); return rwMIN;          }
-"math::max"       { CMDlval.i = MakeToken<int>(rwMAX,              yylineno); return rwMAX;          }
-"math::atan2"     { CMDlval.i = MakeToken<int>(rwATAN2,            yylineno); return rwATAN2;          }
-"math::pow"       { CMDlval.i = MakeToken<int>(rwPOW,              yylineno); return rwPOW;          }
+"math.fmod"      { CMDlval.i = MakeToken<int>(rwFMOD,             yylineno); return rwFMOD;          }
+"math.min"       { CMDlval.i = MakeToken<int>(rwMIN,              yylineno); return rwMIN;          }
+"math.max"       { CMDlval.i = MakeToken<int>(rwMAX,              yylineno); return rwMAX;          }
+"math.atan2"     { CMDlval.i = MakeToken<int>(rwATAN2,            yylineno); return rwATAN2;          }
+"math.pow"       { CMDlval.i = MakeToken<int>(rwPOW,              yylineno); return rwPOW;          }
 
-"math::clamp"       { CMDlval.i = MakeToken<int>(rwCLAMP,         yylineno); return rwCLAMP;          }
-"math::clampf"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
-"math::lerp"        { CMDlval.i = MakeToken<int>(rwLERP,           yylineno); return rwLERP;          }
-"math::smoothstep"  { CMDlval.i = MakeToken<int>(rwSMOOTHSTEP,     yylineno); return rwSMOOTHSTEP;          }
+"math.clamp"       { CMDlval.i = MakeToken<int>(rwCLAMP,         yylineno); return rwCLAMP;          }
+"math.clampf"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
+"math.lerp"        { CMDlval.i = MakeToken<int>(rwLERP,           yylineno); return rwLERP;          }
+"math.smoothstep"  { CMDlval.i = MakeToken<int>(rwSMOOTHSTEP,     yylineno); return rwSMOOTHSTEP;          }
 %{
 // Boolean literals — return INTCONST so the parser treats them as integers.
 %}
