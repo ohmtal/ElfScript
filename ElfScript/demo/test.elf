@@ -466,6 +466,10 @@ function runMathTests()
     testAssert("math::clamp (mittle)", math::clamp(7, 5, 10),    7);
     testAssert("math::clamp (top)",    math::clamp(12, 5, 10),   10);
 
+    testAssert("math::clampf (bottom)", math::clampf(2.1, 5.4, 10.7),    5.4);
+    testAssert("math::clampf (mittle)", math::clampf(7.4, 5.3, 10.4),    7.4);
+    testAssert("math::clampf (top)",    math::clampf(12.3, 5.2, 10.8),   10.8);
+
     testAssert("math::lerp",          math::lerp(10, 20, 0.5),  15);
 
     testAssert("math::smoothstep",    math::smoothstep(0, 1, 0.5), 0.5);

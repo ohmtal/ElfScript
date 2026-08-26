@@ -633,6 +633,8 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
                   break;
             }
             //.... P3
+            case CommandStmtNode::CLAMP:
+                  TORQUE_CASE_FALLTHROUGH;
             case CommandStmtNode::CLAMPF:
                   TORQUE_CASE_FALLTHROUGH;
             case CommandStmtNode::LERP:

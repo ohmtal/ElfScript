@@ -348,9 +348,9 @@ ConsoleFunction(formatString, const char*, 2, 32,
       // we first param is null or function name so move it one up!
       String result = formatString((U32)argc - 1, argv + 1);
 
-      U32 finalLen = result.length();
-      char* returnBuffer = Con::getReturnBuffer(finalLen + 1);
-      dStrcpy(returnBuffer, result.c_str(), (size_t) result.length());
+      U32 finalLen = result.length() + 1;
+      char* returnBuffer = Con::getReturnBuffer(finalLen);
+      dStrcpy(returnBuffer, result.c_str(), (size_t) finalLen);
       return returnBuffer;
 }
 // ConsoleFunction(formatString, const char*, 2, 32,

@@ -659,6 +659,7 @@ struct CommandStmtNode : ExprNode
       ATAN2,
       POW,
       //.... P3
+      CLAMP,
       CLAMPF,
       LERP,
       SMOOTHSTEP,

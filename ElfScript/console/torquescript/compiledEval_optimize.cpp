@@ -4181,12 +4181,24 @@ handle_OP_INLINE_COMMAND_2P:
 handle_OP_INLINE_COMMAND_3P:
 {
       U32 commandID = code[ip++];
+
+      // special we have an int!
+      if (commandID == CommandStmtNode::CLAMP) {
+
+            S64 s3 = stack[_STK].getInt();POP_STK();
+            S64 s2 = stack[_STK].getInt();POP_STK();
+            S64 s1 = stack[_STK].getInt();POP_STK();
+            stack[_STK + 1].setInt(ElfMath::mClamp(s1,s2,s3));
+            PUSH_STK();
+            DISPATCH();
+      }
+
       F64 f3 = stack[_STK].getFastFloat();POP_STK();
       F64 f2 = stack[_STK].getFastFloat();POP_STK();
       F64 f1 = stack[_STK].getFastFloat();POP_STK();
       ConsoleValue& rv = stack[_STK + 1];
 
-      //FIXME FILL ....
+
       switch(commandID) {
             case CommandStmtNode::CLAMPF:       rv.setFloat(ElfMath::mClampF(f1,f2,f3)); break;
             case CommandStmtNode::LERP:         rv.setFloat(ElfMath::mLerp(f1,f2,f3)); break;

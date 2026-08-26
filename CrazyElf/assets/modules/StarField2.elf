@@ -108,7 +108,7 @@ function StarField::Render(%this) {
         // <<<<<<<<<<<<<<<<<<<<<
         if (%this.drawLines)
         {
-            %t = math::ClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
+            %t = math::Clamp(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
 
             if ( (%t - %lStarPoints.z) > 1e-3)
             {

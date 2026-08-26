@@ -117,7 +117,7 @@ struct Token
 %token <i> rwPRINT rwPRINTF rwSPRINTF rwRANDOMF
 %token <i> rwFLOOR rwCEIL rwFABS rwSIN rwCOS rwATAN rwTANH rwSQRT rwISZERO
 %token <i> rwFMOD rwMIN rwMAX rwATAN2 rwPOW
-%token <i> rwCLAMPF rwLERP rwSMOOTHSTEP
+%token <i> rwCLAMP rwCLAMPF rwLERP rwSMOOTHSTEP
 
 
 %union {
@@ -822,6 +822,8 @@ inline_command_expr
       { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::ATAN2, $3); }
    | rwPOW '(' expr_list ')'
       { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::POW, $3); }
+   | rwCLAMP '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::CLAMP, $3); }
    | rwCLAMPF '(' expr_list ')'
       { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::CLAMPF, $3); }
    | rwLERP '(' expr_list ')'

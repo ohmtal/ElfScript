@@ -173,6 +173,12 @@ inline U32 getMin(U32 a, U32 b)
    return a>b ? b : a;
 }
 
+inline S64 getMin(S64 a, S64 b)
+{
+    return a>b ? b : a;
+}
+
+
 /// Returns the lesser of the two parameters: a & b.
 inline U16 getMin(U16 a, U16 b)
 {
@@ -220,6 +226,12 @@ inline U32 getMax(U32 a, U32 b)
 {
    return a>b ? a : b;
 }
+
+inline S64 getMax(S64 a, S64 b)
+{
+    return a>b ? a : b;
+}
+
 
 /// Returns the greater of the two parameters: a & b.
 inline U16 getMax(U16 a, U16 b)
@@ -301,6 +313,11 @@ inline S32 mAbs(const S32 val)
 inline S32 mClamp(S32 val, S32 low, S32 high)
 {
    return getMax(getMin(val, high), low);
+}
+
+inline S64 mClamp(S64 val, S64 low, S64 high)
+{
+    return getMax(getMin(val, high), low);
 }
 
 inline F32 mClampF(F32 val, F32 low, F32 high)

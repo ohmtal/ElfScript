@@ -292,7 +292,8 @@ HEXDIGIT [a-fA-F0-9]
 "math::atan2"     { CMDlval.i = MakeToken<int>(rwATAN2,            yylineno); return rwATAN2;          }
 "math::pow"       { CMDlval.i = MakeToken<int>(rwPOW,              yylineno); return rwPOW;          }
 
-"math::clamp"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
+"math::clamp"       { CMDlval.i = MakeToken<int>(rwCLAMP,         yylineno); return rwCLAMP;          }
+"math::clampf"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
 "math::lerp"        { CMDlval.i = MakeToken<int>(rwLERP,           yylineno); return rwLERP;          }
 "math::smoothstep"  { CMDlval.i = MakeToken<int>(rwSMOOTHSTEP,     yylineno); return rwSMOOTHSTEP;          }
 %{

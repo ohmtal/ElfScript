@@ -140,10 +140,11 @@ extern int CMDdebug;
     rwMAX = 341,                   /* rwMAX  */
     rwATAN2 = 342,                 /* rwATAN2  */
     rwPOW = 343,                   /* rwPOW  */
-    rwCLAMPF = 344,                /* rwCLAMPF  */
-    rwLERP = 345,                  /* rwLERP  */
-    rwSMOOTHSTEP = 346,            /* rwSMOOTHSTEP  */
-    UNARY = 347                    /* UNARY  */
+    rwCLAMP = 344,                 /* rwCLAMP  */
+    rwCLAMPF = 345,                /* rwCLAMPF  */
+    rwLERP = 346,                  /* rwLERP  */
+    rwSMOOTHSTEP = 347,            /* rwSMOOTHSTEP  */
+    UNARY = 348                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -170,7 +171,7 @@ union YYSTYPE
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 
-#line 174 "CMDgram.h"
+#line 175 "CMDgram.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
