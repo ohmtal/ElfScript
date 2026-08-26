@@ -4097,9 +4097,6 @@ handle_OP_INLINE_COMMAND:
                   for (S32 i = count - 1; i >= 0; i--) {
                         POP_STK();
                   }
-
-                  Con::printf("DEBUG STRING IS : %s", stack[_STK + 1].getString());
-
                   break;
             }
             case CommandStmtNode::INVALID_PARAM_COUNT: {

@@ -92,7 +92,6 @@ function NativSDL::Render(%this) {
     SDL_RenderRectF(%this.renderer, 10,10, 300, 180, false);
 
 
-    // SDL_RenderDebugText(%this.renderer, 15,15, FormatString("%.4f sec. Mouse: %.0f,%.0f", GetFrameTime(), SDL_GetMouseX(), SDL_GetMouseY()) );
 
 
 

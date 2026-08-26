@@ -76,7 +76,6 @@ function Grid::getNode(%this, %x, %y) {
 
     if (%node < %this.getCount()) {
         %obj = %this.getObject(%node);
-        // echo(FormatString("NODE: %d, %d/%d {%s}", %node, %xNode, %yNode, %obj.rect));
         return %obj;
     }
     return 0;
@@ -98,7 +97,7 @@ function Grid::onAdd(%this) {
             };
         };
         // %node.dumpFields();
-        echo( formatString("NODE[%d]: %d,%d pos %7.2f, %7.2f", %node, %i,%j, %node.rect.x, %node.rect.y));
+       printf("NODE[%d]: %d,%d pos %7.2f, %7.2f", %node, %i,%j, %node.rect.x, %node.rect.y);
         %this.add(%node);
     }
 }

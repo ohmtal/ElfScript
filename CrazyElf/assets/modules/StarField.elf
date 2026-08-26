@@ -128,10 +128,10 @@ function StarField::Render(%this) {
     SDL_SetRenderDrawColor(%renderer, 128,20,255);
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    SDL_RenderDebugText(%renderer, %scale10 , 0 , $Global::FPS SPC "FPS" );
-    SDL_RenderDebugText(%renderer, %scale10 , %scale10,"[MOUSE WHEEL] Current Speed:" SPC  strFormat("%.2f",%speed));
-    SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale,"[SPACE] Current draw mode:"
-        SPC  ( %this.drawLines ? "Lines" : "Rectangle" ));
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("%d FPS",$Global::FPS));
+    SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%speed));
+    SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
+        ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));
     SDL_SetRenderScale(%renderer); //reset
 
 }

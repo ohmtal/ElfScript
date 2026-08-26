@@ -98,7 +98,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     }
     // --- old Module unloaded go ahead
     // %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
-    // using the ElfScript's formatString :) not so cryptic as the concat before
+    // using the ElfScript's formatString / sPrintf :) not so cryptic as the concat before
 
     %cmd = sPrintf("%d.module = Create%s(%d,%d);",
                         %this.getId(), %this.moduleName,
@@ -110,7 +110,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     %created = isObject(%this.module);
     echo("loadModule success:" SPC %created SPC "id:" SPC %this.module.getId());
 
-    SDL_SetWindowTitle(%this.window,FormatString( "CrazyElf (%dx%d) %s [ctrl up/down]"
+    SDL_SetWindowTitle(%this.window,sPrintf( "CrazyElf (%dx%d) %s [ctrl up/down]"
         ,$Global::ScreenSize.x,$Global::ScreenSize.y, %this.moduleName
     ));
 

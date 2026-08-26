@@ -321,7 +321,7 @@ function Pixels::shuffleGrid(%this) {
 //----------------------------------------------------------------------
 function Pixels::dumpPixelStorage(%this) {
     for(%i in range PixelStorage.storageSize) {
-        print(formatString("%d: %s", %i, PixelStorage.getPointVec(%i)));
+        printf("%d: %s", %i, PixelStorage.getPointVec(%i));
     }
 }
 //----------------------------------------------------------------------
@@ -595,7 +595,7 @@ function Pixels::Render(%this) {
         }
         SDL_SetRenderDrawColor(%r, 205,205, 205,255);
         // lazy coding:
-        %text = formatString( "Size: %2d [%3d]",  %this.MenuBlockSize, %this.getPixelCount( %this.MenuBlockSize ));
+        %text = sprintf( "Size: %2d [%3d]",  %this.MenuBlockSize, %this.getPixelCount( %this.MenuBlockSize ));
         %this.DrawText(%x+17,%y+4, %text ,0.6);
         %rect = { %x + 85, %y, 15,12 };
         if (%this.Button(%rect, ">", 0.6) ) {

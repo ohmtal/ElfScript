@@ -35,10 +35,10 @@ echo("B ==" SPC sto.Module);
 
 for (%i = 0; %i < 10; %i++) {
     // sto.Keys[%i] = %i;
-    sto.addTypeField(formatString("Keys%d", %i), "TypeS32", %i);
+    sto.addTypeField(sprintf("Keys%d", %i), "TypeS32", %i);
     %key = getWord($MODULES, %i);
     echo("* setting sto.Keys[",%key,"] to:",%i * 10);
-    sto.addTypeField(formatString("Keys%s", %key), "TypeS32", %i*10);
+    sto.addTypeField(sprintf("Keys%s", %key), "TypeS32", %i*10);
     // sto.Keys[%key] = %i * 10;
 
 }
