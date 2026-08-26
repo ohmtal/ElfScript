@@ -99,7 +99,8 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     // --- old Module unloaded go ahead
     // %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
     // using the ElfScript's formatString :) not so cryptic as the concat before
-    %cmd = formatString("%d.module = Create%s(%d,%d);",
+
+    %cmd = sPrintf("%d.module = Create%s(%d,%d);",
                         %this.getId(), %this.moduleName,
                         %this.renderer, %this.window);
 
