@@ -483,7 +483,10 @@ U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
       U32 elementCount = 0;
 
-      for (ExprNode* expr = argList; expr; expr = (ExprNode*)expr->next)
+      const U32 MAX_ELEMENTS = 16;
+      for (ExprNode* expr = argList;
+           expr && elementCount < MAX_ELEMENTS;
+           expr = (ExprNode*)expr->next )
       {
             ip = expr->compile(codeStream, ip, TypeReqString);
             elementCount++;
@@ -529,22 +532,25 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       }
 
 
-      // FIXME would be faster calling different OP CODES!!
+      const U32 MAX_ELEMENTS = 16;
       switch (commandID) {
             case CommandStmtNode::PRINT:
             {
-                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
+                  U32 i = 0;
+                  for (ExprNode* expr = args;
+                       expr &&  i < MAX_ELEMENTS;
+                       expr = (ExprNode*)expr->next)
+                  {
+                       ip = expr->compile(codeStream, ip, TypeReqString);
+                       i++;
+                  }
+
                   codeStream.emit(OP_PRINT);
                   codeStream.emit(elementCount);
                   break;
             }
-            case CommandStmtNode::RANDOMF:
-            {
-                   codeStream.emit(OP_MATH_RANDOMF);
-                   break;
 
-            }
-            case CommandStmtNode::RANDOMF_P:
+            case CommandStmtNode::RANDOMF:
             {
                   ExprNode* expr = nullptr;
                   if (elementCount > 0) {
@@ -557,12 +563,98 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
                   }
 
                   switch (elementCount) {
-                        case 1: codeStream.emit(OP_MATH_RANDOMF_1);break;
                         case 0: codeStream.emit(OP_MATH_RANDOMF);break;
+                        case 1: codeStream.emit(OP_MATH_RANDOMF_1);break;
                         default: codeStream.emit(OP_MATH_RANDOMF_2);break;
                   }
                   break;
             }
+
+
+            case CommandStmtNode::FLOOR:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::CEIL:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::FABS:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::SIN:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::COS:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::ATAN:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::TANH:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::SQRT:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::ISZERO: {
+                  if (elementCount < 1) {
+                        // i fallback to OP_INLINE_COMMAND ..
+                        codeStream.emit(OP_INLINE_COMMAND);
+                        codeStream.emit(0); // no params
+                        codeStream.emit(CommandStmtNode::INVALID_PARAM_COUNT);
+                  } else {
+                        ExprNode* expr = nullptr;
+                        // set 1 param on stack :
+                        expr = args; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        // emmit OP code and command id
+                        codeStream.emit(OP_INLINE_COMMAND_1P);
+                        codeStream.emit(commandID);
+                  }
+                  break;
+            }
+
+            // ~~~~~ two params ~~~~~~
+
+            case CommandStmtNode::MIN:
+                   TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::MAX:
+                   TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::ATAN2:
+                   TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::POW:
+                   TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::FMOD: {
+                  if (elementCount < 2) {
+                        // i fallback to OP_INLINE_COMMAND .. to show a error ;)
+                        codeStream.emit(OP_INLINE_COMMAND);
+                        codeStream.emit(0);
+                        codeStream.emit(CommandStmtNode::INVALID_PARAM_COUNT);
+                  } else {
+                        ExprNode* expr = nullptr;
+                        // set 2 params on stack :
+                        expr = args; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        expr = (ExprNode*)expr->next; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        // emmit OP code and command id
+                        codeStream.emit(OP_INLINE_COMMAND_2P);
+                        codeStream.emit(commandID);
+                  }
+                  break;
+            }
+            //.... P3
+            case CommandStmtNode::CLAMPF:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::LERP:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::SMOOTHSTEP: {
+                  if (elementCount < 3) {
+                        // i fallback to OP_INLINE_COMMAND .. to show a error ;)
+                        codeStream.emit(OP_INLINE_COMMAND);
+                        codeStream.emit(0);
+                        codeStream.emit(CommandStmtNode::INVALID_PARAM_COUNT);
+                  } else {
+                        ExprNode* expr = nullptr;
+                        // set 3 params on stack :
+                        expr = args; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        expr = (ExprNode*)expr->next; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        expr = (ExprNode*)expr->next; ip = expr->compile(codeStream, ip, TypeReqFloat);
+                        // emmit OP code and command id
+                        codeStream.emit(OP_INLINE_COMMAND_3P);
+                        codeStream.emit(commandID);
+                  }
+                  break;
+            }
+
 
             default:  {
                   for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
@@ -579,7 +671,7 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
 TypeReq CommandStmtNode::getPreferredType()
 {
-      return TypeReqString;
+      return TypeReqFloat;
 }
 
 // -----------------------------------------------------------------------------

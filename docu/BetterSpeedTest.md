@@ -17,29 +17,37 @@
     - while this test is faster with IPO other are slower than -O2
     - so i can say it's not worth to create extra OP_CODES for this, an switch case at runtime is fast enough
 
-- [ ] default functions to Bytecode: - lot of work for nearly no speed enhancements 
-    - i splitted random for no/one or two parameters but adding all the new 
-    OP codes it too much work for nearly no effect. So i think i can make 
-    OP_MATH_FLT, OP_MATH_FLT1, OP_MATH_FLT2, .. and case them out at runtime 
-    should not really slower than at compile time. 
+- [x] default functions to Bytecode: - lot of work for nearly no speed enhancements 
 
-    - [ ] IFDEF ... will be difficult in bison ...
-    - [ ] OP_MATH_CLAMP
-    - [ ] OP_MATH_LERP
-    - [ ] OP_MATH_SIN
-    - [ ] OP_MATH_COS
-    - [ ] OP_MATH_TAN
-    - [ ] OP_MATH_ASIN
-    - [ ] OP_MATH_ACOS
-    - [ ] OP_MATH_ATAN (2)
-    - [ ] OP_MATH_SQRT
-    - [ ] OP_MATH_ABS
-    - [ ] OP_MATH_POW
-    - [ ] OP_MATH_EXP
-    - [ ] OP_MATH_LOG
-    - [ ] OP_MATH_FLOOR
-    - [ ] OP_MATH_CEIL
-    - [ ] OP_MATH_ROUND
+    Test: is it worth ? 
+        static field test with getRandomF(%i)       : 4.550u 0.002s 0:04.56 99.7%     0+0k 0+0io 0pf+0w 
+        static field test with math::randomf(%i)    : 4.039u 0.004s 0:04.05 99.5%     0+0k 0+0io 0pf+0w 
+        static field test with math::randomf() * %i : 4.080u 0.005s 0:04.10 99.5%     0+0k 0+0io 0pf+0w
+
+        !!! * %i results in rounding errors !!!
+
+    YES! but using only 3 op codes: OP_INLINE_COMMAND_3P, OP_INLINE_COMMAND_2P and OP_INLINE_COMMAND_1P
+
+    - [x] floor     
+    - [x] ceil      
+    - [x] fabs       
+    - [x] fmod      
+    - [x] sin       
+    - [x] cos       
+    - [x] atan      
+    - [x] tanh      
+    - [x] sqrt      
+    - [x] isZero    
+    - [x] min       
+    - [x] max       
+    - [x] atan     
+    - [x] clamp     
+    - [x] lerp      
+    - [x] smoothstep 
+    - [x] pow       
+   
+    
+  
 
 - [ ] Add a new Benchmark file and update the tests with the new functions.
 

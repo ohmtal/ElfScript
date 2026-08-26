@@ -1561,6 +1561,22 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             ip+=2;
             break;
       }
+
+      case OP_INLINE_COMMAND_1P: {
+             U32 commandID = code[ip++];
+            Con::printf("%i: OP_INLINE_COMMAND_1P stk=-1 id:%u", ip - 1, commandID);
+            break;
+      }
+      case OP_INLINE_COMMAND_2P: {
+            U32 commandID = code[ip++];
+            Con::printf("%i: OP_INLINE_COMMAND_2P stk=-1 id:%u", ip - 1, commandID);
+            break;
+      }
+      case OP_INLINE_COMMAND_3P: {
+            U32 commandID = code[ip++];
+            Con::printf("%i: OP_INLINE_COMMAND_3P stk=-1 id:%u", ip - 1, commandID);
+            break;
+      }
       case OP_PRINT: {
             Con::printf("%i: OP_PRINT stk=-1 mode:%u", ip - 1, ip);
             ip++;

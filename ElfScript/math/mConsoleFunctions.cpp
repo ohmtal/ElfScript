@@ -66,6 +66,13 @@ DefineEngineFunction(getRandomF, F32, (F32 min, F32 max) ,(0.f), "getRandom floa
 // <<<<<<<<<<<<< random
 
 
+// inline F32 mCatmullrom(F32 t, F32 p0, F32 p1, F32 p2, F32 p3)
+DefineEngineFunction( mCatmullrom, F32, ( F32 t, F32 p0, F32 p1, F32 p2, F32 p3),,"")
+{
+    return mCatmullrom( t,  p0,  p1,  p2,  p3);
+}
+
+
 
 DefineEngineFunction( mFloor, S32, ( F32 v ),,
     "Round v down to the nearest integer.\n"

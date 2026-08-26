@@ -43,6 +43,7 @@
 
 #include "console/returnBuffer.h"
 #include "console/consoleValueStack.h"
+#include <math/mMathFn.h>
 #include <math/mMathRand.h>
 // #include "console/telnetDebugger.h"
 
@@ -1404,6 +1405,9 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_ASSIGN_DIV,
 
          &&handle_OP_INLINE_COMMAND,
+         &&handle_OP_INLINE_COMMAND_1P,
+         &&handle_OP_INLINE_COMMAND_2P,
+         &&handle_OP_INLINE_COMMAND_3P,
          &&handle_OP_PRINT,
 
          &&handle_OP_MATH_RANDOMF,
@@ -2501,7 +2505,7 @@ handle_OP_LOADFIELD_FASTPATH:
             }
 
 
-            // FIXME  simobject must be revisited!
+            // TODO  simobject should be revisited!
             switch (cachePtr->type) {
                   case staticField: {
                         F64 floatValue = 0.f;
@@ -3337,6 +3341,9 @@ handle_OP_ITER_BEGIN:
             // iter.mVar.mRegister = code[ip + 1];
       }
 
+      // cast to integer
+      iter.mConsoleValue->setInt(0);
+
 
       switch (mode) {
             case 1: // string
@@ -4020,55 +4027,7 @@ handle_OP_CMPNE_UINT:
       DISPATCH();
 
 // --------------- ELFSCRIPT 0.6g  << TODO: inline_command_expr >>----------------
-handle_OP_INLINE_COMMAND:
-{
-      U32 count = code[ip++];
-      U32 commandID = code[ip++];
-
-
-      // FIXME TEST ONLY >>>>>>>>>>>>>>>>>>>>>>>
-      const U32 MAX_ELEMENTS = 16;
-      const char* stringValues[MAX_ELEMENTS];
-
-      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
-
-
-      for (S32 i = count - 1; i >= 0; i--) {
-            stringValues[i] = stack[_STK].getString();
-            POP_STK();
-      }
-      // <<<<<<<<<<<<<<<<<<<<<<< FIXME
-
-
-
-      switch(commandID) {
-            case CommandStmtNode::PRINT: {
-//FIXME!!
-                  U32 len = 0;
-                  S32 i;
-                  for(i = 0; i < count; i++)
-                        len += dStrlen(stringValues[i]) + 1;
-                  static char buff[256];
-                  dMemset(buff, 0, 256);
-                  if (len > 255) len = 255;
-                  for(i = 0; i < count; i++) {
-                        dStrcat(buff, stringValues[i], (U64)(len + 1));
-                        dStrcat(buff, " ", (U64)(len + 1));
-                  }
-
-                  Con::printf("%s", buff);
-
-                  stack[_STK + 1].setEmptyString();
-                  break;
-            }
-            case CommandStmtNode::RANDOMF: stack[_STK + 1].setFastFloat(ElfMath::mRandF64()); break;
-            default: stack[_STK + 1].setEmptyString(); break;
-      }
-
-
-      PUSH_STK();
-      DISPATCH();
-}
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INLINE COMMANDS >>>>>>>>>>>>>>>>>>>>>>>>>>
 handle_OP_PRINT:
 {
       U32 count = code[ip++];
@@ -4081,18 +4040,14 @@ handle_OP_PRINT:
             DISPATCH();
       }
 
-      // FIXME TEST ONLY >>>>>>>>>>>>>>>>>>>>>>>
       const U32 MAX_ELEMENTS = 16;
       const char* stringValues[MAX_ELEMENTS];
 
       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
-
-
       for (S32 i = count - 1; i >= 0; i--) {
             stringValues[i] = stack[_STK].getString();
             POP_STK();
       }
-      // <<<<<<<<<<<<<<<<<<<<<<< FIXME
 
       //FIXME!!
       U32 len = 0;
@@ -4114,11 +4069,122 @@ handle_OP_PRINT:
       PUSH_STK();
       DISPATCH();
 }
+// ------------------------------------
+handle_OP_INLINE_COMMAND:
+{
+      U32 count = code[ip++];
+      U32 commandID = code[ip++];
 
+      switch(commandID) {
+
+
+            case CommandStmtNode::INVALID_PARAM_COUNT: {
+                  Con::errorf("Invalid parameter count for math:: command");
+                  // FALLBACK we need to pop em all but count should be 0!
+                  for (S32 i = count - 1; i >= 0; i--) {
+                        POP_STK();
+                  }
+                  stack[_STK + 1].setEmptyString();
+            }
+            default: {
+                  Con::errorf("Unknown command");
+                  // FALLBACK we need to pop em all
+                  for (S32 i = count - 1; i >= 0; i--) {
+                        POP_STK();
+                  }
+                  stack[_STK + 1].setEmptyString();
+            }
+      } //switch
+
+      PUSH_STK();
+      DISPATCH();
+}
+// ------------------------------------
+handle_OP_INLINE_COMMAND_1P:
+{
+      U32 commandID = code[ip++];
+
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+
+      ConsoleValue& rv = stack[_STK + 1];
+
+      //FIXME FILL ....
+      switch(commandID) {
+            case CommandStmtNode::FLOOR:  rv.setFloat( ElfMath::mFloorD(f1)); break;
+            case CommandStmtNode::CEIL:   rv.setFloat( ElfMath::mCeilD(f1)); break;
+            case CommandStmtNode::FABS:   rv.setFloat( ElfMath::mFabsD(f1)); break;
+            case CommandStmtNode::SIN:    rv.setFloat( ElfMath::mSin(f1)); break;
+            case CommandStmtNode::COS:    rv.setFloat( ElfMath::mCos(f1)); break;
+            case CommandStmtNode::ATAN:   rv.setFloat( ElfMath::mAtan(f1)); break;
+            case CommandStmtNode::TANH:   rv.setFloat( ElfMath::mTanh(f1)); break;
+            case CommandStmtNode::SQRT:   rv.setFloat( ElfMath::mSqrtD(f1)); break;
+            case CommandStmtNode::ISZERO:
+                  rv.setBool( ElfMath::isZero(f1) );
+            break;
+
+            default: {
+                   Con::errorf("Unknown math command");
+                   rv.setFastFloat(0.0);
+            }
+      }
+
+      PUSH_STK();
+      DISPATCH();
+}
+// ------------------------------------
+handle_OP_INLINE_COMMAND_2P:
+{
+      U32 commandID = code[ip++];
+      F64 f2 = stack[_STK].getFastFloat();POP_STK();
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      ConsoleValue& rv = stack[_STK + 1];
+
+      //FIXME FILL ....
+      switch(commandID) {
+
+            case CommandStmtNode::MIN:    rv.setFloat( ElfMath::getMin(f1,f2)); break;
+            case CommandStmtNode::MAX:    rv.setFloat( ElfMath::getMax(f1,f2)); break;
+            case CommandStmtNode::ATAN2:  rv.setFloat( ElfMath::mAtan2(f1,f2)); break;
+            case CommandStmtNode::FMOD:   rv.setFloat( ElfMath::mFmodD(f1,f2)); break;
+            case CommandStmtNode::POW:    rv.setFloat( ElfMath::mPow(f1,f2)); break;
+            default: {
+                  Con::errorf("Unknown math command");
+                  rv.setFastFloat(0.0);
+            }
+      }
+
+      PUSH_STK();
+      DISPATCH();
+}
+// ------------------------------------
+handle_OP_INLINE_COMMAND_3P:
+{
+      U32 commandID = code[ip++];
+      F64 f3 = stack[_STK].getFastFloat();POP_STK();
+      F64 f2 = stack[_STK].getFastFloat();POP_STK();
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      ConsoleValue& rv = stack[_STK + 1];
+
+      //FIXME FILL ....
+      switch(commandID) {
+            case CommandStmtNode::CLAMPF:       rv.setFloat(ElfMath::mClampF(f1,f2,f3)); break;
+            case CommandStmtNode::LERP:         rv.setFloat(ElfMath::mLerp(f1,f2,f3)); break;
+            case CommandStmtNode::SMOOTHSTEP:   rv.setFloat(ElfMath::mSmoothStep(f1,f2,f3)); break;
+
+            default: {
+                  Con::errorf("Unknown math command");
+                  rv.setFastFloat(0.0);
+            }
+      }
+
+      PUSH_STK();
+      DISPATCH();
+}
+// ------------------------------------
 handle_OP_MATH_RANDOMF_2:
 {
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
       F64 f2 = stack[_STK].getFastFloat();POP_STK();
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
       stack[_STK + 1].setFastFloat(ElfMath::mRandF64(f1,f2));
       PUSH_STK();
       DISPATCH();
@@ -4126,8 +4192,8 @@ handle_OP_MATH_RANDOMF_2:
 
 handle_OP_MATH_RANDOMF_1:
 {
-      F64 f2 = stack[_STK].getFastFloat();POP_STK();
-      stack[_STK + 1].setFastFloat(ElfMath::mRandF64(0.0,f2));
+      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      stack[_STK + 1].setFastFloat(ElfMath::mRandF64(0.0,f1));
       PUSH_STK();
       DISPATCH();
 }
@@ -4139,10 +4205,7 @@ handle_OP_MATH_RANDOMF:
       PUSH_STK();
       DISPATCH();
 }
-
-
-
-
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< INLINE COMMANDS <<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 // ~~~~~~~~~~~~~~~~~ INVALID

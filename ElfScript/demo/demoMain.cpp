@@ -107,9 +107,25 @@ struct StrTesto {
     };
 };
 
+class ConValue2 {
+
+union
+{
+    F64   f;
+    S64   i;
+    char* s;
+    void* dataPtr;
+};
+ S32 type;
+ char padding[4];
+};
+
 DefineEngineFunction(testo, F32, (), ,"test for anything i like ;)"){
     Con::printSeparator();
-    Con::printf("test size: %d cur size: %d", sizeof(ConsoleValueTest),sizeof(ConsoleValue));
+    Con::printf("test size: %d cur size: %d curWithoutVec %d",
+                sizeof(ConsoleValueTest),
+                sizeof(ConsoleValue),
+                sizeof(ConValue2));
     Con::printf("console vector: %d  Test.val: %d", sizeof(ConsoleVector), sizeof(ConsoleValueTest::val));
     Con::printf("size of char *: %d, void*: %d", sizeof(char*),sizeof(void*));
     Con::printf("size of StrTesto: %d, va/ptrval: %d/%d", sizeof(StrTesto),sizeof(StrTesto::val), sizeof(StrTesto::ptrval));

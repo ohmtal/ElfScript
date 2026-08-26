@@ -1,4 +1,5 @@
-%option yylineno nounput
+/* ElfScript 0.7: Added caseless */
+%option yylineno nounput caseless
 %{
 
 // flex --nounput -o CMDscan.cpp -P CMD CMDscan.l
@@ -272,6 +273,26 @@ HEXDIGIT [a-fA-F0-9]
 "package"   { CMDlval.i = MakeToken<int>(rwPACKAGE,          yylineno); return rwPACKAGE;          }
 "print"     { CMDlval.i = MakeToken<int>(rwPRINT,            yylineno); return rwPRINT;          }
 "math::randomf"   { CMDlval.i = MakeToken<int>(rwRANDOMF,          yylineno); return rwRANDOMF;          }
+
+"math::floor"     { CMDlval.i = MakeToken<int>(rwFLOOR,            yylineno); return rwFLOOR;          }
+"math::ceil"      { CMDlval.i = MakeToken<int>(rwCEIL,             yylineno); return rwCEIL;          }
+"math::fabs"      { CMDlval.i = MakeToken<int>(rwFABS,             yylineno); return rwFABS;          }
+"math::sin"       { CMDlval.i = MakeToken<int>(rwSIN,              yylineno); return rwSIN;          }
+"math::cos"       { CMDlval.i = MakeToken<int>(rwCOS,              yylineno); return rwCOS;          }
+"math::atan"      { CMDlval.i = MakeToken<int>(rwATAN,             yylineno); return rwATAN;          }
+"math::tanh"      { CMDlval.i = MakeToken<int>(rwTANH,             yylineno); return rwTANH;          }
+"math::sqrt"      { CMDlval.i = MakeToken<int>(rwSQRT,             yylineno); return rwSQRT;          }
+"math::iszero"    { CMDlval.i = MakeToken<int>(rwISZERO,           yylineno); return rwISZERO;          }
+
+"math::fmod"      { CMDlval.i = MakeToken<int>(rwFMOD,             yylineno); return rwFMOD;          }
+"math::min"       { CMDlval.i = MakeToken<int>(rwMIN,              yylineno); return rwMIN;          }
+"math::max"       { CMDlval.i = MakeToken<int>(rwMAX,              yylineno); return rwMAX;          }
+"math::atan2"     { CMDlval.i = MakeToken<int>(rwATAN2,            yylineno); return rwATAN2;          }
+"math::pow"       { CMDlval.i = MakeToken<int>(rwPOW,              yylineno); return rwPOW;          }
+
+"math::clamp"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
+"math::lerp"        { CMDlval.i = MakeToken<int>(rwLERP,           yylineno); return rwLERP;          }
+"math::smoothstep"  { CMDlval.i = MakeToken<int>(rwSMOOTHSTEP,     yylineno); return rwSMOOTHSTEP;          }
 %{
 // Boolean literals — return INTCONST so the parser treats them as integers.
 %}

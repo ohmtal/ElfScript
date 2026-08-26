@@ -73,6 +73,7 @@ typedef const char* StringTableEntry;
 //-------------------------------------- Type constants-------------------------------------------------//
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define __EQUAL_CONST_F F32(0.000001)                                  ///< Constant float epsilon used for F32 comparisons
+#define __EQUAL_CONST_D F64(0.000001)                                  ///< Constant float epsilon used for F64 comparisons
 
 extern const F32 Float_Inf;
 static const F32 Float_One  = F32(1.0);                           ///< Constant float 1.0

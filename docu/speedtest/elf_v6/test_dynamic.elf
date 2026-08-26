@@ -1,0 +1,43 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+%sto = new PointStorageObject(){
+    TypeF32 DynX = 0;
+};
+
+// %sto.DynX = 0;
+for (%j in range  JLOOPS) {
+    for (%i in range ILOOPS) {
+        %sto.DynX ++;
+    }
+    print("SUM (++) IS:" SPC %sto.DynX);
+    // varDumpField("%sto.DynX");
+    for (%i in range  ILOOPS) {
+        %sto.DynX --;
+    }
+    print("SUM (--) IS:" SPC %sto.DynX);
+    // varDumpField("%sto.DynX");
+    %sto.DynX = 66.0;
+    print("set Sum to 66 == " SPC %sto.DynX);
+    for (%i in range  ILOOPS) {
+        %sto.DynX *= %i + 1;
+        %sto.DynX /= %i + 1;
+    }
+    print("SUM (*/ %i+1) IS:" SPC %sto.DynX);
+    // varDumpField("%sto.DynX");
+    %ran = 0.0;
+    for (%i in range  ILOOPS / 2) {
+        %ran = math::randomf(%i);
+        %sto.DynX -= %ran;
+        %sto.DynX += %ran;
+    }
+    print("SUM (rand +-) IS:" SPC %sto.DynX);
+    // varDumpField("%sto.DynX");
+}
+%sto.DynX -= 66.0 ;
+// print(" NOT A SPEED TEST !!! varDumpField is slow.");
+print("---------------------");
+print("---------------------");
+print("Final sum should be 0 == ", %sto.DynX);
+print("---------------------");
+print("---------------------");

@@ -640,7 +640,29 @@ struct CommandStmtNode : ExprNode
    enum {
       PRINT,
       RANDOMF,
-      RANDOMF_P
+      // .... P1
+      FLOOR,
+      CEIL,
+      FABS,
+      SIN,
+      COS,
+      ATAN,
+      TANH,
+      SQRT,
+      ISZERO,
+      //.... P2
+      FMOD,
+      MIN,
+      MAX,
+      ATAN2,
+      POW,
+      //.... P3
+      CLAMPF,
+      LERP,
+      SMOOTHSTEP,
+
+      // ... INVALD PARAM COUNT
+      INVALID_PARAM_COUNT
    };
   // look at FuncCallExprNode
    static CommandStmtNode* alloc(S32 lineNumber, U32 commandType, ExprNode* args);

@@ -1,3 +1,5 @@
+// Elfscript 0.7 removed shift warning for if ... else
+%expect 1
 %define parse.error custom
 %locations
 %define api.header.include {"CMDgram.h"}
@@ -111,8 +113,12 @@ struct Token
 // ElfScript foreach
 %token <i> opDOTDOT rwRANGE rwSTEP
 
-//ElfScript 0.6 TODO
+//ElfScript 0.6
 %token <i> rwPRINT rwRANDOMF
+%token <i> rwFLOOR rwCEIL rwFABS rwSIN rwCOS rwATAN rwTANH rwSQRT rwISZERO
+%token <i> rwFMOD rwMIN rwMAX rwATAN2 rwPOW
+%token <i> rwCLAMPF rwLERP rwSMOOTHSTEP
+
 
 %union {
    Token< char >           c;
@@ -779,12 +785,46 @@ assert_expr
 // ElfScript 0.6d TODO
 inline_command_expr
    : rwPRINT '(' expr_list ')'
-      { $$ = CommandStmtNode::alloc( $1.lineNumber, 0, $3); }
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::PRINT, $3); }
    | rwRANDOMF '('  ')'
-      { $$ = CommandStmtNode::alloc( $1.lineNumber, 1, NULL); }
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::RANDOMF, NULL); }
    | rwRANDOMF '(' expr_list ')'
-      { $$ = CommandStmtNode::alloc( $1.lineNumber, 2, $3); }
-   ;
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::RANDOMF, $3); }
+   | rwFLOOR '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::FLOOR, $3); }
+   | rwCEIL '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::CEIL, $3); }
+   | rwFABS '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::FABS, $3); }
+   | rwSIN '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::SIN, $3); }
+   | rwCOS '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::COS, $3); }
+   | rwATAN '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::ATAN, $3); }
+   | rwTANH '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::TANH, $3); }
+   | rwSQRT '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::SQRT, $3); }
+   | rwISZERO '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::ISZERO, $3); }
+   | rwFMOD '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::FMOD, $3); }
+   | rwMIN '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::MIN, $3); }
+   | rwMAX '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::MAX, $3); }
+   | rwATAN2 '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::ATAN2, $3); }
+   | rwPOW '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::POW, $3); }
+   | rwCLAMPF '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::CLAMPF, $3); }
+   | rwLERP '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::LERP, $3); }
+   | rwSMOOTHSTEP '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::SMOOTHSTEP, $3); }
+  ;
 
 // expr_list_decl
 //    :

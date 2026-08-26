@@ -725,7 +725,7 @@ class SimObject: public ConsoleObject
       /// @param   value       Value to store.
       void setDataField(StringTableEntry slotName, const char *array, const char *value);
 
-      //XXTH Speed HACK FastPath
+      //XXTH  FastPath
       // virtual bool setDataField(const AbstractClassRep::Field *fld, F64 value);
       // virtual bool getDataField(const AbstractClassRep::Field *fld, F64 &outValue);
 

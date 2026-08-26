@@ -124,7 +124,24 @@ extern int CMDdebug;
     rwSTEP = 325,                  /* rwSTEP  */
     rwPRINT = 326,                 /* rwPRINT  */
     rwRANDOMF = 327,               /* rwRANDOMF  */
-    UNARY = 328                    /* UNARY  */
+    rwFLOOR = 328,                 /* rwFLOOR  */
+    rwCEIL = 329,                  /* rwCEIL  */
+    rwFABS = 330,                  /* rwFABS  */
+    rwSIN = 331,                   /* rwSIN  */
+    rwCOS = 332,                   /* rwCOS  */
+    rwATAN = 333,                  /* rwATAN  */
+    rwTANH = 334,                  /* rwTANH  */
+    rwSQRT = 335,                  /* rwSQRT  */
+    rwISZERO = 336,                /* rwISZERO  */
+    rwFMOD = 337,                  /* rwFMOD  */
+    rwMIN = 338,                   /* rwMIN  */
+    rwMAX = 339,                   /* rwMAX  */
+    rwATAN2 = 340,                 /* rwATAN2  */
+    rwPOW = 341,                   /* rwPOW  */
+    rwCLAMPF = 342,                /* rwCLAMPF  */
+    rwLERP = 343,                  /* rwLERP  */
+    rwSMOOTHSTEP = 344,            /* rwSMOOTHSTEP  */
+    UNARY = 345                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -133,7 +150,7 @@ extern int CMDdebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 117 "CMDgram.y"
+#line 123 "CMDgram.y"
 
    Token< char >           c;
    Token< int >            i;
@@ -151,7 +168,7 @@ union YYSTYPE
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 
-#line 155 "CMDgram.h"
+#line 172 "CMDgram.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

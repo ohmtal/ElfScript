@@ -195,7 +195,8 @@ public:
   ConsoleVector v;      // 16 Byte
 #endif
 
-   S32 type;            // 4 Byte
+   S32 type;            // 4 Byte - used a 8 without padding
+   char padding[4];     // 4 Byze ... i may can use this for something ;)
 
    static DataChunker sConversionAllocator;
 
@@ -451,7 +452,8 @@ public:
    // ElfScript 0.6e
    TORQUE_FORCEINLINE void setString(const char* val)
    {
-         s = val ? const_cast<char*>(StringTable->insert(val)) : const_cast<char*>(StringTable->EmptyString());
+         // added case sense
+         s = val ? const_cast<char*>(StringTable->insert(val, true)) : const_cast<char*>(StringTable->EmptyString());
          type = ConsoleValueType::cvSTEntry;
    }
 

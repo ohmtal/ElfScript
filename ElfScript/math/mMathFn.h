@@ -308,6 +308,11 @@ inline F32 mClampF(F32 val, F32 low, F32 high)
    return (F32) getMax(getMin(val, high), low);
 }
 
+inline F64 mClampF(F64 val, F64 low, F64 high)
+{
+    return (F64) getMax(getMin(val, high), low);
+}
+
 // inline S32 mMulDiv(S32 a, S32 b, S32 c)
 // {
 //    return m_mulDivS32(a, b, c);
@@ -364,9 +369,14 @@ inline F32 mAtan( const F32 x )
     return (F32) atan( x );
 }
 
-inline F32 mAtan2(const F32 y, const F32 x)
+inline F64 mAtan( const F64 x )
 {
-    return (F32)atan2(y, x);
+    return (F64) atan( x );
+}
+
+inline F64 mAtan2(const F64 y, const F64 x)
+{
+    return (F64)atan2(y, x);
 }
 inline void mSinCos(const F32 angle, F32 &s, F32 &c)
 {
@@ -387,6 +397,10 @@ inline F32 mSqrt(const F32 val)
 inline F32 mPow(const F32 x, const F32 y)
 {
    return (F32) pow(x, y);
+}
+inline F64 mPow(const F64 x, const F64 y)
+{
+    return (F64) pow(x, y);
 }
 
 inline F32 mLog(const F32 val)
@@ -436,10 +450,7 @@ inline F64 mTanh(const F64 angle)
    return (F64) tanh(angle);
 }
 
-inline F64 mPow(const F64 x, const F64 y)
-{
-   return (F64) pow(x, y);
-}
+
 
 inline F64 mLog(const F64 val)
 {
@@ -447,10 +458,13 @@ inline F64 mLog(const F64 val)
 }
 
 
-// inline F32 mCatmullrom(F32 t, F32 p0, F32 p1, F32 p2, F32 p3)
-// {
-//    return m_catmullrom(t, p0, p1, p2, p3);
-// }
+inline F32 mCatmullrom(F32 t, F32 p0, F32 p1, F32 p2, F32 p3)
+{
+    return 0.5f * ((3.0f*p1 - 3.0f*p2 + p3 - p0)*t*t*t
+    +  (2.0f*p0 - 5.0f*p1 + 4.0f*p2 - p3)*t*t
+    +  (p2-p0)*t
+    +  2.0f*p1);
+}
 
 
 inline F64 mFabsD(const F64 val)
@@ -486,6 +500,11 @@ inline bool isEqual(F32 a, F32 b)
 inline bool isZero(F32 a)
 {
    return mFabs(a) < __EQUAL_CONST_F;
+}
+
+inline bool isZero(F64 a)
+{
+    return mFabsD(a) < __EQUAL_CONST_D;
 }
 
 //--------------------------------------
