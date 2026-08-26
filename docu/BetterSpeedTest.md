@@ -3,12 +3,12 @@
 
 ## Goal: get the (nearly or better) speed as vanilla lua on "localvar test"
 - Lua 5.5.1: 1.243u 0.002s 0:01.25 99.2%     0+0k 0+0io 0pf+0w
-- Elfscript 0.6f close on lua but still 200-300ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
+- Elfscript 0.6f close to lua but still 200-300ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
 - Elfscript 0.6f outperform PHP 8: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
-## Version 0.7 a (TODO);
+## Version 0.7 a 
 
 - [X] special OP_CODES for "for in in range VALUE" -- seams not to be faster in -O2
     - IPO active: 1.354u 0.004s 0:01.36 99.2%     0+0k 0+0io 0pf+0w
@@ -20,11 +20,10 @@
 - [x] default functions to Bytecode: - lot of work for nearly no speed enhancements 
 
     Test: is it worth ? 
-        static field test with getRandomF(%i)       : 4.550u 0.002s 0:04.56 99.7%     0+0k 0+0io 0pf+0w 
-        static field test with math::randomf(%i)    : 4.039u 0.004s 0:04.05 99.5%     0+0k 0+0io 0pf+0w 
-        static field test with math::randomf() * %i : 4.080u 0.005s 0:04.10 99.5%     0+0k 0+0io 0pf+0w
-
-        !!! * %i results in rounding errors !!!
+    - static field test with getRandomF(%i)       : 4.550u 0.002s 0:04.56 99.7%     0+0k 0+0io 0pf+0w 
+    - static field test with math::randomf(%i)    : 4.039u 0.004s 0:04.05 99.5%     0+0k 0+0io 0pf+0w 
+    - static field test with math::randomf() * %i : 4.080u 0.005s 0:04.10 99.5%     0+0k 0+0io 0pf+0w
+    - !!! * %i results in rounding errors !!!
 
     YES! but using only 3 op codes: OP_INLINE_COMMAND_3P, OP_INLINE_COMMAND_2P and OP_INLINE_COMMAND_1P
 
@@ -49,7 +48,7 @@
     
   
 
-- [ ] Add a new Benchmark file and update the tests with the new functions.
+- [X] Add a new Benchmark file and update the tests with the new functions.
 
 ## Version 0.6f :
 - [~] ConsoleVector to pointer - but it's not faster when i remove it ... mhhh 
