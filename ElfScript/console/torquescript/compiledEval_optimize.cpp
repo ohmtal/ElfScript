@@ -4085,6 +4085,7 @@ handle_OP_INLINE_COMMAND:
                         POP_STK();
                   }
                   stack[_STK + 1].setEmptyString();
+                  break;
             }
             default: {
                   Con::errorf("Unknown command");
@@ -4093,6 +4094,7 @@ handle_OP_INLINE_COMMAND:
                         POP_STK();
                   }
                   stack[_STK + 1].setEmptyString();
+                  break;
             }
       } //switch
 

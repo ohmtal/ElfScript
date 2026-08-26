@@ -11,7 +11,8 @@
 
 ## Version 0.7 a 
 
-- TestResult (best of 3 tests) in /docu/speedtest/elf_v6:
+TestResult (best of 3 tests) in /docu/speedtest/elf_v6:
+
 | Script | time |
 | --- | --- |
 | test_localvar.elf     | 1.421u 0.003s 0:01.42 100.0%    0+0k 0+0io 0pf+0w |
@@ -21,7 +22,7 @@
 | test_vector_components.elf    | 5.594u 0.005s 0:05.62 99.4%     0+0k 0+0io 0pf+0w |
 
 **NOTE** Vector Component and Static Field are float. Math::randomF is double. The 
-ConsoleValue is also double. When it float/double is converted there are rounding errors.
+ConsoleValue is also double. When float/double is converted there are rounding errors.
 
 - [X] special OP_CODES for "for in in range VALUE" -- seams not to be faster in -O2
     - IPO active: 1.354u 0.004s 0:01.36 99.2%     0+0k 0+0io 0pf+0w
