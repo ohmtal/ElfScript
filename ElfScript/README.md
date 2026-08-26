@@ -2,11 +2,17 @@
 
 This is the enhanced Version of TorqueScript. 
 
+- direct threading in VM instead of switch/case
+- inline field cache
+- core math commands in VM
+- fast iteration with "for i in"
+- stack ConsoleValue is written and loaded directly in the right format it possible 
+- dynamic fields are not longer strings - converted to ConsoleValue
+- fast stack loading writing of native field types
 - constants preprocessor
-- field type fast path
 - stability fixes
 - memleak fixes.
-- and more ....
+- and much more ....
 
 I already worked on ElfScript bindings for: 
 
