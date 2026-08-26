@@ -272,6 +272,8 @@ HEXDIGIT [a-fA-F0-9]
 "default"   { CMDlval.i = MakeToken<int>(rwDEFAULT,          yylineno); return rwDEFAULT;          }
 "package"   { CMDlval.i = MakeToken<int>(rwPACKAGE,          yylineno); return rwPACKAGE;          }
 "print"     { CMDlval.i = MakeToken<int>(rwPRINT,            yylineno); return rwPRINT;          }
+"printf"   { CMDlval.i = MakeToken<int>(rwPRINTF,            yylineno); return rwPRINTF;          }
+"sprintf"   { CMDlval.i = MakeToken<int>(rwSPRINTF,            yylineno); return rwSPRINTF;          }
 "math::randomf"   { CMDlval.i = MakeToken<int>(rwRANDOMF,          yylineno); return rwRANDOMF;          }
 
 "math::floor"     { CMDlval.i = MakeToken<int>(rwFLOOR,            yylineno); return rwFLOOR;          }

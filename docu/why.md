@@ -57,7 +57,7 @@ back to number and maybe again back to a string again conversations. So this was
 my first part to apply levers. 
 
 ### Many construction sites
-In compare to TGE's TorqueScript the Torque3D Version is more moderen and 
+In compare to TGE's TorqueScript the Torque3D Version is more modern and 
 enhanced. But most of the code is still like it was in "Ur" TGE TorqueScript 
 version. 
 So i realized i had to look at:
@@ -66,7 +66,7 @@ So i realized i had to look at:
 - static fields <<< this was the slowest part of all
 - dynamic fields 
 
-Looking at the OP-Codes of the virual machine most times it call load string 
+Looking at the OP-Codes of the virual machine most times it call load string and
 save string. The ConsoleValue which hold the data is good but it does not 
 use it potential. I don't know how many nights i have spend to get it in the 
 state it's now is. 

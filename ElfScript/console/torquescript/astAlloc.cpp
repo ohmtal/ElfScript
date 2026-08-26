@@ -532,8 +532,9 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       }
 
 
-      const U32 MAX_ELEMENTS = 16;
+      const U32 MAX_ELEMENTS = 32; //too much ?!
       switch (commandID) {
+
             case CommandStmtNode::PRINT:
             {
                   U32 i = 0;
@@ -655,7 +656,10 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
                   break;
             }
 
-
+            case CommandStmtNode::PRINTF:
+                  TORQUE_CASE_FALLTHROUGH;
+            case CommandStmtNode::SPRINTF:
+                  TORQUE_CASE_FALLTHROUGH;
             default:  {
                   for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
                   codeStream.emit(OP_INLINE_COMMAND);

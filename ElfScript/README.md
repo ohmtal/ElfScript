@@ -12,6 +12,7 @@ I already worked on ElfScript bindings for:
 
 - Basic Demo for Testing Script only: [demo](./demo)
 - ImGui and SDL3 bindings demo with BaseFlux: [BaseElf](../BaseElf)
+- Pure SDL3 bindings demo: [CrazyElf](../CrazyElf)
 - OhmFlux (ElfTest) [OhmFlux](https://github.com/ohmtal/OhmFlux)
 - raylib-elfScript [raylib-elfScript](https://github.com/ohmtal/raylib-elfscript)
 - ElfFlux raylib-elfScript with Objects [ElfFlux](https://github.com/ohmtal/ElfFlux)

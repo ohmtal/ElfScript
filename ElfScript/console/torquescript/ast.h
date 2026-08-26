@@ -639,6 +639,8 @@ struct CommandStmtNode : ExprNode
    U32 commandID;
    enum {
       PRINT,
+      PRINTF,
+      SPRINTF,
       RANDOMF,
       // .... P1
       FLOOR,

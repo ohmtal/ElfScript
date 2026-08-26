@@ -4076,8 +4076,27 @@ handle_OP_INLINE_COMMAND:
       U32 commandID = code[ip++];
 
       switch(commandID) {
-
-
+            case CommandStmtNode::PRINTF:
+                  if (count == 0) {
+                        stack[_STK + 1].setEmptyString();
+                        break;
+                  }
+                  Con::printf("%s", formatString( count, &stack[_STK - count + 1]).c_str());
+                  for (S32 i = count - 1; i >= 0; i--) {
+                        POP_STK();
+                  }
+                  stack[_STK + 1].setEmptyString();
+                  break;
+            case CommandStmtNode::SPRINTF:
+                  if (count == 0) {
+                        stack[_STK + 1].setEmptyString();
+                        break;
+                  }
+                  stack[_STK - count + 1].setString(formatString(count, &stack[_STK - count + 1]).c_str());
+                  for (S32 i = count - 1; i >= 0; i--) {
+                        POP_STK();
+                  }
+                  break;
             case CommandStmtNode::INVALID_PARAM_COUNT: {
                   Con::errorf("Invalid parameter count for math:: command");
                   // FALLBACK we need to pop em all but count should be 0!

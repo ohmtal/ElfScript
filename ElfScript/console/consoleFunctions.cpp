@@ -179,131 +179,303 @@ DefineEngineFunction( strasc, int, ( const char* chr ),,
    return oneUTF8toUTF32( chr );
 }
 
+// //-----------------------------------------------------------------------------
+// String formatString(S32 argc, ConsoleValue* argv) {
+//       // First is the command name or null, so we start at 2
+//       if (argc < 2) return "";
+//
+//       const char* fmt = argv[1].getString();
+//       S32 currentArgIndex = 2; // First arg at 2
+//
+//       StringBuilder builder;
+//
+//       while (*fmt)
+//       {
+//             if (*fmt == '%')
+//             {
+//                   if (*(fmt + 1) == '\0')
+//                   {
+//                         builder.append('%');
+//                         break;
+//                   }
+//
+//                   const char* specStart = fmt;
+//                   fmt++;
+//
+//                   // We have a double %%, it's just an escaped percent sign
+//                   if (*fmt == '%')
+//                   {
+//                         builder.append('%');
+//                         fmt++;
+//                         continue;
+//                   }
+//
+//                   if (currentArgIndex >= argc)
+//                   {
+//                         Con::errorf("formatString: invalid argument count !!");
+//                         break;
+//                   }
+//
+//                   ConsoleValue& curVal = argv[currentArgIndex];
+//                   currentArgIndex++;
+//
+//                   // skip flags
+//                   while (*fmt != '\0' && !dIsalpha(*fmt))
+//                   {
+//                         fmt++;
+//                   }
+//
+//                   // long/long flags check
+//                   bool isLongLong = false;
+//                   bool isLong = false;
+//                   bool isLongDouble = false;
+//
+//                   // modifier flags
+//                   while (*fmt == 'l' || *fmt == 'h' || *fmt == 'z' || *fmt == 'L')
+//                   {
+//                         if (*fmt == 'l')
+//                         {
+//                               if (isLong) { isLongLong = true; isLong = false; }
+//                               else { isLong = true; }
+//                         }
+//                         else if (*fmt == 'L')
+//                         {
+//                               isLongDouble = true;
+//                         }
+//                         fmt++;
+//                   }
+//
+//                   // null check
+//                   if (*fmt == '\0')
+//                   {
+//                         Con::errorf("formatString: invalid format specifier!!");
+//                         break;
+//                   }
+//
+//                   // calc length
+//                   U32 specLen = (fmt - specStart) + 1;
+//                   char specBuffer[32];
+//                   if (specLen > 31) specLen = 31;
+//                   dStrncpy(specBuffer, specStart, specLen);
+//                   specBuffer[specLen] = '\0';
+//
+//                   char tokenBuffer[512];
+//                   tokenBuffer[0] = '\0';
+//
+//                   // here is the beaf
+//                   switch (*fmt)
+//                   {
+//                         case 's': // String
+//                               dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, curVal.getString());
+//                               break;
+//
+//                         case 'c': TORQUE_CASE_FALLTHROUGH;
+//                         case 'C': TORQUE_CASE_FALLTHROUGH;
+//                         case 'd': TORQUE_CASE_FALLTHROUGH;
+//                         case 'i': TORQUE_CASE_FALLTHROUGH;
+//                         case 'o': TORQUE_CASE_FALLTHROUGH;
+//                         case 'u': TORQUE_CASE_FALLTHROUGH;
+//                         case 'x': TORQUE_CASE_FALLTHROUGH;
+//                         case 'X':
+//                         {
+//                               if (isLongLong)
+//                               {
+//                                     if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long long)curVal.getInt());
+//                                     else
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long long)curVal.getInt());
+//                               }
+//                               else if (isLong)
+//                               {
+//                                     if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long)curVal.getInt());
+//                                     else
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long)curVal.getInt());
+//                               }
+//                               else //  32-Bit Integer
+//                               {
+//                                     if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned int)curVal.getInt());
+//                                     else
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (int)curVal.getInt());
+//                               }
+//                               break;
+//                         }
+//
+//                         case 'e': TORQUE_CASE_FALLTHROUGH;
+//                         case 'E': TORQUE_CASE_FALLTHROUGH;
+//                         case 'f': TORQUE_CASE_FALLTHROUGH;
+//                         case 'g': TORQUE_CASE_FALLTHROUGH;
+//                         case 'G':
+//                         {
+//                               // sprintf erwartet für %f/%e/%g standardmäßig double (64-Bit Fließkomma)
+//                               if (isLongDouble)
+//                                     dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long double)curVal.getFloat());
+//                               else
+//                                     dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (double)curVal.getFloat());
+//                               break;
+//                         }
+//
+//                         case 'p':
+//                               dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (void*)(uintptr_t)curVal.getInt());
+//                               break;
+//
+//                         default:
+//                               Con::errorf("formatString: unknown type: '%c'!", *fmt);
+//                               tokenBuffer[0] = '\0';
+//                               break;
+//                   }
+//
+//                   builder.append(tokenBuffer);
+//             }
+//             else
+//             {
+//                   builder.append(*fmt);
+//             }
+//
+//             fmt++;
+//       }
+//
+//       return builder.end();
+// }
 //-----------------------------------------------------------------------------
 // ElfScript HeavyMetal formatString
+// NOTE: marked as obsolete .. use sprintf or printf !!
 ConsoleFunction(formatString, const char*, 2, 32,
                 "(string format, ...)\n"
                 "like strFormat but with up to 31 parameters!"
 ){
-      const char* fmt = argv[1];
-      S32 currentArgIndex = 2; // first arg at 2
+      // we first param is null or function name so move it one up!
+      String result = formatString((U32)argc - 1, argv + 1);
 
-      StringBuilder builder;
-
-      while (*fmt)
-      {
-            if (*fmt == '%' && *(fmt + 1) != '\0')
-            {
-                  const char* specStart = fmt;
-                  fmt++;
-
-                  if (*fmt == '%')
-                  {
-                        builder.append('%');
-                        fmt++;
-                        continue;
-                  }
-
-                  if (currentArgIndex >= argc)
-                  {
-                        Con::errorf("formatString: invalid argument count !!");
-                        break;
-                  }
-
-                  const char* argValue = argv[currentArgIndex];
-                  currentArgIndex++;
-                  while (*fmt != '\0' && !dIsalpha(*fmt))
-                  {
-                        fmt++;
-                  }
-
-                  while (*fmt == 'l' || *fmt == 'h' || *fmt == 'z')
-                  {
-                        fmt++;
-                  }
-
-                  if (*fmt == '\0')
-                  {
-                        Con::errorf("formatString: invalid format specifier!!");
-                        break;
-                  }
-
-                  U32 specLen = (fmt - specStart) + 1;
-                  char specBuffer[32];
-                  if (specLen >= 32) specLen = 31;
-                  dStrncpy(specBuffer, specStart, specLen);
-                  specBuffer[specLen] = '\0';
-
-                  char tokenBuffer[512];
-
-                  switch (*fmt)
-                  {
-                        case 's': // String
-                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, argValue);
-                              break;
-
-                        case 'c':
-                        case 'C':
-                        case 'd':
-                        case 'i':
-                        case 'o':
-                        case 'u':
-                        case 'x':
-                        case 'X':
-                        {
-                              // long
-                              if (dStrchr(specBuffer, 'l') != NULL)
-                              {
-                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
-                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long long)strtoull(argValue, NULL, 10));
-                                    else
-                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long long)strtoll(argValue, NULL, 10));
-                              }
-                              else //  32-Bit Integer
-                              {
-                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
-                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoui(argValue));
-                                    else
-                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoi(argValue));
-                              }
-                              break;
-                        }
-
-                        case 'e':
-                        case 'E':
-                        case 'f':
-                        case 'g':
-                        case 'G':
-                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtof(argValue));
-                              break;
-
-                        default:
-                              Con::errorf("formatString: unknown type: '%c'!", *fmt);
-                              tokenBuffer[0] = '\0';
-                              break;
-                  }
-
-                  builder.append(tokenBuffer);
-            }
-            else
-            {
-                  builder.append(*fmt);
-            }
-
-            fmt++;
-      }
-
-      // Ergebnis in den Torque-Return-Buffer schieben
-      U32 finalLen = builder.length();
+      U32 finalLen = result.length();
       char* returnBuffer = Con::getReturnBuffer(finalLen + 1);
-      dMemcpy(returnBuffer, builder.data(), finalLen);
-      returnBuffer[finalLen] = '\0';
-
+      dStrcpy(returnBuffer, result.c_str(), (size_t) result.length());
       return returnBuffer;
 }
+// ConsoleFunction(formatString, const char*, 2, 32,
+//                 "(string format, ...)\n"
+//                 "like strFormat but with up to 31 parameters!"
+// ){
+//
+//       const char* fmt = argv[1];
+//       S32 currentArgIndex = 2; // first arg at 2
+//
+//       StringBuilder builder;
+//
+//       while (*fmt)
+//       {
+//             if (*fmt == '%' && *(fmt + 1) != '\0')
+//             {
+//                   const char* specStart = fmt;
+//                   fmt++;
+//
+//                   if (*fmt == '%')
+//                   {
+//                         builder.append('%');
+//                         fmt++;
+//                         continue;
+//                   }
+//
+//                   if (currentArgIndex >= argc)
+//                   {
+//                         Con::errorf("formatString: invalid argument count !!");
+//                         break;
+//                   }
+//
+//                   const char* argValue = argv[currentArgIndex];
+//                   currentArgIndex++;
+//                   while (*fmt != '\0' && !dIsalpha(*fmt))
+//                   {
+//                         fmt++;
+//                   }
+//
+//                   while (*fmt == 'l' || *fmt == 'h' || *fmt == 'z')
+//                   {
+//                         fmt++;
+//                   }
+//
+//                   if (*fmt == '\0')
+//                   {
+//                         Con::errorf("formatString: invalid format specifier!!");
+//                         break;
+//                   }
+//
+//                   U32 specLen = (fmt - specStart) + 1;
+//                   char specBuffer[32];
+//                   if (specLen >= 32) specLen = 31;
+//                   dStrncpy(specBuffer, specStart, specLen);
+//                   specBuffer[specLen] = '\0';
+//
+//                   char tokenBuffer[512];
+//
+//                   switch (*fmt)
+//                   {
+//                         case 's': // String
+//                               dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, argValue);
+//                               break;
+//
+//                         case 'c':
+//                         case 'C':
+//                         case 'd':
+//                         case 'i':
+//                         case 'o':
+//                         case 'u':
+//                         case 'x':
+//                         case 'X':
+//                         {
+//                               // long
+//                               if (dStrchr(specBuffer, 'l') != NULL)
+//                               {
+//                                     if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long long)strtoull(argValue, NULL, 10));
+//                                     else
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long long)strtoll(argValue, NULL, 10));
+//                               }
+//                               else //  32-Bit Integer
+//                               {
+//                                     if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoui(argValue));
+//                                     else
+//                                           dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtoi(argValue));
+//                               }
+//                               break;
+//                         }
+//
+//                         case 'e':
+//                         case 'E':
+//                         case 'f':
+//                         case 'g':
+//                         case 'G':
+//                               dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, dAtof(argValue));
+//                               break;
+//
+//                         default:
+//                               Con::errorf("formatString: unknown type: '%c'!", *fmt);
+//                               tokenBuffer[0] = '\0';
+//                               break;
+//                   }
+//
+//                   builder.append(tokenBuffer);
+//             }
+//             else
+//             {
+//                   builder.append(*fmt);
+//             }
+//
+//             fmt++;
+//       }
+//
+//       U32 finalLen = builder.length();
+//       char* returnBuffer = Con::getReturnBuffer(finalLen + 1);
+//       dMemcpy(returnBuffer, builder.data(), finalLen);
+//       returnBuffer[finalLen] = '\0';
+//
+//       return returnBuffer;
+// }
 
 //-----------------------------------------------------------------------------
-
+// NOTE: marked as obsolete .. use sprintf or printf !!
 DefineEngineFunction( strformat, const char*, ( const char* format, const char* value ),,
    "Format the given value as a string using printf-style formatting.\n"
    "@param format A printf-style format string.\n"

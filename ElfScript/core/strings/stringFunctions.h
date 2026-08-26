@@ -304,6 +304,15 @@ char* dStripPath(const char* filename);
 int dStrrev(char* str);
 int dItoa(int n, char s[]);
 
+class ConsoleValue;
+/*
+ * format a string -  if you call it from ConsoleFunction you need to
+ *  1.) decrement argc , ingrement argv
+ * U32 argc count of parameter
+ * ConsoleValue* argv pointer to first console value
+ */
+String formatString(U32 argc, ConsoleValue* argv);
+
 //------------------------------------------------------------------------------
 // standard I/O functions [defined in platformString.cpp]
 

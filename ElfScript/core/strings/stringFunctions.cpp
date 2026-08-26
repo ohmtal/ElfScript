@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,11 +21,12 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "core/strings/stringFunctions.h"
-// XXTH not required here ?  #include "platform/platform.h"
+#include <console/console.h>
 
 
 #if defined(TORQUE_OS_WIN)
@@ -626,4 +628,171 @@ int dItoa(int n, char s[])
    s[i] = '\0';
    dStrrev(s);
    return dStrlen(s);
+}
+
+
+// ElfScript :
+//------------------------------------------------------------------------------
+String formatString(U32 argc, ConsoleValue* argv) {
+      // First is the command name or null, so we start at 2
+      if (argc < 1) return "";
+
+      const char* fmt = argv[0].getString();
+      S32 currentArgIndex = 1; // First arg at 1
+
+      StringBuilder builder;
+
+      while (*fmt)
+      {
+            if (*fmt == '%')
+            {
+                  if (*(fmt + 1) == '\0')
+                  {
+                        builder.append('%');
+                        break;
+                  }
+
+                  const char* specStart = fmt;
+                  fmt++;
+
+                  // We have a double %%, it's just an escaped percent sign
+                  if (*fmt == '%')
+                  {
+                        builder.append('%');
+                        fmt++;
+                        continue;
+                  }
+
+                  if (currentArgIndex >= argc)
+                  {
+                        Con::errorf("formatString: invalid argument count !!");
+                        break;
+                  }
+
+                  ConsoleValue& curVal = argv[currentArgIndex];
+                  currentArgIndex++;
+
+                  // skip flags
+                  while (*fmt != '\0' && !dIsalpha(*fmt))
+                  {
+                        fmt++;
+                  }
+
+                  // long/long flags check
+                  bool isLongLong = false;
+                  bool isLong = false;
+                  bool isLongDouble = false;
+
+                  // modifier flags
+                  while (*fmt == 'l' || *fmt == 'h' || *fmt == 'z' || *fmt == 'L')
+                  {
+                        if (*fmt == 'l')
+                        {
+                              if (isLong) { isLongLong = true; isLong = false; }
+                              else { isLong = true; }
+                        }
+                        else if (*fmt == 'L')
+                        {
+                              isLongDouble = true;
+                        }
+                        fmt++;
+                  }
+
+                  // null check
+                  if (*fmt == '\0')
+                  {
+                        Con::errorf("formatString: invalid format specifier!!");
+                        break;
+                  }
+
+                  char tokenBuffer[512];
+                  tokenBuffer[0] = '\0';
+
+                  // calc length
+                  U32 specLen = (fmt - specStart) + 1;
+                  char specBuffer[32];
+                  if (specLen > 31)
+                  {
+                        Con::errorf("formatString: format specifier too long!");
+                        break;
+                  }
+
+                  dStrncpy(specBuffer, specStart, specLen);
+                  specBuffer[specLen] = '\0';
+
+                  // here is the beaf
+                  switch (*fmt)
+                  {
+                        case 's': // String
+                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, curVal.getString());
+                              break;
+
+                        case 'c': TORQUE_CASE_FALLTHROUGH;
+                        case 'C': TORQUE_CASE_FALLTHROUGH;
+                        case 'd': TORQUE_CASE_FALLTHROUGH;
+                        case 'i': TORQUE_CASE_FALLTHROUGH;
+                        case 'o': TORQUE_CASE_FALLTHROUGH;
+                        case 'u': TORQUE_CASE_FALLTHROUGH;
+                        case 'x': TORQUE_CASE_FALLTHROUGH;
+                        case 'X':
+                        {
+                              if (isLongLong)
+                              {
+                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long long)curVal.getInt());
+                                    else
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long long)curVal.getInt());
+                              }
+                              else if (isLong)
+                              {
+                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned long)curVal.getInt());
+                                    else
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long)curVal.getInt());
+                              }
+                              else //  32-Bit Integer
+                              {
+                                    if (*fmt == 'u' || *fmt == 'x' || *fmt == 'X')
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (unsigned int)curVal.getInt());
+                                    else
+                                          dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (int)curVal.getInt());
+                              }
+                              break;
+                        }
+
+                        case 'e': TORQUE_CASE_FALLTHROUGH;
+                        case 'E': TORQUE_CASE_FALLTHROUGH;
+                        case 'f': TORQUE_CASE_FALLTHROUGH;
+                        case 'g': TORQUE_CASE_FALLTHROUGH;
+                        case 'G':
+                        {
+                              // sprintf erwartet für %f/%e/%g standardmäßig double (64-Bit Fließkomma)
+                              if (isLongDouble)
+                                    dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (long double)curVal.getFloat());
+                              else
+                                    dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (double)curVal.getFloat());
+                              break;
+                        }
+
+                        case 'p':
+                              dSprintf(tokenBuffer, sizeof(tokenBuffer), specBuffer, (void*)(uintptr_t)curVal.getInt());
+                              break;
+
+                        default:
+                              Con::errorf("formatString: unknown type: '%c'!", *fmt);
+                              tokenBuffer[0] = '\0';
+                              break;
+                  }
+
+                  builder.append(tokenBuffer);
+            }
+            else
+            {
+                  builder.append(*fmt);
+            }
+
+            fmt++;
+      }
+
+      return builder.end();
 }

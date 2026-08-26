@@ -120,6 +120,18 @@ union
  char padding[4];
 };
 
+struct alignas(16) ConsoleValueTest {
+      union {
+            F64 f;
+            S64 i;
+            void* ptr;
+      } val;                  // 8 Byte
+
+      S32 type;               // 4 byte
+      unsigned char flags;    // 1 byte
+      char padding[3];        // 4 byte
+};
+
 DefineEngineFunction(testo, F32, (), ,"test for anything i like ;)"){
     Con::printSeparator();
     Con::printf("test size: %d cur size: %d curWithoutVec %d",

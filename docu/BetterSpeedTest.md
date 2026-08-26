@@ -3,7 +3,7 @@
 
 ## Goal: get the (nearly or better) speed as vanilla lua on "localvar test"
 - Lua 5.5.1: 1.243u 0.002s 0:01.25 99.2%     0+0k 0+0io 0pf+0w
-- Elfscript 0.6f close to lua but still 200-300ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
+- Elfscript 0.6f close to lua but still about 200ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
 - Elfscript 0.6f outperform PHP 8: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
@@ -15,11 +15,44 @@ TestResult (best of 3 tests) in /docu/speedtest/elf_v6:
 
 | Script | time |
 | --- | --- |
-| test_localvar.elf     | 1.421u 0.003s 0:01.42 100.0%    0+0k 0+0io 0pf+0w |
-| test_global.elf       | 3.009u 0.004s 0:03.03 99.0%     0+0k 0+0io 0pf+0w |
-| test_static.elf       | 4.176u 0.006s 0:04.20 99.2%     0+0k 0+0io 0pf+0w |
-| test_dynamic.elf      | 3.872u 0.005s 0:03.89 99.4%     0+0k 0+0io 0pf+0w |
-| test_vector_components.elf    | 5.594u 0.005s 0:05.62 99.4%     0+0k 0+0io 0pf+0w |
+| test_localvar.elf     | 1.418u 0.005s 0:01.42 99.2%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 2.930u 0.002s 0:02.94 99.6%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.017u 0.002s 0:04.03 99.5%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.804u 0.004s 0:03.81 99.7%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 5.411u 0.002s 0:05.42 99.8%     0+0k 0+0io 0pf+0w |
+
+---
+
+With IPO / -O3 optimized compiled 
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.365u 0.003s 0:01.37 99.2%     0+0k 0+0io 0pf+0w   |
+| test_global.elf       | 3.487u 0.006s 0:03.50 99.4%     0+0k 0+0io 0pf+0w  |
+| test_static.elf       | 4.629u 0.002s 0:04.64 99.5%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 4.118u 0.002s 0:04.13 99.5%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 5.171u 0.004s 0:05.20 99.4%     0+0k 0+0io 0pf+0w |
+
+Localvar and Vector Componets is faster but global/static/dynamic slower!
+
+---
+
+With -0fast compiled:
+
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.410u 0.002s 0:01.41 100.0%    0+0k 0+0io 0pf+0w |
+| test_global.elf       | 2.947u 0.003s 0:02.96 99.3%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 3.908u 0.004s 0:03.92 99.4%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.784u 0.004s 0:03.80 99.4%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 5.699u 0.006s 0:05.73 99.3%     0+0k 0+0io 0pf+0w |
+
+Best results with this only components is slightly slower then -O2 (first one). 
+But i would prefer -O2. 
+
+---
+
+
+
 
 **NOTE** Vector Component and Static Field are float. Math::randomF is double. The 
 ConsoleValue is also double. When float/double is converted there are rounding errors.
@@ -784,3 +817,14 @@ echo("Final sum should be 0 == ", sto.DynX);
 echo("---------------------");
 echo("---------------------");
 ```
+
+
+Speed template saved here ;)
+
+| Script | time |
+| --- | --- |
+| test_localvar.elf     |  |
+| test_global.elf       |  |
+| test_static.elf       |  |
+| test_dynamic.elf      |  |
+| test_vector_components.elf    |  |

@@ -145,22 +145,24 @@ struct ConsoleVector {
 };
 // #endif
 
-struct alignas(16) ConsoleValueTest {
-      union {
-            F64 f;
-            S64 i;
-            void* ptr;
-      } val;                  // 8 Byte
-
-      S32 type;               // 4 byte
-      unsigned char flags;    // 1 byte
-      char padding[3];        // 4 byte
-};
+// TEST only - current is good, no need to rewrite everything
+// // // struct alignas(16) ConsoleValueTest {
+// // //       union {
+// // //             F64 f;
+// // //             S64 i;
+// // //             void* ptr;
+// // //       } val;                  // 8 Byte
+// // //
+// // //       S32 type;               // 4 byte
+// // //       unsigned char flags;    // 1 byte
+// // //       char padding[3];        // 4 byte
+// // // };
 
 
 class ConsoleValue
 {
 public:
+// NOTE for windoofs ignore the "unknown pragma warning" when using gcc/clang
 #pragma warning( push )
 #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
       union
@@ -169,7 +171,7 @@ public:
             S64   i;
             char* s;
             void* dataPtr;
-      };
+      };  // 8 byte
 
 // union
    // {
@@ -188,10 +190,9 @@ public:
    // };
 #pragma warning(pop)
 
-//NOTE  i did move it to dataPtr - was a mess ! and the bad is it was not a bit faster than before
-//      with exaclty 16 bytes - also with the 2 structs (32byte) it was not slower than without
-//      we do not have the problem here stop fiddle with the ConsoleValue
+
 #ifdef ENABLE_CONSOLE_VECTOR
+  // TODO move this to a pointer ... first attempt failed .. and it's not faster but less memory
   ConsoleVector v;      // 16 Byte
 #endif
 
@@ -517,7 +518,8 @@ public:
       type = ConsoleValueType::cvSTEntry;
 
       // StringTable::insert accepts NULL and returns EmptyString
-      s = const_cast<char*>(StringTable->insert(val ? val : ""));
+      // s = const_cast<char*>(StringTable->insert(val ? val : ""));
+      s = val ? const_cast<char*>(StringTable->insert(val, true)) : const_cast<char*>(StringTable->EmptyString());
       // // bufferLen = 0;   // NOT owned — StringTable manages this memory
    }
 

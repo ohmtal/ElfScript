@@ -108,7 +108,7 @@ function StarField::Render(%this) {
         // <<<<<<<<<<<<<<<<<<<<<
         if (%this.drawLines)
         {
-            %t = mClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
+            %t = math::ClampF(%lStarPoints.z + START_DIV , 0.0 , 1.0 );
 
             if ( (%t - %lStarPoints.z) > 1e-3)
             {
@@ -121,7 +121,7 @@ function StarField::Render(%this) {
         }
         else
         {
-            %radius = mLerp(2.0, 0.3, %lStarPoints.z);
+            %radius = math::Lerp(2.0, 0.3, %lStarPoints.z);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
@@ -153,5 +153,5 @@ function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %is
 }
 function StarField::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
 function StarField::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
-    %this.speed = mClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
+    %this.speed = math::ClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
 }

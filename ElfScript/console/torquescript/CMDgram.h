@@ -123,25 +123,27 @@ extern int CMDdebug;
     rwRANGE = 324,                 /* rwRANGE  */
     rwSTEP = 325,                  /* rwSTEP  */
     rwPRINT = 326,                 /* rwPRINT  */
-    rwRANDOMF = 327,               /* rwRANDOMF  */
-    rwFLOOR = 328,                 /* rwFLOOR  */
-    rwCEIL = 329,                  /* rwCEIL  */
-    rwFABS = 330,                  /* rwFABS  */
-    rwSIN = 331,                   /* rwSIN  */
-    rwCOS = 332,                   /* rwCOS  */
-    rwATAN = 333,                  /* rwATAN  */
-    rwTANH = 334,                  /* rwTANH  */
-    rwSQRT = 335,                  /* rwSQRT  */
-    rwISZERO = 336,                /* rwISZERO  */
-    rwFMOD = 337,                  /* rwFMOD  */
-    rwMIN = 338,                   /* rwMIN  */
-    rwMAX = 339,                   /* rwMAX  */
-    rwATAN2 = 340,                 /* rwATAN2  */
-    rwPOW = 341,                   /* rwPOW  */
-    rwCLAMPF = 342,                /* rwCLAMPF  */
-    rwLERP = 343,                  /* rwLERP  */
-    rwSMOOTHSTEP = 344,            /* rwSMOOTHSTEP  */
-    UNARY = 345                    /* UNARY  */
+    rwPRINTF = 327,                /* rwPRINTF  */
+    rwSPRINTF = 328,               /* rwSPRINTF  */
+    rwRANDOMF = 329,               /* rwRANDOMF  */
+    rwFLOOR = 330,                 /* rwFLOOR  */
+    rwCEIL = 331,                  /* rwCEIL  */
+    rwFABS = 332,                  /* rwFABS  */
+    rwSIN = 333,                   /* rwSIN  */
+    rwCOS = 334,                   /* rwCOS  */
+    rwATAN = 335,                  /* rwATAN  */
+    rwTANH = 336,                  /* rwTANH  */
+    rwSQRT = 337,                  /* rwSQRT  */
+    rwISZERO = 338,                /* rwISZERO  */
+    rwFMOD = 339,                  /* rwFMOD  */
+    rwMIN = 340,                   /* rwMIN  */
+    rwMAX = 341,                   /* rwMAX  */
+    rwATAN2 = 342,                 /* rwATAN2  */
+    rwPOW = 343,                   /* rwPOW  */
+    rwCLAMPF = 344,                /* rwCLAMPF  */
+    rwLERP = 345,                  /* rwLERP  */
+    rwSMOOTHSTEP = 346,            /* rwSMOOTHSTEP  */
+    UNARY = 347                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -168,7 +170,7 @@ union YYSTYPE
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 
-#line 172 "CMDgram.h"
+#line 174 "CMDgram.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -114,7 +114,7 @@ struct Token
 %token <i> opDOTDOT rwRANGE rwSTEP
 
 //ElfScript 0.6
-%token <i> rwPRINT rwRANDOMF
+%token <i> rwPRINT rwPRINTF rwSPRINTF rwRANDOMF
 %token <i> rwFLOOR rwCEIL rwFABS rwSIN rwCOS rwATAN rwTANH rwSQRT rwISZERO
 %token <i> rwFMOD rwMIN rwMAX rwATAN2 rwPOW
 %token <i> rwCLAMPF rwLERP rwSMOOTHSTEP
@@ -782,10 +782,14 @@ assert_expr
    ;
 
 
-// ElfScript 0.6d TODO
+// ElfScript 0.6d inline math and a print
 inline_command_expr
    : rwPRINT '(' expr_list ')'
       { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::PRINT, $3); }
+   | rwPRINTF  '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::PRINTF, $3); }
+   | rwSPRINTF  '(' expr_list ')'
+      { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::SPRINTF, $3); }
    | rwRANDOMF '('  ')'
       { $$ = CommandStmtNode::alloc( $1.lineNumber, CommandStmtNode::RANDOMF, NULL); }
    | rwRANDOMF '(' expr_list ')'
