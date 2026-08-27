@@ -249,10 +249,10 @@ public:
         addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject), "Flip mode on Render Target 0..3, see also SDL_FlipMode");
 
         addField("color", TypeColor, Offset(mColor,SpriteBaseObject), "Color in Byte representation default WHITE = 255 255 255 255");
-        addField("r", TypeS8, Offset(mColor.r,SpriteBaseObject));
-        addField("g", TypeS8, Offset(mColor.g,SpriteBaseObject));
-        addField("b", TypeS8, Offset(mColor.b,SpriteBaseObject));
-        addField("a", TypeS8, Offset(mColor.g,SpriteBaseObject));
+        addField("r", TypeU8, Offset(mColor.r,SpriteBaseObject));
+        addField("g", TypeU8, Offset(mColor.g,SpriteBaseObject));
+        addField("b", TypeU8, Offset(mColor.b,SpriteBaseObject));
+        addField("a", TypeU8, Offset(mColor.g,SpriteBaseObject));
 
         addField("visible", TypeBool, Offset(mVisible,SpriteBaseObject), "Flag for Rendering with SpriteGroup or manually checked.");
 

@@ -130,7 +130,7 @@ void ConsoleConstructor::init( const char *cName, const char *fName, const char 
    mUsage = usg;
    mClassName = cName;
    mSC = 0; mFC = 0; mVC = 0; mBC = 0; mIC = 0;
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    mVecC = 0;
 #endif
    mCallback = mGroup = false;
@@ -159,14 +159,14 @@ void ConsoleConstructor::setup()
          Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
       else if( walk->mBC )
          Con::addCommand( walk->mClassName, walk->mFuncName, walk->mBC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+#ifdef ENABLE_CONSOLE_VECTOR
+      else if( walk->mVecC)
+        Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVecC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+#endif
       else if( walk->mGroup )
          Con::markCommandGroup( walk->mClassName, walk->mFuncName, walk->mUsage);
       else if( walk->mClassName)
          Con::noteScriptCallback( walk->mClassName, walk->mFuncName, walk->mUsage, walk->mHeader);
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
-      else if( walk->mVecC)
-        Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVecC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
-#endif
       else if( walk->mNS )
       {
          Namespace* ns = Namespace::find( StringTable->insert( walk->mClassName) );
@@ -210,7 +210,7 @@ ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcNa
    mBC = bfunc;
 }
 // --------------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
@@ -1340,7 +1340,7 @@ void addCommand( const char *nsName, const char *name,FloatCallback cb, const ch
    ns->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 void addCommand( const char *nsName, const char *name,VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       Namespace *ns = lookupNamespace(nsName);
@@ -1402,7 +1402,7 @@ void addCommand( const char *name,BoolCallback cb,const char *usage, S32 minArgs
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 void addCommand( const char *name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );

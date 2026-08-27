@@ -1,16 +1,23 @@
 exec("include/AtlasFont.elf");
 
-#define BORDER 60
 #define LOGO_SPAWN_RATE 50
 #define LOGO_START_SPEED 100
 #define MAG_DIR_VALUE 15
 #define MAG_MAX 5000
-#define BOUNCY 6.66
-#define LOGO_SIZE 32
 //----------------------------------------------------------------------
 function createBaseDemo() {
-    %obj = new ScriptGroup() {
+    %obj = new Group() {
         class = "BaseDemo";
+        TypeF32 magDirection = 0.0;
+        TypeF32 magnetism = 0.0;
+        TypeS32 GrayTexture = 0;
+        TypeS32 IconTexture = 0;
+        TypeS32 logoList = 0;
+
+        TypeF32 _border   = 60.0;
+        TypeF32 _logoSize = 32.0;
+        TypeF32 logoHalfSize = 16.0;
+        TypeF32 _bouncy   = 6.66;
     };
 
     return %obj;
@@ -18,12 +25,13 @@ function createBaseDemo() {
 //----------------------------------------------------------------------
 function BaseDemo::onAdd(%this) {
     SetClearBackground( SEABLUE ); //set background color
-    %this.add ( new TextureObject(IconTexture) { fileName = "texture/icon_32.png"; } );
-    %this.add ( new TextureObject(GrayTexture) { fileName = "texture/icon_32_gray.png"; });
+    %this.add ( %this.IconTexture = new TextureObject() { fileName = "texture/icon_32.png"; } );
+    %this.add ( %this.GrayTexture =  new TextureObject() { fileName = "texture/icon_32_gray.png"; });
 
-    new SimSet(LogoList);
+    %this.logoList = new Group(LogoList);
+    %this.add(%this.logoList);
 
-    $magDirection = MAG_DIR_VALUE;
+    %this.magDirection = MAG_DIR_VALUE;
     $showBla =1;
 
 
@@ -45,13 +53,7 @@ function BaseDemo::onAdd(%this) {
 }
 //----------------------------------------------------------------------
 function BaseDemo::OnRemove(%this) {
-    // cleanup done by ScriptGroup: ($this)
-    // IconTexture.delete();
-    // GrayTexture.delete();
-    // FontTexture.delete();
 
-    LogoList.deleteObjects();
-    LogoList.delete();
 }
 //----------------------------------------------------------------------
 function BaseDemo::OnUpdate(%this, %dt) {
@@ -63,9 +65,8 @@ function BaseDemo::Render(%this) {
    if ($showBla) {
         %y = 20;
         %x = 10;
-        if (isObject(IconTexture)) {
-            // IconTexture.DrawCentered(%x + 16,%y + 8);
-             IconTexture.DrawRotatedCentered( %x + 16,%y + 8, mFmod( getGameTime() * 150, 359)  );
+        if (isObject(%this.IconTexture)) {
+             %this.IconTexture.DrawRotatedCentered( %x + 16,%y + 8, mFmod( getGameTime() * 150, 359)  );
         }
 
         %fontScale = 1.25;
@@ -128,11 +129,6 @@ function BaseDemo::Render(%this) {
                 $FONT_EFFECT_RAINBOW
         );
 
-        // if (isObject(IconTexture)){
-        //     IconTexture.DrawRotatedSrcDstRect( "0 0 32 32",250 SPC %y SPC "32 32", 45, "0 0");
-        //     IconTexture.DrawRotatedSrcDstRect( "0 0 32 32",280 SPC %y SPC "32 32", 60, "16 16", SDL_FLIP_HORIZONTAL, "200 100 100 200" );
-        //     IconTexture.DrawRotatedCentered( 310 + 32, %y + 16, 45, SDL_FLIP_HORIZONTAL_AND_VERTICAL, "200 200 100 200" );
-        // }
 
 
         %y+= 60;DrawText(%x,%y,"right click for fun ;)", 1.5, ORANGE, true, SLATEGRAY);
@@ -141,71 +137,63 @@ function BaseDemo::Render(%this) {
         // physic playground -----------------
 
         %dt = GetFrameTime();
-        // echo("FRAMETIME=" SPC %dt);
-         %cnt = LogoList.getCount();
-
-
-
+         %cnt = %this.logoList.getCount();
 
         $ticker++;
 
-        %bx = %borders.x - BORDER; %by = %borders.y -BORDER;
-        %cp = (%bx - BORDER) / 2 SPC (%by - BORDER) / 2 SPC 0;
-        // %cp = (%bx - BORDER) / 2 SPC (%by - BORDER)  SPC 0;
+        %bx = %borders.x - %this._border; %by = %borders.y -%this._border;
+        %cp = (%bx - %this._border) / 2 SPC (%by - %this._border) / 2 SPC 0;
+        // %cp = (%bx - %this._border) / 2 SPC (%by - %this._border)  SPC 0;
         // echo(%cp);
 
         // is half ...
         #define TEX_SIZE 16
 
-        DrawRect(BORDER - TEX_SIZE, BORDER - TEX_SIZE, %bx - BORDER + TEX_SIZE * 2, %by - BORDER + TEX_SIZE * 2, "10 10 10 255");
-        DrawRect(BORDER - TEX_SIZE, BORDER - TEX_SIZE, %bx - BORDER + TEX_SIZE * 2, %by - BORDER + TEX_SIZE * 2, WHITE, false);
+        DrawRect(%this._border - TEX_SIZE, %this._border - TEX_SIZE, %bx - %this._border + TEX_SIZE * 2, %by - %this._border + TEX_SIZE * 2, "10 10 10 255");
+        DrawRect(%this._border - TEX_SIZE, %this._border - TEX_SIZE, %bx - %this._border + TEX_SIZE * 2, %by - %this._border + TEX_SIZE * 2, WHITE, false);
 
 
-        $magnetism += $magDirection;
-        if ( $magnetism > MAG_MAX ) $magDirection = -MAG_DIR_VALUE;
-        else if ( $magnetism < -MAG_MAX ) {
-            $magDirection = MAG_DIR_VALUE;
+        %this.magnetism += %this.magDirection;
+        if ( %this.magnetism > MAG_MAX ) %this.magDirection = -MAG_DIR_VALUE;
+        else if ( %this.magnetism < -MAG_MAX ) {
+            %this.magDirection = MAG_DIR_VALUE;
             // %this.impulse();
         }
 
-        %damping = BOUNCY; //1
+        %damping = %this._bouncy; //1
 
-        DrawCircle(%cp.x, %cp.y, mAbs($magnetism) / 50,  $magnetism < 0 ? RED : ORANGE);
-        if ($magDirection > 0) DrawLine(BORDER, %by, %bx, %by , ORANGE);
-        else  DrawLine(BORDER, BORDER, %bx, BORDER, ORANGE);
+        DrawCircle(%cp.x, %cp.y, mAbs(%this.magnetism) / 50,  %this.magnetism < 0 ? RED : ORANGE);
+        if (%this.magDirection > 0) DrawLine(%this._border, %by, %bx, %by , ORANGE);
+        else  DrawLine(%this._border, %this._border, %bx, %this._border, ORANGE);
 
-        // for (%i = 0; %i < %cnt; %i++) {
-        //     %logo = LogoList.getObject(%i);
-
-        %mag = $magnetism / 200;
-        foreach(%logo in LogoList) { //much faster than for/getObject
+        %mag = %this.magnetism / 200;
+        foreach(%logo in %this.logoList ) { //much faster than for/getObject
             // %logo.moveLinear();
-            %logo.moveGravity(0, 4 * $magDirection);
+            %logo.moveGravity(0, 4 * %this.magDirection);
             %logo.moveOrbital(%cp, %mag , 5, LOGO_START_SPEED );
 
+            // if (%logo.solveCollideRect({0.0,0.0,}))
+
             if ($ticker % 2 == 0) {
-                if (%logo.x <= BORDER.0 ) { %logo.VeloX *= -%damping; %logo.x = BORDER.01;}
-                else if ( %logo.x >= %bx) { %logo.VeloX *= -%damping; %logo.x = %bx - 0.01;}
-                if (%logo.y <= BORDER.0)  { %logo.VeloY *= -%damping; %logo.y = BORDER.01;}
-                else if ( %logo.y >= %by) { %logo.VeloY *= -%damping; %logo.y = %by - 0.01; }
+                if (%logo.x <= %this._border ) { %logo.VeloX *= -%damping; %logo.x = %this._border;}
+                else if ( %logo.x >= %bx - %this._logoSize) { %logo.VeloX *= -%damping; %logo.x = %bx - %this._logoSize - 0.01;}
+                if (%logo.y <= %this._border)  { %logo.VeloY *= -%damping; %logo.y = %this._border;}
+                else if ( %logo.y >= %by - %this._logoSize) { %logo.VeloY *= -%damping; %logo.y = %by - %this._logoSize - 0.01; }
             }
-            // %logo.drawTexture(GrayTexture.getId(), true);
-            %logo.draw();
+            %logo.Draw();
         }
 
         // -----------------
 
-        DrawText(80,0, %cnt SPC "magdir:" SPC $magDirection SPC "mag:" SPC $magnetism ,2, "100 100 150");
+        DrawText(80,0, %cnt SPC "magdir:" SPC %this.magDirection SPC "mag:" SPC %this.magnetism ,2, "100 100 150");
     }
 
     DrawFPS(0,0);
 }
 //----------------------------------------------------------------------
 function BaseDemo::impulse(%this) {
-    // %cnt = LogoList.getCount();
-    // for (%i = 0; %i < %cnt; %i++) {
-        // %logo = LogoList.getObject(%i);
-    foreach(%logo in LogoList) {
+
+    foreach(%logo in %this.logoList ) {
         %logo.veloX = getRandom(-LOGO_START_SPEED * 5,LOGO_START_SPEED * 5);
         %logo.veloY = getRandom(-LOGO_START_SPEED * 5,LOGO_START_SPEED * 5);
     }
@@ -219,15 +207,12 @@ function BaseDemo::addLogo(%this,%x,%y) {
         veloX = getRandom(-LOGO_START_SPEED,LOGO_START_SPEED);
         veloY = getRandom(-LOGO_START_SPEED,LOGO_START_SPEED);
         color = getRandom(0,255) SPC getRandom(0,255) SPC getRandom(0,255) SPC getRandom(32,255);
-        width = LOGO_SIZE;
-        height = LOGO_SIZE;
-        textureObjectId = GrayTexture.getId();
+        width = %this._logoSize;
+        height = %this._logoSize;
+        textureObjectId = %this.GrayTexture.getId();
     };
-    LogoList.add(%logo);
+    %this.logoList .add(%logo);
 
-    //LogoList.getObject(0).dumpFields();
-
-    // echo("added logo:" SPC %logo);
 }
 //----------------------------------------------------------------------
 function BaseDemo::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {}

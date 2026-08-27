@@ -203,6 +203,33 @@ struct EngineUnmarshallData
       return value;
    }
 };
+
+#ifdef ENABLE_CONSOLE_VECTOR
+template<>
+struct EngineUnmarshallData< ConsoleVector >
+{
+      ConsoleVector operator()( ConsoleValue &ref ) const
+      {
+            return ref.getVector();
+      }
+
+      ConsoleVector operator()( const char* str ) const
+      {
+            ConsoleVector result = {0};
+            if (str && str[0] != '\0') {
+                  dSscanf(str, "%g %g %g %g",
+                        result.points[0],
+                        result.points[1],
+                        result.points[2],
+                        result.points[3]
+                  );
+            }
+            return result;
+      }
+};
+#endif
+
+
 template<>
 struct EngineUnmarshallData< S32 >
 {
@@ -436,7 +463,7 @@ inline bool _EngineConsoleThunkReturnValue( bool value )
    return value;
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
 {
       return value;
@@ -509,7 +536,7 @@ struct _EngineConsoleThunkType< bool >
    typedef BoolCallback CallbackType;
 };
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct _EngineConsoleThunkType< ConsoleVector >
 {

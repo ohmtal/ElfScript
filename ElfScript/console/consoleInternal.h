@@ -93,7 +93,7 @@ public:
          FloatCallbackType,
          VoidCallbackType,
          BoolCallbackType
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
         , VectorCallbackType
 #endif
 
@@ -150,7 +150,7 @@ public:
          VoidCallback mVoidCallbackFunc;
          FloatCallback mFloatCallbackFunc;
          BoolCallback mBoolCallbackFunc;
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
          VectorCallback mVectorCallbackFunc;
 #endif
          const char *mGroupName;
@@ -200,7 +200,7 @@ public:
    void addCommand(StringTableEntry name, FloatCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    void addCommand(StringTableEntry name, VoidCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    void addCommand(StringTableEntry name, BoolCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(StringTableEntry name, VectorCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 #endif
    void addScriptCallback(const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);

@@ -346,3 +346,13 @@ DefineEngineFunction(Test_PushPoint, bool, (S32 pId, S32 index), , "same as push
     object->mY = object->mPoints[index].y;
     return true;
 }
+
+// -----------------------------------------
+// $t = new TestObj(); $t.showVec();
+DefineEngineMethod(TestObj, showVec, void, (ConsoleVector vec),,"") {
+    Con::printf("VEC: %f, %f, %f, %f", vec.points[0], vec.points[1], vec.points[2], vec.points[3]);
+}
+
+DefineEngineMethod(TestObj, getVec, ConsoleVector, (),,"") {
+    return ConsoleVector({1.1,2.2,3.3,4.4});
+}

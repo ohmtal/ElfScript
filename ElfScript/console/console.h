@@ -725,7 +725,7 @@ typedef F32(*FloatCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef void(*VoidCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]); // We have it return a value so things don't break..
 typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
 typedef ConsoleVector(*VectorCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 #endif
 
@@ -1086,7 +1086,7 @@ namespace Con
    void addCommand(const char* name, FloatCallback  cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, VoidCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, BoolCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    void addCommand( const char* name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
                                                                                                                                                                    /// @}
@@ -1111,7 +1111,7 @@ namespace Con
    void addCommand(const char *nameSpace, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(const char *nameSpace, const char *name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
                                                                                                                                                                                         /// @}
@@ -1381,7 +1381,7 @@ public:
    FloatCallback mFC;    ///< A function/method that returns a float.
    VoidCallback mVC;     ///< A function/method that returns nothing.
    BoolCallback mBC;     ///< A function/method that returns a bool.
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    VectorCallback mVecC;     ///< A function/method that returns a ConsoleVector.
 #endif
 
@@ -1494,7 +1494,7 @@ public:
    ConsoleConstructor(const char* className, const char* funcName, FloatCallback  ffunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, VoidCallback   vfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, BoolCallback   bfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
    ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
 #endif
    /// @}

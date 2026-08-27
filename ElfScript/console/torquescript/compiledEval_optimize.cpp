@@ -3069,7 +3069,7 @@ handle_OP_CALLFUNC:
                   switch (nsEntry->mType)
                   {
 
-#ifdef ENABLE_CONSOLE_VECTOR_CALLBACK
+#ifdef ENABLE_CONSOLE_VECTOR
                         case Namespace::Entry::VectorCallbackType:
                         {
                               ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);

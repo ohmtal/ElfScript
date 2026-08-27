@@ -13,6 +13,9 @@ endif()
 # // only one left so obsolete option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
 set(BUILD_ELFSCRIPT ON)
 # -----------------------------------------------------------------------------
+# # option(ELF_ENABLE_CONSOLE_VECTOR_CALLBACK "ElfScript: Enable experimetal console vector callback" OFF)
+
+# -----------------------------------------------------------------------------
 set(FAST_DEFAULT OFF)
 set(BUILD_O_FAST ${FAST_DEFAULT} CACHE BOOL "Build Application with maximum speed (-Ofast)")
 
@@ -84,6 +87,13 @@ if (BUILD_ELFSCRIPT)
         ${ELFSCRIPT_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
+
+
+    # # if ( ELF_ENABLE_CONSOLE_VECTOR_CALLBACK )
+    # #  add_compile_definitions(ENABLE_CONSOLE_VECTOR_CALLBACK)
+    # # endif()
+
+
 
     if (BUILD_WITH_IPO)
         target_link_libraries(${TARGET_NAME} PUBLIC  flux_speed_profile)

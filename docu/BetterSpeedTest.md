@@ -9,6 +9,11 @@
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
 
+## Version 0.7 b
+- Added [virtual functions](./FastPathCustomFieldTypes.md) to overwrite static fields fastPath 
+- Got [ConsoleVector directly accessed](./ImplementConsoleTypeCasters.md) via Console-Functions and -Methods without string convert! - Rock 'n Roll!! 
+- this means ConsoleVector is completely implemented as a "nativ type" and i will not removed it from ConsoleValue because of 16 bytes! it's 32 bytes and disable it does not change anything in speed. 
+
 ## Version 0.7 a 
 
 TestResult (best of 3 tests) in /docu/speedtest/elf_v6:
