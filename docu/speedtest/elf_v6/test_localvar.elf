@@ -20,7 +20,7 @@ for(%j in range JLOOPS)  {
     }
     print("SUM (*/ %i+1) IS:" SPC %localX);
     for(%i in range HALF_ILOOPS)  {
-        %ran = math::randomf(%i);
+        %ran = math.randomf(%i);
         %localX -= %ran;
         %localX += %ran;
     }

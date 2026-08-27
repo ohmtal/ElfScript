@@ -27,7 +27,7 @@ for (%j in range  JLOOPS) {
     // varDumpField("%sto.DynX");
     %ran = 0.0;
     for (%i in range  ILOOPS / 2) {
-        %ran = math::randomf(%i);
+        %ran = math.randomf(%i);
         %sto.DynX -= %ran;
         %sto.DynX += %ran;
     }

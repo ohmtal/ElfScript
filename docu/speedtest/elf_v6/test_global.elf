@@ -21,7 +21,7 @@ for (%j in range JLOOPS) {
     }
     print("SUM (*/ %i+1) IS:" SPC $globalX);
     for (%i in range ILOOPS / 2.0) {
-        %ran = math::randomf(%i);
+        %ran = math.randomf(%i);
         $globalX -= %ran;
         $globalX += %ran;
     }

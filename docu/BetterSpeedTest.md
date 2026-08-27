@@ -54,7 +54,7 @@ But i would prefer -O2.
 
 
 
-**NOTE** Vector Component and Static Field are float. Math::randomF is double. The 
+**NOTE** Vector Component and Static Field are float. Math.randomF is double. The 
 ConsoleValue is also double. When float/double is converted there are rounding errors.
 
 - [X] special OP_CODES for "for in in range VALUE" -- seams not to be faster in -O2
@@ -68,8 +68,8 @@ ConsoleValue is also double. When float/double is converted there are rounding e
 
     Test: is it worth ? 
     - static field test with getRandomF(%i)       : 4.550u 0.002s 0:04.56 99.7%     0+0k 0+0io 0pf+0w 
-    - static field test with math::randomf(%i)    : 4.039u 0.004s 0:04.05 99.5%     0+0k 0+0io 0pf+0w 
-    - static field test with math::randomf() * %i : 4.080u 0.005s 0:04.10 99.5%     0+0k 0+0io 0pf+0w
+    - static field test with math.randomf(%i)    : 4.039u 0.004s 0:04.05 99.5%     0+0k 0+0io 0pf+0w 
+    - static field test with math.randomf() * %i : 4.080u 0.005s 0:04.10 99.5%     0+0k 0+0io 0pf+0w
     - !!! * %i results in rounding errors !!!
 
     YES! but using only 3 op codes: OP_INLINE_COMMAND_3P, OP_INLINE_COMMAND_2P and OP_INLINE_COMMAND_1P

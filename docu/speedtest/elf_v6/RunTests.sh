@@ -10,7 +10,7 @@ scripts=(
 )
 
 # Path to the executable
-cmd_path="/opt/ElfScript/HelloElf"
+cmd_path="../../../HelloElf"
 
 # Temporary file
 summary_file="./results.md"
@@ -27,12 +27,11 @@ for script in "${scripts[@]}"; do
 
     for i in {1..3}; do
         echo "  Run $i/3..."
-
         exec_time=$( { time -p $cmd_path --script "$script" > /dev/null; } 2>&1 | grep real | awk '{print $2}' )
 
         echo "    Duration: ${exec_time}s"
         printf "${exec_time}s |" >> "$summary_file"
-
+        sleep 2
     done
     echo "---------------------"
 done

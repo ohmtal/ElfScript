@@ -22,7 +22,7 @@ for (%j in range JLOOPS) {
     print("SUM (*/ %i+1) IS:" SPC %stoObj.x);
     for (%i in range ILOOPS / 2.0) {
         //%ran = getRandomF(%i);
-        %ran = math::randomf(%i);
+        %ran = math.randomf(%i);
         // %ran = math::randomf() * %i;
         %stoObj.x -= %ran;
         %stoObj.x += %ran;
