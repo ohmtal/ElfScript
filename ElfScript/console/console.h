@@ -139,7 +139,6 @@ enum ConsoleValueType
 };
 
 // #ifdef ENABLE_CONSOLE_VECTOR
-//should i add a count ?!
 struct ConsoleVector {
       F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
 };
@@ -193,11 +192,12 @@ public:
 
 #ifdef ENABLE_CONSOLE_VECTOR
   // TODO move this to a pointer ... first attempt failed .. and it's not faster but less memory
+  // 0.7: i would do this different now, but how can i change it and keep all the math and field fastpath i added for ?
   ConsoleVector v;      // 16 Byte
 #endif
 
    S32 type;            // 4 Byte - used a 8 without padding
-   char padding[4];     // 4 Byze ... i may can use this for something ;)
+   char padding[4];     // 4 Byte ... i may can use this for something ;)
 
    static DataChunker sConversionAllocator;
 
@@ -286,38 +286,7 @@ public:
    {
       setEmptyString();
    }
-#ifdef  ENABLE_CONSOLE_VECTOR
 
-   TORQUE_FORCEINLINE ConsoleVector getVector() const
-   {
-         if (type == ConsoleValueType::cvVector) return v;
-         else {
-               ConsoleVector result = {0};
-               switch (type)
-               {
-                     case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
-                     case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
-                     case ConsoleValueType::cvSTEntry:
-                           if (s == StringTable->EmptyString()) break;
-                           dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-                           break;
-                     // case ConsoleValueType::cvVector: return v;
-                     // case ConsoleValueType::cvString: {
-                     //       if (s[0] == '\0') break;
-                     //       dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-                     //       break;
-                     // }
-
-                     // case ConsoleValueType::cvNULL:
-                     //       return 0.0;
-                     // default:
-                     //       return dAtof(getConsoleData());
-               }
-               return result;
-         }
-
-   }
-#endif
 
    TORQUE_FORCEINLINE F64 getFloat() const
    {
@@ -425,6 +394,36 @@ public:
       // cleanupData();
       type = ConsoleValueType::cvVector;
       v = vec;
+   }
+
+   TORQUE_FORCEINLINE ConsoleVector getVector() const
+   {
+         if (type == ConsoleValueType::cvVector) return v;
+         else {
+               ConsoleVector result = {0};
+               switch (type)
+               {
+                     case ConsoleValueType::cvFloat: result.points[0] = static_cast<F32>(f); break;
+                     case ConsoleValueType::cvInteger: result.points[0] = static_cast<F32>(i); break;
+                     case ConsoleValueType::cvSTEntry:
+                           if (s == StringTable->EmptyString()) break;
+                           dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+                           break;
+                     // case ConsoleValueType::cvVector: return v;
+                     // case ConsoleValueType::cvString: {
+                     //       if (s[0] == '\0') break;
+                     //       dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
+                     //       break;
+                     // }
+
+                     // case ConsoleValueType::cvNULL:
+                     //       return 0.0;
+                     // default:
+                     //       return dAtof(getConsoleData());
+               }
+               return result;
+         }
+
    }
 #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
@@ -784,7 +783,7 @@ namespace Con
       /// 09/04/21 - JTH - 49->50 Rewrite of interpreter
       /// 08/06/26 - XXTH - 50->2605 ElfScript Version 0.5
             // =>69 ="E" + 05 for version 0.5 (foreach range, pod nodes {}, ...)
-      DSOVersion = 6906,
+      DSOVersion = 6907,
 
       MaxLineLength = 512,  ///< Maximum length of a line of console input.
       MaxDataTypes = 256    ///< Maximum number of registered data types.

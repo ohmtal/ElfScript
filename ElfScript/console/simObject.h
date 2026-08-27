@@ -637,11 +637,11 @@ class SimObject: public ConsoleObject
                                           stackP->setFloat(entry->mValue.getFloat());
                                           // stackP->setFastFloat(entry->mValue.getFloat());
                                           break;
-                                          #ifdef ENABLE_CONSOLE_VECTOR
+                                    #ifdef ENABLE_CONSOLE_VECTOR
                                     case ConsoleValueType::cvVector:
                                           stackP->setVector(entry->mValue.getVector());
                                           break;
-                                          #endif
+                                    #endif
                                     default: {
                                           const char* str = entry->mValue.getString();
                                           if (str) stackP->setString(str);
@@ -700,12 +700,12 @@ class SimObject: public ConsoleObject
                         entry->mValue.setFloat(stackP->getFloat());
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
-                        #ifdef ENABLE_CONSOLE_VECTOR
+                  #ifdef ENABLE_CONSOLE_VECTOR
                   case ConsoleValueType::cvVector:
                         entry->mValue.setVector(stackP->getVector());
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
-                        #endif
+                  #endif
                   default:
                         entry->mValue.setString(stackP->getString());
                         break;
