@@ -2470,9 +2470,6 @@ handle_OP_SETCURFIELD_TYPE:
 handle_OP_LOADFIELD_FASTPATH:
 {
       if (code[ip] < U32_MAX) {
-            // if (stack[_STK + 1].type != (S32) code[ip]) {
-            //       stack[_STK + 1].cleanupData();
-            // }
             stack[_STK + 1].type = (S32) code[ip];
       }
       ip++;
@@ -2518,10 +2515,6 @@ handle_OP_LOADFIELD_FASTPATH:
             }
 
             if (cachePtr->type == componentVectorField) {
-                  // Con::printf("ID:%d var: %p",
-                  //             Script::gEvalState.mFrameID,
-                  //             cachePtr->VectorComponentFloat
-                  //             );
                   stackPtr->setFastFloat( (F64)*cachePtr->VectorComponentFloat);
                   PUSH_STK();
                   DISPATCH();
@@ -2558,9 +2551,6 @@ handle_OP_LOADFIELD_FASTPATH:
       } else {
             // NOTE THIS HAPPEN IN a loop where the object change every iter .....
             if (cachePtr->objectPtr != curObject) {
-// #ifdef TORQUE_DEBUG
-//                   Con::printf("LOAD: we lost the cache - refill! FIELD:%s", curField);
-// #endif
                   cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
                   if (cachePtr->cacheFailed) {
@@ -2595,29 +2585,10 @@ handle_OP_LOADFIELD_FASTPATH:
             // TODO  simobject should be revisited!
             switch (cachePtr->type) {
                   case staticField: {
-
                         curObject->stackStaticFieldFastPath(cachePtr->staticFieldPtr,stackPtr );
-
-                        // F64 floatValue = 0.f;
-                        // #ifdef ENABLE_CONSOLE_VECTOR
-                        // if (cachePtr->staticFieldPtr->type == TypeVector) {
-                        //       ConsoleVector* source = (ConsoleVector*)(((const char*)this) + cachePtr->staticFieldPtr->offset);
-                        //       stackPtr->setVector(*source);
-                        // }
-                        // else
-                        // #endif
-                        // if (curObject->getDataField(cachePtr->staticFieldPtr, floatValue)) {
-                        //       if (cachePtr->staticFieldPtr->type == TypeF64 || cachePtr->staticFieldPtr->type == TypeF32) {
-                        //             stackPtr->setFastFloat(floatValue);
-                        //       } else {
-                        //             stackPtr->setFastInt((S64)floatValue);
-                        //       }
-                        // }
                         break;
                   }
                   case staticField_NoFastPath: {
-                        // curObject->stackDataField()
-
                         stackPtr->setString(
                               (*cachePtr->staticFieldPtr->getDataFn)
                               ( curObject,
@@ -2804,15 +2775,8 @@ handle_OP_SAVEFIELD_FASTPATH:
       // FIXME 3 simobject must be revisited!
             switch (cachePtr->type) {
                   case staticField: {
-
                         curObject->pushStaticFieldFastPath(cachePtr->staticFieldPtr,&stack[_STK]);
-
-                        // pushStaticFieldFastPath
-                        // if (cachePtr->staticFieldPtr->type == TypeF32 || cachePtr->staticFieldPtr->type == TypeF64)
-                        //       curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getFloat() );
-                        // else
-                        //       curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getInt() );
-                        // break;
+                        break;
                   }
                   case staticField_NoFastPath: {
                         curObject->pushDataField(curField, curFieldArray, &stack[_STK]);

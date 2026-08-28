@@ -9,9 +9,28 @@
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
-## Version 0.7 e
+## Version 0.7e
 
-- Fieldcache disabled again need more testing - is to unstable in "real" application! For Benchmark it's cool, nothing else.
+- Fieldcache cleaned and fixed but still default off in cmake.
+
+***Results with FieldCache on -Ofast***
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.388u 0.003s 0:01.39 99.2%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 3.004u 0.001s 0:03.01 99.6%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.499u 0.004s 0:04.51 99.5%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.844u 0.006s 0:03.86 99.4%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 4.100u 0.003s 0:04.11 99.7%     0+0k 0+0io 0pf+0w |
+
+***Results with FieldCache on***
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.412u 0.003s 0:01.42 99.2%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 2.975u 0.003s 0:02.98 99.6%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.621u 0.002s 0:04.63 99.7%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 4.007u 0.004s 0:04.02 99.5%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 4.135u 0.002s 0:04.14 99.7%     0+0k 0+0io 0pf+0w |
+
 
 ***Results with FieldCache off***
 | Script | time |
