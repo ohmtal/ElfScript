@@ -1,11 +1,10 @@
-//FIXME EAT TOO MUCH MEMORY!
-// #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
-// #define ENABLE_INLINE_CACHE_LOAD
-// #define ENABLE_INLINE_CACHE_SAVE
-//
-// #define ENABLE_COMPONENT_CACHE_LOAD
-// #define ENABLE_COMPONENT_CACHE_SAVE
-// #endif
+#ifdef ELFSCRIPT_ENABLE_FIELDCACHE
+#define ENABLE_INLINE_CACHE_LOAD
+#define ENABLE_INLINE_CACHE_SAVE
+
+#define ENABLE_COMPONENT_CACHE_LOAD
+#define ENABLE_COMPONENT_CACHE_SAVE
+#endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -2542,7 +2541,7 @@ handle_OP_LOADFIELD_FASTPATH:
 #endif
       if (!cachePtr) {
             cachePtr = new FieldCache();
-            cachePtr->objectPtr = curObject;
+                  cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
             cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
@@ -2557,7 +2556,12 @@ handle_OP_LOADFIELD_FASTPATH:
                   DISPATCH();
             }
       } else {
+            // NOTE THIS HAPPEN IN a loop where the object change every iter .....
             if (cachePtr->objectPtr != curObject) {
+// #ifdef TORQUE_DEBUG
+//                   Con::printf("LOAD: we lost the cache - refill! FIELD:%s", curField);
+// #endif
+                  cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
                   if (cachePtr->cacheFailed) {
                         #ifdef TORQUE_DEBUG
@@ -2771,6 +2775,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                   }
       } else {
             if (cachePtr->objectPtr != curObject) {
+                  cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
 
                   if (cachePtr->cacheFailed) {

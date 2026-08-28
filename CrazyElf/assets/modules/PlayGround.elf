@@ -158,17 +158,36 @@ function PlayGround::Render(%this) {
         SDL_SetRenderDrawColor(%r, 80, 80, 80);
         SDL_RenderRect(%r, %node.rect);
     }
+    %testing = true;
 
-    foreach(%pupser in PupserGroup) {
-        if (%doUpdate) {
-            %pupser.update(%udt);
+    if (%testing) {
+
+        %pg = PupserGroup;
+        %cnt = %pg.getCount();
+        for (%i = 0; %i < %cnt; %i++) {
+            %pupser = %pg.getObject(%i);
+            if (%doUpdate) {
+                %pupser.update(%udt);
+            }
+
+            if (%pupser.gender == 0) SDL_SetRenderDrawColor(%r,   0,   0, 200);
+            else SDL_SetRenderDrawColor(%r,   200,   0, 0);
+
+            SDL_RenderRect(%r, %pupser.rect);
         }
+    } else {
+        foreach(%pupser in PupserGroup) {
+            if (%doUpdate) {
+                %pupser.update(%udt);
+            }
 
-        if (%pupser.gender == 0) SDL_SetRenderDrawColor(%r,   0,   0, 200);
-        else SDL_SetRenderDrawColor(%r,   200,   0, 0);
+            if (%pupser.gender == 0) SDL_SetRenderDrawColor(%r,   0,   0, 200);
+            else SDL_SetRenderDrawColor(%r,   200,   0, 0);
 
-        SDL_RenderRect(%r, %pupser.rect);
+            SDL_RenderRect(%r, %pupser.rect);
+        }
     }
+
 
 
     SDL_SetRenderDrawColor(%r, 55,55,55);
