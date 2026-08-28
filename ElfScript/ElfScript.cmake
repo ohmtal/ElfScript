@@ -7,7 +7,7 @@ add_compile_definitions(ELFSCRIPT_VERSION_0_6)
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)
 
-option(ELF_ENABLE_FIELDCACHE "ElfScript: Enable FieldCache - this is faster but you need to initialize the fields to get a good result. Disable this is you use old lazy written scripts" ON)
+option(ELF_ENABLE_FIELDCACHE "ElfScript: Enable FieldCache - EXPERIMENTAL - this is faster but you need to initialize the fields to get a good result. Disable this is you use old lazy written scripts" OFF)
 
 option(ELF_ENABLE_EXEC_OVERWRITE "ElfScript: Disable the default exec to overwrite it with custom function" OFF)
 option(ELF_ENABLE_GARBAGECOLLECTION "ElfScript: Auto Garbage Collection - not recommended when using lot of objects" OFF)
