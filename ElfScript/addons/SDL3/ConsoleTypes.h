@@ -32,6 +32,21 @@ typedef SDL_Point Point2I;
 typedef SDL_FPoint Point2F;
 
 
+inline ConsoleVector toConsoleVector(const Color4F& value) { return { value.r,value.g,value.b,value.a}; }
+inline ConsoleVector toConsoleVector(const Color& value) { return { (F32)value.r,(F32)value.g,(F32)value.b,(F32)value.a}; }
+inline ConsoleVector toConsoleVector(const RectF& value) { return { value.x,value.y,value.w,value.h}; }
+inline ConsoleVector toConsoleVector(const RectI& value) { return { (F32)value.x,(F32)value.y,(F32)value.w,(F32)value.h}; }
+inline ConsoleVector toConsoleVector(const Point2F& value) { return { value.x,value.y,0.f,0.f}; }
+inline ConsoleVector toConsoleVector(const Point2I& value) { return { (F32)value.x,(F32)value.y,0.f,0.f}; }
+
+inline Color4F toColor4F(const ConsoleVector& value) { return { value.points[0],value.points[1],value.points[2],value.points[3]}; }
+inline Color toColor(const ConsoleVector& value) { return { (U8)value.points[0],(U8)value.points[1],(U8)value.points[2],(U8)value.points[3]}; }
+inline RectF toRectF(const ConsoleVector& value) { return { value.points[0],value.points[1],value.points[2],value.points[3]}; }
+inline RectI toRectI(const ConsoleVector&  value)  { return { (S32)value.points[0],(S32)value.points[1],(S32)value.points[2],(S32)value.points[3]}; }
+inline Point2F toPoint2F(const ConsoleVector& value) { return { value.points[0],value.points[1]}; }
+inline Point2I toPoint2I(const ConsoleVector& value) { return { (S32)value.points[0],(S32)value.points[1]}; }
+
+
 #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Color >

@@ -10,6 +10,7 @@
 #include "console/simSet.h"
 #include "core/volume.h"
 #include "math/mMathFn.h"
+#include "math/mMathConsoleVector.h"
 #include "core/util/tDictionary.h"
 
 #include <string>
@@ -218,52 +219,52 @@ class SpriteBaseObject :public SimObject
     typedef SimObject Parent;
 public:
     DECLARE_CONOBJECT(SpriteBaseObject);
-    RectF   mSrcRect = { 0.f, 0.f, 0.f, 0.f};
-    RectF   mDstRect = { 0.f, 0.f, 0.f, 0.f};
+    ConsoleVector   mSrcRect = { 0.f, 0.f, 0.f, 0.f};
+    ConsoleVector   mDstRect = { 0.f, 0.f, 0.f, 0.f};
     F32     mAngle   = 0.f;
-    Point2F mCenterPoint = {0.f, 0.f};
+    ConsoleVector mCenterPoint = {0.f, 0.f};
     S32     mFlip = 0; // (SDL_FlipMode)
     Color   mColor = WHITEBLEND;
     bool    mVisible = true;
 
     // this is used for camera !!!!
-    RectF   mScreenRect = { 0.f, 0.f, 0.f, 0.f};
-    Point2F mScreenCenterPoint = { 0.f, 0.f};
+    ConsoleVector   mScreenRect = { 0.f, 0.f, 0.f, 0.f};
+    ConsoleVector mScreenCenterPoint = { 0.f, 0.f};
 
     static void initPersistFields() {
         Parent::initPersistFields();
-        addField("srcRect", TypeRectF, Offset(mSrcRect,SpriteBaseObject), "Rect on Texture.");
-        addField("srcX", TypeF32, Offset(mSrcRect.x,SpriteBaseObject));
-        addField("srcY", TypeF32, Offset(mSrcRect.y,SpriteBaseObject));
-        addField("srcWidth", TypeF32, Offset(mSrcRect.w,SpriteBaseObject));
-        addField("srcHeight", TypeF32, Offset(mSrcRect.h,SpriteBaseObject));
+        addField("srcRect", TypeVector, Offset(mSrcRect,SpriteBaseObject), "Rect on Texture.");
+        addField("srcX", TypeF32, Offset(mSrcRect.points[0],SpriteBaseObject));
+        addField("srcY", TypeF32, Offset(mSrcRect.points[1],SpriteBaseObject));
+        addField("srcWidth", TypeF32, Offset(mSrcRect.points[2],SpriteBaseObject));
+        addField("srcHeight", TypeF32, Offset(mSrcRect.points[3],SpriteBaseObject));
 
-        addField("dstRect", TypeRectF, Offset(mDstRect,SpriteBaseObject), "Rect on Render Target.");
-        addField("x", TypeF32, Offset(mDstRect.x,SpriteBaseObject));
-        addField("y", TypeF32, Offset(mDstRect.y,SpriteBaseObject));
-        addField("width", TypeF32, Offset(mDstRect.w,SpriteBaseObject));
-        addField("height", TypeF32, Offset(mDstRect.h,SpriteBaseObject));
+        addField("dstRect", TypeVector, Offset(mDstRect,SpriteBaseObject), "Rect on Render Target.");
+        addField("x", TypeF32, Offset(mDstRect.points[0],SpriteBaseObject));
+        addField("y", TypeF32, Offset(mDstRect.points[1],SpriteBaseObject));
+        addField("width", TypeF32, Offset(mDstRect.points[2],SpriteBaseObject));
+        addField("height", TypeF32, Offset(mDstRect.points[3],SpriteBaseObject));
 
         addField("angle", TypeF32, Offset(mAngle,SpriteBaseObject), "Rotation Angle on Render Target (degree)");
-        addField("centerPoint", TypePoint2F, Offset(mCenterPoint,SpriteBaseObject), "The Centerpoit of the Rotation - when angle is set.");
+        addField("centerPoint", TypeVector, Offset(mCenterPoint,SpriteBaseObject), "The Centerpoit of the Rotation - when angle is set.");
         addField("flip", TypeS32, Offset(mFlip,SpriteBaseObject), "Flip mode on Render Target 0..3, see also SDL_FlipMode");
 
         addField("color", TypeColor, Offset(mColor,SpriteBaseObject), "Color in Byte representation default WHITE = 255 255 255 255");
         addField("r", TypeU8, Offset(mColor.r,SpriteBaseObject));
         addField("g", TypeU8, Offset(mColor.g,SpriteBaseObject));
         addField("b", TypeU8, Offset(mColor.b,SpriteBaseObject));
-        addField("a", TypeU8, Offset(mColor.g,SpriteBaseObject));
+        addField("a", TypeU8, Offset(mColor.a,SpriteBaseObject));
 
         addField("visible", TypeBool, Offset(mVisible,SpriteBaseObject), "Flag for Rendering with SpriteGroup or manually checked.");
 
-        addField("ScreenRect", TypeRectF, Offset(mScreenRect,SpriteBaseObject), "Translated rect when using camera translate");
-        addField("ScreenCenterPoint", TypePoint2F, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
+        addField("ScreenRect", TypeVector, Offset(mScreenRect,SpriteBaseObject), "Translated rect when using camera translate");
+        addField("ScreenCenterPoint", TypeVector, Offset(mScreenCenterPoint,SpriteBaseObject), "Translated point when using camera translate");
     }
 
     // center the centerpoint by dstRect
     void CenterCenterPoint() {
-        mCenterPoint.x = mDstRect.w / 2.0;
-        mCenterPoint.y = mDstRect.h / 2.0;
+        mCenterPoint.points[0] = mDstRect.points[2] / 2.0;
+        mCenterPoint.points[1] = mDstRect.points[3] / 2.0;
     }
 
 
@@ -401,7 +402,12 @@ public:
         if (!sprite || !sprite->mVisible) return false;
         sprite->mScreenCenterPoint = sprite->mCenterPoint;
         sprite->mScreenRect = sprite->mDstRect;
-        return Translate(sprite->mScreenRect, sprite->mScreenCenterPoint);
+        RectF r = toRectF(sprite->mScreenRect);
+        Point2F p = toPoint2F(sprite->mScreenCenterPoint);
+        bool result = Translate(r,p);
+        sprite->mScreenRect = toConsoleVector(r);
+        sprite->mScreenCenterPoint = toConsoleVector(p);
+        return result;
     }
 
     // get the Translated mouse position !
@@ -442,15 +448,15 @@ DefineEngineMethod(Camera2DObject, GetInsideSceen, bool, (RectF rect),,
 // -----------------------------------------------------------------------------
 // Camera Translate world 2 screen:
 // -----------------------------------------------------------------------------
-DefineEngineMethod(Camera2DObject, TranslateWorldRect, RectF, (RectF rect),,
+DefineEngineMethod(Camera2DObject, TranslateWorldRect, /*RectF*/ ConsoleVector, (RectF rect),,
         "Translate a world rect to screen / render rect ") {
     object->TranslateWorldRect(rect);
-    return rect;
+    return toConsoleVector(rect);
 }
-DefineEngineMethod(Camera2DObject, TranslateCenterPoint, Point2F, (Point2F point),,
+DefineEngineMethod(Camera2DObject, TranslateCenterPoint, /*Point2F*/ ConsoleVector, (Point2F point),,
         "Translate a world rect to screen / render rect ") {
     object->TranslateCenterPoint(point);
-    return point;
+    return toConsoleVector(point);
 }
 
 DefineEngineMethod(Camera2DObject, TranslateSpriteBaseObject, bool, (S32 spriteBaseObjectId),,
@@ -735,9 +741,9 @@ DefineEngineMethod(TextureObject, getSize,/*Point2I*/ ConsoleVector, (),
     // return {tex->w,tex->h};
 }
 
-DefineEngineMethod(TextureObject, getAtlasRect,RectF, (S32 colCount, S32 rowCount, S32 index),
+DefineEngineMethod(TextureObject, getAtlasRect,/*RectF*/ ConsoleVector, (S32 colCount, S32 rowCount, S32 index),
                    ,"get the rectangle on a atlas texture for a given index" ) {
-    return object->getAtlasRect(colCount, rowCount, index);
+    return toConsoleVector(object->getAtlasRect(colCount, rowCount, index));
 }
 
 
@@ -795,7 +801,7 @@ class SpriteObject :public SpriteBaseObject
 public:
     DECLARE_CONOBJECT(SpriteObject);
 
-    Point2F mVelo = {0.f, 0.f };
+    ConsoleVector mVelo = {0.f, 0.f , 0.f, 0.f};
     U32     mLayer = 0;
     SDL_BlendMode mBlendMode = SDL_BLENDMODE_INVALID;
     SimObjectId mTextureObjectId = 0;
@@ -805,33 +811,33 @@ public:
     static void initPersistFields() {
         Parent::initPersistFields();
         addField("velocity", TypePoint2F, Offset(mVelo,SpriteObject), "velocity as point see also veloX veloY");
-        addField("veloX", TypeF32, Offset(mVelo.x,SpriteObject), "X velocity");
-        addField("veloY", TypeF32, Offset(mVelo.y,SpriteObject), "Y velocity");
+        addField("veloX", TypeF32, Offset(mVelo.points[0],SpriteObject), "X velocity");
+        addField("veloY", TypeF32, Offset(mVelo.points[1],SpriteObject), "Y velocity");
         addField("layer", TypeU32, Offset(mLayer,SpriteObject), "Layer of the Sprite. ");
         addField("blendMode", TypeU32, Offset(mBlendMode,SpriteObject), "SDL_BLENDMODE_ overwrite the Texture blendmode\ndefault SDL_BLENDMODE_INVALID => not overwritten");
         addField("textureObjectId", TypeU32, Offset(mTextureObjectId,SpriteObject), "Id of the Texture Object. Must be set after loading from file. The id is not persistent!");
         addField("textureName", TypeString, Offset(mTextureName,SpriteObject), "optional Texturename");
     }
     // -------------------------------------------------------------------------
-    RectF getRectF() {
-        return mDstRect;
-    }
-    Point2F getCenter2F() {
-        return { mDstRect.x + mDstRect.w / 2.0f , mDstRect.y + mDstRect.h / 2.0f };
+    // RectF getRectF() {
+    //     return mDstRect;
+    // }
+    ConsoleVector getCenter2F() {
+        return { mDstRect.points[0] + mDstRect.points[2] / 2.0f , mDstRect.points[1] + mDstRect.points[3] / 2.0f, 0.f, 0.f };
     }
     // -------------------------------------------------------------------------
     // Movement
     // -------------------------------------------------------------------------
     void moveLinear(F32 dt = -1.f) {
         if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
-        mDstRect.x += mVelo.x * dt;
-        mDstRect.y += mVelo.y * dt;
+        mDstRect.points[0] += mVelo.points[0] * dt;
+        mDstRect.points[1] += mVelo.points[1] * dt;
     }
     // -------------------------------------------------------------------------
     void moveGravity(F32 gravityX, F32 gravityY, F32 dt = -1.f) {
         if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
-        mVelo.x += gravityX * dt;
-        mVelo.y += gravityY * dt;
+        mVelo.points[0] += gravityX * dt;
+        mVelo.points[1] += gravityY * dt;
         moveLinear(dt);
     }
 
@@ -839,7 +845,7 @@ public:
     void moveOrbital(Point2F ankerPoint,F32 gravity, F32 softening, F32 maxSpeed, F32 dt = -1.f) {
         if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
 
-        Point2F direction = ankerPoint - Point2F(mDstRect.x, mDstRect.y);
+        Point2F direction = ankerPoint - Point2F(mDstRect.points[0], mDstRect.points[1]);
 
         F32 distance = length(direction);
 
@@ -848,18 +854,19 @@ public:
         if (distance > 0.0001f) {
             normalize(direction);
             F32 gravityPull = (gravity * 1000.f) / (distance * distance + softening);
-            mVelo.x += direction.x * gravityPull * dt;
-            mVelo.y += direction.y * gravityPull * dt;
+            mVelo.points[0] += direction.x * gravityPull * dt;
+            mVelo.points[1] += direction.y * gravityPull * dt;
         }
 
         // F32 drag = 0.995f;
         // mVelo.x *= drag;
         // mVelo.y *= drag;
 
-        F32 currentSpeed = ElfMath::mSqrt(mVelo.x * mVelo.x + mVelo.y * mVelo.y);
+        // F32 currentSpeed = ElfMath::mSqrt(mVelo.x * mVelo.x + mVelo.y * mVelo.y);
+        F32 currentSpeed = ElfMath::Vec2Length(mVelo);
         if (currentSpeed > maxSpeed && currentSpeed > 0.0f) {
-            mVelo.x = (mVelo.x / currentSpeed) * maxSpeed;
-            mVelo.y = (mVelo.y / currentSpeed) * maxSpeed;
+            mVelo.points[0] = (mVelo.points[0] / currentSpeed) * maxSpeed;
+            mVelo.points[1] = (mVelo.points[1] / currentSpeed) * maxSpeed;
         }
 
         moveLinear(dt);
@@ -871,16 +878,19 @@ public:
     bool solveCollideLine(F32 x1, F32 y1, F32 x2, F32 y2, F32 bounceStrength /*= 0.2f*/) {
 
         BaseFlux::Collision::Info info;
-        if ( BaseFlux::Collision::getInfoRectLine(mDstRect, x1, y1, x2, y2 , info))
+        if ( BaseFlux::Collision::getInfoRectLine(toRectF(mDstRect), x1, y1, x2, y2 , info))
         {
-            BaseFlux::Collision::solveOberlap(mDstRect, info);
+            RectF r = toRectF(mDstRect);
+            BaseFlux::Collision::solveOberlap(r, info);
+            mDstRect = toConsoleVector(r);
 
             if (bounceStrength > 0.f) {
-                float dotProduct = (mVelo.x * info.mNormal.x) + (mVelo.y * info.mNormal.y);
+                // float dotProduct = (mVelo.x * info.mNormal.x) + (mVelo.y * info.mNormal.y);
+                float dotProduct = (mVelo.points[0] * info.mNormal.x) + (mVelo.points[1] * info.mNormal.y);
                 if (dotProduct < 0.0f) {
                     float impulse = -(1.0f + bounceStrength) * dotProduct;
-                    mVelo.x += info.mNormal.x * impulse;
-                    mVelo.y += info.mNormal.y * impulse;
+                    mVelo.points[0] += info.mNormal.x * impulse;
+                    mVelo.points[1] += info.mNormal.y * impulse;
                 }
             }
             return true;
@@ -890,11 +900,15 @@ public:
     // -------------------------------------------------------------------------
     bool solveCollideRect(RectF otherRect, bool stopMovement) {
         BaseFlux::Collision::Info info;
-        if (BaseFlux::Collision::getInfoRectF(mDstRect, otherRect, info)) {
-            BaseFlux::Collision::solveOberlap(mDstRect, info);
+        if (BaseFlux::Collision::getInfoRectF(toRectF(mDstRect), otherRect, info)) {
+
+            RectF r = toRectF(mDstRect);
+            BaseFlux::Collision::solveOberlap(r, info);
+            mDstRect = toConsoleVector(r);
+
             if (stopMovement) {
-                mVelo.x = 0.f;
-                mVelo.y = 0.f;
+                mVelo.points[0] = 0.f;
+                mVelo.points[1] = 0.f;
             }
             return true;
         }
@@ -920,22 +934,22 @@ public:
         if (!texture) return false;
 
         // autosize src if not set or invalid
-        if (this->mSrcRect.w <= 0.f || this->mSrcRect.h <= 0.f) {
-            this->mSrcRect = RectF(
+        if (this->mSrcRect.points[2] <= 0.f || this->mSrcRect.points[3] <= 0.f) {
+            this->mSrcRect = {
                 0.f,
                 0.f,
                 (F32)texture->get()->w,
                 (F32)texture->get()->h
-            );
+            };
         }
         if (camera) {
             // Translate also make a frustum check :
             if (camera->Translate(this)) {
                return texture->DrawRotatedSrcDstRect(
-                    this->mSrcRect,
-                    this->mScreenRect,
+                    toRectF(this->mSrcRect),
+                    toRectF(this->mScreenRect),
                     this->mAngle,
-                    this->mScreenCenterPoint,
+                    toPoint2F( this->mScreenCenterPoint),
                     (SDL_FlipMode)this->mFlip,
                     this->mColor,
                     this->mBlendMode
@@ -943,10 +957,10 @@ public:
             }
         } else {
             return texture->DrawRotatedSrcDstRect(
-                this->mSrcRect,
-                this->mDstRect,
+                toRectF(this->mSrcRect),
+                toRectF(this->mDstRect),
                 this->mAngle,
-                this->mCenterPoint,
+                toPoint2F(this->mCenterPoint),
                 (SDL_FlipMode)this->mFlip,
                 this->mColor,
                 this->mBlendMode
@@ -958,7 +972,7 @@ public:
 };
 IMPLEMENT_CONOBJECT(SpriteObject);
 
-DefineEngineMethod(SpriteObject, getCenter2F, Point2F, (), ,"get the center point") {
+DefineEngineMethod(SpriteObject, getCenter2F, ConsoleVector, (), ,"get the center point") {
     return object->getCenter2F();
 }
 // -------------------------------------------------------------------------
@@ -1337,11 +1351,11 @@ DefineEngineFunction(DrawText, void, ( F32 x, F32 y,String text,
     BaseFlux::DrawDebugText(app.getRenderer(),x,y,text.c_str(), scale, color, doShadow, shadowColor);
 }
 
-DefineEngineFunction(MeasureText, Point2F, ( String text, F32 scale)
+DefineEngineFunction(MeasureText, ConsoleVector /*Point2F*/, ( String text, F32 scale)
 ,(1.0),"Calculate Text Width and Heigth and return Point2F")
 {
     F32 size = (F32)SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * scale;
-    return Point2F( (F32) text.length() * size, size);
+    return { (F32) text.length() * size, size, 0.f, 0.f};
 }
 
 DefineEngineFunction(DrawLine, void, (F32 x1, F32 y1,F32 x2, F32 y2, Color color, F32 thickness)
