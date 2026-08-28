@@ -484,24 +484,24 @@ DefineEngineFunction( SDL_CreateTextureFromSurface, S32,
 // extern SDL_DECLSPEC SDL_Renderer * SDLCALL SDL_GetRendererFromTexture(SDL_Texture *texture);
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetTextureSize(SDL_Texture *texture, float *w, float *h);
-DefineEngineFunction(SDL_GetTextureSize, Point2F, (S32 textureID),,"get the size of a texture as float Point" ) {
-    Point2F result = {0.f,0.f};
+DefineEngineFunction(SDL_GetTextureSize, /*Point2F*/ ConsoleVector, (S32 textureID),,"get the size of a texture as float Point" ) {
+    ConsoleVector result = {0};
     SDL_Texture* texture = getTextureByID(textureID);
     if (!texture) return result;
 
-    SDL_GetTextureSize(texture, &result.x, &result.y);
+    SDL_GetTextureSize(texture, &result.points[0], &result.points[1]);
 
     return result;
 }
 
 
 // not nativ SDL:
-DefineEngineFunction(SDL_GetTextureRect, RectF, (S32 textureID),,"get the size of a texture as float Rectangle (ElfSDL3 extension)" ) {
-    RectF result = {0.f,0.f, 0.f, 0.f};
+DefineEngineFunction(SDL_GetTextureRect, /*RectF*/ ConsoleVector, (S32 textureID),,"get the size of a texture as float Rectangle (ElfSDL3 extension)" ) {
+    ConsoleVector result = {0.f,0.f, 0.f, 0.f};
     SDL_Texture* texture = getTextureByID(textureID);
     if (!texture) return result;
-    result.w = texture->w;
-    result.h = texture->h;
+    result.points[2] = texture->w;
+    result.points[3] = texture->h;
     return result;
 }
 
@@ -827,17 +827,17 @@ DefineEngineFunction(SDL_HasRectIntersectionFloat, bool , (RectF rectA, RectF re
                      ,"Check rect intersection") {
     return SDL_HasRectIntersectionFloat(&rectA, &rectB);
 }
-DefineEngineFunction(SDL_GetRectIntersectionFloat, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(SDL_GetRectIntersectionFloat, /*RectF*/ ConsoleVector , (RectF rectA, RectF rectB),
                      ,"get rect intersection (overlap)") {
-    RectF result = {0.f,0.f,0.f};
+    RectF result = {0};
     SDL_GetRectIntersectionFloat(&rectA, &rectB, &result);
-    return result;
+    return { result.x, result.y, result.w, result.h};
 }
-DefineEngineFunction(SDL_GetRectUnionFloat, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(SDL_GetRectUnionFloat, /*RectF*/ ConsoleVector, (RectF rectA, RectF rectB),
                      ,"get rect unio both rects combined to one big.") {
-    RectF result = {0.f,0.f,0.f};
+    RectF result = {0};
     SDL_GetRectUnionFloat(&rectA, &rectB, &result);
-    return result;
+    return { result.x, result.y, result.w, result.h};
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRectEnclosingPointsFloat(const SDL_FPoint *points, int count, const SDL_FRect *clip, SDL_FRect *result);
 

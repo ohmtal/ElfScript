@@ -34,6 +34,55 @@ typedef SDL_FPoint Point2F;
 
 #ifdef ENABLE_CONSOLE_VECTOR
 template<>
+struct EngineUnmarshallData< Color >
+{
+    Color operator()( ConsoleValue &ref ) const
+    {
+        ConsoleVector v = ref.getVector();
+        // I did lazy add only 3 params so i need to set 255 if 0! alpha 0 is not possible .. but ok
+        U8 a =  (v.points[3] == 0.f) ? 255 : (U8)v.points[3];
+        return {(U8)v.points[0], (U8)v.points[1], (U8)v.points[2], a};
+    }
+
+    Color operator()( const char* str ) const
+    {
+        Color result = {0};
+        if (str && str[0] != '\0') {
+            // dSscanf(str, "%hhu %hhu %hhu %hhu",
+            dSscanf(str, "%d %d %d %d",
+                    result.r,
+                    result.g,
+                    result.b,
+                    result.a
+            );
+        }
+        return result;
+    }
+};
+
+template<>
+struct EngineUnmarshallData< Point2I >
+{
+    Point2I operator()( ConsoleValue &ref ) const
+    {
+        ConsoleVector v = ref.getVector();
+        return {(S32)v.points[0], (S32)v.points[1]};
+    }
+
+    Point2I operator()( const char* str ) const
+    {
+        Point2I result = {0};
+        if (str && str[0] != '\0') {
+            dSscanf(str, "%d %d",
+                    result.x,
+                    result.y
+            );
+        }
+        return result;
+    }
+};
+
+template<>
 struct EngineUnmarshallData< Point2F >
 {
     Point2F operator()( ConsoleValue &ref ) const

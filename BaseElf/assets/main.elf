@@ -64,7 +64,7 @@ function Main::loop(%this) {
     }
     if ( %this.hideBottomMessage ) return;
 
-    DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS(), 1.5,  "200 200 180", true, SLATEGRAY);
+    DrawText (5, $ScreenSize.y - 40,"CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS(), 1.5,  {200, 200, 180, 255}, true, SLATEGRAY);
 
     DrawText($ScreenSize.x - 500, $ScreenSize.y - 10
         , "Mouse:" SPC strFormat("%.2f",SDL_GetMouseX()) SPC strFormat("%.2f",SDL_GetMouseY())
@@ -73,7 +73,7 @@ function Main::loop(%this) {
                 SPC SDL_IsMouseButtonDown(SDL_BUTTON_MIDDLE)
                 SPC SDL_IsMouseButtonDown(SDL_BUTTON_RIGHT)
           SPC "WHEEL:" SPC SDL_GetMouseWheelY()
-        , 1.2, "0 255 200");
+        , 1.2, "0 255 200 255");
 
 }
 

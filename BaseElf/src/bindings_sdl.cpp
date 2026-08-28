@@ -726,11 +726,13 @@ DefineEngineMethod(TextureObject, load, bool, (const char* fileName),,"Load a Te
     return object->load(fileName);
 }
 
-DefineEngineMethod(TextureObject, getSize,Point2I, (),
+DefineEngineMethod(TextureObject, getSize,/*Point2I*/ ConsoleVector, (),
                    ,"get the width and height of the loaded texture" ) {
     SDL_Texture* tex = object->get();
     if (!tex) return {0,0};
-    return {tex->w,tex->h};
+
+    return { (F32)tex->w,(F32)tex->h,0.f,0.f };
+    // return {tex->w,tex->h};
 }
 
 DefineEngineMethod(TextureObject, getAtlasRect,RectF, (S32 colCount, S32 rowCount, S32 index),
@@ -1290,17 +1292,17 @@ DefineEngineFunction(HasRectIntersection, bool , (RectF rectA, RectF rectB),
                      ,"Check rect intersection") {
     return SDL_HasRectIntersectionFloat(&rectA, &rectB);
 }
-DefineEngineFunction(GetRectIntersection, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(GetRectIntersection, ConsoleVector , (RectF rectA, RectF rectB),
                      ,"get rect intersection (overlap)") {
-    RectF result = {0.f,0.f,0.f};
+    RectF result = {0};
     SDL_GetRectIntersectionFloat(&rectA, &rectB, &result);
-    return result;
+    return { result.x, result.y, result.w,result.h};
 }
-DefineEngineFunction(GetRectUnion, RectF , (RectF rectA, RectF rectB),
+DefineEngineFunction(GetRectUnion, ConsoleVector , (RectF rectA, RectF rectB),
                      ,"get rect unio both rects combined to one big.") {
-    RectF result = {0.f,0.f,0.f};
+    RectF result = {0};
     SDL_GetRectUnionFloat(&rectA, &rectB, &result);
-    return result;
+    return { result.x, result.y, result.w,result.h};
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRectEnclosingPointsFloat(const SDL_FPoint *points, int count, const SDL_FRect *clip, SDL_FRect *result);
 
@@ -1515,8 +1517,8 @@ DefineEngineFunction(getRealTime, S32, (),, "get current time from script engine
 DefineEngineFunction(getFPS, S32,(),, "Get the current fps") {
     return (S32)BaseFlux::getFPS();
 }
-DefineEngineFunction(GetMousePosition, Point2I, (),, "") {
-    return gMousePos;
+DefineEngineFunction(GetMousePosition, /*Point2I*/ ConsoleVector, (),, "") {
+    return { (F32)gMousePos.x,(F32)gMousePos.y,0.f,0.f };
 }
 
 
@@ -1536,28 +1538,17 @@ DefineEngineFunction(unSetScreenSize, bool, (), ,
     return SDL_SetRenderLogicalPresentation(app.getRenderer(), 0, 0, SDL_LOGICAL_PRESENTATION_DISABLED);
 }
 
-DefineEngineFunction(GetScreenSize, Point2I, (), , "Get the current scaled screen size (SDL_GetRenderLogicalPresentation)") {
-   // Point2I screenSize = {0,0};
-   //  SDL_RendererLogicalPresentation mode = SDL_LOGICAL_PRESENTATION_DISABLED;
-   //
-   //  if (SDL_GetRenderLogicalPresentation(app.getRenderer(), &screenSize.x, &screenSize.y, &mode)) {
-   //      // Con::printf("SDL_GetRenderLogicalPresentation: %dx%d, mode=%d\n", screenSize.x, screenSize.y, (int)mode);
-   //  } else {
-   //      Con::errorf("SDL_GetRenderLogicalPresentation failed: %s\n", SDL_GetError());
-   //  }
-   //  // fallback
-   //  if (mode == 0) SDL_GetWindowSize(app.getWindow(), &screenSize.x, &screenSize.y);
-   //
-   //  return screenSize;
-    return ElfSDL3::GetScreenSize();
+DefineEngineFunction(GetScreenSize, /*Point2I*/ ConsoleVector, (), , "Get the current scaled screen size (SDL_GetRenderLogicalPresentation)") {
+    const Point2I& p= ElfSDL3::GetScreenSize();
+    return {(F32)p.x, (F32)p.y,0.f,0.f};
 }
 
 
 
-DefineEngineFunction(getWindowSize, Point2I, (), , "") {
+DefineEngineFunction(getWindowSize, /*Point2I*/ConsoleVector, (), , "") {
     int x, y;
     SDL_GetWindowSize(app.getWindow(), &x, &y);
-    return {x,y};
+    return {(F32)x,(F32)y,0.0,0.0};
 }
 
 DefineEngineFunction(setVSync, void, (bool value), , "bool value") {
