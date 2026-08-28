@@ -78,3 +78,6 @@ many interpreted languages in speed and is close to the best of the rest: Lua.
 Sure the performance of lua-jit or V8 (jit) is impossible to reach by a 
 interpreted language. But for a neat, really easy to embed scripting language, 
 which is in syntax close to C, php or JavaScript - it's not bad. 
+
+### Version 0.7 performace close to lua in  "local var test" 
+About 100ms - i would say: Mission completed :)

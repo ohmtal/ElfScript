@@ -1,15 +1,16 @@
 # ElfScript Simple Speed Test:
 
 
-## Goal: get the (nearly or better) speed as vanilla lua on "localvar test"
+## Goal: get the (nearly or better) speed as lua (without jit) on "localvar test"
 - Lua 5.5.1: 1.243u 0.002s 0:01.25 99.2%     0+0k 0+0io 0pf+0w
+- Elfscript 0.7c very close : **1.354u** 0.002s 0:01.36 99.2%     0+0k 0+0io 0pf+0w
 - Elfscript 0.6f close to lua but still about 200ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
 - Elfscript 0.6f outperform PHP 8: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
 ## Version 0.7 c
-- [X] Let's see if I can speedup Vector Componets. As FieldCache failed because it have 
+- [X] Let's see if I can speedup Vector Componets as Fieldcache:
    - only for local and global vars 
    - ok, not as fast as expected, but faster as without =>  3.945u instead of 5.411u
 - [X] fixme stack overflow when a new command is used but not consumed!! << added OP_POP_STK
@@ -22,8 +23,10 @@
 | test_dynamic.elf      | 3.923u 0.001s 0:03.93 99.7%     0+0k 0+0io 0pf+0w |
 | test_vector_components.elf    | 3.837u 0.005s 0:03.85 99.4%     0+0k 0+0io 0pf+0w |
 
-localvar is also faster ?! - nice but not sure why.
-Fields are slower ... mhhh but components are much faster.  
+- localvar is also faster  - nice but not sure why.
+- Components are much faster.
+- Fields are slightly slower because of my change to virtual overwrite custom types
+. This is ok because it speed up in real world applciation. 
     
 ## Version 0.7 b
 - Added [virtual functions](./FastPathCustomFieldTypes.md) to overwrite static fields fastPath 
