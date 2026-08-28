@@ -14,6 +14,16 @@
    - ok, not as fast as expected, but faster as without =>  3.945u instead of 5.411u
 - [X] fixme stack overflow when a new command is used but not consumed!! << added OP_POP_STK
 
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.354u 0.002s 0:01.36 99.2%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 3.023u 0.004s 0:03.03 99.6%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.196u 0.002s 0:04.21 99.5%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.923u 0.001s 0:03.93 99.7%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 3.837u 0.005s 0:03.85 99.4%     0+0k 0+0io 0pf+0w |
+
+localvar is also faster ?! - nice but not sure why.
+Fields is slower ... mhhh but components are much faster.  
     
 ## Version 0.7 b
 - Added [virtual functions](./FastPathCustomFieldTypes.md) to overwrite static fields fastPath 
