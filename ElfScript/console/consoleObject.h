@@ -1404,14 +1404,14 @@ struct FieldCache {
       bool cacheFailed = true;
       FieldCacheType type = unknownField;
       const SimObject* objectPtr = nullptr;
-      S32 staticArrayIndex = 0;
+      // used from staticArrayIndex, to frameID
+      S32 cacheIndex = 0;
       union {
             const AbstractClassRep::Field* staticFieldPtr = nullptr;
             // FieldValuePtr for dynamicField
             ConsoleValue* fieldValuePtr/* = nullptr*/;
             F32* VectorComponentFloat /*= nullptr*/;
       };
-      void* VectorCurrentFrame = nullptr;
 };
 // <<<<<<<<<<< FieldCache
 

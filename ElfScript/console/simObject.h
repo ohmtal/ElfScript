@@ -545,7 +545,7 @@ class SimObject: public ConsoleObject
                               )) {
                               cacheP->type = staticField;
                               } else {
-                                    cacheP->staticArrayIndex = array1;
+                                    cacheP->cacheIndex = array1;
                                     cacheP->type = staticField_NoFastPath;
                               }
                               return true;

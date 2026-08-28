@@ -13,6 +13,7 @@ public:
    Dictionary::Entry *currentVariable;
    Dictionary::Entry *copyVariable;
 
+   S32 mFrameID; //ElfScript for cache
    U32 mStackDepth;
    bool mShouldReset; ///< Designates if the value stack should be reset
    bool mResetLocked; ///< mShouldReset will be set at the end

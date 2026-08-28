@@ -13,8 +13,9 @@
 
 - [X] SDL3 added EngineUnmarshallData< Point2F >
 - [X] SDL3 added  EngineUnmarshallData< RectF >
-- [ ] BUG: Vector Componets Fieldcache disabled again: AddressSanitizer: heap-use-after-free
-popFrame/pushFrame ... make my cache invalid!! .... musst think about a solution. 
+- [X] Vector Component Fieldcache disabled again: AddressSanitizer: heap-use-after-free
+popFrame/pushFrame ... make my cache invalid!! ....added a S32 frameID no idea the cache
+is worth to live there !! 
 
 ## Version 0.7 c
 - [X] Let's see if I can speedup Vector Componets as Fieldcache:

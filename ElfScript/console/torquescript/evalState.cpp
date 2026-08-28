@@ -3,6 +3,7 @@
 
 void ExprEvalState::pushFrame(StringTableEntry frameName, Namespace *ns, S32 registerCount)
 {
+      mFrameID++;
 #ifdef DEBUG_SPEW
    validate();
 

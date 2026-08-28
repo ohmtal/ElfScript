@@ -1,8 +1,9 @@
 #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
 #define ENABLE_INLINE_CACHE_LOAD
 #define ENABLE_INLINE_CACHE_SAVE
-// #define ENABLE_COMPONENT_CACHE_LOAD
-// #define ENABLE_COMPONENT_CACHE_SAVE
+
+#define ENABLE_COMPONENT_CACHE_LOAD
+#define ENABLE_COMPONENT_CACHE_SAVE
 #endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
@@ -288,7 +289,7 @@ static void fetchConsoleVectorVar(FieldCache* cachePtr, StringTableEntry subFiel
       cachePtr->type = componentVectorField;
       cachePtr->cacheFailed = false;
       cachePtr->VectorComponentFloat = &cv->v.points[componentIndex];
-      cachePtr->VectorCurrentFrame = Script::gEvalState.stack.last();
+      cachePtr->cacheIndex = Script::gEvalState.mFrameID;
       return;
 
 #else
@@ -2503,16 +2504,25 @@ handle_OP_LOADFIELD_FASTPATH:
                   DISPATCH();
             }
 
-            if (!cachePtr  || cachePtr->VectorCurrentFrame != Script::gEvalState.stack.last()) {
+            if (!cachePtr  ) {
                   cachePtr = new FieldCache();
                   fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
                   mFieldCache.push_back(cachePtr);
                   *cacheSlot = cachePtr;
+            } else {
+                  // new FrameID!!!!
+                  if ( currentRegister >=0 && cachePtr->cacheIndex != Script::gEvalState.mFrameID )
+                        fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
+
+
             }
+
             if (cachePtr->type == componentVectorField) {
-                  Con::printf("%p", cachePtr->VectorCurrentFrame,  Script::gEvalState.stack.last());
-                  F32 f = *cachePtr->VectorComponentFloat;
-                  stackPtr->setFastFloat( (F64)f );
+                  // Con::printf("ID:%d var: %p",
+                  //             Script::gEvalState.mFrameID,
+                  //             cachePtr->VectorComponentFloat
+                  //             );
+                  stackPtr->setFastFloat( (F64)*cachePtr->VectorComponentFloat);
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2589,7 +2599,7 @@ handle_OP_LOADFIELD_FASTPATH:
                               ( curObject,
                                 Con::getData(cachePtr->staticFieldPtr->type,
                                 (void *) (((const char *)curObject) + cachePtr->staticFieldPtr->offset),
-                                cachePtr->staticArrayIndex, cachePtr->staticFieldPtr->table,
+                                cachePtr->cacheIndex, cachePtr->staticFieldPtr->table,
                                 cachePtr->staticFieldPtr->flag) )
                          );
                         break;
@@ -2688,11 +2698,15 @@ handle_OP_SAVEFIELD_FASTPATH:
                   DISPATCH();
             }
 
-            if (!cachePtr || cachePtr->VectorCurrentFrame != Script::gEvalState.stack.last()) {
+            if (!cachePtr) {
                   cachePtr = new FieldCache();
                   fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
                   mFieldCache.push_back(cachePtr);
                   *cacheSlot = cachePtr;
+            }  else {
+                  // new FrameID!!!!
+                  if ( currentRegister >=0 && cachePtr->cacheIndex != Script::gEvalState.mFrameID )
+                        fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
             }
             if (cachePtr->type == componentVectorField) {
                   *cachePtr->VectorComponentFloat = (F32)stack[_STK].getFloat();
@@ -2763,7 +2777,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                   case staticField_NoFastPath: {
                         // FIXME i dont have a setDataField with arrayindex...
                         // FIXME 2 why is array index a problem on fast path?
-                        // curObject->setDataField(curField, cachePtr->staticArrayIndex, stack[_STK].getString());
+                        // curObject->setDataField(curField, cachePtr->cacheIndex, stack[_STK].getString());
                         curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
                         break;
                   }
