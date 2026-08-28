@@ -13,6 +13,15 @@
 
 - Fieldcache disabled again need more testing - is to unstable in "real" application! For Benchmark it's cool, nothing else.
 
+***Results with FieldCache off***
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.420u 0.003s 0:01.43 99.3%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 2.960u 0.007s 0:02.99 98.9%     0+0k 8+0io 0pf+0w |
+| test_static.elf       | 9.044u 0.001s 0:09.07 99.6%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 11.402u 0.004s 0:11.44 99.6%    0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 6.108u 0.007s 0:06.14 99.3%     0+0k 0+0io 0pf+0w |
+
 ## Version 0.7 d
 
 - [X] SDL3 added EngineUnmarshallData< Point2F >

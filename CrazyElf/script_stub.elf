@@ -359,12 +359,6 @@ class  SimObject {
     * @return const char*
     */
       function getField( int index );
-   /** --- ArrayObject* getDebugInfo ---
-    * Return some behind-the-scenes information on the object.
-    * @return An ArrayObject filled with internal information about the object.
-    * @return ArrayObject*
-    */
-      function getDebugInfo();
    /** --- void dumpFields ---
     * Dump a description of all fields defined on this object to the console.
     * @param detailed Whether to print detailed information about members.
@@ -444,200 +438,6 @@ class  SimObject {
    
     */
    pid persistentId;
-};
-class  PointStorageObject : public SimObject {
-  public:
-   /** --- ConsoleVector getPosVec ---
-    * get the position as Vector 
-    * @return ConsoleVector
-    */
-      function getPosVec();
-   /** --- void setPosVec ---
-    * set the position by Vector (String)
-    */
-      function setPosVec( ConsoleVector vector );
-   /** --- void setPos ---
-    * Set position by method 
-    */
-      function setPos( float x, float y, float z=0.f, float w=0.f );
-   /** --- void normalizeXZ ---
-    * normalize the current position
-    */
-      function normalizeXZ();
-   /** --- F32 getLen ---
-    * len of current position
-    * @return F32
-    */
-      function getLen();
-   /** --- bool setPoint ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
-   /** --- bool setPoint3 ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint3( uint index, float x, float y, float z );
-   /** --- bool setPoint2 ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint2( uint index, float x, float y );
-   /** --- void getPointByReference ---
-    * get the point at index  by Reference from 2-4 Variables
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
-   /** --- void setPointByReference ---
-    * set the point at index  by Reference to 2-4 Variables
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
-   /** --- void getPointVecByReference ---
-    * get the point at index and push it into vecVar
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function getPointVecByReference( uint index, string vecVar );
-   /** --- void setPointVecByReference ---
-    * use the data from vecVar to save a point at index
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function setPointVecByReference( uint index, string vecVar );
-   /** --- F32 getPointX ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointX( uint index );
-   /** --- F32 getPointY ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointY( uint index );
-   /** --- F32 getPointZ ---
-    * get the point.points[2] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointZ( uint index );
-   /** --- F32 getPointW ---
-    * get the point.points[3] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointW( uint index );
-   /** --- bool setPointX ---
-    * set the point.points[0] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointX( uint index, float value );
-   /** --- bool setPointY ---
-    * set the point.points[1] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointY( uint index, float value );
-   /** --- bool setPointZ ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointZ( uint index, float value );
-   /** --- bool setPointW ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointW( uint index, float value );
-   /** --- ConsoleVector getPointVec ---
-    * get the point from the point storage at index as Vector (String)
-    * @return ConsoleVector
-    */
-      function getPointVec( uint index );
-   /** --- bool setPointVec ---
-    * set the point in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPointVec( uint index, ConsoleVector vec4 );
-   /** --- String getPoint2Vec ---
-    * get the point xy from the point storage at index as Vector (String)
-    * @return String
-    */
-      function getPoint2Vec( uint index );
-   /** --- bool setPoint2Vec ---
-    * set the point xy in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPoint2Vec( uint index, String strVector );
-   /** --- bool storePoint ---
-    * store the current values x,y,z,w, to the point storage
-    * @return bool
-    */
-      function storePoint( uint index );
-   /** --- bool fetchPoint ---
-    * fetch the point from the point storage at index to the current values x,y,z,w
-    * @return bool
-    */
-      function fetchPoint( uint index );
-   /** --- bool applyMathOnPoints ---
-    * Apply a Math expression on point Storage.
-    * expected format: "x+5; y*2; z; w" separated by ';'
-    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
-    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
-    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
-    *   normalizeXY => applyMathOnPoints("normalizeXY()");
-    * @return bool
-    */
-      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   TypeVector point;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float z;
-   /*!
-    */
-   float w;
-   /*!
-   alias for z
-   
-    */
-   float width;
-   /*!
-   alias for w - yes w.
-   
-    */
-   float height;
-   /*!
-   alias for x
-   
-    */
-   float r;
-   /*!
-   alias for y
-   
-    */
-   float g;
-   /*!
-   alias for z
-   
-    */
-   float b;
-   /*!
-   alias for w
-   
-    */
-   float a;
-   /*!
-   Set the storage size (how many points we can work with) Max:1000000.
-   
-    */
-   uint storageSize;
 };
 /*!
 @brief A collection of SimObjects.
@@ -818,6 +618,20 @@ class  SimGroup : public SimSet {
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
+class  Group : public SimGroup {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
+class  Object : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
 /*!
 @brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.
 @tsexample
@@ -870,20 +684,6 @@ new ScriptObject(Game)
 @ingroup Console
  */
 class  ScriptObject : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
-class  Object : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
-class  Group : public SimGroup {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
@@ -1779,122 +1579,199 @@ function Message::onRemove(%this)
    // --- Group: Editing ---
    // --- Group: Persistence ---
 };
-/*!
-@brief Provides access to a zip file.
-A ZipObject add, delete and extract files that are within a zip archive.  You may also read and write directly to the files within the archive by obtaining a StreamObject for the file.@tsexample
-// Open a zip archive, creating it if it doesn't exist
-%archive = new ZipObject();
-%archive.openArchive("testArchive.zip", Write);
-// Add a file to the archive with the given name
-%archive.addFile("./water.png", "water.png");
-// Close the archive to save the changes
-%archive.closeArchive();
-@endtsexample
-@note Behind the scenes all of the work is being done with the ZipArchive and StreamObject classes.
-@see StreamObject when using methods such as openFileForRead() and openFileForWrite()
-@ingroup FileSystem
- */
-class  ZipObject : public SimObject {
+class  PointStorageObject : public SimObject {
   public:
-   /** --- bool openArchive ---
-    * @brief Open a zip archive for manipulation.
-    * Once a zip archive is opened use the various ZipObject methods for working with the files within the archive.  Be sure to close the archive when you are done with it.
-    * @param filename The path and file name of the zip archive to open.
-    * @param accessMode One of read, write or readwrite
-    * @return True is the archive was successfully opened.
-    * @note If you wish to make any changes to the archive, be sure to open it with a write or readwrite access mode.
-    * @see closeArchive()
+   /** --- ConsoleVector getPosVec ---
+    * get the position as Vector 
+    * @return ConsoleVector
+    */
+      function getPosVec();
+   /** --- void setPosVec ---
+    * set the position by Vector (String)
+    */
+      function setPosVec( ConsoleVector vector );
+   /** --- void setPos ---
+    * Set position by method 
+    */
+      function setPos( float x, float y, float z=0.f, float w=0.f );
+   /** --- void normalizeXZ ---
+    * normalize the current position
+    */
+      function normalizeXZ();
+   /** --- F32 getLen ---
+    * len of current position
+    * @return F32
+    */
+      function getLen();
+   /** --- bool setPoint ---
+    * Set a  point at index in the point storage.
     * @return bool
     */
-      function openArchive( string filename, string accessMode="read" );
-   /** --- void closeArchive ---
-    * @brief Close an already opened zip archive.
-    * @see openArchive()
-    */
-      function closeArchive();
-   /** --- SimObject* openFileForRead ---
-    * @brief Open a file within the zip archive for reading.
-    * Be sure to close the file when you are done with it.
-    * @param filename The path and name of the file to open within the zip archive.
-    * @return A standard StreamObject is returned for working with the file.
-    * @note You must first open the zip archive before working with files within it.
-    * @see closeFile()
-    * @see openArchive()
-    * @return SimObject*
-    */
-      function openFileForRead( string filename );
-   /** --- SimObject* openFileForWrite ---
-    * @brief Open a file within the zip archive for writing to.
-    * Be sure to close the file when you are done with it.
-    * @param filename The path and name of the file to open within the zip archive.
-    * @return A standard StreamObject is returned for working with the file.
-    * @note You must first open the zip archive before working with files within it.
-    * @see closeFile()
-    * @see openArchive()
-    * @return SimObject*
-    */
-      function openFileForWrite( string filename );
-   /** --- void closeFile ---
-    * @brief Close a previously opened file within the zip archive.
-    * @param stream The StreamObject of a previously opened file within the zip archive.
-    * @see openFileForRead()
-    * @see openFileForWrite()
-    */
-      function closeFile( SimObject stream );
-   /** --- bool addFile ---
-    * @brief Add a file to the zip archive
-    * @param filename The path and name of the file to add to the zip archive.
-    * @param pathInZip The path and name to be given to the file within the zip archive.
-    * @param replace If a file already exists within the zip archive at the same location as this new file, this parameter indicates if it should be replaced.  By default, it will be replaced.
-    * @return True if the file was successfully added to the zip archive.
+      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
+   /** --- bool setPoint3 ---
+    * Set a  point at index in the point storage.
     * @return bool
     */
-      function addFile( string filename, string pathInZip, bool replace=true );
-   /** --- bool extractFile ---
-    * @brief Extact a file from the zip archive and save it to the requested location.
-    * @param pathInZip The path and name of the file to be extracted within the zip archive.
-    * @param filename The path and name to give the extracted file.
-    * @return True if the file was successfully extracted.
+      function setPoint3( uint index, float x, float y, float z );
+   /** --- bool setPoint2 ---
+    * Set a  point at index in the point storage.
     * @return bool
     */
-      function extractFile( string pathInZip, string filename );
-   /** --- bool deleteFile ---
-    * @brief Deleted the given file from the zip archive
-    * @param pathInZip The path and name of the file to be deleted from the zip archive.
-    * @return True of the file was successfully deleted.
-    * @note Files that have been deleted from the archive will still show up with a getFileEntryCount() until you close the archive.  If you need to have the file count up to date with only valid files within the archive, you could close and then open the archive again.
-    * @see getFileEntryCount()
-    * @see closeArchive()
-    * @see openArchive()
+      function setPoint2( uint index, float x, float y );
+   /** --- void getPointByReference ---
+    * get the point at index  by Reference from 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void setPointByReference ---
+    * set the point at index  by Reference to 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void getPointVecByReference ---
+    * get the point at index and push it into vecVar
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointVecByReference( uint index, string vecVar );
+   /** --- void setPointVecByReference ---
+    * use the data from vecVar to save a point at index
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointVecByReference( uint index, string vecVar );
+   /** --- F32 getPointX ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.points[2] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.points[3] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.points[0] from the point storage at index as Vector (String)
     * @return bool
     */
-      function deleteFile( string pathInZip );
-   /** --- S32 getFileEntryCount ---
-    * @brief Get the number of files within the zip archive.
-    * Use getFileEntry() to retrive information on each file within the archive.
-    * @return The number of files within the zip archive.
-    * @note The returned count will include any files that have been deleted from the archive using deleteFile().  To clear out all deleted files, you could close and then open the archive again.
-    * @see getFileEntry()
-    * @see closeArchive()
-    * @see openArchive()
-    * @return S32
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.points[1] from the point storage at index as Vector (String)
+    * @return bool
     */
-      function getFileEntryCount();
-   /** --- String getFileEntry ---
-    * @brief Get information on the requested file within the zip archive.
-    * This methods provides five different pieces of information for the requested file:
-    * <ul><li>filename - The path and name of the file within the zip archive</li><li>uncompressed size</li><li>compressed size</li><li>compression method</li><li>CRC32</li></ul>
-    * Use getFileEntryCount() to obtain the total number of files within the archive.
-    * @param index The index of the file within the zip archive.  Use getFileEntryCount() to determine the number of files.
-    * @return A tab delimited list of information on the requested file, or an empty string if the file could not be found.
-    * @see getFileEntryCount()
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
+   /** --- ConsoleVector getPointVec ---
+    * get the point from the point storage at index as Vector (String)
+    * @return ConsoleVector
+    */
+      function getPointVec( uint index );
+   /** --- bool setPointVec ---
+    * set the point in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPointVec( uint index, ConsoleVector vec4 );
+   /** --- String getPoint2Vec ---
+    * get the point xy from the point storage at index as Vector (String)
     * @return String
     */
-      function getFileEntry( int index );
+      function getPoint2Vec( uint index );
+   /** --- bool setPoint2Vec ---
+    * set the point xy in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPoint2Vec( uint index, String strVector );
+   /** --- bool storePoint ---
+    * store the current values x,y,z,w, to the point storage
+    * @return bool
+    */
+      function storePoint( uint index );
+   /** --- bool fetchPoint ---
+    * fetch the point from the point storage at index to the current values x,y,z,w
+    * @return bool
+    */
+      function fetchPoint( uint index );
+   /** --- bool applyMathOnPoints ---
+    * Apply a Math expression on point Storage.
+    * expected format: "x+5; y*2; z; w" separated by ';'
+    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
+    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
+    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
+    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+    * @return bool
+    */
+      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Editing ---
    // --- Group: Persistence ---
+   /*!
+    */
+   TypeVector point;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float z;
+   /*!
+    */
+   float w;
+   /*!
+   alias for z
+   
+    */
+   float width;
+   /*!
+   alias for w - yes w.
+   
+    */
+   float height;
+   /*!
+   alias for x
+   
+    */
+   float r;
+   /*!
+   alias for y
+   
+    */
+   float g;
+   /*!
+   alias for z
+   
+    */
+   float b;
+   /*!
+   alias for w
+   
+    */
+   float a;
+   /*!
+   Set the storage size (how many points we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
 };
 //------------------------------------------------------------------
 //                  F U N C T I O N S 
@@ -2878,13 +2755,10 @@ namespace Global {
     * @ingroup Logging
     */
       function echo( string message... );
-   /** --- void print ---
-    * @brief Logs a message to the console see also echo 
-    * Concatenates all given arguments to a single string and prints the string to the console.
-    * A newline is added automatically after the text.
-    * @param message Any number of string arguments.
+   /** --- void printSeparator ---
+    * Print a separator line
     */
-      function print( string message... );
+      function printSeparator();
    /** --- void warn ---
     * @brief Logs a warning message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as a warning message (in the in-game console, these will show up using a turquoise font by default). A newline is added automatically after the text.
@@ -3344,12 +3218,6 @@ namespace Global {
     * @return bool
     */
       function dumpEngineDocs( string outputFile );
-   /** --- void debugDumpAllObjects ---
-    * @brief Dumps all current EngineObject instances to the console.
-    * @note This function is only available in debug builds.
-    * @ingroup Debugging
-    */
-      function debugDumpAllObjects();
    /** --- const char* expandFilename ---
     * @brief Grabs the full path of a specified file
     * @param filename Name of the local file to locate
@@ -3435,13 +3303,6 @@ namespace Global {
     * @return bool
     */
       function isValidObjectName( string name );
-   /** --- void debugEnumInstances ---
-    * Call the given function for each instance of the given class.
-    * @param className Name of the class for which to enumerate instances.
-    * @param functionName Name of function to call and pass each instance of the given class.
-    * @note This function is only available in debug builds and primarily meant as an aid in debugging.@ingroup Console
-    */
-      function debugEnumInstances( string className, string functionName );
    /** --- ArrayObject* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
@@ -3533,6 +3394,10 @@ namespace Global {
     * @return F32
     */
       function getRandomF( float min, float max=0.f );
+   /** --- F32 mCatmullrom ---
+    * @return F32
+    */
+      function mCatmullrom( float t, float p0, float p1, float p2, float p3 );
    /** --- S32 mFloor ---
     * Round v down to the nearest integer.
     * @param v Number to convert to integer.@returns Number converted to integer.@ingroup Math
@@ -4318,6 +4183,14 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
+  START_DIV = 0.03125
+  CANVAS_HEIGHT = 200.0
+  CANVAS_WIDTH = 250.0
+  UPDATE_TIME = 0.05
+  PIXEL_SIZE = 4.0
+  VECTOR = TypeVector
+  FLOAT = TypeF32
+  INT = TypeS32
   PIXELS_VERSION = "0.260818"
   MAX_BLOCK_SIZE = 48
   SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
@@ -4328,6 +4201,7 @@ namespace Global {
   SDL_BLENDOPERATION_MINIMUM = 4
   SDL_BLENDOPERATION_SUBTRACT = 2
   SDL_BLENDMODE_BLEND_PREMULTIPLIED = 16
+  INITAL_COUNT = 50
   SDL_BLENDMODE_NONE = 0
   SDL_SCALEMODE_PIXELART = 2
   SDL_SCALEMODE_LINEAR = 1
@@ -4361,6 +4235,7 @@ namespace Global {
   SDL_PIXELFORMAT_XRGB8888 = 370546692
   SDL_TEXTUREACCESS_STREAMING = 1
   SDL_WINDOW_NOT_FOCUSABLE = 2147483648
+  STRING = TypeString
   SDL_WINDOW_METAL = 536870912
   SDL_WINDOW_VULKAN = 268435456
   SDL_WINDOW_FILL_DOCUMENT = 2097152
@@ -4541,6 +4416,7 @@ namespace Global {
   SDL_SCANCODE_LANG3 = 146
   SDL_INIT_EVENTS = 16384
   SDL_SCANCODE_F18 = 109
+  STAR_COUNT = 420
   SDL_SCANCODE_BACKSLASH = 49
   SDL_SCANCODE_1 = 30
   SDL_PATHTYPE_OTHER = 3
@@ -4706,5 +4582,5 @@ namespace Global {
   SDL_SCANCODE_RIGHTBRACKET = 48
   SDL_KMOD_CAPS = 8192
   SDL_KMOD_SCROLL = 32768
---- End of Dump (388 items) ---
+--- End of Dump (399 items) ---
 */
