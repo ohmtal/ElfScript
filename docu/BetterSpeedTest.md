@@ -9,6 +9,10 @@
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
+## Version 0.7 e
+
+- Fieldcache disabled again need more testing - is to unstable in "real" application! For Benchmark it's cool, nothing else.
+
 ## Version 0.7 d
 
 - [X] SDL3 added EngineUnmarshallData< Point2F >

@@ -1,11 +1,11 @@
 //FIXME EAT TOO MUCH MEMORY!
-#ifdef ELFSCRIPT_ENABLE_FIELDCACHE
-#define ENABLE_INLINE_CACHE_LOAD
-#define ENABLE_INLINE_CACHE_SAVE
-
-#define ENABLE_COMPONENT_CACHE_LOAD
-#define ENABLE_COMPONENT_CACHE_SAVE
-#endif
+// #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
+// #define ENABLE_INLINE_CACHE_LOAD
+// #define ENABLE_INLINE_CACHE_SAVE
+//
+// #define ENABLE_COMPONENT_CACHE_LOAD
+// #define ENABLE_COMPONENT_CACHE_SAVE
+// #endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -2540,7 +2540,7 @@ handle_OP_LOADFIELD_FASTPATH:
       }
       else
 #endif
-      if (!cachePtr || cachePtr->objectPtr != curObject ) {
+      if (!cachePtr) {
             cachePtr = new FieldCache();
             cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
@@ -2556,7 +2556,21 @@ handle_OP_LOADFIELD_FASTPATH:
                   PUSH_STK();
                   DISPATCH();
             }
-      } //if not cachePtr
+      } else {
+            if (cachePtr->objectPtr != curObject) {
+                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
+                  if (cachePtr->cacheFailed) {
+                        #ifdef TORQUE_DEBUG
+                        Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
+                        #endif
+                        // simply reset the cache again .. it's a bad practice to not init field variables but ...
+                        cachePtr->objectPtr = nullptr;
+                        stackPtr->setString("");
+                        PUSH_STK();
+                        DISPATCH();
+                  }
+            }
+      }
 
 
       // double safety
@@ -2727,7 +2741,7 @@ handle_OP_SAVEFIELD_FASTPATH:
       }
       else
 #endif
-      if (!cachePtr || cachePtr->objectPtr != curObject ) {
+      if (!cachePtr  ) {
             cachePtr = new FieldCache();
             if (curObject) cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
@@ -2755,7 +2769,18 @@ handle_OP_SAVEFIELD_FASTPATH:
                         Con::printf("SAVE: object: %d cached field: %s[%s] type: %s (%d)", curObject ? curObject->getId() : 0 , curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
 #endif
                   }
-      } //if not cachePtr
+      } else {
+            if (cachePtr->objectPtr != curObject) {
+                  cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
+
+                  if (cachePtr->cacheFailed) {
+                        Con::printSeparator();
+                        Con::errorf("SAVE: error invalid field detected : %s[%s] object:%d", curField, curFieldArray, curObject ? curObject->getId() : 0 );
+                        Con::printSeparator();
+                        DISPATCH();
+                  }
+            }
+      }
 
       // double safety
       if (cachePtr) {
