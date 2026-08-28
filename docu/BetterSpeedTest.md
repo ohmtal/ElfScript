@@ -23,7 +23,7 @@
 | test_vector_components.elf    | 3.837u 0.005s 0:03.85 99.4%     0+0k 0+0io 0pf+0w |
 
 localvar is also faster ?! - nice but not sure why.
-Fields is slower ... mhhh but components are much faster.  
+Fields are slower ... mhhh but components are much faster.  
     
 ## Version 0.7 b
 - Added [virtual functions](./FastPathCustomFieldTypes.md) to overwrite static fields fastPath 
