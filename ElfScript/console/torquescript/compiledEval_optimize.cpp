@@ -1,6 +1,7 @@
 #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
 #define ENABLE_INLINE_CACHE_LOAD
 #define ENABLE_INLINE_CACHE_SAVE
+#define ENABLE_COMPONENT_CACHE
 #endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
@@ -213,8 +214,87 @@ namespace Con
       }
       return ret;
    }
-}
+} //Con
 
+// -----------------------------------------------------------------------------
+static S32 getComponentIndex(StringTableEntry subField) {
+      // -----
+      static const StringTableEntry xyzw[] =
+      {
+            StringTable->insert("x"),
+            StringTable->insert("y"),
+            StringTable->insert("z"),
+            StringTable->insert("w")
+      };
+
+      //XXTH added
+      static const StringTableEntry wh[] =
+      {
+            StringTable->insert("width"),
+            StringTable->insert("height")
+      };
+
+
+      static const StringTableEntry rgba[] =
+      {
+            StringTable->insert("r"),
+            StringTable->insert("g"),
+            StringTable->insert("b"),
+            StringTable->insert("a")
+      };
+      // -----
+
+      int componentIndex = -1;
+      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
+      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
+      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
+      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
+
+      return componentIndex;
+}
+// -----------------------------------------------------------------------------
+static ConsoleValue* fetchConsoleValue( S32 currentLocalRegister) {
+      if (currentLocalRegister != -1) {
+            return Script::gEvalState.getLocalConsoleValuePtr(currentLocalRegister);
+      } else if (Script::gEvalState.currentVariable) {
+            return Script::gEvalState.getConsoleValue();
+      }
+      return nullptr;
+}
+// -----------------------------------------------------------------------------
+static void fetchConcoleVectorVar(FieldCache* cachePtr, StringTableEntry subField, S32 currentLocalRegister)
+{
+#ifdef ENABLE_CONSOLE_VECTOR
+
+      cachePtr->fieldValuePtr = fetchConsoleValue(currentLocalRegister);
+
+      if (cachePtr->fieldValuePtr == nullptr ||
+            (cachePtr->fieldValuePtr->type != ConsoleValueType::cvVector)
+      ) {
+            cachePtr->type = component_NoVector;
+            cachePtr->cacheFailed = true;
+            return;
+      }
+
+
+      S32 componentIndex = getComponentIndex(subField);
+      if (componentIndex < 0 ) {
+            // should i set something else ?
+            cachePtr->type = component_NoVector;
+            cachePtr->cacheFailed = true;
+            return;
+      }
+      cachePtr->type = componentVectorField;
+      cachePtr->cacheFailed = false;
+      cachePtr->VectorComponentFloat = &cachePtr->fieldValuePtr->v.points[componentIndex];
+      return;
+
+#else
+      cachePtr->type = component_NoVector;
+      cachePtr->cacheFailed = false;
+      return;
+#endif
+}
 // -----------------------------------------------------------------------------
 static void stackFieldComponent(SimObject* object, StringTableEntry field, const char* array
       , StringTableEntry subField, ConsoleValue* pStack, S32 currentLocalRegister)
@@ -248,44 +328,13 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       }
 
 
-      // -----
-      static const StringTableEntry xyzw[] =
-      {
-            StringTable->insert("x"),
-            StringTable->insert("y"),
-            StringTable->insert("z"),
-            StringTable->insert("w")
-      };
-
-      //XXTH added
-      static const StringTableEntry wh[] =
-      {
-            StringTable->insert("width"),
-            StringTable->insert("height")
-      };
-
-
-      static const StringTableEntry rgba[] =
-      {
-            StringTable->insert("r"),
-            StringTable->insert("g"),
-            StringTable->insert("b"),
-            StringTable->insert("a")
-      };
-      // -----
-      F64 targetValue = 0.f;
-
-      int componentIndex = -1;
-      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
-      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
-      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
-      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
-
+      S32 componentIndex = getComponentIndex(subField);
       if (componentIndex < 0) {
             pStack->setEmptyString();
             return;
       }
 
+      F64 targetValue = 0.f;
 #ifdef  ENABLE_CONSOLE_VECTOR
        if (srcValue->type == cvVector) {
              targetValue = (F64)srcValue->v.points[componentIndex];
@@ -433,36 +482,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
       }
 
       // ----
-      static const StringTableEntry xyzw[] =
-      {
-            StringTable->insert("x"),
-            StringTable->insert("y"),
-            StringTable->insert("z"),
-            StringTable->insert("w")
-      };
-
-      static const StringTableEntry wh[] =
-      {
-            StringTable->insert("width"),
-            StringTable->insert("height")
-      };
-
-
-      static const StringTableEntry rgba[] =
-      {
-            StringTable->insert("r"),
-            StringTable->insert("g"),
-            StringTable->insert("b"),
-            StringTable->insert("a")
-      };
-      // ----
-
-      int componentIndex = -1;
-      if      (subField == xyzw[0] || subField == rgba[0]) componentIndex = 0;
-      else if (subField == xyzw[1] || subField == rgba[1]) componentIndex = 1;
-      else if (subField == xyzw[2] || subField == rgba[2] || subField == wh[0]) componentIndex = 2;
-      else if (subField == xyzw[3] || subField == rgba[3] || subField == wh[1]) componentIndex = 3;
-
+      S32 componentIndex = getComponentIndex(subField);
       if (componentIndex < 0) return;
 
 
@@ -2457,7 +2477,9 @@ handle_OP_LOADFIELD_FASTPATH:
 #ifdef ENABLE_INLINE_CACHE_LOAD
       ConsoleValue* stackPtr = &stack[_STK + 1];
 
-      // we got a component which cant be cached
+#ifndef ENABLE_COMPONENT_CACHE
+      // we got a component which cant be cached :(
+
       if (!curObject) {
             ip+=2; //FieldCache emitted ...
             stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
@@ -2465,12 +2487,48 @@ handle_OP_LOADFIELD_FASTPATH:
             PUSH_STK();
             DISPATCH();
       }
-
+#endif
       // FieldCache for Objects
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ip+=2;
       FieldCache* cachePtr = *cacheSlot;
+#ifdef ENABLE_COMPONENT_CACHE
+      if (!curObject)  {
+            // ConsoleValue* curValue = fetchConsoleValue(currentRegister);
+            // if (!curValue) {
+            //       stackPtr->setEmptyString();
+            //       PUSH_STK();
+            //       DISPATCH();
+            // }
 
+            if (!cachePtr /*|| cachePtr->fieldValuePtr != curValue*/) {
+                  cachePtr = new FieldCache();
+                  if (prevObject) {
+                        cachePtr->type=component_NoVector;
+                  } else {
+                        fetchConcoleVectorVar(cachePtr,  curField, currentRegister);
+                  }
+                  mFieldCache.push_back(cachePtr);
+                  *cacheSlot = cachePtr;
+            }
+            if (cachePtr->type == componentVectorField) {
+                  stackPtr->setFastFloat( (F64)*cachePtr->VectorComponentFloat );
+                  PUSH_STK();
+                  DISPATCH();
+            }
+            else
+            if (cachePtr && cachePtr->type == component_NoVector) {
+                  stackFieldComponent(prevObject, prevField, prevFieldArray, curField, stackPtr,currentRegister);
+                  PUSH_STK();
+                  DISPATCH();
+            }
+
+            Con::errorf("I SHOULD NOT BE HERE !!!");
+            PUSH_STK();
+            DISPATCH();
+      }
+      else
+#endif
       if (!cachePtr || cachePtr->objectPtr != curObject ) {
             cachePtr = new FieldCache();
             cachePtr->objectPtr = curObject;
@@ -2497,7 +2555,7 @@ handle_OP_LOADFIELD_FASTPATH:
                   Con::warnf("LOAD: we have a cache (type:%d) for field: %s ! But it failed to fetch a field or component!! object:%d"
                   , (S32)cachePtr->type, curField, curObject ? curObject->getId() : 0);
                   #endif
-                  stackPtr->setString("");
+                  stackPtr->setEmptyString();
                   // simply reset the cache again .. it's a bad practice to not init field variables but ...
                   cachePtr->objectPtr = nullptr;
                   PUSH_STK();
@@ -2598,89 +2656,15 @@ handle_OP_LOADFIELD_FASTPATH:
 #endif
 }
 
-
-// // // handle_OP_LOADFIELD_UINT:
-// // //             if (curObject)
-// // //             {
-// // //                   stack[_STK + 1].cleanupData();
-// // //                   stack[_STK + 1].type = cvInteger; //HardCore!
-// // //                   curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
-// // //
-// // //             }
-// // //             else
-// // //             {
-// // //                   stack[_STK + 1].cleanupData();
-// // //                   stack[_STK + 1].type = cvInteger; //HardCore!
-// // //                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
-// // //
-// // //                   // char buff[FieldBufferSizeString];
-// // //                   // memset(buff, 0, sizeof(buff));
-// // //                   // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-// // //                   // stack[_STK + 1].setString(buff);
-// // //             }
-// // //             PUSH_STK();
-// // //             DISPATCH();
-// // //
-// // // handle_OP_LOADFIELD_FLT:
-// // //
-// // //
-// // //
-// // // // XXTH FieldCache
-// // //             if (curObject)
-// // //             {
-// // //                   stack[_STK + 1].cleanupData();
-// // //                   stack[_STK + 1].type = cvFloat; //HardCore!
-// // //                   curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
-// // //
-// // //             }
-// // //             else
-// // //             {
-// // //                   stack[_STK + 1].cleanupData();
-// // //                   stack[_STK + 1].type = cvFloat; //HardCore!
-// // //                   stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
-// // //
-// // //                   // char buff[FieldBufferSizeString];
-// // //                   // memset(buff, 0, sizeof(buff));
-// // //                   // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-// // //                   // stack[_STK + 1].setString(buff);
-// // //             }
-// // //             PUSH_STK();
-// // //             DISPATCH();
-// // //
-// // // handle_OP_LOADFIELD_STR:
-// // //          if (curObject)
-// // //          {
-// // //             stack[_STK + 1].cleanupData();
-// // //             stack[_STK + 1].type = cvString; // :(
-// // //             curObject->stackDataField(curField, curFieldArray, &stack[_STK + 1]);
-// // //
-// // //          }
-// // //          else
-// // //          {
-// // //             // stack[_STK + 1].cleanupData();
-// // //             // stack[_STK + 1].type = cvString;
-// // //             stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
-// // //
-// // //             // The field is not being retrieved from an object. Maybe it's
-// // //             // a special accessor?
-// // //             // char buff[FieldBufferSizeString];
-// // //             // memset(buff, 0, sizeof(buff));
-// // //             // getFieldComponent(prevObject, prevField, prevFieldArray, curField, buff, currentRegister);
-// // //             // stack[_STK + 1].setString(buff);
-// // //          }
-// // //          PUSH_STK();
-// // //          DISPATCH();
-
-
-// // handle_OP_SAVEFIELD_UINT:
-// // handle_OP_SAVEFIELD_FLT:
+// -----------------------------------------------------------------------------
 handle_OP_SAVEFIELD_FASTPATH:
 {
       S32 desiredType = (S32) code[ip]; ip++; //0.6e emitted type
 
 #ifdef ENABLE_INLINE_CACHE_SAVE
 
-      // We have no object so it's a component which can't be cached!
+      // // We have no object so it's a component which can't be cached!
+#ifndef ENABLE_COMPONENT_CACHE
       if (!curObject) {
             ip+=2; // skip FieldCache
             // The field is not being set on an object. Maybe it's a special accessor?
@@ -2688,14 +2672,49 @@ handle_OP_SAVEFIELD_FASTPATH:
             prevObject = NULL;
             DISPATCH();
       }
-
+#endif
 
       // FieldCache prepare:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ip+=2;
       // Con::printf("Cache-Slot RAM : %p", (void*)cacheSlot);
       FieldCache* cachePtr = *cacheSlot;
+#ifdef ENABLE_COMPONENT_CACHE
+      if (!curObject)  {
+            // ConsoleValue* curValue = fetchConsoleValue(currentRegister);
+            // if (!curValue) {
+            //       prevObject = NULL;
+            //       DISPATCH();
+            // }
 
+            if (!cachePtr /*|| cachePtr->fieldValuePtr != curValue*/) {
+                  cachePtr = new FieldCache();
+                  if (prevObject) {
+                        cachePtr->type=component_NoVector;
+                  } else {
+                        fetchConcoleVectorVar(cachePtr,  curField, currentRegister);
+                  }
+                  mFieldCache.push_back(cachePtr);
+                  *cacheSlot = cachePtr;
+            }
+            if (cachePtr->type == componentVectorField) {
+                  *cachePtr->VectorComponentFloat = (F32)stack[_STK].getFloat();
+                  prevObject = NULL;
+                  DISPATCH();
+            }
+            else
+            if (cachePtr && cachePtr->type == component_NoVector) {
+                  pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+                  prevObject = NULL;
+                  DISPATCH();
+            }
+
+            Con::errorf("I SHOULD NOT BE HERE !!!");
+            prevObject = NULL;
+            DISPATCH();
+      }
+      else
+#endif
       if (!cachePtr || cachePtr->objectPtr != curObject ) {
             cachePtr = new FieldCache();
             if (curObject) cachePtr->objectPtr = curObject;
@@ -3933,7 +3952,7 @@ handle_OP_BUILD_VECTOR_STRING: {
       ConsoleVector cv = {0};
       // get values from stack
       for (S32 i = count - 1; i >= 0; i--) {
-            if (matchVectorFields) cv.points[i] = static_cast<F32> (stack[_STK].getFloat());
+            if (matchVectorFields) cv.points[i] = static_cast<F32>(stack[_STK].getFloat());
             else stringValues[i] = stack[_STK].getString();
             POP_STK();
       }
@@ -4072,20 +4091,20 @@ handle_OP_PRINT:
 // ------------------------------------
 handle_OP_INLINE_COMMAND:
 {
-      U32 count = code[ip++];
+      S32 count = code[ip++];
       U32 commandID = code[ip++];
 
       switch(commandID) {
             case CommandStmtNode::PRINTF: {
                   if (count == 0) {
-                        stack[_STK + 1].setEmptyString();
+                         stack[_STK + 1].setEmptyString();
                         break;
                   }
                   Con::printf("%s", formatString( count, &stack[_STK - count + 1]).c_str());
                   for (S32 i = count - 1; i >= 0; i--) {
                         POP_STK();
                   }
-                  stack[_STK + 1].setEmptyString();
+                   stack[_STK + 1].setEmptyString();
                   break;
             }
             case CommandStmtNode::SPRINTF: {
@@ -4114,7 +4133,7 @@ handle_OP_INLINE_COMMAND:
                   for (S32 i = count - 1; i >= 0; i--) {
                         POP_STK();
                   }
-                  stack[_STK + 1].setEmptyString();
+                  DISPATCH();
                   break;
             }
       } //switch
@@ -4234,9 +4253,7 @@ handle_OP_MATH_RANDOMF_1:
 }
 handle_OP_MATH_RANDOMF:
 {
-
       stack[_STK + 1].setFastFloat(ElfMath::mRandF64());
-
       PUSH_STK();
       DISPATCH();
 }

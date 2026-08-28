@@ -8,11 +8,19 @@
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
+## Version 0.7 c
+- [X] Let's see if I can speedup Vector Componets. As FieldCache failed because it have 
+   - only for local and global vars 
+   - ok, not as fast as expected, but faster as without =>  3.945u instead of 5.411u
+- [X] fixme stack overflow when a new command is used but not consumed!! << added OP_POP_STK
 
+    
 ## Version 0.7 b
 - Added [virtual functions](./FastPathCustomFieldTypes.md) to overwrite static fields fastPath 
 - Got [ConsoleVector directly accessed](./ImplementConsoleTypeCasters.md) via Console-Functions and -Methods without string convert! - Rock 'n Roll!! 
-- this means ConsoleVector is completely implemented as a "nativ type" and i will not removed it from ConsoleValue because of 16 bytes! it's 32 bytes and disable it does not change anything in speed. 
+- this means ConsoleVector is completely implemented as a "nativ type" and i will not remove it from ConsoleValue because of 16 bytes! It's 32 bytes and disable it does not change anything in speed. 
+- too bad i dont have a benchmark to test this ... but my ConsoleVector Math functions using reference can be 
+changed now!
 
 ## Version 0.7 a 
 

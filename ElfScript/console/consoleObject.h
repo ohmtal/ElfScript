@@ -1395,6 +1395,8 @@ enum FieldCacheType {
       staticField_NoFastPath,
       dynamicField,
       dynamicField_WithArray,
+      componentVectorField,
+      component_NoVector,
       ARCFirstCustomField //skip this
 };
 
@@ -1402,10 +1404,13 @@ struct FieldCache {
       bool cacheFailed = true;
       FieldCacheType type = unknownField;
       const SimObject* objectPtr = nullptr;
-      const AbstractClassRep::Field* staticFieldPtr = nullptr;
       S32 staticArrayIndex = 0;
-      // FieldValuePtr for dynamicField
-      ConsoleValue* fieldValuePtr = nullptr;
+      union {
+            const AbstractClassRep::Field* staticFieldPtr = nullptr;
+            // FieldValuePtr for dynamicField
+            ConsoleValue* fieldValuePtr/* = nullptr*/;
+            F32* VectorComponentFloat /*= nullptr*/;
+      };
 };
 // <<<<<<<<<<< FieldCache
 

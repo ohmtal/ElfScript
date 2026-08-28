@@ -7,6 +7,7 @@ vardump("%myVec");
 for (%j in range  JLOOPS) {
     for (%i in range ILOOPS) {
         %myVec.x ++;
+        // printf("#%d:%d %f",%j,%i, %myVec.x);
     }
     print("SUM (++) IS:" SPC %myVec.x);
     // varDumpField("%myVec.x");

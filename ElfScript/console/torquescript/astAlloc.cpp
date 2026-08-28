@@ -663,7 +663,16 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             case CommandStmtNode::SPRINTF:
                   TORQUE_CASE_FALLTHROUGH;
             default:  {
-                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next)  ip = expr->compile(codeStream, ip, TypeReqString);
+                  U32 i = 0;
+                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next) {
+                        ip = expr->compile(codeStream, ip, TypeReqString);
+                        i++;
+                  }
+                  if (i!=elementCount) {
+                        Con::errorf("elementCount MISSMATCH !!!!");
+
+                  }
+
                   codeStream.emit(OP_INLINE_COMMAND);
                   codeStream.emit(elementCount);
                   codeStream.emit(commandID);
@@ -671,6 +680,9 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             }
 
       }
+
+      if (type == TypeReqNone)
+            codeStream.emit(OP_POP_STK);
 
       return codeStream.tell();
 }

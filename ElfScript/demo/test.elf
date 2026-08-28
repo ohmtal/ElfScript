@@ -339,15 +339,26 @@ print (" ----- FIELD COMPONENT TEST ----- ");
 %foo = new Object();
 %foo.lineCount = 3;
 %foo.line = "lalalala";
-%foo.line[0] = { 1, 2, 3 };
-%foo.line[1] = { 4 ,5 ,6 };
-%foo.line[2] = { 7, 8, 9 };
+%foo.line[0] = { 1, 2, 3 , 0.1 };
+%foo.line[1] = { 4 ,5 ,6 , 0.2 };
+%foo.line[2] = { 7, 8, 9 , 0.3 };
 
     vardumpField("%foo.line");
 for( %i in range %foo.lineCount) {
     vardumpField("%foo.line" @ %i);
     echo("LINE " SPC %i SPC "=" SPC %foo.line[%i]);
 }
+%myVec = {1,1,1,1};
+for (%i in Range 10) {
+    %myVec.x += 1;
+    %myVec.y += 2;
+    %myVec.z += 3;
+    %myVec.w -= 0.001;
+    varDump("%myVec");
+
+}
+
+
 
 printSeparator();
 print (" ----- NEW ASSIGN TEST ----- ");
@@ -485,8 +496,15 @@ function runMathTests()
 
 runMathTests();
 // -----------------------------------------------------------------------------
-
-
+// function ochjo() { return 1; }
+// for (%i in range 200000) {
+//
+//     %foo = {1,2,3,4};
+//     print("#",%i, math.RandomF());
+//     math.RandomF();
+//     ochjo();
+//     // printf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
+// }
 
 
 printSeparator();
