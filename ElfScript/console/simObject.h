@@ -650,6 +650,7 @@ class SimObject: public ConsoleObject
                   }
                   return true;
             }
+            stackP->setString("");
             return false;
       }
 

@@ -100,13 +100,13 @@ function FieldInspector::_addFieldDef(%this, %fieldname) {
 // this should be cached in a file
 function FieldInspector::Inspect(%this, %object, %force) {
 
+
     if (!%force && %this.object == %object) return true;
 
     if (!isObject( %object )) {
         %this.object = 0;
         return false;
     }
-
 
     %this.object = %object;
     if (isObject(%this.gui)) %this.gui.delete();

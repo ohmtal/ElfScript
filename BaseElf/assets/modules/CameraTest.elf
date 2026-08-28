@@ -6,6 +6,7 @@ include ("include/Inspector.elf");
 function createCameraTest() {
     %obj = new ScriptGroup(CameraTest) {
         // class = "CameraTest";
+        TypeS32 Spritesheet = 0;
     };
 
     return %obj;
@@ -132,7 +133,14 @@ function CameraTest::onAdd(%this) {
     SceneObjects.sortLayers();
 
     %this.add ( new SimObject(FieldInspector));
+
+
     FieldInspector.inspect(LightMap.getId());
+
+    printSeparator();
+    print("Objects of " SPC %this.getId());
+    %this.listObjects();
+    printSeparator();
 
     return true;
 }
@@ -191,7 +199,7 @@ function CameraTest::OnUpdate(%this, %dt) {
 function CameraTest::Render(%this) {
 
 
-    FieldInspector.render();
+   FieldInspector.render();
 
 
 
