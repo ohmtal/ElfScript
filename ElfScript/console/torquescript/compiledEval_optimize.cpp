@@ -2595,24 +2595,29 @@ handle_OP_LOADFIELD_FASTPATH:
             // TODO  simobject should be revisited!
             switch (cachePtr->type) {
                   case staticField: {
-                        F64 floatValue = 0.f;
-                        #ifdef ENABLE_CONSOLE_VECTOR
-                        if (cachePtr->staticFieldPtr->type == TypeVector) {
-                              ConsoleVector* source = (ConsoleVector*)(((const char*)this) + cachePtr->staticFieldPtr->offset);
-                              stackPtr->setVector(*source);
-                        }
-                        else
-                        #endif
-                        if (curObject->getDataField(cachePtr->staticFieldPtr, floatValue)) {
-                              if (cachePtr->staticFieldPtr->type == TypeF64 || cachePtr->staticFieldPtr->type == TypeF32) {
-                                    stackPtr->setFastFloat(floatValue);
-                              } else {
-                                    stackPtr->setFastInt((S64)floatValue);
-                              }
-                        }
+
+                        curObject->stackStaticFieldFastPath(cachePtr->staticFieldPtr,stackPtr );
+
+                        // F64 floatValue = 0.f;
+                        // #ifdef ENABLE_CONSOLE_VECTOR
+                        // if (cachePtr->staticFieldPtr->type == TypeVector) {
+                        //       ConsoleVector* source = (ConsoleVector*)(((const char*)this) + cachePtr->staticFieldPtr->offset);
+                        //       stackPtr->setVector(*source);
+                        // }
+                        // else
+                        // #endif
+                        // if (curObject->getDataField(cachePtr->staticFieldPtr, floatValue)) {
+                        //       if (cachePtr->staticFieldPtr->type == TypeF64 || cachePtr->staticFieldPtr->type == TypeF32) {
+                        //             stackPtr->setFastFloat(floatValue);
+                        //       } else {
+                        //             stackPtr->setFastInt((S64)floatValue);
+                        //       }
+                        // }
                         break;
                   }
                   case staticField_NoFastPath: {
+                        // curObject->stackDataField()
+
                         stackPtr->setString(
                               (*cachePtr->staticFieldPtr->getDataFn)
                               ( curObject,
@@ -2799,17 +2804,18 @@ handle_OP_SAVEFIELD_FASTPATH:
       // FIXME 3 simobject must be revisited!
             switch (cachePtr->type) {
                   case staticField: {
-                        if (cachePtr->staticFieldPtr->type == TypeF32 || cachePtr->staticFieldPtr->type == TypeF64)
-                              curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getFloat() );
-                        else
-                              curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getInt() );
-                        break;
+
+                        curObject->pushStaticFieldFastPath(cachePtr->staticFieldPtr,&stack[_STK]);
+
+                        // pushStaticFieldFastPath
+                        // if (cachePtr->staticFieldPtr->type == TypeF32 || cachePtr->staticFieldPtr->type == TypeF64)
+                        //       curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getFloat() );
+                        // else
+                        //       curObject->setDataField(cachePtr->staticFieldPtr,stack[_STK].getInt() );
+                        // break;
                   }
                   case staticField_NoFastPath: {
-                        // FIXME i dont have a setDataField with arrayindex...
-                        // FIXME 2 why is array index a problem on fast path?
-                        // curObject->setDataField(curField, cachePtr->cacheIndex, stack[_STK].getString());
-                        curObject->setDataField(curField, curFieldArray, stack[_STK].getString());
+                        curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
                         break;
                   }
                   case dynamicField_WithArray: {

@@ -128,6 +128,9 @@ function CameraTest::onAdd(%this) {
         layer = 0;
         textureObjectId = TexLightMap.getId();
     });
+
+    warn("LightMap.srcRect:", LightMap.srcRect, " LightMap.dstRect:", LightMap.dstRect);
+
     LightMap.CenterCenterPoint();
     SceneObjects.add(LightMap);
     SceneObjects.sortLayers();
