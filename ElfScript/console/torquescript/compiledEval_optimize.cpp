@@ -1,7 +1,8 @@
 #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
 #define ENABLE_INLINE_CACHE_LOAD
 #define ENABLE_INLINE_CACHE_SAVE
-#define ENABLE_COMPONENT_CACHE
+// #define ENABLE_COMPONENT_CACHE_LOAD
+// #define ENABLE_COMPONENT_CACHE_SAVE
 #endif
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
@@ -262,14 +263,14 @@ static ConsoleValue* fetchConsoleValue( S32 currentLocalRegister) {
       return nullptr;
 }
 // -----------------------------------------------------------------------------
-static void fetchConcoleVectorVar(FieldCache* cachePtr, StringTableEntry subField, S32 currentLocalRegister)
+static void fetchConsoleVectorVar(FieldCache* cachePtr, StringTableEntry subField, S32 currentLocalRegister)
 {
 #ifdef ENABLE_CONSOLE_VECTOR
 
-      cachePtr->fieldValuePtr = fetchConsoleValue(currentLocalRegister);
+      ConsoleValue* cv  = fetchConsoleValue(currentLocalRegister);
 
-      if (cachePtr->fieldValuePtr == nullptr ||
-            (cachePtr->fieldValuePtr->type != ConsoleValueType::cvVector)
+      if (cv == nullptr ||
+            (cv->type != ConsoleValueType::cvVector)
       ) {
             cachePtr->type = component_NoVector;
             cachePtr->cacheFailed = true;
@@ -286,7 +287,8 @@ static void fetchConcoleVectorVar(FieldCache* cachePtr, StringTableEntry subFiel
       }
       cachePtr->type = componentVectorField;
       cachePtr->cacheFailed = false;
-      cachePtr->VectorComponentFloat = &cachePtr->fieldValuePtr->v.points[componentIndex];
+      cachePtr->VectorComponentFloat = &cv->v.points[componentIndex];
+      cachePtr->VectorCurrentFrame = Script::gEvalState.stack.last();
       return;
 
 #else
@@ -2477,7 +2479,7 @@ handle_OP_LOADFIELD_FASTPATH:
 #ifdef ENABLE_INLINE_CACHE_LOAD
       ConsoleValue* stackPtr = &stack[_STK + 1];
 
-#ifndef ENABLE_COMPONENT_CACHE
+#ifndef ENABLE_COMPONENT_CACHE_LOAD
       // we got a component which cant be cached :(
 
       if (!curObject) {
@@ -2492,27 +2494,25 @@ handle_OP_LOADFIELD_FASTPATH:
       FieldCache** cacheSlot = (FieldCache**)(&code[ip]);
       ip+=2;
       FieldCache* cachePtr = *cacheSlot;
-#ifdef ENABLE_COMPONENT_CACHE
+#ifdef ENABLE_COMPONENT_CACHE_LOAD
       if (!curObject)  {
-            // ConsoleValue* curValue = fetchConsoleValue(currentRegister);
-            // if (!curValue) {
-            //       stackPtr->setEmptyString();
-            //       PUSH_STK();
-            //       DISPATCH();
-            // }
 
-            if (!cachePtr /*|| cachePtr->fieldValuePtr != curValue*/) {
+            if (prevObject) {
+                  stackFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK + 1],currentRegister);
+                  PUSH_STK();
+                  DISPATCH();
+            }
+
+            if (!cachePtr  || cachePtr->VectorCurrentFrame != Script::gEvalState.stack.last()) {
                   cachePtr = new FieldCache();
-                  if (prevObject) {
-                        cachePtr->type=component_NoVector;
-                  } else {
-                        fetchConcoleVectorVar(cachePtr,  curField, currentRegister);
-                  }
+                  fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
                   mFieldCache.push_back(cachePtr);
                   *cacheSlot = cachePtr;
             }
             if (cachePtr->type == componentVectorField) {
-                  stackPtr->setFastFloat( (F64)*cachePtr->VectorComponentFloat );
+                  Con::printf("%p", cachePtr->VectorCurrentFrame,  Script::gEvalState.stack.last());
+                  F32 f = *cachePtr->VectorComponentFloat;
+                  stackPtr->setFastFloat( (F64)f );
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2664,7 +2664,7 @@ handle_OP_SAVEFIELD_FASTPATH:
 #ifdef ENABLE_INLINE_CACHE_SAVE
 
       // // We have no object so it's a component which can't be cached!
-#ifndef ENABLE_COMPONENT_CACHE
+#ifndef ENABLE_COMPONENT_CACHE_SAVE
       if (!curObject) {
             ip+=2; // skip FieldCache
             // The field is not being set on an object. Maybe it's a special accessor?
@@ -2679,21 +2679,18 @@ handle_OP_SAVEFIELD_FASTPATH:
       ip+=2;
       // Con::printf("Cache-Slot RAM : %p", (void*)cacheSlot);
       FieldCache* cachePtr = *cacheSlot;
-#ifdef ENABLE_COMPONENT_CACHE
+#ifdef ENABLE_COMPONENT_CACHE_SAVE
       if (!curObject)  {
-            // ConsoleValue* curValue = fetchConsoleValue(currentRegister);
-            // if (!curValue) {
-            //       prevObject = NULL;
-            //       DISPATCH();
-            // }
 
-            if (!cachePtr /*|| cachePtr->fieldValuePtr != curValue*/) {
+            if (prevObject) {
+                  pushFieldComponent(prevObject, prevField, prevFieldArray, curField, &stack[_STK], currentRegister);
+                  prevObject = NULL;
+                  DISPATCH();
+            }
+
+            if (!cachePtr || cachePtr->VectorCurrentFrame != Script::gEvalState.stack.last()) {
                   cachePtr = new FieldCache();
-                  if (prevObject) {
-                        cachePtr->type=component_NoVector;
-                  } else {
-                        fetchConcoleVectorVar(cachePtr,  curField, currentRegister);
-                  }
+                  fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
                   mFieldCache.push_back(cachePtr);
                   *cacheSlot = cachePtr;
             }

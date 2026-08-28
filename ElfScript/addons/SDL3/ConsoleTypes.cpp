@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
+// FIXME ElfScript 0.7: can we add engineAPI Console Vector link to this types?!
 // Console Types source
 //-----------------------------------------------------------------------------
 #include <console/console.h>

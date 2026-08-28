@@ -20,12 +20,67 @@
 #include "console/engineStructs.h"
 #endif
 
+#ifndef _ENGINEAPI_H_
+#include "console/engineAPI.h"
+#endif
+
 typedef SDL_FColor Color4F;
 typedef SDL_Color Color;
 typedef SDL_FRect RectF;
 typedef SDL_Rect RectI;
 typedef SDL_Point Point2I;
 typedef SDL_FPoint Point2F;
+
+
+#ifdef ENABLE_CONSOLE_VECTOR
+template<>
+struct EngineUnmarshallData< Point2F >
+{
+    Point2F operator()( ConsoleValue &ref ) const
+    {
+        ConsoleVector v = ref.getVector();
+        return {v.points[0], v.points[1]};
+    }
+
+    Point2F operator()( const char* str ) const
+    {
+        Point2F result = {0};
+        if (str && str[0] != '\0') {
+            dSscanf(str, "%g %g",
+                    result.x,
+                    result.y
+            );
+        }
+        return result;
+    }
+};
+
+template<>
+struct EngineUnmarshallData< RectF >
+{
+    RectF operator()( ConsoleValue &ref ) const
+    {
+        ConsoleVector v = ref.getVector();
+        return {v.points[0], v.points[1], v.points[2], v.points[3]};
+    }
+
+    RectF operator()( const char* str ) const
+    {
+        RectF result = {0};
+        if (str && str[0] != '\0') {
+            dSscanf(str, "%g %g %g %g",
+                    result.x,
+                    result.y,
+                    result.w,
+                    result.h
+            );
+        }
+        return result;
+    }
+};
+#endif
+
+
 
 
 inline bool isValid(const RectF& rect) {

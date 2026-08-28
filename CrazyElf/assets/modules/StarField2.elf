@@ -123,6 +123,7 @@ function StarField::Render(%this) {
         {
             %radius = math.Lerp(2.0, 0.3, %lStarPoints.z);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
+            // SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
         }
 
         %lStarPoints.storePoint(%i);

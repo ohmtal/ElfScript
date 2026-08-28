@@ -496,15 +496,14 @@ function runMathTests()
 
 runMathTests();
 // -----------------------------------------------------------------------------
-// function ochjo() { return 1; }
-// for (%i in range 200000) {
-//
-//     %foo = {1,2,3,4};
-//     print("#",%i, math.RandomF());
-//     math.RandomF();
-//     ochjo();
-//     // printf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
-// }
+function ochjo() { return 1; }
+for (%i in range 2000) {
+
+    %foo = {1,2,3,4};
+    math.RandomF();
+    ochjo();
+    printf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
+}
 
 
 printSeparator();

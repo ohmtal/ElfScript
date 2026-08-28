@@ -1411,6 +1411,7 @@ struct FieldCache {
             ConsoleValue* fieldValuePtr/* = nullptr*/;
             F32* VectorComponentFloat /*= nullptr*/;
       };
+      void* VectorCurrentFrame = nullptr;
 };
 // <<<<<<<<<<< FieldCache
 
