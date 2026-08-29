@@ -65,7 +65,7 @@ $posObj = new ScriptObject() {
 You can also add a new typed field with:
 
 ```
-$posObj.addTypeField("z", "TypeF32", 0);
+$posObj.addField("z", "TypeF32", 0);
 $posObj.dumpFields(); 
 ```
 Note with this function the type need to set as String. 
@@ -74,7 +74,6 @@ using BaseElf.
 
 You can also use `$posObj.setFieldType("m0", "TypeF32");` but then the field
 m0 must exists. Example: `$posObj.m0=0; $posObj.setFieldType("m0", "TypeF32");`.
-
 
 ## foreach
 
