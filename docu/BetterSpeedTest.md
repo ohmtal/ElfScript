@@ -22,6 +22,9 @@
  clear $foo, create variables TypeString $foo0 = "Hello", TypeString $foo1="World", TypeF64 $foo2= 10.0;
  and return the count of variables;
  - Both new function also works with a string like: "Hello World 10.0";
+ - Auto set type on Dynamic Fields:
+    - `$foo = {1,2,3}; %obj.foo = $foo;vardumpField("%obj.foo");` set an TypeVector
+    - `%obj.addField("myFloat", "TypeF32", 0); %obj.myFloat[0]= 4;` myFloat[0] copy the type from myFloat. 
  
 ## Version 0.7e
 
