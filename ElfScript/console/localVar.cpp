@@ -10,6 +10,7 @@
 #include <console/consoleInternal.h>
 #include <console/torquescript/ast.h>
 #include <console/torquescript/compiler.h>
+#include <core/strings/stringUnit.h>
 
 
 extern  FuncVars gEvalFuncVars;
@@ -242,6 +243,12 @@ namespace ElfScript {
 
     #endif
 
+    void varDump(const char* variableName) {
+        if ( !variableName || variableName[0] == '\0') return;
+        if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
+        else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
+    }
+
 } //namespace ElfScript
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -253,9 +260,10 @@ DefineEngineFunction(varDumpField, void, (const char* variableName), , "local/gl
 
 DefineEngineFunction(varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
-    if ( !variableName || variableName[0] == '\0') return;
-    if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
-    else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
+    ElfScript::varDump(variableName);
+    // if ( !variableName || variableName[0] == '\0') return;
+    // if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
+    // else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
 
 
 }
@@ -280,5 +288,59 @@ DefineEngineFunction(whereAmI, void,(),,"look up the function where i'am called 
                 namespaceName ? namespaceName : ""
                 , functionName ? functionName :"unknown");
 
+}
+// -----------------------------------------------------------------------------
+
+DefineEngineFunction(toArray,S32, (const char* varName, bool debugOut),(false)
+                     ,"Convert an string content of varname to an set typed of variables with varName[0..count] fields\n"
+                     "tab separated (default) or space separated"
+                     "@return the count of variables"
+) {
+
+    const char* text = ElfScript::getLocalString(varName);
+
+    if (!text || text[0] == '\0') {
+        Con::errorf("Variable %s is empty and cant be converted to object", varName);
+        return 0;
+    }
+
+    const char* set = "\t\n";
+    // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+    U32 count =  StringUnit::getUnitCount( text, "\t\n" );
+    // we only got no or one token - switch to space / tab separated
+    if (count < 2) {
+        count =  StringUnit::getUnitCount( text, " \t\n" );
+        set = " \t\n";
+    }
+
+    // nothing - is empty ?
+    if (count < 1) {
+        Con::errorf("Variable %s is empty and cant be converted to object", varName);
+        return 0;
+    }
+    char buff[256];
+    StringTableEntry fieldNameEntry = nullptr;
+    for (U32 i = 0; i < count; i++) {
+        const char * token = StringUnit::getUnit( text, i, set );
+
+        dSprintf(buff,256,"%s%d",varName, i); //mhh or as array ?
+        fieldNameEntry = StringTable->insert( buff );
+
+        Script::gEvalState.setCurVarNameCreate(fieldNameEntry);
+
+        ConsoleValue* stack = ElfScript::getLocalVariable(fieldNameEntry);
+        if (!stack) return 0;
+        if (isInt(token)) stack->setInt(dAtol(token));
+        else if (isFloat(token)) stack->setFloat(dAtod(token));
+        else stack->setString(token);
+
+        if (debugOut) ElfScript::varDump(fieldNameEntry);
+    }
+    // clean original content:
+    ElfScript::setLocalString(varName, "");
+
+
+
+    return count;
 }
 

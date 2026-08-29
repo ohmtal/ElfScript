@@ -2158,7 +2158,7 @@ handle_OP_SETCURVAR_CREATE:
       curNSDocBlock = NULL;
       DISPATCH();
 
-      handle_OP_SETCURVAR_ARRAY:
+handle_OP_SETCURVAR_ARRAY:
       var = StringTable->insert(stack[_STK].getString());
 
       // See OP_SETCURVAR

@@ -9,15 +9,20 @@
 ///////////////////////////////////////////////////////
 // some testfunction .......
 
+// Script::gEvalState.setCurVarNameCreate(var);
 
-
-// moved to console functions
-// DefineEngineFunction(toObject,S32, (const char* text),
-//     ,"Convert an string to Object with v[] fields\n"
+// toObject moved to console functions
+// FIXME moved to localvar :D
+// DefineEngineFunction(toArray,S32, (const char* varName),
+//     ,"Convert an string content of varname to an set typed of variables with varName[0..count] fields\n"
 //      "tab separated (default) or space separated"
+//      "@return the count of variables"
 // ) {
+//
+//     const char* text = ElfScript::getLocalString(varName);
+//
 //     if (!text || text[0] == '\0') {
-//         Con::errorf("Empty text cant be converted to object");
+//         Con::errorf("Variable %s is empty and cant be converted to object", varName);
 //         return 0;
 //     }
 //
@@ -32,26 +37,29 @@
 //
 //     // nothing - is empty ?
 //     if (count < 1) {
-//         Con::errorf("Empty text cant be converted to object");
+//         Con::errorf("Variable %s is empty and cant be converted to object", varName);
 //         return 0;
 //     }
-//
-//     SimObject* obj = new SimObject();
-//     char buff[32];
+//     char buff[256];
 //     StringTableEntry fieldNameEntry = nullptr;
 //     for (U32 i = 0; i < count; i++) {
 //         const char * token = StringUnit::getUnit( text, i, set );
 //
-//         dSprintf(buff,32,"v%d", i); //mhh or as array ?
+//         dSprintf(buff,256,"%s%d",varName, i); //mhh or as array ?
 //         fieldNameEntry = StringTable->insert( buff );
 //
-//         obj->setDataField(fieldNameEntry, nullptr, token);
-//         // try to typeCast:
-//         if (isInt(token)) obj->setDataFieldType(TypeS32, fieldNameEntry, nullptr );
-//         else if (isFloat(token)) obj->setDataFieldType(TypeF32, fieldNameEntry, nullptr );
+//         Script::gEvalState.setCurVarNameCreate(fieldNameEntry);
+//
+//         ConsoleValue* stack = ElfScript::getLocalVariable(fieldNameEntry);
+//         if (!stack) return 0;
+//         if (isInt(token)) stack->setInt(dAtol(token));
+//         else if (isFloat(token)) stack->setFloat(dAtod(token));
+//         else stack->setString(token);
 //     }
-//     obj->registerObject();
-//     return obj->getId();
+//     // clean original content:
+//     ElfScript::setLocalString(varName, "");
+//
+//     return count;
 // }
 
 
