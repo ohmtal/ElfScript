@@ -16,7 +16,13 @@
  - added ConsoleVector to union << 24 byte instead of 32
  - print and printf do not need to pop.
  - ELF_ENABLE_FIELDCACHE default ON again 
-
+ - function toObject => `%obj = toObject({"Hello", "World", 10.0});` create an object
+ with fields TypeString v0 = "Hello", TypeString v1="World", TypeF64 v2= 10.0;
+ - function toArray => `$foo = {"Hello", "World", 10.0}; echo(toArray("$foo"));`
+ clear $foo, create variables TypeString $foo0 = "Hello", TypeString $foo1="World", TypeF64 $foo2= 10.0;
+ and return the count of variables;
+ - Both new function also works with a string like: "Hello World 10.0";
+ 
 ## Version 0.7e
 
 - Fieldcache cleaned and fixed but still default off in cmake.
