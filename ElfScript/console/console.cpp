@@ -299,7 +299,7 @@ static DataChunker consoleLogChunker;
 // static bool consoleLogLocked;
 bool scriptWarningsAsAsserts = true;
 static bool logBufferEnabled=false; //XXTH default to false! use consumer
-static S32 printLevel = 10;
+// onsolete static S32 printLevel = 10;
 // static FileStream consoleLogFile;
 // static const char *defLogFileName = "console.log";
 // static S32 consoleLogMode = 0;
@@ -407,10 +407,10 @@ void init()
    setVariable("Con::prompt", "% ");
    addVariable("Con::logBufferEnabled", TypeBool, &logBufferEnabled, "If true, the log buffer will be enabled.\n"
       "@ingroup Console\n");
-   addVariable("Con::printLevel", TypeS32, &printLevel, 
-      "@brief This is deprecated.\n\n"
-      "It is no longer in use and does nothing.\n"      
-      "@ingroup Console\n");
+   // addVariable("Con::printLevel", TypeS32, &printLevel,
+   //    "@brief This is deprecated.\n\n"
+   //    "It is no longer in use and does nothing.\n"
+   //    "@ingroup Console\n");
    addVariable("Con::warnUndefinedVariables", TypeBool, &gWarnUndefinedScriptVariables, "If true, a warning will be displayed in the console whenever a undefined variable is used in script.\n"
       "@ingroup Console\n");
    addVariable( "instantGroup", TypeRealString, &gInstantGroup, "The group that objects will be added to when they are created.\n"

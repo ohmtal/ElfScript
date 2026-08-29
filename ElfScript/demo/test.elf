@@ -1,5 +1,6 @@
 function rl() {
-    exec("ElfScript/demo/test.elf");
+    // exec("ElfScript/demo/test.elf");
+    exec($Con::File);
 }
 
 
@@ -35,10 +36,10 @@ echo("B ==" SPC sto.Module);
 
 for (%i = 0; %i < 10; %i++) {
     // sto.Keys[%i] = %i;
-    sto.addTypeField(sprintf("Keys%d", %i), "TypeS32", %i);
+    sto.addField(sprintf("Keys%d", %i), "TypeS32", %i);
     %key = getWord($MODULES, %i);
     echo("* setting sto.Keys[",%key,"] to:",%i * 10);
-    sto.addTypeField(sprintf("Keys%s", %key), "TypeS32", %i*10);
+    sto.addField(sprintf("Keys%s", %key), "TypeS32", %i*10);
     // sto.Keys[%key] = %i * 10;
 
 }
@@ -496,13 +497,16 @@ function runMathTests()
 
 runMathTests();
 // -----------------------------------------------------------------------------
+printSeparator();
 function ochjo() { return 1; }
-for (%i in range 2000) {
+for (%i in range 20) {
 
     %foo = {1,2,3,4};
     math.RandomF();
     ochjo();
-    printf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
+    %foo = sprintf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
+    print(%foo);
+    printf("#%f %f %f %f %f %s",%i,%foo.x,%foo.y,%foo.b,%foo.a, %foo);
 }
 
 

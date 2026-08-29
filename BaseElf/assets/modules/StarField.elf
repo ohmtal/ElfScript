@@ -9,7 +9,7 @@
 // using PointStorageObject (since ElfScript 0.4e) rocket mode (Rectangle)
 // RelWithDebInfo > ~900 fps ... with 4200 stars still 120fps yay, 9000 stats 60fps
 //
-// NOTE foreach does not make a difference here ?! :/
+// 0.7e fully optimized 930 fps @ 1152x648 on my Thinkpad T570. CPU[0] 100% GPU: ~85%
 // -----------------------------------------------------------------------------
 
 // orig 420
@@ -19,10 +19,11 @@
 function createStarField() {
     %obj = new ScriptGroup() {
         class = "StarField";
+        // ~~~ dynamic fields: ~~~
         TypeF32 speed = 0.4;
         TypeBool drawLines = false;
+        TypeS32 starPoints = 0;
     };
-    error("%obj.speed is" SPC %obj.speed);
     return %obj;
 }
 // -----------------------------------------------------------------------------
@@ -49,7 +50,7 @@ function StarField::OnAdd(%this) {
 
     %this.updateSize();
 
-    %this.add( new PointStorageObject(starPoints) {
+    %this.add( %this.starPoints = new PointStorageObject() {
         storageSize = STAR_COUNT;
     });
 
@@ -57,7 +58,7 @@ function StarField::OnAdd(%this) {
     // for ( %i = 0; %i < STAR_COUNT; %i++)
     for(%i in range STAR_COUNT)
     {
-        starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
+        %this.starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
     }
 
 
@@ -92,7 +93,17 @@ function StarField::Render(%this) {
     %speed = %this.speed;
     SDL_SetRenderDrawColor(%renderer, 255,255,255);
 
-    %lStarPoints = starPoints.getId(); // slightly faster
+    // to local registers:
+    %lStarPoints = %this.starPoints; // slightly faster
+
+    %hW = $hW;
+    %hH = $hH;
+
+    %minH = $minH;
+    %maxH = $maxH;
+
+    %screenWidth = $screenWidth;
+    %screenHeight = $screenHeight;
 
     // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
@@ -101,50 +112,44 @@ function StarField::Render(%this) {
         %lStarPoints.fetchPoint(%i);
         %pointX = %lStarPoints.x;
         %pointY = %lStarPoints.y;
-        // %pointZ = %lStarPoints.z; <<<< later
-
-        // %pointX = %lStarPoints.getPointX(%i);
-        // %pointY = %lStarPoints.getPointY(%i);
-        // %pointZ = %lStarPoints.getPointZ(%i);
-
-
         // >>>>>>>>>>>>>>>> update point
-        // %pointZ -= %dt * %speed;
         %pointZ = %lStarPoints.z - %dt * %speed; //one call saved
 
         // Calculate the screen position
         %invZ = 1.0 /  %pointZ;
-        %screenPos_X = $hW + (%pointX * %invZ);
-        %screenPos_Y = $hH + (%pointY * %invZ);
+        %screenPos_X = %hW + (%pointX * %invZ);
+        %screenPos_Y = %hH + (%pointY * %invZ);
 
         if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
-            || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
+            || %screenPos_X > %screenWidth || %screenPos_Y > %screenHeight)
         {
-
-            // %lStarPoints.setPos(GetRandomF($minH, $maxH), GetRandomF($minH, $maxH), 1.0);
-            %pointX = GetRandomF($minH, $maxH);
-            %pointY = GetRandomF($minH, $maxH);
+            // %pointX = GetRandomF($minH, $maxH);
+            // %pointY = GetRandomF($minH, $maxH);
+            %pointX = math.RandomF(%minH, %maxH);
+            %pointY = math.RandomF(%minH, %maxH);
             %pointZ = 1.0;
-            %screenPos_X = $hW +  %pointX;
-            %screenPos_Y = $hH +  %pointY;
+            %screenPos_X = %hW +  %pointX;
+            %screenPos_Y = %hH +  %pointY;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%drawLines)
         {
-            %t = mClampF(%pointZ + START_DIV , 0.0 , 1.0 );
+            // %t = mClampF(%pointZ + START_DIV , 0.0 , 1.0 );
+            %t = math.ClampF(%pointZ + START_DIV , 0.0 , 1.0 );
 
             if ( (%t - %pointZ) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = $hW + ( %pointX * %invT);
-                %startY = $hH + (  %pointY * %invT);
+                %startX = %hW + ( %pointX * %invT);
+                %startY = %hH + (  %pointY * %invT);
 
                 SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
             }
         }
         else
         {
-            %radius = mLerp(4.0, 0.5, %pointZ);
+            // %radius = mLerp(4.0, 0.5, %pointZ);
+            %radius = math.Lerp(4.0, 0.5, %pointZ);
             SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
         }
 
@@ -164,7 +169,7 @@ function StarField::Render(%this) {
     // DrawText("[MOUSE WHEEL] Current Speed:" SPC  strFormat("%.2f",$speed) , 10, 40, 20, RAYWHITE);
     // DrawText("[SPACE] Current draw mode:" SPC  ( %this.drawLines ? "Lines" : "Circles" ) , 10, 70, 20, RAYWHITE);
 
-    DrawFPS(10, 10);
+    // DrawFPS(10, 10);
 }
 // -----------------------------------------------------------------------------
 function StarField::OnUpdate(%this, %dt) { }

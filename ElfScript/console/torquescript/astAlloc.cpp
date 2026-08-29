@@ -483,12 +483,18 @@ U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
       U32 elementCount = 0;
 
+
       const U32 MAX_ELEMENTS = 16;
       for (ExprNode* expr = argList;
            expr && elementCount < MAX_ELEMENTS;
            expr = (ExprNode*)expr->next )
       {
-            ip = expr->compile(codeStream, ip, TypeReqString);
+            if (expr->getExprNodeNameEnum() ==  NameFloatNode || expr->getExprNodeNameEnum() ==  NameIntNode) {
+                  ip = expr->compile(codeStream, ip, TypeReqFloat);
+            } else {
+                  ip = expr->compile(codeStream, ip, TypeReqString);
+            }
+
             elementCount++;
       }
 
@@ -531,8 +537,11 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             }
       }
 
+      bool needPOP = (type == TypeReqNone);
 
       const U32 MAX_ELEMENTS = 32; //too much ?!
+      if (elementCount > MAX_ELEMENTS) elementCount = MAX_ELEMENTS;
+
       switch (commandID) {
 
             case CommandStmtNode::PRINT:
@@ -548,6 +557,7 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
                   codeStream.emit(OP_PRINT);
                   codeStream.emit(elementCount);
+                  needPOP = false; // we never return anything
                   break;
             }
 
@@ -659,12 +669,15 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             }
 
             case CommandStmtNode::PRINTF:
+                  needPOP = false;
                   TORQUE_CASE_FALLTHROUGH;
             case CommandStmtNode::SPRINTF:
                   TORQUE_CASE_FALLTHROUGH;
             default:  {
                   U32 i = 0;
-                  for (ExprNode* expr = args; expr; expr = (ExprNode*)expr->next) {
+                  for (ExprNode* expr = args;
+                       expr  &&  i < MAX_ELEMENTS;
+                       expr = (ExprNode*)expr->next) {
                         ip = expr->compile(codeStream, ip, TypeReqString);
                         i++;
                   }
@@ -681,7 +694,7 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
       }
 
-      if (type == TypeReqNone)
+      if (needPOP)
             codeStream.emit(OP_POP_STK);
 
       return codeStream.tell();

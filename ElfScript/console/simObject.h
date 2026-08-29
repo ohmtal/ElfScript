@@ -583,7 +583,17 @@ class SimObject: public ConsoleObject
                         if (isLoad) return false;
                         entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
                         // // entry->mValue.bufferLen = 0; // else we get in trouble on clean
-                        entry->mValue.type = stackP->type;
+                        // entry->mValue.type = stackP->type;
+                        switch (stackP->type) {
+                              case cvFloat: mFieldDictionary->setFieldType(dynamicFieldName, TypeF64); break;
+                              case cvInteger: mFieldDictionary->setFieldType(dynamicFieldName, TypeS64); break;
+                              #ifdef ENABLE_CONSOLE_VECTOR
+                              case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
+                              #endif
+                              default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
+                        }
+
+
                   }
                   if (entry)
                   {
@@ -681,10 +691,31 @@ class SimObject: public ConsoleObject
 
             // let fetch the entry directly ::::: FIXME ConsoleBaseType ?!
             if (!entry) {
+                  // ElfScipt 0.7f copy type from "main" if we have an array
+                  SimFieldDictionary::Entry* parentEntry = nullptr;
+                  if (!arrayEmpty) {
+                        parentEntry = mFieldDictionary->findDynamicField(slotName);
+                  }
+
                   entry = mFieldDictionary->addEntry(dynamicFieldName, 0 );
-                  if (stackP) {
-                        // // entry->mValue.bufferLen = 0; // else we get in trouble on clean
-                        entry->mValue.type = stackP->type;
+                  // Thats bullshit since it still think it's string!
+                  // if (stackP) {
+                  //       // // entry->mValue.bufferLen = 0; // else we get in trouble on clean
+                  //       entry->mValue.type = stackP->type;
+                  // }
+                  if (!arrayEmpty && parentEntry) {
+                        // we have only this function which need a new lookup ...
+                        mFieldDictionary->setFieldType(dynamicFieldName, mFieldDictionary->getFieldType(slotName));
+                  } else  {
+                        //NOTE with field cache on we never reach this because it's writen directly
+                        switch (stackP->type) {
+                              case cvFloat: mFieldDictionary->setFieldType(dynamicFieldName, TypeF64); break;
+                              case cvInteger: mFieldDictionary->setFieldType(dynamicFieldName, TypeS64); break;
+                              #ifdef ENABLE_CONSOLE_VECTOR
+                              case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
+                              #endif
+                              default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
+                        }
                   }
             }
 
@@ -1431,7 +1462,9 @@ class SimObject: public ConsoleObject
 
       /// @name Accessors
       /// @{
-      
+      // NOTE: ElfScript should i remove all this "editor" stuff from this base object ?!
+      //       why is all this here .. name SimObject is ok to have this here but ConsoleObject
+      //       can not be used in script.
       bool isSelected() const { return mFlags.test(Selected); }
       bool isExpanded() const { return mFlags.test(Expanded); }
       bool isEditorOnly() const { return mFlags.test( EditorOnly ); }
@@ -1517,9 +1550,11 @@ class SimObject: public ConsoleObject
       virtual void getConsoleMethodData(const char * fname, S32 routingId, S32 * type, S32 * minArgs, S32 * maxArgs, void ** callback, const char ** usage) {}
       
       DECLARE_CONOBJECT( SimObject );
+#ifndef ELFSCRIPT_SLIM_OBJECT
       DECLARE_CALLBACK(void, onInspectPostApply, (SimObject* obj));
       DECLARE_CALLBACK(void, onSelected, (SimObject* obj));
       DECLARE_CALLBACK(void, onUnselected, (SimObject* obj));
+#endif // #ifndef ELFSCRIPT_SLIM_OBJECT
       DECLARE_CALLBACK(void, onAdd, (SimObjectId ID) );
       DECLARE_CALLBACK(void, onRemove, (SimObjectId ID));
       

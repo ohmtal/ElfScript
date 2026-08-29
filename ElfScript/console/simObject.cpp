@@ -60,10 +60,11 @@ SimObjectId SimObject::smForcedId = 0;
 
 bool SimObject::preventNameChanging = false;
 
+#ifndef ELFSCRIPT_SLIM_OBJECT
 IMPLEMENT_CALLBACK(SimObject, onInspectPostApply, void, (SimObject* obj), (obj), "Generic callback for when an object is edited");
 IMPLEMENT_CALLBACK(SimObject, onSelected, void, (SimObject* obj), (obj), "Generic callback for when an object is selected");
 IMPLEMENT_CALLBACK(SimObject, onUnselected, void, (SimObject* obj), (obj), "Generic callback for when an object is un-selected");
-
+#endif
 
 IMPLEMENT_CALLBACK( SimObject, onAdd, void, ( SimObjectId ID ), ( ID ),
    "Called when this SimObject is added to the system.\n"
@@ -173,11 +174,12 @@ void SimObject::initPersistFields()
       addProtectedField( "name", TypeName, Offset(mObjectName, SimObject), &setProtectedName, &defaultProtectedGetFn,
          "Optional global name of this object." );
 
+#ifndef ELFSCRIPT_SLIM_OBJECT
       addProtectedField("inheritFrom", TypeString, Offset(mInheritFrom, SimObject), &setInheritFrom, &defaultProtectedGetFn,
          "Optional Name of object to inherit from as a parent.");
-
       addProtectedField("Prototype", TypeBool, Offset(mPrototype, SimObject), &_doPrototype, &defaultProtectedGetFn, "Prototype Methods", AbstractClassRep::FieldFlags::FIELD_ComponentInspectors);
-   endGroup( "Ungrouped" );
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
+  endGroup( "Ungrouped" );
 
    addGroup( "Object" );
 
@@ -192,13 +194,13 @@ void SimObject::initPersistFields()
 
       addProtectedField( "superClass", TypeString, Offset(mSuperClassName, SimObject), &setSuperClass, &defaultProtectedGetFn,
          "Script super-class of object." );
-
+#ifndef ELFSCRIPT_SLIM_OBJECT
       // For legacy support
       addProtectedField( "className", TypeString, Offset(mClassName, SimObject), &setClass, &defaultProtectedGetFn,
          "Script class of object.", AbstractClassRep::FIELD_HideInInspectors );
-
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
    endGroup( "Object" );
-   
+#ifndef ELFSCRIPT_SLIM_OBJECT
    addGroup( "Editing" );
    
       addProtectedField( "hidden", TypeBool, 0,
@@ -209,7 +211,7 @@ void SimObject::initPersistFields()
          "Whether the object can be edited." );
    
    endGroup( "Editing" );
-   
+#endif
    addGroup( "Persistence" );
 
       addProtectedField( "canSave", TypeBool, Offset( mFlags, SimObject ),
@@ -2697,13 +2699,17 @@ void SimObject::setSelected( bool sel )
    {
       mFlags.set( Selected );
       _onSelected();
+#ifndef ELFSCRIPT_SLIM_OBJECT
       onSelected_callback(this);
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
    }
    else
    {
       mFlags.clear( Selected );
       _onUnselected();
+#ifndef ELFSCRIPT_SLIM_OBJECT
       onUnselected_callback(this);
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
    }
 }
 
@@ -2848,7 +2854,9 @@ void SimObject::inspectPreApply()
 
 void SimObject::inspectPostApply()
 {
+#ifndef ELFSCRIPT_SLIM_OBJECT
    onInspectPostApply_callback(this);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2945,6 +2953,7 @@ DefineEngineMethod( SimObject, setSuperClassNamespace, void, ( const char* name 
 }
 
 //-----------------------------------------------------------------------------
+#ifndef ELFSCRIPT_SLIM_OBJECT
 
 DefineEngineMethod( SimObject, isSelected, bool, (),,
    "Get whether the object has been marked as selected. (in editor)\n"
@@ -2980,6 +2989,7 @@ DefineEngineMethod( SimObject, setIsExpanded, void, ( bool state ), ( true ),
    object->setExpanded( state );
 }
 
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SimObject, getFilename, const char*, (),,
@@ -3075,6 +3085,7 @@ DefineEngineMethod( SimObject, setCanSave, void, ( bool value ), ( true ),
 }
 
 //-----------------------------------------------------------------------------
+#ifndef ELFSCRIPT_SLIM_OBJECT
 
 DefineEngineMethod( SimObject, isEditorOnly, bool, (),,
    "Return true if the object is only used by the editor.\n"
@@ -3091,7 +3102,7 @@ DefineEngineMethod( SimObject, setEditorOnly, void, ( bool value ), ( true ),
 {
    object->setEditorOnly( value );
 }
-
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SimObject, isNameChangeAllowed, bool, (),,
@@ -3129,7 +3140,7 @@ DefineEngineMethod( SimObject, deepClone, SimObject*, (),,
 }
 
 //-----------------------------------------------------------------------------
-
+#ifndef ELFSCRIPT_SLIM_OBJECT
 DefineEngineMethod( SimObject, setLocked, void, ( bool value ), ( true ),
    "Lock/unlock the object in the editor.\n"
    "@param value If true, the object will be locked; if false, the object will be unlocked." )
@@ -3145,7 +3156,7 @@ DefineEngineMethod( SimObject, setHidden, void, ( bool value ), ( true ),
 {
    object->setHidden( value );
 }
-
+#endif //#ifndef ELFSCRIPT_SLIM_OBJECT
 //-----------------------------------------------------------------------------
 // ElfScript why is this called dump?
 // DefineEngineMethod( SimObject, dumpMethods, ArrayObject*, (),,
@@ -3657,7 +3668,7 @@ DefineEngineMethod( SimObject, setFieldValue, bool, ( const char* fieldName, con
 
 //-----------------------------------------------------------------------------
 // XXTH like setFieldValue + setFieldType == ROCK 'N ROLL
-DefineEngineMethod( SimObject, addTypeField, bool,
+DefineEngineMethod( SimObject, addField, bool,
                     ( const char* fieldName, const char* type, const char* value  ), ,
                     "Set the value and console type of the given field on this object.\n"
                     "NOTE: this cant be used with arrays like setFieldValue"

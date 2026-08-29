@@ -140,7 +140,7 @@ enum ConsoleValueType
 
 // #ifdef ENABLE_CONSOLE_VECTOR
 struct ConsoleVector {
-      F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT] = {0.f,0.f,0.f,0.f}; // 4!!
+      F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT];/* = {0.f,0.f,0.f,0.f};*/ // 4!!
 };
 // #endif
 
@@ -170,7 +170,10 @@ public:
             S64   i;
             char* s;
             void* dataPtr;
-      };  // 8 byte
+            #ifdef ENABLE_CONSOLE_VECTOR
+            ConsoleVector v;      // 16 Byte
+            #endif
+      };  // 8 or 16 byte
 
 // union
    // {
@@ -190,11 +193,11 @@ public:
 #pragma warning(pop)
 
 
-#ifdef ENABLE_CONSOLE_VECTOR
-  // TODO move this to a pointer ... first attempt failed .. and it's not faster but less memory
-  // 0.7: i would do this different now, but how can i change it and keep all the math and field fastpath i added for ?
-  ConsoleVector v;      // 16 Byte
-#endif
+// #ifdef ENABLE_CONSOLE_VECTOR
+//   // TODO move this to a pointer ... first attempt failed .. and it's not faster but less memory
+//   // 0.7: i would do this different now, but how can i change it and keep all the math and field fastpath i added for ?
+//   ConsoleVector v;      // 16 Byte
+// #endif
 
    S32 type;            // 4 Byte - used a 8 without padding
    char padding[4];     // 4 Byte ... i may can use this for something ;)
@@ -232,7 +235,7 @@ public:
       // bufferLen = 0;
 #ifdef ENABLE_CONSOLE_VECTOR
       // for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
-      dMemset(v.points, 0, sizeof(ConsoleVector::points));
+      //NO! i moved it into the union! // dMemset(v.points, 0, sizeof(ConsoleVector::points));
 #endif
    }
 

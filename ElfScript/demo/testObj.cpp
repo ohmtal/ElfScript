@@ -4,10 +4,58 @@
 #include <console/torquescript/ast.h>
 #include <console/torquescript/compiler.h>
 #include <console/localVar.h>
+#include <core/strings/stringUnit.h>
 
 ///////////////////////////////////////////////////////
 // some testfunction .......
 
+
+
+// moved to console functions
+// DefineEngineFunction(toObject,S32, (const char* text),
+//     ,"Convert an string to Object with v[] fields\n"
+//      "tab separated (default) or space separated"
+// ) {
+//     if (!text || text[0] == '\0') {
+//         Con::errorf("Empty text cant be converted to object");
+//         return 0;
+//     }
+//
+//     const char* set = "\t\n";
+//     // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+//     U32 count =  StringUnit::getUnitCount( text, "\t\n" );
+//     // we only got no or one token - switch to space / tab separated
+//     if (count < 2) {
+//         count =  StringUnit::getUnitCount( text, " \t\n" );
+//         set = " \t\n";
+//     }
+//
+//     // nothing - is empty ?
+//     if (count < 1) {
+//         Con::errorf("Empty text cant be converted to object");
+//         return 0;
+//     }
+//
+//     SimObject* obj = new SimObject();
+//     char buff[32];
+//     StringTableEntry fieldNameEntry = nullptr;
+//     for (U32 i = 0; i < count; i++) {
+//         const char * token = StringUnit::getUnit( text, i, set );
+//
+//         dSprintf(buff,32,"v%d", i); //mhh or as array ?
+//         fieldNameEntry = StringTable->insert( buff );
+//
+//         obj->setDataField(fieldNameEntry, nullptr, token);
+//         // try to typeCast:
+//         if (isInt(token)) obj->setDataFieldType(TypeS32, fieldNameEntry, nullptr );
+//         else if (isFloat(token)) obj->setDataFieldType(TypeF32, fieldNameEntry, nullptr );
+//     }
+//     obj->registerObject();
+//     return obj->getId();
+// }
+
+
+// ----------------------------------
 DefineEngineFunction(Test_FindObject, S32, (const char* objectname), , "")
 {
     // only named and by ID (as string) work here ?!!?!?!!

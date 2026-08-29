@@ -7,7 +7,7 @@
 
 bool isInt(const char* str);
 
-bool isFloat(const char* str);
+bool isFloat(const char* str,bool sciOk = false);
 
 bool isValidIP(const char* ip);
 

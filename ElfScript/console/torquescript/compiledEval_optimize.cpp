@@ -5,6 +5,9 @@
 #define ENABLE_COMPONENT_CACHE_LOAD
 #define ENABLE_COMPONENT_CACHE_SAVE
 #endif
+
+// haha later ... need to think about the syntax
+#define ENABLE_AUTO_ARRAY_OBJECT
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -3962,12 +3965,23 @@ handle_OP_BUILD_VECTOR_STRING: {
       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
       bool matchVectorFields = count <= CONSOLE_VALUE_VECTOR_FIELD_COUNT;
       ConsoleVector cv = {0};
-      // get values from stack
+
+
+      // 1. find out we have all floats
+      for (S32 i = 0; i < count; i++) {
+            if (stack[_STK - i].type != cvFloat && stack[_STK - i].type != cvInteger) {
+                  matchVectorFields = false;
+            }
+      }
+
+      // get values from stack and fill ConsoleVector or TAB separated String
       for (S32 i = count - 1; i >= 0; i--) {
             if (matchVectorFields) cv.points[i] = static_cast<F32>(stack[_STK].getFloat());
             else stringValues[i] = stack[_STK].getString();
             POP_STK();
       }
+
+
 
       static char buffer[256];
       if (!matchVectorFields) {
@@ -3978,7 +3992,7 @@ handle_OP_BUILD_VECTOR_STRING: {
             for (U32 i = 0; i < count; i++) {
                   offset += dSprintf(buffer + offset
                   , sizeof(buffer) - offset
-                  , (i == 0) ? "%s" : " %s", stringValues[i]);
+                  , (i == 0) ? "%s" : "\t%s", stringValues[i]);
             }
       }
 
@@ -4024,7 +4038,7 @@ handle_OP_BUILD_VECTOR_STRING: {
       for (U32 i = 0; i < count; i++) {
             offset += dSprintf(buffer + offset
             , sizeof(buffer) - offset
-            , (i == 0) ? "%s" : " %s", stringValues[i]);
+            , (i == 0) ? "%s" : "\t%s", stringValues[i]);
       }
 
       PUSH_STK();
@@ -4066,8 +4080,6 @@ handle_OP_PRINT:
       if (count == 1) {
             Con::printf("%s", stack[_STK].getString());
             POP_STK();
-            stack[_STK + 1 ].setEmptyString();
-            PUSH_STK();
             DISPATCH();
       }
 
@@ -4095,9 +4107,6 @@ handle_OP_PRINT:
 
       Con::printf("%s", buff);
 
-      stack[_STK + 1].setEmptyString();
-
-      PUSH_STK();
       DISPATCH();
 }
 // ------------------------------------
@@ -4116,7 +4125,9 @@ handle_OP_INLINE_COMMAND:
                   for (S32 i = count - 1; i >= 0; i--) {
                         POP_STK();
                   }
-                   stack[_STK + 1].setEmptyString();
+
+                  // no need to return a value- so bail out here (pop disabled in ast)
+                  DISPATCH();
                   break;
             }
             case CommandStmtNode::SPRINTF: {

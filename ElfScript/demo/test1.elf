@@ -2,8 +2,7 @@ echo("Hello from Test.elf");
 // exec("./test2.elf");
 
 function rl(%mode) {
-    exec("./test.elf");
-
+    exec($Con::File);
     if (%mode !$= "") {
         $mode = %mode;
         $i = $times = 0;
@@ -76,7 +75,8 @@ function SpeedTest() {
             // THIS MUST BE A BUG !!! .x is slow like hell while myFloat is ok
             // -- x,y,z,w,r,g,b,a are defined in parser ---
             // 600 ms for this .... omg
-            %foo.x += 0.1; //WAS "VERY VERY SLOW" => now fast path...;)
+            %foo.x +=  0.7 ; //WAS "VERY VERY SLOW" => now fast path...;)
+            %foo.x -= 0.2;
 
             // BUG testFloat is 600ms!!!
             // so its not the .x
@@ -199,11 +199,13 @@ function SpeedTest() {
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
             $myVector = %i SPC %i*2 SPC %i / 2;
         }
+        // vardump("$myVector");
     }
     if ($mode == 14) {
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
             $myVector = { %i, %i*2 , %i / 2};
         }
+        // vardump("$myVector");
     }
     if ($mode == 15) {
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
@@ -222,6 +224,14 @@ function SpeedTest() {
     if ($mode == 17) { //BANG OP_SAVEFIELD_FASTPATH
          %foo = $foo;
         for (%i =0 ; %i < LOOP_COUNT; %i++) {
+            %foo.x =  %i; //BANG => OP_LOAD_LOCAL_VAR_STR FastPath // Not longer  * 1.0; //Typecast %i IMPORTANT!!, else VM thinks it's a string - stupid shit i know << FIXED :D !!
+            %foo.y =  %i * 2;
+            %foo.z =  %i / 2;
+        }
+    }
+    if ($mode == 18) { //BANG OP_SAVEFIELD_FASTPATH
+        %foo = $foo;
+        for (%i in RANGE LOOP_COUNT) {
             %foo.x =  %i; //BANG => OP_LOAD_LOCAL_VAR_STR FastPath // Not longer  * 1.0; //Typecast %i IMPORTANT!!, else VM thinks it's a string - stupid shit i know << FIXED :D !!
             %foo.y =  %i * 2;
             %foo.z =  %i / 2;

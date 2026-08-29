@@ -254,7 +254,6 @@ while ($Global::running) {
 
     %tickCount = SDL_GetPerformanceCounter();
 
-    //lol all 64bit .. let see what we get
     $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
 
 

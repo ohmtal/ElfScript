@@ -72,7 +72,7 @@ bool isInt(const char* str)
       return true;
 }
 
-bool isFloat(const char* str, bool sciOk = false)
+bool isFloat(const char* str, bool sciOk/* = false*/)
 {
    int len = dStrlen(str);
    if(len <= 0)
@@ -80,12 +80,13 @@ bool isFloat(const char* str, bool sciOk = false)
 
    // Ingore whitespace
    int start = 0;
-   for(int i = start; i < len; i++)
+   for(int i = start; i < len; i++) {
       if(str[i] != ' ')
       {
          start = i;
          break;
       }
+   }
 
       bool seenDot = false;
       int eLoc = -1;
@@ -2925,7 +2926,7 @@ DefineEngineFunction( getModNameFromPath, const char *, ( const char* path ), , 
 }
 
 //-----------------------------------------------------------------------------
-
+#ifndef ELFSCRIPT_SLIM_OBJECT
 DefineEngineFunction( pushInstantGroup, void, ( String group ),("") , "([group])" 
             "@brief Pushes the current $instantGroup on a stack "
             "and sets it to the given value (or clears it).\n\n"
@@ -2947,7 +2948,7 @@ DefineEngineFunction( popInstantGroup, void, (), , "()"
 {
    Con::popInstantGroup();
 }
-
+#endif
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
@@ -3051,47 +3052,47 @@ DefineEngineFunction( trace, void, ( bool enable ), ( true ),
 
 //-----------------------------------------------------------------------------
 
-#if defined(TORQUE_DEBUG) || !defined(TORQUE_SHIPPING)
-
-DefineEngineFunction( debug, void, (),,
-   "Drops the engine into the native C++ debugger.\n\n"
-   "This function triggers a debug break and drops the process into the IDE's debugger.  If the process is not "
-   "running with a debugger attached it will generate a runtime error on most platforms.\n\n"
-   "@note This function is not available in shipping builds."
-   "@ingroup Debugging" )
-{
-   Platform::debugBreak();
-}
-
-#endif
-
-//-----------------------------------------------------------------------------
-
-DefineEngineFunction(isPlayerBuild, bool, (), ,
-   "Test whether the engine has been compiled with TORQUE_PLAYER.\n\n"
-   "@return True if this is a playback only build; false otherwise.\n\n"
-   "@ingroup Platform")
-{
-#ifdef TORQUE_PLAYER
-   return true;
-#else
-   return false;
-#endif
-}
+// #if defined(TORQUE_DEBUG) || !defined(TORQUE_SHIPPING)
+//
+// DefineEngineFunction( debug, void, (),,
+//    "Drops the engine into the native C++ debugger.\n\n"
+//    "This function triggers a debug break and drops the process into the IDE's debugger.  If the process is not "
+//    "running with a debugger attached it will generate a runtime error on most platforms.\n\n"
+//    "@note This function is not available in shipping builds."
+//    "@ingroup Debugging" )
+// {
+//    Platform::debugBreak();
+// }
+//
+// #endif
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( isShippingBuild, bool, (),,
-   "Test whether the engine has been compiled with TORQUE_SHIPPING, i.e. in a form meant for final release.\n\n"
-   "@return True if this is a shipping build; false otherwise.\n\n"
-   "@ingroup Platform" )
-{
-#ifdef TORQUE_SHIPPING
-   return true;
-#else
-   return false;
-#endif
-}
+// DefineEngineFunction(isPlayerBuild, bool, (), ,
+//    "Test whether the engine has been compiled with TORQUE_PLAYER.\n\n"
+//    "@return True if this is a playback only build; false otherwise.\n\n"
+//    "@ingroup Platform")
+// {
+// #ifdef TORQUE_PLAYER
+//    return true;
+// #else
+//    return false;
+// #endif
+// }
+
+//-----------------------------------------------------------------------------
+
+// DefineEngineFunction( isShippingBuild, bool, (),,
+//    "Test whether the engine has been compiled with TORQUE_SHIPPING, i.e. in a form meant for final release.\n\n"
+//    "@return True if this is a shipping build; false otherwise.\n\n"
+//    "@ingroup Platform" )
+// {
+// #ifdef TORQUE_SHIPPING
+//    return true;
+// #else
+//    return false;
+// #endif
+// }
 
 //-----------------------------------------------------------------------------
 
@@ -3109,17 +3110,17 @@ DefineEngineFunction( isDebugBuild, bool, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( isToolBuild, bool, (),,
-   "Test whether the engine has been compiled with TORQUE_TOOLS, i.e. if it includes tool-related functionality.\n\n"
-   "@return True if this is a tool build; false otherwise.\n\n"
-   "@ingroup Platform" )
-{
-#ifdef TORQUE_TOOLS
-   return true;
-#else
-   return false;
-#endif
-}
+// DefineEngineFunction( isToolBuild, bool, (),,
+//    "Test whether the engine has been compiled with TORQUE_TOOLS, i.e. if it includes tool-related functionality.\n\n"
+//    "@return True if this is a tool build; false otherwise.\n\n"
+//    "@ingroup Platform" )
+// {
+// #ifdef TORQUE_TOOLS
+//    return true;
+// #else
+//    return false;
+// #endif
+// }
 
 // DefineEngineFunction( getMaxDynamicVerts, S32, (),,
 //    "Get max number of allowable dynamic vertices in a single vertex buffer.\n\n"
@@ -3246,3 +3247,46 @@ bool getDocsURL(void* obj, const char* array, const char* data)
 }
 
 #endif
+
+// ElfScript 0.7f
+DefineEngineFunction(toObject,S32, (const char* text),
+                     ,"Convert an string to Object with v[] fields\n"
+                     "tab separated (default) or space separated"
+) {
+      if (!text || text[0] == '\0') {
+            Con::errorf("Empty text cant be converted to object");
+            return 0;
+      }
+
+      const char* set = "\t\n";
+      // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+      U32 count =  StringUnit::getUnitCount( text, "\t\n" );
+      // we only got no or one token - switch to space / tab separated
+      if (count < 2) {
+            count =  StringUnit::getUnitCount( text, " \t\n" );
+            set = " \t\n";
+      }
+
+      // nothing - is empty ?
+      if (count < 1) {
+            Con::errorf("Empty text cant be converted to object");
+            return 0;
+      }
+
+      SimObject* obj = new SimObject();
+      char buff[32];
+      StringTableEntry fieldNameEntry = nullptr;
+      for (U32 i = 0; i < count; i++) {
+            const char * token = StringUnit::getUnit( text, i, set );
+
+            dSprintf(buff,32,"v%d", i); //mhh or as array ?
+            fieldNameEntry = StringTable->insert( buff );
+
+            obj->setDataField(fieldNameEntry, nullptr, token);
+            // try to typeCast:
+            if (isInt(token)) obj->setDataFieldType(TypeS64, fieldNameEntry, nullptr );
+            else if (isFloat(token)) obj->setDataFieldType(TypeF64, fieldNameEntry, nullptr );
+      }
+      obj->registerObject();
+      return obj->getId();
+}
