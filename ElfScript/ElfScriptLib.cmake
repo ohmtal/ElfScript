@@ -1,7 +1,8 @@
-
-FIXME need a torqueConfig replacement first !!!!
+# NOTE: this only works with the default platform/stub/platformProcess.cpp which
+#       is not feature complete - depending on what you want to do.
 
 include( ${CMAKE_CURRENT_LIST_DIR}/ElfScript.cmake)
+list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/platform/stub/platformProcess.cpp)
 
 add_library(ElfScript ${ELFSCRIPT_SRC})
 target_include_directories(ElfScript PUBLIC ${CMAKE_CURRENT_LIST_DIR})

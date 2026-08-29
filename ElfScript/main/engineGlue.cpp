@@ -192,8 +192,10 @@ namespace engineGlue
         }
 
 
-        Con::printf("APP: %s %s (%d)", TORQUE_APP_NAME, TORQUE_APP_VERSION_STRING, TORQUE_APP_VERSION);
-        Con::printf("Current script directory: %s ",Torque::FS::GetCwd().getFullPath().c_str() );
+        if (!engineGlue::silent) {
+            Con::printf("APP: %s %s (%d)", TORQUE_APP_NAME, TORQUE_APP_VERSION_STRING, TORQUE_APP_VERSION);
+            Con::printf("Current script directory: %s ",Torque::FS::GetCwd().getFullPath().c_str() );
+        }
 
 
 

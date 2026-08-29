@@ -11,6 +11,11 @@
 
 
 
+## Version 0.7g
+ - SDL3 Colors (baseElf) changed to ConsoleVector
+ - Short if: Vector (PoD) parser: true ? {0} : {0} || true ? {0} : expr || true ? expr : {0}
+ - MiniElf Demo - linking a lib with only a script loader 
+ 
 ## Version 0.7f
 
  - added ConsoleVector to union << 24 byte instead of 32

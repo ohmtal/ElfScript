@@ -44,6 +44,7 @@
 
 #include "core/util/rawData.h"
 
+//
 extern StringStack STR;
 extern ConsoleValueStack<4096> gCallStack;
 

@@ -1,8 +1,12 @@
 # ElfScript Source Files definition
 
+# version flags when something is changed to keep compat.
+# Example raylib-elfScript resource manager .
+
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 add_compile_definitions(ELFSCRIPT_VERSION_0_5)
 add_compile_definitions(ELFSCRIPT_VERSION_0_6)
+add_compile_definitions(ELFSCRIPT_VERSION_0_7)
 
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)

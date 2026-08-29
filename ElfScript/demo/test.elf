@@ -12,6 +12,8 @@ function FooBar::Hello(%this) {
 if (isObject(sto)) sto.delete();
 new PointStorageObject(sto) {
     class ="FooBar";
+    storageSize = 1000;
+    // dynamic:
     TypeS32 DynX = 99;
     TypeF32 speed = 0.1;
     TypeVector DynVec = { 8,9,10,11};
@@ -166,21 +168,10 @@ varDump("%localStr");
 varDump("%localStr");
 
 
-error("staticfield to var is not implemented so far");
 %copyX = sto.getPointX(0);
-// echo("**this makes a case Namespace::Entry::FloatCallbackType: on line ~ 2697");
-// echo("** initalized by FloatCallback");
-// echo("** ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, FloatCallback ffunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )");
-// echo("** void Namespace::addCommand(StringTableEntry name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header) ");
-// echo(" THIS ====> void ConsoleConstructor::setup()");
 varDump("%copyX");
 
-%copyVec = sto.getPointVec(0);
-varDump("%copyVec");
-echo("........ tried to implement it but no luck so far => ENABLE_CONSOLE_VECTOR_CALLBACK");
-echo("........ it compiles and run but the methods using ConsoleVector  like getPointVec are gone.");
-echo("........ DefineConsoleType is it or Trampolin - i dont know.");
-echo("........ Check also IMPLEMENT_PRIMITIVE");
+%copyVec = sto.getPointVec(0); varDump("%copyVec");
 
 %copyVec.x *= 1.0; // ok we dont get it work like it should so i use this trick
 varDump("%copyVec");
@@ -339,7 +330,8 @@ printSeparator();
 print (" ----- FIELD COMPONENT TEST ----- ");
 %foo = new Object();
 %foo.lineCount = 3;
-%foo.line = "lalalala";
+%foo.addField("line", "TypeVector", {0});
+// i set the "base" fields so this should auto assign now:
 %foo.line[0] = { 1, 2, 3 , 0.1 };
 %foo.line[1] = { 4 ,5 ,6 , 0.2 };
 %foo.line[2] = { 7, 8, 9 , 0.3 };
@@ -503,13 +495,50 @@ for (%i in range 20) {
 
     %foo = {1,2,3,4};
     math.RandomF();
+    math.Sin(0);
     ochjo();
-    %foo = sprintf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
-    print(%foo);
-    printf("#%f %f %f %f %f %s",%i,%foo.x,%foo.y,%foo.b,%foo.a, %foo);
+    // %foo = sprintf("#%f %f %f %f %f",%i,%foo.x,%foo.y,%foo.b,%foo.a);
+    // print(%foo);
+    // printf("#%f %f %f %f %f %s",%i,%foo.x,%foo.y,%foo.b,%foo.a, %foo);
 }
+print("* Stack Test passed.");
+
+printSeparator();
+
+print("ConsoleVector in short if:");
+%vector = true ? { 10, 0 } : { 20, 10 };
+vardump("%vector");
+%vector2 = true ? %vector : { 20, 10 };
+vardump("%vector2");
+
+%vector3 = true ? { 20, 10 } : %vector ;
+vardump("%vector3");
+
+%vector4 = true ? %vector2 : %vector ;
+vardump("%vector4");
+
+printSeparator();
+
+print("Test ConsoleVector return by getPointVec:");
+sto.setPointVec(0, {1,2,3,4});
+sto.fetchPoint(0); printf("Cur point: %f %f %f", sto.x,sto.y,sto.z);
+%copyVec = sto.getPointVec(0); varDump("%copyVec");
+
+print("Test tinyEpr on pointVec:");
+%sto = sto.getId();
+%sto.applyMathOnPoints("randf();randf();randf();randf()", 0,%sto.storageSize - 1);
+// now we have a random lut for something
+%sto.addField("lutIndex","TypeS32", 0);
+function FooBar::getRand(%this) {
+    %result = %this.getPointX(%this.lutIndex);
+    %this.lutIndex = (%this.lutIndex + 1) % (%this.storageSize);
+
+    return %result;
+}
+printf("index:%d value:%f", sto.lutIndex, sto.getRand());
+
 
 
 printSeparator();
-echo("script load completed.....");
-$Debug::DumpByteCode=1;
+print("script load completed..... no parse errors....");
+// $Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");

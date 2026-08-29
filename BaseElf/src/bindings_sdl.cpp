@@ -109,14 +109,20 @@ void registerColors() {
     for (std::size_t i = 0; i < colors.size(); ++i) {
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
-        ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
 
-        if (type) {
-            const char* colorStrP = type->getData(&value, nullptr, 0);
-            std::string colorString = std::format("\"{}\"", colorStrP);
-            Con::setScriptConstant(fullName.c_str(), colorString );
-            // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
-        }
+        std::string colorString = std::format("{{ {},{},{},{} }}", value.r, value.g, value.b, value.a);
+        Con::setScriptConstant(fullName.c_str(), colorString );
+        // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+
+
+        // ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
+        //
+        // if (type) {
+        //     const char* colorStrP = type->getData(&value, nullptr, 0);
+        //     std::string colorString = std::format("\"{}\"", colorStrP);
+        //     Con::setScriptConstant(fullName.c_str(), colorString );
+        //     // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+        // }
     }
 
 }

@@ -535,6 +535,29 @@ expr
       { $$ = TTagExprNode::alloc( $1.lineNumber, $1.value ); }
    | expr '?' expr ':' expr
       { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, $3, $5); }
+   | expr '?' '{' expr_list '}' ':' '{' expr_list '}'
+   {
+//     ElfScript 0.7g
+         VectorConstructorNode* trueNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         trueNode->argList = (ExprNode*)$4;
+         VectorConstructorNode* falseNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         falseNode->argList = (ExprNode*)$8;
+         { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, trueNode, falseNode); }
+   }
+   | expr '?' expr ':' '{' expr_list '}'
+   {
+//     ElfScript 0.7g
+         VectorConstructorNode* falseNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         falseNode->argList = (ExprNode*)$6;
+         { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, $3, falseNode); }
+   }
+   | expr '?' '{' expr_list '}' ':' expr
+   {
+//     ElfScript 0.7g
+         VectorConstructorNode* trueNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         trueNode->argList = (ExprNode*)$4;
+         { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, trueNode, $7); }
+   }
    | expr '<' expr
       { $$ = IntBinaryExprNode::alloc( $1->dbgLineNumber, $2.value, $1, $3); }
    | expr '>' expr

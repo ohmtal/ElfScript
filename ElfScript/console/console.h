@@ -1121,12 +1121,15 @@ namespace Con
 
                                                                                                                                                                                         /// @name Special Purpose Registration
                                                                                                                                                                                         ///
-                                                                                                                                                                                        /// These are special-purpose functions that exist to allow commands to be grouped, so
-                                                                                                                                                                                        /// that when we generate console docs, they can be more meaningfully presented.
-                                                                                                                                                                                        ///
-                                                                                                                                                                                        /// @ref console_autodoc "Click here for more information about console docs and grouping."
-                                                                                                                                                                                        ///
-                                                                                                                                                                                        /// @{
+
+
+// -------------------
+/// These are special-purpose functions that exist to allow commands to be grouped, so
+      /// that when we generate console docs, they can be more meaningfully presented.
+      ///
+      /// @ref console_autodoc "Click here for more information about console docs and grouping."
+      ///
+      /// @{
 
    void markCommandGroup(const char * nsName, const char *name, const char* usage = NULL);
    void beginCommandGroup(const char * nsName, const char *name, const char* usage);
@@ -1186,6 +1189,9 @@ namespace Con
    /// @param ...       Variables to be written
    /// @see Con::errorf()
    void errorf(ConsoleLogEntry::Type type, const char *_format, ...);
+
+
+
 
    //some additions from t2d
    /// Prints a separator to the console.
@@ -1306,6 +1312,8 @@ template<typename P1> struct _EngineConsoleExecCallbackHelper;
 
 namespace Con
 {
+
+
    /// @name Console Execution - executef
    /// {
    ///
@@ -1518,6 +1526,7 @@ public:
    ConsoleConstructor(const char *className, const char *callbackName, const char *usage, ConsoleFunctionHeader* header);
 
    /// @}
+
 };
 
 

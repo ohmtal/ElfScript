@@ -66,4 +66,28 @@ inline F64 mRandF64(F64 min ,F64 max) {
     return mRandDist64(mRandGen64,  std::uniform_real_distribution<F64>::param_type{range.first, range.second});
 }
 
-}
+// ---------- using with seed: -----------------
+// usage:
+// RandomGenerator mRandomF(12345);
+// F32 foo = mRandomF();
+// mRandomF.setSeed(987654); //to change it
+struct RandomGenerator {
+    std::mt19937 gen;
+    std::uniform_real_distribution<F32> dist;
+
+    RandomGenerator(U32 seed = std::random_device{}())
+    : gen(seed), dist(0.f, 1.f) {}
+
+    inline F32 operator()() {
+        return dist(gen);
+    }
+
+    inline void setSeed(U32 seed) {
+        gen.seed(seed);
+    }
+};
+
+
+
+
+} //ElfMath

@@ -3968,9 +3968,13 @@ handle_OP_BUILD_VECTOR_STRING: {
 
 
       // 1. find out we have all floats
-      for (S32 i = 0; i < count; i++) {
-            if (stack[_STK - i].type != cvFloat && stack[_STK - i].type != cvInteger) {
-                  matchVectorFields = false;
+      // this failes on set dynamic fields when they are not initialized!
+      // ok since it's TypeString by default this should be ok
+      if (matchVectorFields) {
+            for (S32 i = 0; i < count; i++) {
+                  if (stack[_STK - i].type != cvFloat && stack[_STK - i].type != cvInteger) {
+                        matchVectorFields = false;
+                  }
             }
       }
 

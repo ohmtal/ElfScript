@@ -32,6 +32,9 @@
 
 namespace ElfMath {
 
+
+
+
 /*! Gets a random integer number from min to max.
  *    @param min The minimum range of the random integer number.
  *    @param max The maximum range of the random integer number.

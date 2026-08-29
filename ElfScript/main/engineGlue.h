@@ -6,6 +6,7 @@ namespace engineGlue
 {
     inline String ScriptDirectory = "";
     inline String ScriptFile = "assets/main.elf";
+    inline bool silent = false;
     // default argParser used to set --script and --dir combinded with
     int argParser(int argc, char* argv[]);
 
