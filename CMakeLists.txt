@@ -61,6 +61,9 @@ if (BUILD_ELFSCRIPT)
     set(ELF_APP_NAME "ElfScript Demo" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
     include("${CMAKE_CURRENT_LIST_DIR}/ElfScript/ElfScript.cmake")
 
+    # # KI_ELFSCRIPT_SRC
+    # include("${CMAKE_CURRENT_LIST_DIR}/ElfScript/addons/genann/KI.cmake")
+
 #     set_target_properties(${PROJECT_NAME} PROPERTIES
 #         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 # 
@@ -85,6 +88,8 @@ if (BUILD_ELFSCRIPT)
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/demoMain.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/demo/testObj.cpp
         ${ELFSCRIPT_SRC}
+        # ${KI_ELFSCRIPT_SRC}
+
         ${CMAKE_CURRENT_LIST_DIR}/ElfScript/platform/stub/platformProcess.cpp
     )
 

@@ -13,7 +13,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # =============== ElfScript >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 set(ELFSCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../" CACHE PATH "Path to ElfScript")
 set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
-set(ELF_CMAKE ${ELF_MODULE}/ElfScriptLib.cmake)
+# FIXME lib does not work correctly - a lot of functions are not bound
+# set(ELF_CMAKE ${ELF_MODULE}/ElfScriptLib.cmake)
+set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 
 if(NOT EXISTS ${ELF_CMAKE})
     message(FATAL_ERROR
@@ -28,6 +30,8 @@ endif()
 
 add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
+    ${ELFSCRIPT_SRC}
+    ${ELF_MODULE}/platform/stub/platformProcess.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -39,7 +43,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-     ElfScript
+     # ElfScript
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

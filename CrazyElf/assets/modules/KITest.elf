@@ -1,0 +1,133 @@
+function createKiTest(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "KiTest";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+        TypeS32 KiPlayer = 0;
+        TypeS32 Obstacle = 0;
+        TypeString KiFile = "bot_brain.elfdata";
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function KiPlayer::update(%this, %Obstacle) {
+    %distX = %this.rect.x - %Obstacle.rect.x;
+    %distY = %this.rect.y - %Obstacle.rect.y;
+
+    %normX = %distX / $Global::ScreenSize.x;
+    %normY = %distY / $Global::ScreenSize.y;
+    %normSpeed = %Obstacle.speed / 10.0;
+
+    %inputVec = {%normX, %normY, %normSpeed, 0.0};
+
+    %this.decision = KI_Run(%this.ki, %inputVec);
+
+    if (%this.decision.x > 0.5) %this.rect.x -= 1.0;
+    if (%this.decision.y > 0.5) %this.rect.x += 1.0;
+
+    %border = 50.0;
+    if (%this.rect.x < %border) %this.rect.x = %border;
+    if (%this.rect.x > ($Global::ScreenSize.x - %border)) {
+        %this.rect.x = $Global::ScreenSize.x - %border;
+    }
+
+    return %inputVec;
+}
+//----------------------------------------------------------------------
+function KiTest::onAdd(%this) {
+
+    %this.KiPlayer = new Object() {
+        class = "KiPlayer";
+        TypeVector rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 8.0,8.0};
+        TypeVector decision = {0};
+    };
+    %this.KiPlayer.ki =  KI_Load(%this.KiFile, {3, 1, 5, 2});
+    if (%this.KiPlayer.ki < 1) %this.KiPlayer.ki = KI_Create(3, 1, 5, 2);
+
+    %this.Obstacle = new Object() {
+        class = "Obstacle";
+        TypeVector rect = {math.randomF(50, $Global::ScreenSize.x - 50), 0.0, 30.0, 30.0};
+        TypeF32 speed = math.randomF(4, 7);
+    };
+
+    return true;
+}
+//----------------------------------------------------------------------
+function Obstacle::Reset(%this) {
+    %this.rect.y = 0;
+    %this.rect.x = math.randomF( 0, $Global::ScreenSize.x - %this.rect.width);
+    %this.speed = math.randomF(4, 7);
+}
+//----------------------------------------------------------------------
+function KiTest::OnRemove(%this) {
+    if (KI_Save(%this.KiPlayer.ki, %this.KiFile)) {
+        printf("KiFile: %s saved!", %this.KiFile);
+    }
+    KI_Destroy(%this.KiPlayer.ki);
+    %this.KiPlayer.delete();
+
+    %this.Obstacle.delete();
+}
+//----------------------------------------------------------------------
+function KiTest::Render(%this) {
+    if (!%this.renderer) return;
+
+    // --- KI LOGIK ---
+    %this.Obstacle.rect.y += %this.Obstacle.speed;
+    %lastInput = %this.KiPlayer.update(%this.Obstacle);
+
+    %isHit = SDL_HasRectIntersectionFloat(%this.KiPlayer.rect, %this.Obstacle.rect);
+
+
+    if (%isHit) {
+        // hurt we say thats bad!
+        %desired = {0, 0, 0, 0};
+        if (%this.KiPlayer.rect.x < %this.Obstacle.rect.x) {
+            %desired = {1.0, 0.0, 0, 0}; // Obstacle was right go left!
+        } else {
+            %desired = {0.0, 1.0, 0, 0}; // Obstacle was left for right
+        }
+
+        KI_Train(%this.KiPlayer.ki, %lastInput, %desired, 1.5);
+
+        // Reset Obstacle
+        %this.Obstacle.reset();
+
+    }
+    else if (%this.Obstacle.rect.y > $Global::ScreenSize.y) {
+        // good - only if it was close!
+        %absDistX = Math.fabs(%this.KiPlayer.rect.x - %this.Obstacle.rect.x);
+
+        if (%absDistX < 150) {
+            %currentDecision = KI_Run(%this.KiPlayer.ki, %lastInput);
+            KI_Train(%this.KiPlayer.ki, %lastInput, %currentDecision, 0.3);
+        }
+
+        // Reset Obstacle
+        %this.Obstacle.reset();
+    }
+
+
+    // --- RENDERING ---
+    SDL_SetRenderDrawColor(%this.renderer, 30, 30, 40, 255);
+    SDL_RenderClear(%this.renderer);
+
+    // Player
+    SDL_SetRenderDrawColor(%this.renderer, 55, 155, 155, 255);
+    SDL_RenderFillRect(%this.renderer, %this.KiPlayer.rect);
+
+    // Obstangle
+    SDL_SetRenderDrawColor(%this.renderer, 200, 25, 25, 255);
+    SDL_RenderFillRect(%this.renderer, %this.Obstacle.rect);
+
+
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_RenderDebugText(%this.renderer, 10, 10, "~~~ KI Test ~~~");
+    SDL_RenderDebugText(%this.renderer, 10, 20, sprintf("left:%.4f right:%.4f", %this.KiPlayer.decision.x, %this.KiPlayer.decision.y));
+}
+//----------------------------------------------------------------------
+function  KiTest::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  KiTest::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  KiTest::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
