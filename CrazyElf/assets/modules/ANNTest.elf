@@ -1,0 +1,150 @@
+function createANNTest(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "ANNTest";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+        TypeS32 AIPlayer = 0;
+        TypeS32 Obstacle = 0;
+        TypeString KiFile = "bot_brain.elfdata";
+
+
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function AIPlayer::update(%this, %Obstacle) {
+    %distX = %this.rect.x - %Obstacle.rect.x;
+    %distY = %this.rect.y - %Obstacle.rect.y;
+
+    %normX = %distX / $Global::ScreenSize.x;
+    %normY = %distY / $Global::ScreenSize.y;
+
+    // %inputVec = {%normX, %normY, $time};
+    %inputVec = { $time};
+
+    %this.decision = ANN_Run(%this.ki, %inputVec);
+
+    if (%this.decision.x > 0.5) %this.rect.x -= 3.0;
+    if (%this.decision.y > 0.5) %this.rect.x += 3.0;
+
+    %border = 50.0;
+    if (%this.rect.x < %border) %this.rect.x = %border;
+    if (%this.rect.x > ($Global::ScreenSize.x - %border)) {
+        %this.rect.x = $Global::ScreenSize.x - %border;
+    }
+
+    return %inputVec;
+}
+//----------------------------------------------------------------------
+function ANNTest::onAdd(%this) {
+
+    %this.AIPlayer = new Object() {
+        class = "AIPlayer";
+        TypeVector rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 8.0,8.0};
+        TypeVector decision = {0};
+    };
+    %this.AIPlayer.ki =  ANN_Load(%this.KiFile, {1, 1, 5, 2});
+    if (%this.AIPlayer.ki < 1) %this.AIPlayer.ki = ANN_Create(1, 1, 5, 2);
+
+    %this.Obstacle = new Object() {
+        class = "Obstacle";
+        TypeVector rect = {math.randomF(50, $Global::ScreenSize.x - 50), 0.0, 30.0, 30.0};
+        TypeF32 speed = math.randomF(4, 7);
+    };
+
+    return true;
+}
+//----------------------------------------------------------------------
+function Obstacle::Reset(%this) {
+    %this.rect.y = 0;
+
+    %minX = 30;
+    %maxX = $Global::ScreenSize.x - %this.rect.width - 15;
+
+    %norm = (%maxX - %minX ) / 12;
+
+    if ($time < 12) %this.rect.x  = %minX + $time * %norm;
+    else %this.rect.x =  %maxX - ($time - 12)  * %norm;
+
+    // if ($time < 6) %this.rect.x  = 30;
+    // else if ($time < 12) %this.rect.x = math.randomF( $Global::ScreenSize.x / 2, $Global::ScreenSize.x - %this.rect.width);
+    // else if ($time < 18)  %this.rect.x = math.randomF( 0 , $Global::ScreenSize.x / 2 - %this.rect.width);
+    // else %this.rect.x  = $Global::ScreenSize.x - %this.rect.width - 15;
+    %this.speed = 6; //math.randomF(4, 7);
+}
+//----------------------------------------------------------------------
+function ANNTest::OnRemove(%this) {
+    if (ANN_Save(%this.AIPlayer.ki, %this.KiFile)) {
+        printf("KiFile: %s saved!", %this.KiFile);
+    }
+    ANN_Destroy(%this.AIPlayer.ki);
+    %this.AIPlayer.delete();
+
+    %this.Obstacle.delete();
+}
+//----------------------------------------------------------------------
+function ANNTest::Render(%this) {
+    if (!%this.renderer) return;
+    %dt = GetFrameTime();
+    $time = mFMod($time + %dt , 24) ;
+
+    // --- KI LOGIK ---
+    %this.Obstacle.rect.y += %this.Obstacle.speed;
+    %lastInput = %this.AIPlayer.update(%this.Obstacle);
+
+    %isHit = SDL_HasRectIntersectionFloat(%this.AIPlayer.rect, %this.Obstacle.rect);
+
+
+    if (%isHit) {
+        // hurt we say thats bad!
+        %desired = {0, 0, 0, 0};
+        if (%this.AIPlayer.rect.x + %this.AIPlayer.rect.width / 2.0
+                < %this.Obstacle.rect.x + %this.Obstacle.rect.width / 2.0) {
+            %desired = {1.0, 0.0, 0, 0}; // Obstacle was right go left!
+        } else {
+            %desired = {0.0, 1.0, 0, 0}; // Obstacle was left for right
+        }
+
+        ANN_Train(%this.AIPlayer.ki, %lastInput, %desired, 1.5);
+
+        // Reset Obstacle
+        %this.Obstacle.reset();
+
+    }
+    else if (%this.Obstacle.rect.y > $Global::ScreenSize.y) {
+        // good - only if it was close!
+        %absDistX = Math.fabs(%this.AIPlayer.rect.x - %this.Obstacle.rect.x);
+
+        if (%absDistX < 150) {
+            %currentDecision = ANN_Run(%this.AIPlayer.ki, %lastInput);
+            ANN_Train(%this.AIPlayer.ki, %lastInput, %currentDecision, 0.3);
+        }
+
+        // Reset Obstacle
+        %this.Obstacle.reset();
+    }
+
+
+    // --- RENDERING ---
+    SDL_SetRenderDrawColor(%this.renderer, 30, 30, 40, 255);
+    SDL_RenderClear(%this.renderer);
+
+    // Player
+    SDL_SetRenderDrawColor(%this.renderer, 55, 155, 155, 255);
+    SDL_RenderFillRect(%this.renderer, %this.AIPlayer.rect);
+
+    // Obstangle
+    SDL_SetRenderDrawColor(%this.renderer, 200 - $time * 4.0, 40, 40, 255);
+    SDL_RenderFillRect(%this.renderer, %this.Obstacle.rect);
+
+
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_RenderDebugText(%this.renderer, 10, 10, sprintf( "Time %4.2f", $time));
+    SDL_RenderDebugText(%this.renderer, 10, 20, sprintf("left:%.4f right:%.4f", %this.AIPlayer.decision.x, %this.AIPlayer.decision.y));
+}
+//----------------------------------------------------------------------
+function  ANNTest::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  ANNTest::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  ANNTest::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

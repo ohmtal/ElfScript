@@ -272,8 +272,8 @@ set(EXT_SRC
    ${CMAKE_CURRENT_LIST_DIR}/ext/tinyexpr.c
 )
 
-# ${KI_ELFSCRIPT_SRC}
-include(${CMAKE_CURRENT_LIST_DIR}/addons/genann/KI.cmake)
+# ${ANN_ELFSCRIPT_SRC}
+include(${CMAKE_CURRENT_LIST_DIR}/addons/genann/ANN.cmake)
 
 
 if(WIN32)
@@ -292,7 +292,7 @@ set(ELFSCRIPT_SRC
     ${MATH_SRC}
     ${OBJECTS_SRC}
     ${EXT_SRC}
-    ${KI_ELFSCRIPT_SRC}
+    ${ANN_ELFSCRIPT_SRC}
 )
 
 if (ELF_ENABLE_CONSOLE_VECTOR)

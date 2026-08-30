@@ -9,12 +9,12 @@
 #include "resourceManager/ElfResource.h"
 #include "genann.h"
 
-namespace ElfKI {
+namespace ElfAi {
     // void RegisterCoreConstants();
     inline ElfResource::ElfStorage<genann*  , genann_free>   GenannMap;
 
     inline bool IsInitialized = false;
-    void Init();
-    void ShutDown();
+    void InitANN();
+    void ShutDownANN();
 
 }

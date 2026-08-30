@@ -1,4 +1,4 @@
-$MODULES = "Pixels NativSDL blank StarField StarField2 PlayGround KITest";
+$MODULES = "Pixels NativSDL blank StarField StarField2 PlayGround ANNTest";
 
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};
