@@ -4,6 +4,10 @@ print("");
 printSeparator();
 print("Hello World!");
 printSeparator();
-print("");
+print("calling my new functions from main.cpp:");
+MyScriptFunction();
+MyScriptFunctionWithParameter(); //default true
+MyScriptFunctionWithParameter(false);
+printSeparator();
 print("");
 print("");
