@@ -74,6 +74,9 @@ function Main::OnRemove(%this) {
 
 //------------------------------------------------------------------------------
 function Main::loadModule(%this, %setNewModuleIndex) {
+
+    $scriptError = "";
+
     if (%setNewModuleIndex !$= "" ) {
         %this.moduleIndex = %setNewModuleIndex;
     }
@@ -107,12 +110,19 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 
     echo("loadModule command is:" SPC %cmd);
     eval(%cmd);
-    %created = isObject(%this.module);
-    echo("loadModule success:" SPC %created SPC "id:" SPC %this.module.getId());
 
-    SDL_SetWindowTitle(%this.window,sPrintf( "CrazyElf (%dx%d) %s [ctrl up/down]"
-        ,$Global::ScreenSize.x,$Global::ScreenSize.y, %this.moduleName
-    ));
+    if ($scriptError) {
+        error($scriptError);
+    } else {
+
+        %created = isObject(%this.module);
+        echo("loadModule success:" SPC %created SPC "id:" SPC %this.module.getId());
+        SDL_SetWindowTitle(%this.window,sPrintf( "CrazyElf (%dx%d) %s [ctrl up/down]"
+            ,$Global::ScreenSize.x,$Global::ScreenSize.y, %this.moduleName
+        ));
+    }
+
+
 
 
     if (!%created || !%this.module.isMethod("render")) {
