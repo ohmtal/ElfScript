@@ -1,0 +1,382 @@
+function createStreetAI(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "StreetAI";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+        TypeS32 AIPlayer = 0;
+        TypeS32 Obstacle = 0;
+        TypeString AIFile = "car_brain.elfdata";
+
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function StreetAI::onAdd(%this) {
+
+    %this.AIPlayer = new Group() {
+        class = "AIPlayer";
+        TypeVector  rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 6.0,12.0};
+        TypeVector  speed = 0.0; // normalied 0.5 = no acceleration
+        TypeVector  steering = 0.5;     // normalied 0.5 = no forward
+        TypeS32     ai = 0; //NeuralNetObject
+        TypeF64     fitness = 0.0;
+    };
+    %this.AIPlayer.add( %this.AIPlayer.ai =  new NeuralNetObject());
+
+
+
+    if (! %this.AIPlayer.ai.load(%this.AIFile)) {
+        /*
+         * Inputs:
+         * 1..5 raycast sensors distance to border - normalized
+         *  0 : forward raycast
+         *  1 : 45° forward left
+         *  2 : 45° forward right
+         *  3 : left
+         *  4 : right
+         * 5 current speed
+         * 6 Curvature of the road
+         * ----
+         * Outputs:
+         *  0: steering
+         *  1: Acceleration  < 0.5 == break
+         */
+        //  function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
+        if (!%this.AIPlayer.ai.init(7, 1, 5,2)) return false;
+    }
+    // the the mode ...
+    %this.AIPlayer.ai.setActivationHidden(2); // ReLU is fantastic for hidden layers!
+    %this.AIPlayer.ai.setActivationOutput(1); // Tanh for symmetrical steering (-1 to 1)
+
+
+    // Road
+    %this.add( %this.road = new PointStorageObject()  {
+        class = "Road";
+        storageSize = 40; // create a 40 x ConsoleVector (TotalSegments)
+        // dynamic:
+        TypeF32 TotalSegments = 40; // must match storageSize
+        TypeF32 width = 60.0;
+        TypeF32 segmentHeight = 20;
+        TypeF32 TargetCurvature = 0.0; // direction
+        TypeS32 CurvatureSteps = 0.0;  // steps left on the curve
+
+    });
+    %this.road.segmentHeight = $Global::ScreenSize.y / %this.road.TotalSegments;
+
+    for (%i in Range %this.road.storageSize) {
+        %this.road.setPointX( %i, $Global::ScreenSize.x / 2);
+    }
+
+
+    // Evolution parameters
+    $AI::PopulationSize = 20;
+    $AI::CurrentGeneration = 1;
+    $AI::CurrentAgentIndex = 0;
+
+    // Track the best weights found so far
+    $AI::BestFitness = 0.0;
+
+
+
+    return true;
+}
+//----------------------------------------------------------------------
+function StreetAI::updateRoad(%this, %dt) {
+    %road   = %this.road;
+    %player = %this.AIPlayer;
+
+    // ==========================================
+    // 1. SCROLL THE ROAD (Dynamic resolution scaling)
+    // ==========================================
+    for (%i = 0; %i < %road.TotalSegments - 1; %i++) {
+        %road.setPointX(%i, %road.getPointX(%i + 1));
+    }
+
+    if (%road.CurvatureSteps <= 0) {
+        %road.TargetCurvature = math.randomF(-1.0, 1.0);
+        %road.CurvatureSteps = math.floor(math.randomF(15.0)) + 5;
+    }
+    %road.CurvatureSteps--;
+
+    %topIdx = %road.TotalSegments - 1;
+    %lastX = %road.getPointX(%topIdx - 1);
+
+    // Scale curve sharpness dynamically based on screen width (e.g., ~0.8% of screen width max shift)
+    %curveIntensity = $Global::ScreenSize.x * 0.008;
+    %newX = %lastX + (%road.TargetCurvature * %curveIntensity);
+
+    // Dynamic boundaries based on actual global screen size
+    %minX = %road.width / 2.0 + 10.0;
+    %maxX = $Global::ScreenSize.x - (%road.width / 2.0) - 10.0;
+    %newX = math.clampf(%newX, %minX, %maxX);
+
+    %road.setPointX(%topIdx, %newX);
+
+    // ==========================================
+    // 2. DYNAMIC LOOKAHEAD BASED ON SPEED
+    // ==========================================
+    %playerSegmentIdx = math.floor(%player.rect.y / %road.segmentHeight);
+    %currentRoadX = %road.getPointX(%playerSegmentIdx);
+
+    // Variable sensor length: higher speed = looks further ahead
+    %dynamicLookAhead = 2 + math.floor(%player.speed * 0.8);
+
+    %lookAheadIdx = %playerSegmentIdx + %dynamicLookAhead;
+    if (%lookAheadIdx >= %road.TotalSegments) { %lookAheadIdx = %road.TotalSegments - 1; }
+    %futureRoadX = %road.getPointX(%lookAheadIdx);
+
+    // Curvature input scaled to dynamic screen width
+    %curvatureInput = 0.5 + ((%futureRoadX - %currentRoadX) / $Global::ScreenSize.x);
+    %player.ai.setIn(6, %curvatureInput);
+
+    // Normalized speed (Assuming max speed scales with resolution or stays at a stable cap like 5.0)
+    %player.ai.setIn(5, %player.speed / 5.0);
+
+    // ==========================================
+    // 3. SYMMETRIC SENSORS (Normalized to dynamic screen width)
+    // ==========================================
+    %leftBorder  = %currentRoadX - (%road.width / 2.0);
+    %rightBorder = %currentRoadX + (%road.width / 2.0);
+
+    // Distances scaled beautifully by screen size
+    %player.ai.setIn(3, math.clampf((%player.rect.x - %leftBorder) / $Global::ScreenSize.x, 0.0, 1.0));
+    %player.ai.setIn(4, math.clampf((%rightBorder - %player.rect.x) / $Global::ScreenSize.x, 0.0, 1.0));
+
+    // Forward sensor using dynamic lookahead
+    %fwdIdx = math.min(%playerSegmentIdx + %dynamicLookAhead, %road.TotalSegments - 1);
+    %fwdRoadX = %road.getPointX(%fwdIdx);
+    %fwdDiff = math.fabs(%player.rect.x - %fwdRoadX);
+    %fwdInput = 1.0 - (%fwdDiff / (%road.width / 2.0));
+    %player.ai.setIn(0, math.clampf(%fwdInput, 0.0, 1.0));
+
+    // Diagonal 45° sensors
+    %diagLookAhead = math.max(1, math.floor(%dynamicLookAhead * 0.5));
+    %diagIdx = math.min(%playerSegmentIdx + %diagLookAhead, %road.TotalSegments - 1);
+    %diagRoadX = %road.getPointX(%diagIdx);
+
+    %leftEdgeAhead = %diagRoadX - (%road.width / 2.0);
+    %leftDiagDiff  = %player.rect.x - %leftEdgeAhead;
+    %player.ai.setIn(1, math.clampf(1.0 - (%leftDiagDiff / $Global::ScreenSize.x), 0.0, 1.0));
+
+    %rightEdgeAhead = %diagRoadX + (%road.width / 2.0);
+    %rightDiagDiff  = %rightEdgeAhead - %player.rect.x;
+    %player.ai.setIn(2, math.clampf(1.0 - (%rightDiagDiff / $Global::ScreenSize.x), 0.0, 1.0));
+}
+
+//----------------------------------------------------------------------
+function StreetAI::evolvePopulation(%this) {
+    $AI::CurrentGeneration++;
+    $AI::CurrentAgentIndex = 0;
+
+    printSeparator();
+    print("=== STARTING GENERATION " @ $AI::CurrentGeneration @ " ===");
+    print("Current All-Time Best Fitness: " @ $AI::BestFitness);
+    printSeparator();
+
+    // Load the absolute best brain for the first agent of the new generation
+    %player = %this.AIPlayer;
+    %player.ai.load(%this.AIFile);
+}
+
+//----------------------------------------------------------------------
+function StreetAI::updatePlayer(%this, %dt) {
+    %player = %this.AIPlayer;
+    %road   = %this.road;
+
+    // ==========================================
+    // 1. RUN NEURAL NETWORK PREDICTION
+    // ==========================================
+    // execute the network based on the 7 inputs we set earlier
+    %player.ai.run();
+
+
+    %tanh = true;
+    if (%tanh) {
+        // ==========================================
+        // NEW TANH-BASED STEERING (Output is already -1.0 to 1.0)
+        // ==========================================
+        %steeringOutput = %player.ai.getOut(0); // -1.0 (full left) to 1.0 (full right)
+
+        // Acceleration is also tanh now! (-1.0 = full brake, 1.0 = full gas)
+        %accelerationOutput = %player.ai.getOut(1);
+
+        // 1. Apply Steering directly without the "- 0.5" shift
+        %baseSteeringSpeed = $Global::ScreenSize.x * 0.0025;
+        %steeringForce = %steeringOutput * %baseSteeringSpeed;
+        %player.rect.x = %player.rect.x + (%steeringForce * %player.speed);
+
+        // 2. Apply Acceleration
+        // Map -1.0..1.0 to speed changes (-0.2 to +0.2)
+        %speedDelta = %accelerationOutput * 0.2;
+        %player.speed = %player.speed + %speedDelta;
+        %player.speed = math.clampf(%player.speed, 2.0, 5.0);
+
+        $DEBUG::steeringOutput = %steeringOutput;
+        $DEBUG::accelerationOutput = %accelerationOutput;
+        $DEBUG::steeringForce = %steeringForce;
+
+    } else {
+        // Retrieve outputs (0.0 to 1.0)
+        %steeringOutput     = %player.ai.getOut(0); // 0.5 = center, 0.0 = full left, 1.0 = full right
+        %accelerationOutput = %player.ai.getOut(1); // > 0.5 = gas, < 0.5 = brake
+
+        // ==========================================
+        // 2. APPLY ACCELERATION & SPEED PHYSICS
+        // ==========================================
+        // Map output 0.0..1.0 to a change in speed (-0.2 to +0.2)
+        %speedDelta = (%accelerationOutput - 0.5) * 0.4;
+        %player.speed = %player.speed + %speedDelta;
+
+        // Clamp speed between a minimum drift and maximum speed
+        %player.speed = math.clampf(%player.speed, 2.0, 8.0);
+
+        // ==========================================
+        // 3. APPLY STEERING (X-Position change)
+        // ==========================================
+        // Map output 0.0..1.0 to horizontal movement (-1.0 to +1.0)
+        // We multiply by %player.speed so handling changes with velocity
+        %baseSteeringSpeed = $Global::ScreenSize.x * 0.0025; // 0.8 pixels per frame at 320 width
+        %steeringForce = (%steeringOutput - 0.5) * %baseSteeringSpeed;
+        %player.rect.x = %player.rect.x + (%steeringForce * %player.speed);
+
+        // Keep the player on the screen boundaries
+        %player.rect.x = math.clampf(%player.rect.x, 0.0, $Global::ScreenSize.x);
+    }
+
+
+
+    // ==========================================
+    // 4. FITNESS & CRASH DETECTION
+    // ==========================================
+    %playerSegmentIdx = math.floor(%player.rect.y / %road.segmentHeight);
+    %currentRoadX = %road.getPointX(%playerSegmentIdx);
+
+    %leftBorder  = %currentRoadX - (%road.width / 2.0);
+    %rightBorder = %currentRoadX + (%road.width / 2.0);
+
+    // Check if player is outside the road boundaries
+    if (%player.rect.x < %leftBorder || %player.rect.x > %rightBorder) {
+        // ==========================================
+        // AGENT CRASHED -> TRIGGER EVOLUTION STEP
+        // ==========================================
+
+        // Report to console for debugging
+        printf("Generation %d - Agent %d died. Fitness:%d", $AI::CurrentGeneration,$AI::CurrentAgentIndex,%player.fitness);
+
+        // Move to the next agent in the population
+        $AI::CurrentAgentIndex++;
+
+        if ($AI::CurrentAgentIndex >= $AI::PopulationSize) {
+            // All agents in this generation have driven -> Evolve!
+            %this.evolvePopulation();
+        } else {
+            // If the current run was better than the all-time best, save it!
+            if (%player.fitness > $AI::BestFitness) {
+                $AI::BestFitness = %player.fitness;
+                print("--> New Best Fitness Record: " @ $AI::BestFitness);
+                // Save the current successful weights to your file
+                %player.ai.save(%this.AIFile);
+            } else {
+                // If it performed worse, discard it.
+                // Reload the best brain and mutate it for the next attempt.
+                %player.ai.load(%this.AIFile);
+
+                // Assuming your mutate method is exposed to script:
+                // %player.ai.mutate(mutationRate, mutationAmount);
+                %player.ai.mutate(0.15, 0.4);
+            }
+        }
+
+        // Reset player position and state for the next run
+        %player.rect.x = $Global::ScreenSize.x / 2.0;
+        %player.speed = 2.0;
+        %player.fitness = 0.0;
+
+        // Reset road to a straight line so every agent starts with the exact same setup
+        for (%i = 0; %i < %road.storageSize; %i++) {
+            %road.setPointX(%i, $Global::ScreenSize.x / 2.0);
+        }
+        %road.CurvatureSteps = 0;
+
+    } else {
+        // Reward the AI for surviving and driving fast + center bonus
+        // Calculate how far the player is from the road center (0.0 = perfect center)
+        %distanceFromCenter = math.fabs(%player.rect.x - %currentRoadX);
+
+        // Normalized center bonus: 1.0 at center, 0.0 at the absolute edge
+        %centerBonus = 1.0 - (%distanceFromCenter / (%road.width / 2.0));
+        %centerBonus = math.clampf(%centerBonus, 0.0, 1.0);
+
+        // Update fitness with speed AND center-line discipline
+        %player.fitness = %player.fitness + (%player.speed * %centerBonus * %dt * 20.0);
+    }
+
+
+}
+
+//----------------------------------------------------------------------
+function StreetAI::OnRemove(%this) {
+    if ( %this.AIPlayer.ai.save(this.AIFile)) {
+        printf("AIFile: %s saved!", %this.AIFile);
+    }
+    %this.AIPlayer.delete();
+}
+//----------------------------------------------------------------------
+function StreetAI::Render(%this) {
+    if (!%this.renderer) return;
+    %dt = GetFrameTime();
+
+    %road   = %this.road;
+    %player = %this.AIPlayer;
+
+    %this.updateRoad(%dt);
+    %this.updatePlayer(%dt);
+
+    // $time = mFMod($time + %dt , 24) ;
+    // %isHit = SDL_HasRectIntersectionFloat(%this.AIPlayer.rect, %this.Obstacle.rect);
+
+
+    // --- RENDERING ---
+    SDL_SetRenderDrawColor(%this.renderer, 30, 30, 40, 255);
+    SDL_RenderClear(%this.renderer);
+
+    // Road
+    %halfW  = %road.width / 2.0;
+    %height = %road.segmentHeight;
+    %r      = %this.renderer;
+
+    for (%segment in RANGE %road.TotalSegments) {
+        %center = %road.getPointX(%segment);
+        %y = $Global::ScreenSize.y - ((%segment + 1) * %height);
+        %rect = { %center - %halfW, %y, %road.width, %height };
+
+        if (math.fmod(%segment, 2) == 0) {
+            SDL_SetRenderDrawColor(%r, 100, 100, 100, 255); // Dark gray
+        } else {
+            SDL_SetRenderDrawColor(%r, 130, 130, 130, 255); // Light gray
+        }
+        SDL_RenderFillRect(%r, %rect);
+    }
+
+
+    // Player
+    SDL_SetRenderDrawColor(%this.renderer, 55, 155, 155, 255);
+    SDL_RenderFillRect(%this.renderer, %this.AIPlayer.rect);
+
+
+
+
+
+    SDL_SetRenderDrawColor(%this.renderer, 200,205,105);
+    SDL_RenderDebugText(%this.renderer, 10, 10, sprintf("steering:%.4f, acc:%.4f",
+                        $DEBUG::steeringOutput, $DEBUG::accelerationOutput));
+    // $DEBUG::steeringOutput = %steeringOutput;
+    // $DEBUG::accelerationOutput = %accelerationOutput;
+    // $DEBUG::steeringForce = %steeringForce;
+    // SDL_RenderDebugText(%this.renderer, 10, 20, sprintf("left:%.4f right:%.4f", %this.AIPlayer.decision.x, %this.AIPlayer.decision.y));
+}
+//----------------------------------------------------------------------
+function  StreetAI::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  StreetAI::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  StreetAI::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}

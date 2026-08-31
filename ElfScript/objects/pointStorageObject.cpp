@@ -136,6 +136,7 @@ public:
     }
 
 
+
     static bool _setStorageSize(void* obj,const char* , const char* data) {
         PointStorageObject* object = static_cast<PointStorageObject*>(obj);
         if (!object || !data) {

@@ -5,12 +5,32 @@ function createANNTest(%renderer, %window) {
         TypeS32 window   = %window;
         TypeS32 AIPlayer = 0;
         TypeS32 Obstacle = 0;
-        TypeString KiFile = "bot_brain.elfdata";
+        TypeString AIFile = "bot_brain.elfdata";
 
 
     };
 
     return %obj;
+}
+//----------------------------------------------------------------------
+function ANNTest::onAdd(%this) {
+
+    %this.AIPlayer = new Object() {
+        class = "AIPlayer";
+        TypeVector  rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 8.0,8.0};
+        TypeVector  decision = {0};
+        TypeS32     ai = 0;
+    };
+    %this.AIPlayer.ai =  ANN_Load(%this.AIFile, {1, 1, 5, 2});
+    if (%this.AIPlayer.ai < 1) %this.AIPlayer.ai = ANN_Create(1, 1, 5, 2);
+
+    %this.Obstacle = new Object() {
+        class = "Obstacle";
+        TypeVector rect = {math.randomF(50, $Global::ScreenSize.x - 50), 0.0, 30.0, 30.0};
+        TypeF32 speed = math.randomF(4, 7);
+    };
+
+    return true;
 }
 //----------------------------------------------------------------------
 function AIPlayer::update(%this, %Obstacle) {
@@ -23,7 +43,7 @@ function AIPlayer::update(%this, %Obstacle) {
     // %inputVec = {%normX, %normY, $time};
     %inputVec = { $time};
 
-    %this.decision = ANN_Run(%this.ki, %inputVec);
+    %this.decision = ANN_Run(%this.ai, %inputVec);
 
     if (%this.decision.x > 0.5) %this.rect.x -= 3.0;
     if (%this.decision.y > 0.5) %this.rect.x += 3.0;
@@ -35,25 +55,6 @@ function AIPlayer::update(%this, %Obstacle) {
     }
 
     return %inputVec;
-}
-//----------------------------------------------------------------------
-function ANNTest::onAdd(%this) {
-
-    %this.AIPlayer = new Object() {
-        class = "AIPlayer";
-        TypeVector rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 8.0,8.0};
-        TypeVector decision = {0};
-    };
-    %this.AIPlayer.ki =  ANN_Load(%this.KiFile, {1, 1, 5, 2});
-    if (%this.AIPlayer.ki < 1) %this.AIPlayer.ki = ANN_Create(1, 1, 5, 2);
-
-    %this.Obstacle = new Object() {
-        class = "Obstacle";
-        TypeVector rect = {math.randomF(50, $Global::ScreenSize.x - 50), 0.0, 30.0, 30.0};
-        TypeF32 speed = math.randomF(4, 7);
-    };
-
-    return true;
 }
 //----------------------------------------------------------------------
 function Obstacle::Reset(%this) {
@@ -75,10 +76,10 @@ function Obstacle::Reset(%this) {
 }
 //----------------------------------------------------------------------
 function ANNTest::OnRemove(%this) {
-    if (ANN_Save(%this.AIPlayer.ki, %this.KiFile)) {
-        printf("KiFile: %s saved!", %this.KiFile);
+    if (ANN_Save(%this.AIPlayer.ai, %this.AIFile)) {
+        printf("AIFile: %s saved!", %this.AIFile);
     }
-    ANN_Destroy(%this.AIPlayer.ki);
+    ANN_Destroy(%this.AIPlayer.ai);
     %this.AIPlayer.delete();
 
     %this.Obstacle.delete();
@@ -106,7 +107,7 @@ function ANNTest::Render(%this) {
             %desired = {0.0, 1.0, 0, 0}; // Obstacle was left for right
         }
 
-        ANN_Train(%this.AIPlayer.ki, %lastInput, %desired, 1.5);
+        ANN_Train(%this.AIPlayer.ai, %lastInput, %desired, 1.5);
 
         // Reset Obstacle
         %this.Obstacle.reset();
@@ -117,8 +118,8 @@ function ANNTest::Render(%this) {
         %absDistX = Math.fabs(%this.AIPlayer.rect.x - %this.Obstacle.rect.x);
 
         if (%absDistX < 150) {
-            %currentDecision = ANN_Run(%this.AIPlayer.ki, %lastInput);
-            ANN_Train(%this.AIPlayer.ki, %lastInput, %currentDecision, 0.3);
+            %currentDecision = ANN_Run(%this.AIPlayer.ai, %lastInput);
+            ANN_Train(%this.AIPlayer.ai, %lastInput, %currentDecision, 0.3);
         }
 
         // Reset Obstacle

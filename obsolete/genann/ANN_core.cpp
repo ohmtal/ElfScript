@@ -12,6 +12,8 @@
 
 #include "ANN_core.h"
 
+#define ANN_MAXINPUTS 100000
+#define ANN_MAXOUTPUTS 100
 
 namespace ElfAi {
 
@@ -25,8 +27,8 @@ void ShutDownANN() {
 DefineEngineFunction(ANN_Create, S32, (S32 inputs, S32 hidden_layers, S32 hidden_neuros, S32 outputs ),
                      , "Create a new KI and return the ID of it. Max four inputs/outputs") {
 
-    if (inputs < 1 || inputs > 4 || outputs < 1 || outputs > 4) {
-        Con::errorf("ANN_Create - Sorry we support only max. 4 inputs and max 4 outputs.");
+    if (inputs < 1 || inputs > ANN_MAXINPUTS || outputs < 1 || outputs > ANN_MAXOUTPUTS) {
+        Con::errorf("ANN_Create - Sorry we support only max. %d inputs and max %d outputs.", ANN_MAXINPUTS, ANN_MAXOUTPUTS);
         return 0;
     }
 
@@ -52,8 +54,8 @@ DefineEngineFunction(ANN_Train, bool, (S32 kiObjectID, ConsoleVector inputVector
     }
     genann *ann = *annPrt;
 
-    if (ann->inputs > 4 || ann->outputs > 4 ) {
-        Con::errorf("ANN_Train - Network Dimension overflow! Inputs(%d) Outputs(%d) must be max 4!",
+    if (ann->inputs > ANN_MAXOUTPUTS || ann->outputs > ANN_MAXOUTPUTS ) {
+        Con::errorf("ANN_Train - Network Dimension overflow! Inputs %d of %d Outputs %d  must be max %!",
                     ann->inputs, ann->outputs);
         return false;
     }

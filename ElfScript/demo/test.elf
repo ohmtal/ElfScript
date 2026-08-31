@@ -537,33 +537,75 @@ function FooBar::getRand(%this) {
 }
 printf("index:%d value:%f", sto.lutIndex, sto.getRand());
 
+// function TestAI(%loops = 10000, %filename = "myAITest.elfdata") {
+//
+//     %ann = ANN_Load(%filename, {2, 1, 3, 1});
+//     if (%ann < 1) %ann = ANN_Create(2, 1, 3, 1);
+//
+//     for (%i in range %loops) {
+//         ANN_Train(%ann, {0.0, 0.0}, {0.0}, 3.0);
+//         ANN_Train(%ann, {0.0, 1.0}, {1.0}, 3.0);
+//         ANN_Train(%ann, {1.0, 0.0}, {1.0}, 3.0);
+//         ANN_Train(%ann, {1.0, 1.0}, {0.0}, 3.0);
+//     }
+//     printSeparator();
+//     printf("AI ANN-TEST doing %d loops:", %loops);
+//     %res1 = ANN_Run(%ann, {0, 1, 0, 0});
+//     printf("AI ANN result for 0 and 1 is: %f (should be about 1.0)", %res1.x);
+//
+//     %res2 = ANN_Run(%ann, {1, 1, 0, 0});
+//     printf("AI ANN result for 1 and 1 is: %f (should be about 0.0)", %res2.x);
+//     printSeparator();
+//
+//     if (!ANN_Save(%ann, %filename)) {
+//         printf("Failed to save AI ANN file (%s)!", %filename);
+//     }
+//
+//     ANN_Destroy(%ann);
+// }
+
+// Helper with
+function Test_Train(%obj, %inputVec, %output) {
+    %obj.setInVec(0,%inputVec);
+    %obj.setOut(0, %output);
+    %obj.train(3.0);
+}
+
 function TestAI(%loops = 10000, %filename = "myAITest.elfdata") {
 
-    %ann = ANN_Load(%filename, {2, 1, 3, 1});
-    if (%ann < 1) %ann = ANN_Create(2, 1, 3, 1);
+    %Net = new NeuralNetObject();
+    if (!isObject(%Net)) return;
+    if (!%Net.Load(%filename, 2, 1, 3, 1) ) {
+        if (!%Net.Init(2, 1, 3, 1)) return false;
+    }
 
     for (%i in range %loops) {
-        ANN_Train(%ann, {0.0, 0.0}, {0.0}, 3.0);
-        ANN_Train(%ann, {0.0, 1.0}, {1.0}, 3.0);
-        ANN_Train(%ann, {1.0, 0.0}, {1.0}, 3.0);
-        ANN_Train(%ann, {1.0, 1.0}, {0.0}, 3.0);
+        Test_Train(%Net, { 0.0, 0.0}, 0.0);
+        // ANN_Train(%ann, {0.0, 0.0}, {0.0}, 3.0);
+        Test_Train(%Net, {0.0, 1.0}, 1.0);
+        // ANN_Train(%ann, {0.0, 1.0}, {1.0}, 3.0);
+        Test_Train(%Net, {1.0, 0.0}, 1.0);
+        // ANN_Train(%ann, {1.0, 0.0}, {1.0}, 3.0);
+        Test_Train(%Net, {1.0, 1.0}, 0.0);
+        // ANN_Train(%ann, {1.0, 1.0}, {0.0}, 3.0);
     }
     printSeparator();
     printf("AI ANN-TEST doing %d loops:", %loops);
-    %res1 = ANN_Run(%ann, {0, 1, 0, 0});
-    printf("AI ANN result for 0 and 1 is: %f (should be about 1.0)", %res1.x);
+    %Net.setInVec(0,{0.0, 1.0});
+    %Net.Run();
+    printf("AI ANN result for 0 and 1 is: %f (should be about 1.0)", %Net.getOut(0));
 
-    %res2 = ANN_Run(%ann, {1, 1, 0, 0});
-    printf("AI ANN result for 1 and 1 is: %f (should be about 0.0)", %res2.x);
+    %Net.setInVec(0,{1.0, 1.0});
+    %Net.Run();
+    printf("AI ANN result for 1 and 1 is: %f (should be about 0.0)",  %Net.getOut(0));
     printSeparator();
 
-    if (!ANN_Save(%ann, %filename)) {
+    if (!%Net.Save( %filename)) {
         printf("Failed to save AI ANN file (%s)!", %filename);
     }
 
-    ANN_Destroy(%ann);
+    %Net.delete();
 }
-
 
 printSeparator();
 print("script load completed..... no parse errors....");

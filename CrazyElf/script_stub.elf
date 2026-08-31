@@ -143,14 +143,14 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dump( bool detailed=false );
-   /** --- bool save ---
+   /** --- bool Save ---
     * Save out the object to the given file.
     * @param fileName The name of the file to save to.@param selectedOnly If true, only objects marked as selected will be saved out.
     * @param preAppendString Text which will be preprended directly to the object serialization.
     * @param True on success, false on failure.
     * @return bool
     */
-      function save( string fileName, bool selectedOnly=false, string preAppendString="" );
+      function Save( string fileName, bool selectedOnly=false, string preAppendString="" );
    /** --- void setName ---
     * Set the global name of the object.
     * @param newName The new global name to assign to the object.
@@ -1686,6 +1686,138 @@ function Message::onRemove(%this)
     * Decrement the reference count for this message
     */
       function freeReference();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  ValueStorageObject : public SimObject {
+  public:
+   /** --- F64 getFloat ---
+    * get the float (double)value at index
+    * @return F64
+    */
+      function getFloat( int index );
+   /** --- bool setFloat ---
+    * set the float(double) value at index
+    * @return bool
+    */
+      function setFloat( int index, F64 value );
+   /** --- S64 getInt ---
+    * get the integer(long) value at index
+    * @return S64
+    */
+      function getInt( int index );
+   /** --- bool setInt ---
+    * set the integer(long) value at index
+    * @return bool
+    */
+      function setInt( int index, F64 value );
+   /** --- const char* getString ---
+    * get the sttring value at index
+    * @return const char*
+    */
+      function getString( int index );
+   /** --- bool setString ---
+    * set the string value at index
+    * @return bool
+    */
+      function setString( int index, string value );
+   /** --- ConsoleVector getVector ---
+    * get the Vector value at index
+    * @return ConsoleVector
+    */
+      function getVector( int index );
+   /** --- bool setVector ---
+    * set the vector value at index
+    * @return bool
+    */
+      function setVector( int index, ConsoleVector value );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+   Set the storage size (how many Values we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
+};
+class  NeuralNetObject : public SimObject {
+  public:
+   /** --- bool init ---
+    * initialize network
+    * @return bool
+    */
+      function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
+   /** --- bool Load ---
+    * load network and check parameter to match the loaded data.
+    * @return bool
+    */
+      function Load( string filename, int inputs, int hidden_layers, int hidden_neuros, int outputs );
+   /** --- bool Save ---
+    * Save a network to file
+    * @return bool
+    */
+      function Save( string filename );
+   /** --- bool Run ---
+    * Run with your input data and set output data
+    * @return bool
+    */
+      function Run();
+   /** --- bool Train ---
+    * Tain (Backpropagation) your network with your input data and output data
+    * @return bool
+    */
+      function Train( F64 learningRate );
+   /** --- bool Mutate ---
+    * Mutate (Evolutuion) modify the weight of your network
+    * @return bool
+    */
+      function Mutate( F64 mutationRate, F64 mutationAmount );
+   /** --- bool Crossover ---
+    * Crossover (Evolutuion) from 2 parents
+    * @return bool
+    */
+      function Crossover( uint parentAObjID, uint parentBObjID );
+   /** --- F64 getIn ---
+    * Get the input value at index
+    * @return F64
+    */
+      function getIn( int index );
+   /** --- bool setIn ---
+    * Set the input value at index
+    * @return bool
+    */
+      function setIn( int index, F64 value );
+   /** --- ConsoleVector getInVec ---
+    * get 4 input values at index by ConsoleVector
+    * @return ConsoleVector
+    */
+      function getInVec( int index );
+   /** --- bool setInVec ---
+    * Set 4 input values at index by ConsoleVector
+    * @return bool
+    */
+      function setInVec( int index, ConsoleVector value );
+   /** --- F64 getOut ---
+    * Get the output value at index
+    * @return F64
+    */
+      function getOut( int index );
+   /** --- bool setOut ---
+    * Set the output value at index
+    * @return bool
+    */
+      function setOut( int index, F64 value );
+   /** --- ConsoleVector getOutVec ---
+    * get 4 output values at index by ConsoleVector
+    * @return ConsoleVector
+    */
+      function getOutVec( int index );
+   /** --- bool setOutVec ---
+    * Set 4 output values at index by ConsoleVector
+    * @return bool
+    */
+      function setOutVec( int index, ConsoleVector value );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Persistence ---
@@ -3593,36 +3725,6 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
-   /** --- S32 KI_Create ---
-    * Create a new KI and return the ID of it. Max four inputs/outputs
-    * @return S32
-    */
-      function KI_Create( int inputs, int hidden_layers, int hidden_neuros, int outputs );
-   /** --- void KI_Destroy ---
-    * Destroy an KI and remove it.
-    */
-      function KI_Destroy( int kiObjectID );
-   /** --- bool KI_Train ---
-    * Train the KI with an input and the desired output.
-    * @return bool
-    */
-      function KI_Train( int kiObjectID, ConsoleVector inputVector, ConsoleVector desiredOutputVector, F64 learning_rate );
-   /** --- ConsoleVector KI_Run ---
-    * Run prediction with a 4-float vector
-    * @return ConsoleVector
-    */
-      function KI_Run( int kiObjectID, ConsoleVector inputVector );
-   /** --- bool KI_Save ---
-    * Save KI state to a file. Returns true on success.
-    * @return bool
-    */
-      function KI_Save( int kiObjectID, String filename );
-   /** --- S32 KI_Load ---
-    * Load a KI from a file and return its new ID. Returns 0 on failure.
-    * validateSettings is {S32 inputs, S32 hidden_layers, S32 hidden, S32 outputs}
-    * @return S32
-    */
-      function KI_Load( String filename, ConsoleVector validateSettings );
    /** --- void Vec4Add ---
     * v1 = v1 + v2
     */

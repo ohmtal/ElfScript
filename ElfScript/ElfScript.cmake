@@ -216,7 +216,9 @@ set(PLATFORM_SRC
 set ( OBJECTS_SRC
     # some neat objects to work with
     ${CMAKE_CURRENT_LIST_DIR}/objects/pointStorageObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/valueStorageObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/objects/objectAliases.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/NeuralNetObject.cpp
 
 
 )
@@ -270,10 +272,10 @@ set(MATH_SRC
 
 set(EXT_SRC
    ${CMAKE_CURRENT_LIST_DIR}/ext/tinyexpr.c
+   ${CMAKE_CURRENT_LIST_DIR}/ext/genann.c
 )
 
-# ${ANN_ELFSCRIPT_SRC}
-include(${CMAKE_CURRENT_LIST_DIR}/addons/genann/ANN.cmake)
+
 
 
 if(WIN32)
