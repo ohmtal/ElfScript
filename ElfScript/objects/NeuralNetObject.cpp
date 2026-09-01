@@ -165,6 +165,12 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
+    // after load or load + mutate call a warmup
+    inline bool WarmUp( ) {
+        for (S32 i = 0; i < mInputs.size(); i++) mInputs[i] = 0.0;
+        return Run();
+    }
+    // ------------------------------------------------------------------------
     inline bool Run() {
         if (!mAnn) {
             Con::errorf("NeuralNetObject run: not initialized!");
@@ -217,6 +223,19 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
+    // genann_copy
+    inline bool Copy(const NeuralNetObject* parentA) {
+        if (!mAnn || !parentA->mAnn ) {
+            Con::errorf("NeuralNetObject Copy: Parent object is not initialized!");
+            return false;;
+        }
+        genann *ann = genann_copy(parentA->mAnn);
+        if (mAnn) genann_free(mAnn);
+        mAnn = ann;
+
+        return true;
+    }
+    // ------------------------------------------------------------------------
     inline bool Crossover(const NeuralNetObject* parentA, const NeuralNetObject* parentB) {
         if (!mAnn || !parentA->mAnn || !parentB->mAnn) {
             Con::errorf("NeuralNetObject Crossover: one or more objects not initialized!");
@@ -227,7 +246,7 @@ public:
             mAnn->total_weights != parentB->mAnn->total_weights
         ) {
             Con::errorf("NeuralNetObject Crossover: weight size missmatch");
-            return false;;
+            return false;
         }
         for (S32 i = 0; i < mAnn->total_weights; i++) {
             if (ElfMath::mRandF64() > 0.5) {
@@ -236,7 +255,7 @@ public:
                 mAnn->weight[i] = parentB->mAnn->weight[i];
             }
         }
-        return false;
+        return true;
     }
     // ------------------------------------------------------------------------
     // return a set of 4 values a
@@ -313,6 +332,14 @@ DefineEngineMethod(NeuralNetObject, init, bool,
     return object->Init(inputs, hidden_layers, hidden_neuros, outputs);
 }
 
+DefineEngineMethod(NeuralNetObject, Copy, bool,(U32 parentObjID),
+            ,"deep copy the of a other network") {
+
+    NeuralNetObject* parentA = dynamic_cast<NeuralNetObject*>(Sim::findObject(parentObjID));
+    if (!parentA) return false;
+    return object->Copy(parentA);
+}
+
 DefineEngineMethod(NeuralNetObject, Load, bool,
             (const char* filename, S32 inputs, S32 hidden_layers, S32 hidden_neuros, S32 outputs ),(0,0,0,0)
             , "load network and check parameter to match the loaded data."){
@@ -321,6 +348,9 @@ DefineEngineMethod(NeuralNetObject, Load, bool,
 DefineEngineMethod(NeuralNetObject, Save, bool,(const char* filename),
                    ,"Save a network to file") {
     return object->Save(filename);
+}
+DefineEngineMethod(NeuralNetObject, WarmUP, bool,(), ,"Run with empty input to warmup the network") {
+    return object->WarmUp();
 }
 DefineEngineMethod(NeuralNetObject, Run, bool,(), ,"Run with your input data and set output data") {
     return object->Run();
@@ -334,8 +364,8 @@ DefineEngineMethod(NeuralNetObject, Mutate, bool,(F64 mutationRate, F64 mutation
     return object->Mutate(mutationRate, mutationAmount);
 }
 
-// FIXME Crossover
-// inline bool Crossover(const NeuralNetObject* parentA, const NeuralNetObject* parentB)
+
+
 DefineEngineMethod(NeuralNetObject, Crossover, bool,(U32 parentAObjID, U32 parentBObjID),
             ,"Crossover (Evolutuion) from 2 parents") {
 

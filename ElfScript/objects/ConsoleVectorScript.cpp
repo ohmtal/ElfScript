@@ -9,6 +9,18 @@
 #include "math/mMathConsoleVector.h"
 #include "console/localVar.h"
 
+
+//-----------------------------------------------------------------------------
+// "normal" Getter
+//-----------------------------------------------------------------------------
+DefineEngineFunction(getRectCentered, ConsoleVector, (ConsoleVector vec),,"return a centered rect")
+{
+    return  ElfMath::getRectCentered(vec);
+}
+
+
+//-----------------------------------------------------------------------------
+// Set be Reference functions  directly into the local/global variable
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction(Vec4Add, void , (const char* varVec1, const char* varVec2),

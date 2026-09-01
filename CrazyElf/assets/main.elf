@@ -1,4 +1,4 @@
-$MODULES = "Pixels NativSDL blank StarField StarField2 PlayGround StreetAI";
+$MODULES = "Pixels NativSDL blank StarField StarField2 PlayGround StreetAI OnOffAI Squash";
 
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};
@@ -22,6 +22,13 @@ function onEmscriptenMountReady(%success) {
     }
 
     Main.loadModule();
+}
+//------------------------------------------------------------------------------
+function Main::setScreenSize(%this, %size) {
+    if (%size.x <= 0 || %size.y <=0) return false;
+    $Global::ScreenSize = %size;
+    %this.scaledScreen = SDL_SetRenderLogicalPresentation(%this.renderer, $Global::ScreenSize.x,$Global::ScreenSize.y);
+    return true;
 }
 //------------------------------------------------------------------------------
 function Main::init(%this) {
@@ -142,6 +149,18 @@ function Main::DrawText(%this, %x, %y, %text, %scale=1.0, %colorStr, %shadow, %s
     SDL_SetRenderScale(%this.renderer, 1.0, 1.0);
 }
 
+function Main::BeginText(%this, %scale) {
+    %this.textScale = %scale;
+    SDL_SetRenderScale(%this.renderer, %scale, %scale);
+}
+function Main::Text(%this, %x, %y, %text) {
+    %scale = %this.textScale;
+    SDL_RenderDebugText(%this.renderer, %x /%scale , %y/%scale, %text );
+}
+function Main::EndText(%this) {
+    %this.textScale = 1;
+    SDL_SetRenderScale(%this.renderer);
+}
 //------------------------------------------------------------------------------
 function Main::Render(%this) {
 
@@ -166,6 +185,7 @@ function onInit() {
         TypeS32 moduleIndex = 0;
         TypeS32 module = 0;
         TypeBool hideBottomMessage = false;
+        TypeF32 textScale = 0.0;
     };
     return $Main.init();
 

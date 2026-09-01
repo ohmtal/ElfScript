@@ -18,8 +18,8 @@ function StreetAI::onAdd(%this) {
     %this.AIPlayer = new Group() {
         class = "AIPlayer";
         TypeVector  rect = {$Global::ScreenSize.x / 2, $Global::ScreenSize.y / 2, 6.0,12.0};
-        TypeF64  speed = 0.0; // normalied 0.5 = no acceleration
-        TypeF64  steering = 0.0;     // normalied 0.5 = no forward
+        TypeF64  speed = 0.0;         // tanh -1.0 - 1.0
+        TypeF64  steering = 0.0;      // tanh -1.0 - 1.0
         TypeS32     ai = 0; //NeuralNetObject
         TypeF64     fitness = 0.0;
     };
@@ -41,15 +41,17 @@ function StreetAI::onAdd(%this) {
          * ----
          * Outputs:
          *  0: steering
-         *  1: Acceleration  < 0.5 == break
+         *  1: Acceleration  < 0.0 == break
          */
         //  function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
         if (!%this.AIPlayer.ai.init(7, 1, 5,2)) return false;
+    } else {
+        printf("***** %s LOADED *****", %this.AIFile);
     }
     // the the mode ...
-    %this.AIPlayer.ai.setActivationHidden(2); // ReLU is fantastic for hidden layers!
+    %this.AIPlayer.ai.setActivationHidden(2); // ReLU  for hidden layers!
     %this.AIPlayer.ai.setActivationOutput(1); // Tanh for symmetrical steering (-1 to 1)
-
+    %this.AIPlayer.ai.WarmUP(); // call run with empty inputs NOTE: did not fix my stupid after load!
 
     // Road
     %this.add( %this.road = new PointStorageObject()  {
@@ -57,7 +59,7 @@ function StreetAI::onAdd(%this) {
         storageSize = 40; // create a 40 x ConsoleVector (TotalSegments)
         // dynamic:
         TypeF32 TotalSegments = 40; // must match storageSize
-        TypeF32 width = 60.0;
+        TypeF32 width = 40.0;
         TypeF32 segmentHeight = 20;
         TypeF32 TargetCurvature = 0.0; // direction
         TypeS32 CurvatureSteps = 0.0;  // steps left on the curve
@@ -149,7 +151,7 @@ function StreetAI::updateRoad(%this, %dt) {
     %leftBorder  = %currentRoadX - (%road.width / 2.0);
     %rightBorder = %currentRoadX + (%road.width / 2.0);
 
-    // Distances scaled beautifully by screen size
+    // Distances scaled  by screen size
     %player.ai.setIn(3, math.clampf((%player.rect.x - %leftBorder) / $Global::ScreenSize.x, 0.0, 1.0));
     %player.ai.setIn(4, math.clampf((%rightBorder - %player.rect.x) / $Global::ScreenSize.x, 0.0, 1.0));
 
@@ -238,13 +240,13 @@ function StreetAI::updatePlayer(%this, %dt) {
     %rightBorder = %currentRoadX + (%road.width / 2.0);
 
     // Check if player is outside the road boundaries
-    if (%player.rect.x < %leftBorder || %player.rect.x > %rightBorder || %player.fitness < -10.0) {
+    if (%player.rect.x < %leftBorder || %player.rect.x > %rightBorder || %player.fitness < -1.0) {
         // ==========================================
         // AGENT CRASHED -> TRIGGER EVOLUTION STEP
         // ==========================================
 
         // Report to console for debugging
-        printf("Generation %d - Agent %d died. Fitness:%d", $AI::CurrentGeneration,$AI::CurrentAgentIndex,%player.fitness);
+        printf("Generation %d - Agent %d died. Fitness:%.1f", $AI::CurrentGeneration,$AI::CurrentAgentIndex,%player.fitness);
 
         // Move to the next agent in the population
         $AI::CurrentAgentIndex++;
@@ -253,21 +255,24 @@ function StreetAI::updatePlayer(%this, %dt) {
             // All agents in this generation have driven -> Evolve!
             %this.evolvePopulation();
         } else {
-            // If the current run was better than the all-time best, save it!
+            // save file if it was better ....
             if (%player.fitness > $AI::BestFitness) {
                 $AI::BestFitness = %player.fitness;
                 printf("--> New Best Fitness Record: %.3f",$AI::BestFitness);
-                // Save the current successful weights to your file
                 %player.ai.save(%this.AIFile);
             } else {
-                // If it performed worse, discard it.
-                // Reload the best brain and mutate it for the next attempt.
+                // load previous best file
                 %player.ai.load(%this.AIFile);
 
+                // and mutate
                 // %player.ai.mutate(mutationRate, mutationAmount);
                 // %player.ai.mutate(0.15, 0.4);
                 %player.ai.mutate(0.15, 0.4);
+
+                %player.ai.WarmUP(); // call run with empty inputs after mutate
             }
+
+
         }
 
         // Reset player position and state for the next run
@@ -295,16 +300,17 @@ function StreetAI::updatePlayer(%this, %dt) {
         // %player.fitness = %player.fitness + (%player.speed * %centerBonus * %dt * 20.0);
         // // %player.fitness = %player.fitness + (%player.speed * %centerBonus * 0.32);
 
-        %survivalBonus = 1.0 * %dt;
         %drivingBonus = (%player.speed * %centerBonus * 20.0) * %dt;
-
 
         // dont be too slow!
         if (%player.speed < 1.0) {
-            %player.fitness -= %player.fitness - (5.0 * %dt);
+            %player.fitness -=  (5.0 * %dt);
         } else {
-            %player.fitness += %survivalBonus + %drivingBonus;
+
+            %player.fitness +=  %drivingBonus;
         }
+
+
     }
 
 
@@ -312,8 +318,11 @@ function StreetAI::updatePlayer(%this, %dt) {
 
 //----------------------------------------------------------------------
 function StreetAI::OnRemove(%this) {
-    if ( %this.AIPlayer.ai.save(%this.AIFile)) {
-        printf("AIFile: %s saved!", %this.AIFile);
+    %player = %this.AIPlayer;
+    if (%player.fitness > $AI::BestFitness) {
+        if ( %this.AIPlayer.ai.save(%this.AIFile)) {
+            printf("******** %s saved! **********", %this.AIFile);
+        }
     }
     %this.AIPlayer.delete();
 }
@@ -356,8 +365,8 @@ function StreetAI::Render(%this) {
 
 
     // Player
-    SDL_SetRenderDrawColor(%this.renderer, 55, 155, 155, 255);
-    SDL_RenderFillRect(%this.renderer, %this.AIPlayer.rect);
+    SDL_SetRenderDrawColor(%this.renderer, 10, 10, 160, 255);
+    SDL_RenderFillRect(%this.renderer, getRectCentered(%player.rect));
 
 
 
@@ -371,7 +380,7 @@ function StreetAI::Render(%this) {
     SDL_SetRenderDrawColor(%this.renderer, 200,205,105);
     SDL_RenderDebugText(%this.renderer, %scale10, 10 / %fontScale, sprintf("steering:%.4f, acc:%.4f", $DEBUG::steeringOutput, $DEBUG::accelerationOutput));
     SDL_RenderDebugText(%this.renderer, %scale10, 20 / %fontScale, sprintf("center dist:%.4f, force:%.4f", $DEBUG::distanceFromCenter, $DEBUG::steeringForce ));
-    // SDL_RenderDebugText(%this.renderer, %scale10, 30 / %fontScale, sprintf("center bonus:%.4f ",$DEBUG::centerBonus));
+    SDL_RenderDebugText(%this.renderer, %scale10, 30 / %fontScale, sprintf("center bonus:%.4f ",$DEBUG::centerBonus));
     SDL_SetRenderScale(%this.renderer);
 }
 //----------------------------------------------------------------------

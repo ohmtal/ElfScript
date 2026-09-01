@@ -1,0 +1,113 @@
+// Very Simple Neural Network
+// AI should keep the system off
+
+function createOnOffAI(%renderer, %window) {
+    %obj = new ScriptGroup() {
+        class = "OnOffAI";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function OnOffAI::onAdd(%this) {
+
+
+    %this.addField("hour", "TypeF64", 0);
+    %this.addField("lasthour", "TypeS64", 0);
+
+    %buttonHalfSize = 50;
+    %rect = { $Global::ScreenSize.x / 2 - %buttonHalfSize
+            , $Global::ScreenSize.y / 2 - %buttonHalfSize
+            , %buttonHalfSize * 2.0, %buttonHalfSize * 2.0
+    };
+    %this.add(%this.button = new Object() {
+        TypeVector rect = %rect;
+        TypeBool   isOn = false;
+
+    });
+
+    %this.add(%this.ai =  new NeuralNetObject(){
+        TypeF64 LastResult = 0.0;
+    });
+    // We only need 1 Input and one output ...
+    // added time so it take off at day and on at night
+    // hidden neuros can be also 1 - i guess.
+    %this.ai.init(2, 1, 1, 1);
+
+
+    return true;
+}
+//----------------------------------------------------------------------
+function OnOffAI::setButtonState(%this, %floatvalue) {
+    %this.button.isOn = %floatvalue > 0.50;
+}
+//----------------------------------------------------------------------
+function OnOffAI::Think(%this) {
+    %this.ai.setIn(0, %this.button.isOn);
+    %this.ai.setIn(1, %this.hour / 24.0);
+    // we ttain it should be on:
+    if (%this.hour >= 22 || %this.hour <= 6) {
+        %this.ai.setOut(0, 1.0); // on at night
+         // print("Night", %this.hour);
+    } else  {
+        %this.ai.setOut(0, 0.0); // off at day
+        // print("Day");
+    }
+    // printf("IN 0:%.3f 1:%.3f TRAIN:%.4f", %this.ai.getIn(0), %this.ai.getIn(1), %this.ai.getOut(0) );
+    %this.ai.train(0.3); //using train. 3.0 is a good learning rate
+    %this.ai.Run();
+    %this.ai.LastResult = %this.ai.getOut(0);
+    %this.setButtonState(%this.ai.LastResult);
+    // %this.schedule(0, setButtonState, %this.ai.LastResult);
+}
+//----------------------------------------------------------------------
+function OnOffAI::OnRemove(%this) { }
+//----------------------------------------------------------------------
+function OnOffAI::Render(%this) {
+    if (!%this.renderer) return;
+
+    %dt = GetFrameTime();
+
+    SDL_SetRenderDrawColor(%this.renderer, 60, 20, 60);
+    SDL_RenderClear(%this.renderer);
+
+    if (%this.button.isOn) SDL_SetRenderDrawColor(%this.renderer, 50, 255, 255);
+    else SDL_SetRenderDrawColor(%this.renderer, 50, 55, 55);
+    SDL_RenderFillRect(%this.renderer, %this.button.rect);
+
+    if (%this.button.isOn) SDL_SetRenderDrawColor(%this.renderer, 50, 50, 50);
+    else SDL_SetRenderDrawColor(%this.renderer, 205, 205, 205);
+    SDL_RenderDebugText(%this.renderer, %this.button.rect.x + 10,
+                        %this.button.rect.y + 10, %this.button.isOn ? "On" : "Off");
+
+    SDL_SetRenderDrawColor(%this.renderer, 150, 150, 150);
+    SDL_RenderRectF(%this.renderer, %this.button.rect.x - 1, %this.button.rect.y - 1
+                , %this.button.rect.width + 2 , %this.button.rect.height + 2, false
+    );
+
+
+    if ( SDL_IsMouseButtonPressed(SDL_BUTTON_LEFT)
+        && SDL_PointInRectFloat({SDL_GetMouseX(), SDL_GetMouseY()},%this.button.rect) ) {
+            %this.button.isOn = !%this.button.isOn;
+            %this.Think();
+    }
+
+    %this.hour = math.fMod(%this.hour + %dt * 2.0, 24.0);
+    if (math.floor(%this.hour) != %this.lasthour) {
+        %this.lasthour = math.floor(%this.hour);
+    }
+        %this.Think();
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_RenderDebugText(%this.renderer, 0, 10, " Simple Button On Off AI:" SPC %this.ai.LastResult );
+    SDL_RenderDebugText(%this.renderer, 0, 20, sprintf( " Time: %.0f",%this.hour ));
+}
+//----------------------------------------------------------------------
+function  OnOffAI::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) { }
+function  OnOffAI::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  OnOffAI::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+

@@ -104,6 +104,14 @@ inline ConsoleVector operator /= ( ConsoleVector& v1, const ConsoleVector& v2)  
 
 inline bool operator == ( ConsoleVector& v1, const ConsoleVector& v2)  { return Vec4Equal(v1,v2); }
 
+inline ConsoleVector getRectCentered(const ConsoleVector& v)  {
+
+    ConsoleVector result = v;
+    result.points[0] -= v.points[2] / 2.0;
+    result.points[1] -= v.points[3] / 2.0;
+    return result;
+}
+
 inline bool pointInRect(const ConsoleVector& pt, const ConsoleVector& v)  {
     return (
            pt.points[0] >= v.points[0]

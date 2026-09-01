@@ -1,5 +1,5 @@
 function createBlank(%renderer, %window) {
-    %obj = new ScriptGroup() {
+    %obj = new Group() {
         class = "Blank";
         TypeS32 renderer = %renderer;
         TypeS32 window   = %window;

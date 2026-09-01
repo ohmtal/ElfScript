@@ -370,199 +370,6 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  PointStorageObject : public SimObject {
-  public:
-   /** --- ConsoleVector getPosVec ---
-    * get the position as Vector 
-    * @return ConsoleVector
-    */
-      function getPosVec();
-   /** --- void setPosVec ---
-    * set the position by Vector (String)
-    */
-      function setPosVec( ConsoleVector vector );
-   /** --- void setPos ---
-    * Set position by method 
-    */
-      function setPos( float x, float y, float z=0.f, float w=0.f );
-   /** --- void normalizeXZ ---
-    * normalize the current position
-    */
-      function normalizeXZ();
-   /** --- F32 getLen ---
-    * len of current position
-    * @return F32
-    */
-      function getLen();
-   /** --- bool setPoint ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
-   /** --- bool setPoint3 ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint3( uint index, float x, float y, float z );
-   /** --- bool setPoint2 ---
-    * Set a  point at index in the point storage.
-    * @return bool
-    */
-      function setPoint2( uint index, float x, float y );
-   /** --- void getPointByReference ---
-    * get the point at index  by Reference from 2-4 Variables
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
-   /** --- void setPointByReference ---
-    * set the point at index  by Reference to 2-4 Variables
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
-   /** --- void getPointVecByReference ---
-    * get the point at index and push it into vecVar
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function getPointVecByReference( uint index, string vecVar );
-   /** --- void setPointVecByReference ---
-    * use the data from vecVar to save a point at index
-    * NOTE: the variables must exists before this is called it does NOT create them.
-    */
-      function setPointVecByReference( uint index, string vecVar );
-   /** --- F32 getPointX ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointX( uint index );
-   /** --- F32 getPointY ---
-    * get the point.points[0] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointY( uint index );
-   /** --- F32 getPointZ ---
-    * get the point.points[2] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointZ( uint index );
-   /** --- F32 getPointW ---
-    * get the point.points[3] from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointW( uint index );
-   /** --- bool setPointX ---
-    * set the point.points[0] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointX( uint index, float value );
-   /** --- bool setPointY ---
-    * set the point.points[1] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointY( uint index, float value );
-   /** --- bool setPointZ ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointZ( uint index, float value );
-   /** --- bool setPointW ---
-    * set the point.points[2] from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointW( uint index, float value );
-   /** --- ConsoleVector getPointVec ---
-    * get the point from the point storage at index as Vector (String)
-    * @return ConsoleVector
-    */
-      function getPointVec( uint index );
-   /** --- bool setPointVec ---
-    * set the point in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPointVec( uint index, ConsoleVector vec4 );
-   /** --- String getPoint2Vec ---
-    * get the point xy from the point storage at index as Vector (String)
-    * @return String
-    */
-      function getPoint2Vec( uint index );
-   /** --- bool setPoint2Vec ---
-    * set the point xy in the Point Storage at index by Vector (String)
-    * @return bool
-    */
-      function setPoint2Vec( uint index, String strVector );
-   /** --- bool storePoint ---
-    * store the current values x,y,z,w, to the point storage
-    * @return bool
-    */
-      function storePoint( uint index );
-   /** --- bool fetchPoint ---
-    * fetch the point from the point storage at index to the current values x,y,z,w
-    * @return bool
-    */
-      function fetchPoint( uint index );
-   /** --- bool applyMathOnPoints ---
-    * Apply a Math expression on point Storage.
-    * expected format: "x+5; y*2; z; w" separated by ';'
-    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
-    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
-    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
-    *   normalizeXY => applyMathOnPoints("normalizeXY()");
-    * @return bool
-    */
-      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   TypeVector point;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float z;
-   /*!
-    */
-   float w;
-   /*!
-   alias for z
-   
-    */
-   float width;
-   /*!
-   alias for w - yes w.
-   
-    */
-   float height;
-   /*!
-   alias for x
-   
-    */
-   float r;
-   /*!
-   alias for y
-   
-    */
-   float g;
-   /*!
-   alias for z
-   
-    */
-   float b;
-   /*!
-   alias for w
-   
-    */
-   float a;
-   /*!
-   Set the storage size (how many points we can work with) Max:1000000.
-   
-    */
-   uint storageSize;
-};
 /*!
 @brief A collection of SimObjects.
 It is often necessary to keep track of an arbitrary set of SimObjects. For instance, Torque's networking code needs to not only keep track of the set of objects which need to be ghosted, but also the set of objects which must <i>always</i> be ghosted. It does this by working with two sets. The first of these is the RootGroup (which is actually a SimGroup) and the second is the GhostAlwaysSet, which contains objects which must always be ghosted to the client.
@@ -740,6 +547,12 @@ class  SimGroup : public SimSet {
    // --- Group: Object ---
    // --- Group: Persistence ---
 };
+class  Group : public SimGroup {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
 /*!
 @brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.
 @tsexample
@@ -797,12 +610,6 @@ class  ScriptObject : public SimObject {
    // --- Group: Persistence ---
 };
 class  Object : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Persistence ---
-};
-class  Group : public SimGroup {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
@@ -1690,6 +1497,199 @@ function Message::onRemove(%this)
    // --- Group: Object ---
    // --- Group: Persistence ---
 };
+class  PointStorageObject : public SimObject {
+  public:
+   /** --- ConsoleVector getPosVec ---
+    * get the position as Vector 
+    * @return ConsoleVector
+    */
+      function getPosVec();
+   /** --- void setPosVec ---
+    * set the position by Vector (String)
+    */
+      function setPosVec( ConsoleVector vector );
+   /** --- void setPos ---
+    * Set position by method 
+    */
+      function setPos( float x, float y, float z=0.f, float w=0.f );
+   /** --- void normalizeXZ ---
+    * normalize the current position
+    */
+      function normalizeXZ();
+   /** --- F32 getLen ---
+    * len of current position
+    * @return F32
+    */
+      function getLen();
+   /** --- bool setPoint ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
+   /** --- bool setPoint3 ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint3( uint index, float x, float y, float z );
+   /** --- bool setPoint2 ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint2( uint index, float x, float y );
+   /** --- void getPointByReference ---
+    * get the point at index  by Reference from 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void setPointByReference ---
+    * set the point at index  by Reference to 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void getPointVecByReference ---
+    * get the point at index and push it into vecVar
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointVecByReference( uint index, string vecVar );
+   /** --- void setPointVecByReference ---
+    * use the data from vecVar to save a point at index
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointVecByReference( uint index, string vecVar );
+   /** --- F32 getPointX ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.points[2] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.points[3] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.points[0] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.points[1] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
+   /** --- ConsoleVector getPointVec ---
+    * get the point from the point storage at index as Vector (String)
+    * @return ConsoleVector
+    */
+      function getPointVec( uint index );
+   /** --- bool setPointVec ---
+    * set the point in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPointVec( uint index, ConsoleVector vec4 );
+   /** --- String getPoint2Vec ---
+    * get the point xy from the point storage at index as Vector (String)
+    * @return String
+    */
+      function getPoint2Vec( uint index );
+   /** --- bool setPoint2Vec ---
+    * set the point xy in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPoint2Vec( uint index, String strVector );
+   /** --- bool storePoint ---
+    * store the current values x,y,z,w, to the point storage
+    * @return bool
+    */
+      function storePoint( uint index );
+   /** --- bool fetchPoint ---
+    * fetch the point from the point storage at index to the current values x,y,z,w
+    * @return bool
+    */
+      function fetchPoint( uint index );
+   /** --- bool applyMathOnPoints ---
+    * Apply a Math expression on point Storage.
+    * expected format: "x+5; y*2; z; w" separated by ';'
+    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
+    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
+    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
+    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+    * @return bool
+    */
+      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   TypeVector point;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float z;
+   /*!
+    */
+   float w;
+   /*!
+   alias for z
+   
+    */
+   float width;
+   /*!
+   alias for w - yes w.
+   
+    */
+   float height;
+   /*!
+   alias for x
+   
+    */
+   float r;
+   /*!
+   alias for y
+   
+    */
+   float g;
+   /*!
+   alias for z
+   
+    */
+   float b;
+   /*!
+   alias for w
+   
+    */
+   float a;
+   /*!
+   Set the storage size (how many points we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
+};
 class  ValueStorageObject : public SimObject {
   public:
    /** --- F64 getFloat ---
@@ -1752,12 +1752,17 @@ class  NeuralNetObject : public SimObject {
     * load network and check parameter to match the loaded data.
     * @return bool
     */
-      function Load( string filename, int inputs, int hidden_layers, int hidden_neuros, int outputs );
+      function Load( string filename, int inputs=0, int hidden_layers=0, int hidden_neuros=0, int outputs=0 );
    /** --- bool Save ---
     * Save a network to file
     * @return bool
     */
       function Save( string filename );
+   /** --- bool WarmUP ---
+    * Run with empty input to warmup the network
+    * @return bool
+    */
+      function WarmUP();
    /** --- bool Run ---
     * Run with your input data and set output data
     * @return bool
@@ -1818,6 +1823,16 @@ class  NeuralNetObject : public SimObject {
     * @return bool
     */
       function setOutVec( int index, ConsoleVector value );
+   /** --- void setActivationHidden ---
+    * Sets the hidden layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationHidden( int type );
+   /** --- void setActivationOutput ---
+    * Sets the output layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationOutput( int type );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Persistence ---
@@ -3725,6 +3740,11 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
+   /** --- ConsoleVector getRectCentered ---
+    * return a centered rect
+    * @return ConsoleVector
+    */
+      function getRectCentered( ConsoleVector vec );
    /** --- void Vec4Add ---
     * v1 = v1 + v2
     */
@@ -4332,6 +4352,13 @@ namespace Global {
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
+  CANVAS_HEIGHT = 200.0
+  CANVAS_WIDTH = 250.0
+  UPDATE_TIME = 0.05
+  PIXEL_SIZE = 4.0
+  VECTOR = TypeVector
+  FLOAT = TypeF32
+  INT = TypeS32
   PIXELS_VERSION = "0.260818"
   MAX_BLOCK_SIZE = 48
   SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
@@ -4342,6 +4369,7 @@ namespace Global {
   SDL_BLENDOPERATION_MINIMUM = 4
   SDL_BLENDOPERATION_SUBTRACT = 2
   SDL_BLENDMODE_BLEND_PREMULTIPLIED = 16
+  INITAL_COUNT = 50
   SDL_BLENDMODE_NONE = 0
   SDL_SCALEMODE_PIXELART = 2
   SDL_SCALEMODE_LINEAR = 1
@@ -4375,6 +4403,7 @@ namespace Global {
   SDL_PIXELFORMAT_XRGB8888 = 370546692
   SDL_TEXTUREACCESS_STREAMING = 1
   SDL_WINDOW_NOT_FOCUSABLE = 2147483648
+  STRING = TypeString
   SDL_WINDOW_METAL = 536870912
   SDL_WINDOW_VULKAN = 268435456
   SDL_WINDOW_FILL_DOCUMENT = 2097152
@@ -4720,5 +4749,5 @@ namespace Global {
   SDL_SCANCODE_RIGHTBRACKET = 48
   SDL_KMOD_CAPS = 8192
   SDL_KMOD_SCROLL = 32768
---- End of Dump (388 items) ---
+--- End of Dump (397 items) ---
 */
