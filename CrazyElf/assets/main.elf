@@ -1,4 +1,4 @@
-$MODULES = "Pixels NativSDL blank StarField StarField2 PlayGround StreetAI OnOffAI Squash";
+$MODULES = "MelodyMaker Pixels NativSDL blank StarField StarField2 PlayGround StreetAI OnOffAI Squash";
 
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};
@@ -189,6 +189,11 @@ function onInit() {
     };
     return $Main.init();
 
+}
+// -----------------------------------------------------------------------------
+// see also:  SDL_StartTextInput(%this.window); / SDL_StopTextInput(%this.window);
+function onSDLTextInputEvent(%text) {
+    if (isObject($Main.module)) $Main.module.onSDLTextInputEvent(%text);
 }
 // -----------------------------------------------------------------------------
 function onSDLMouseWheelEvent(%wheelX, %wheelY) {

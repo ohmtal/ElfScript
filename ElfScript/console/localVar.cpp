@@ -290,9 +290,10 @@ DefineEngineFunction(whereAmI, void,(),,"look up the function where i'am called 
 
 }
 // -----------------------------------------------------------------------------
-
-DefineEngineFunction(toArray,S32, (const char* varName, bool debugOut),(false)
-                     ,"Convert an string content of varname to an set typed of variables with varName[0..count] fields\n"
+// see also toObject (previous toArray)
+DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(false),
+                     "WARNING works only with Global Variable '$' !!!!!!\n"
+                     "Convert an string content of varname to an set typed of variables with varName[0..count] fields\n"
                      "tab separated (default) or space separated"
                      "@return the count of variables"
 ) {
@@ -300,7 +301,7 @@ DefineEngineFunction(toArray,S32, (const char* varName, bool debugOut),(false)
     const char* text = ElfScript::getLocalString(varName);
 
     if (!text || text[0] == '\0') {
-        Con::errorf("Variable %s is empty and cant be converted to object", varName);
+        // Con::errorf("Variable %s is empty and cant be converted to array", varName);
         return 0;
     }
 
@@ -342,5 +343,48 @@ DefineEngineFunction(toArray,S32, (const char* varName, bool debugOut),(false)
 
 
     return count;
+}
+// ElfScript 0.7f - see also
+DefineEngineFunction(explodeObject,S32, (const char* text),
+                     ,"Convert an string to Object with v[] fields\n"
+                     "tab separated (default) or space separated\n"
+                     "WARNING you need to delete the object after it's not longer needed."
+) {
+    if (!text || text[0] == '\0') {
+        Con::errorf("Empty text cant be converted to object");
+        return 0;
+    }
+
+    const char* set = "\t\n";
+    // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+    U32 count =  StringUnit::getUnitCount( text, "\t\n" );
+    // we only got no or one token - switch to space / tab separated
+    if (count < 2) {
+        count =  StringUnit::getUnitCount( text, " \t\n" );
+        set = " \t\n";
+    }
+
+    // nothing - is empty ?
+    if (count < 1) {
+        Con::errorf("Empty text cant be converted to object");
+        return 0;
+    }
+
+    SimObject* obj = new SimObject();
+    char buff[32];
+    StringTableEntry fieldNameEntry = nullptr;
+    for (U32 i = 0; i < count; i++) {
+        const char * token = StringUnit::getUnit( text, i, set );
+
+        dSprintf(buff,32,"v%d", i); //mhh or as array ?
+        fieldNameEntry = StringTable->insert( buff );
+
+        obj->setDataField(fieldNameEntry, nullptr, token);
+        // try to typeCast:
+        if (isInt(token)) obj->setDataFieldType(TypeS64, fieldNameEntry, nullptr );
+        else if (isFloat(token)) obj->setDataFieldType(TypeF64, fieldNameEntry, nullptr );
+    }
+    obj->registerObject();
+    return obj->getId();
 }
 

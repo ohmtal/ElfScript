@@ -21,9 +21,22 @@ namespace Audio{
         SDL_AudioSpec spec;
     };
 
+   struct Tone {
+        S32 midiNote;
+        F32 duration;
+        F32 amplitute = 0.2f;
+   };
 
+   struct ToneEntry {
+        S32 LineNumber = 0;
+        Tone tone = {0};
+   };
 
-    void UnloadWavData(WavData wavData);
+   typedef Vector<ToneEntry> Melody;
+   inline void UnloadMelody(Melody) {}
+   inline ElfResource::ElfStorage<Melody , UnloadMelody>  MelodyMap;
+   // -----------------
+   void UnloadWavData(WavData wavData);
     inline ElfResource::ElfStorage<WavData , UnloadWavData>  WaveDataMap;
 
 

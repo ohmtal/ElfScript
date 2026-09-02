@@ -281,6 +281,18 @@ DefineEngineFunction( SDL_SetWindowSize, bool, (S32 WindowID, S32 width, S32 hei
 }
 
 
+DefineEngineFunction(SDL_StartTextInput, bool, (S32 WindowID),, "start text input mode for input onSDLTextInputEvent(%text)"){
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return false;
+    return SDL_StartTextInput(window);
+}
+DefineEngineFunction(SDL_StopTextInput, bool, (S32 WindowID),, "STOP text input mode for input onSDLTextInputEvent(%text)"){
+    SDL_Window* window  = WindowMap.getValue(WindowID);
+    if (!window) return false;
+    return SDL_StopTextInput(window);
+}
+
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSize(SDL_Window *window, int *w, int *h);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSafeArea(SDL_Window *window, SDL_Rect *rect);
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAspectRatio(SDL_Window *window, float min_aspect, float max_aspect);

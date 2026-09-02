@@ -1018,6 +1018,8 @@ DefineEngineMethod( SimSet, getCount, S32, (),,
    return object->size();
 }
 
+
+
 //-----------------------------------------------------------------------------
 
 DEFINE_CALLIN( fnSimSet_getCountRecursive, getCountRecursive, SimSet, U32, ( SimSet* set ),,,
@@ -1138,6 +1140,60 @@ DefineEngineMethod( SimSet, acceptsAsChild, bool, ( SimObject* obj ),,
 {
    if( !obj )
       return false;
-   
+
    return object->acceptsAsChild( obj );
+}
+
+//-----------------------------------------------------------------------------
+// ElfScript 0.7 - Vector like bindings
+DefineEngineMethod( SimSet, size, S32, (),,
+                    "Get the number of objects contained in the set.\n"
+                    "@return The number of objects contained in the set." )
+{
+      return object->size();
+}
+DefineEngineMethod( SimSet, last, S32, (),,
+                    "Get the last object in the set.")
+{
+      if (object->size() < 1 ) return 0;
+      return object->last()->getId();
+}
+DefineEngineMethod( SimSet, first, S32, (),,
+                    "Get the first object in the set.")
+{
+      if (object->size() < 1 ) return 0;
+      return object->first()->getId();
+}
+
+DefineEngineMethod( SimSet, at, S32, (S32 index),,
+                    "Get the object ID at the specified index.\n"
+                    "@return The object ID, or 0 if index is out of bounds." )
+{
+      if (index < 0 || index >= object->size()) return 0;
+      return object->at(index)->getId();
+}
+
+DefineEngineMethod( SimSet, remove_at, void, (S32 index),,
+                    "Remove the object at the specified index from the set." )
+{
+      if (index < 0 || index >= object->size()) return;
+      SimObject *obj = object->at(index);
+      object->removeObject(obj);
+}
+
+DefineEngineMethod( SimSet, push_back, void, (S32 SimObjectId),,
+                    "push a object (ID!)to the end of the list")
+{
+      SimObject *obj = Sim::findObject( SimObjectId );
+      if (!obj) return ;
+      object->addObject(obj);
+}
+
+DefineEngineMethod( SimSet, pop_front, void, (),,
+                    "pop the first object")
+{
+      if (object->size() < 1 ) return;
+      SimObject *obj = object->first();
+      object->removeObject(obj);
+
 }

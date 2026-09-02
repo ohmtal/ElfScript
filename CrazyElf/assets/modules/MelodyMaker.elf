@@ -1,0 +1,281 @@
+//----------------------------------------------------------------------
+// Basic like Melody maker
+//----------------------------------------------------------------------
+// TODO:
+//  - [X] save / load << funny implementation :D
+//  - [X] max line length
+//  - [ ] cursor to change lines << using  %this.cursorPos == strpos of line, line
+// ------ not related -----
+//  - [ ] make editor a class
+//  - [ ] @engine: move Melody into it's own source out of SDL_audio?
+//----------------------------------------------------------------------
+function createMelodyMaker(%renderer, %window) {
+    %obj = new Group() {
+        class = "MelodyMaker";
+        // dynamic:
+        TypeString appName = "Melody Maker 0.92";
+
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+        TypeS32 wav = 0;
+        TypeS32 Lines = 0;
+        TypeS32 maxLines = 24;
+        TypeS32 maxLineLength = 80;
+        TypeVector EditorScale = {0.6, 0.8};
+        TypeVector EditorBounds = { 10, 10, $Global::ScreenSize.x - 20 , $Global::ScreenSize.y - 20 };
+        TypeF32 cursorCounter = 0.0;
+
+        TypeVector cursorPos = {0,0};
+
+        TypeU32 Melody = 0;
+        TypeBool debugParser = true;
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+function MelodyMaker::onAdd(%this) {
+    SDL_StartTextInput(%this.window);
+
+    // %this.add(%this.Lines = new Object() {
+    //     TypeU32 count = 0;
+    //     TypeU32 curLine = -1;
+    // });
+
+    %this.add(%this.Lines = new Group() {
+        // TypeU32 curLine = -1;
+    });
+
+    %this.Melody = MelodyBegin();
+
+    %this.maxLines = (%this.EditorBounds.height  / (10 * %this.EditorScale.y) ) - 1; //8+2
+
+    %this.maxLineLength = (%this.EditorBounds.width  / (8 * %this.EditorScale.x) ) - 2;
+
+
+    %this.addLine(sprintf("%s ready (%d x %d)",%this.appName, %this.maxLineLength ,%this.maxLines ));
+    %this.AddLine("");
+
+    return true;
+}
+//----------------------------------------------------------------------
+function MelodyMaker::OnRemove(%this) {
+    SDL_StopTextInput(%this.window);
+    Audio_UnLoadWav(%this.wav);
+    MelodyEnd(%this.melody);
+}
+//----------------------------------------------------------------------
+function MelodyMaker::RenderEditor(%this) {
+    SDL_SetRenderDrawColor(%this.renderer, 20,20,20);
+    SDL_RenderFillRect(%this.renderer,%this.EditorBounds);
+    SDL_SetRenderDrawColor(%this.renderer, 150,150,150);
+    SDL_RenderRect(%this.renderer,%this.EditorBounds);
+
+    SDL_SetRenderDrawColor(%this.renderer, 176, 191, 26); //acid green
+    SDL_SetRenderScale(%this.renderer, %this.EditorScale.x, %this.EditorScale.y);
+
+    // FIXME add a vector for charsize
+    %x = (%this.EditorBounds.x + 4.0) / %this.EditorScale.x;
+    %y = (%this.EditorBounds.y + 4.0) / %this.EditorScale.y;
+
+    %yOffset = 8 + 2; //Debug text is 8x8
+    %y = (%this.EditorBounds.y + 2.0) /  %this.EditorScale.x;
+    foreach(%lineObj in %this.Lines) {
+        SDL_RenderDebugText(%this.renderer, %x, %y,%lineObj.text);
+        %y += %yOffset;
+    }
+    %y -= %yOffset;
+    %x += (8 * strLen(%lineObj.text));
+
+    %this.cursorCounter += GetFrameTime();
+    if ( %this.cursorCounter > 0.5 ) {
+        if (%this.cursorCounter > 1.0) %this.cursorCounter-= 1.0;
+    } else {
+        SDL_RenderDebugText(%this.renderer, %x, %y,"_");
+    }
+
+
+
+    SDL_SetRenderScale(%this.renderer);
+}
+//----------------------------------------------------------------------
+function MelodyMaker::AppendText(%this, %text) {
+    if (%this.Lines.size() == 0) return;
+    %text = strupr(%text);
+
+
+
+    %cur = %this.Lines.last();
+    %cur.text = getSubStr( %cur.text @ %text, 0, %this.maxLineLength);
+
+}
+//----------------------------------------------------------------------
+function MelodyMaker::onBackSpacePressed(%this) {
+    if (%this.Lines.size() == 0) return;
+    %cur = %this.Lines.last();
+    %len = strLen(%cur.text);
+    if (%len == 0) return;
+    %cur.text = getSubStr(%cur.text, 0, %len-1);
+}
+
+//----------------------------------------------------------------------
+function MelodyMaker::parser(%this, %text) {
+
+    $p = trim(%text);
+    %count = explodeGlobal("$p", %this.debugParser); //like php explode ...
+    if (%count == 0) return;
+
+    switch$ ($p0) {
+        case "cls" : %this.Lines.clear();
+        case "list":
+            %str = MelodyList(%this.melody, $p1!$= "" ? $p1: -1, $p2!$= "" ? $p2: -1);
+            // echo(%str);
+            %lineCount = getRecordCount(%str);
+            for (%i in Range %lineCount) %this.AddLine(getRecord(%str, %i));
+        case "save" :
+            %result = false;
+            if ($p1 !$= ""){
+                %str = MelodyList(%this.melody);
+                if (%str !$= "") %result = SDL_SaveFile($p1,%str);
+            }
+            if (!%result) %this.AddLine("ERROR: SAVE FAILED");
+            else %this.AddLine(sprintf("SAVED TO %s", $p1));
+
+        case "LOAD" : //this merge ... use reset to clear first!
+            if ($p1 !$= ""){
+                %str = SDL_LoadFile($p1);
+            }
+            if (%str $= "") %this.AddLine("ERROR: LOAD FAILED");
+            else {
+                // hackfest ;)
+                %lineCount = getRecordCount(%str);
+                if (%lineCount > 0 ) {
+                    for (%i in Range %lineCount)  {
+                        %line = getRecord(%str, %i);
+                        print("line",%i, "is",%line);
+                        %this.schedule(%i*10, "parser", %line);
+                    }
+                    %this.AddLine("READY");
+                    // %this.schedule(%lineCount + 1000, "parser", "LIST");
+                }
+                else {
+                    %this.AddLine("ERROR: EMPTY FILE");
+                }
+            }
+
+        case "run" :
+            if (%this.wav > 0 ) Audio_UnLoadWav(%this.wav);
+            %this.wav = MelodyGen(%this.melody);
+            Audio_Play(%this.wav);
+        case "break":
+            if (%this.wav > 0 ) Audio_Stop(%this.wav);
+        case "reset":
+            %this.Lines.clear();
+             MelodyEnd(%this.melody);
+             %this.melody = MelodyBegin();
+             %this.addLine(sprintf("%s ready",%this.appName));
+        case "help":
+             %this.addLine("COMMANDS: cls, list [start,end], run, break, help, reset");
+             %this.addLine("DEF: linenumer notenumber [tonelen] [amplitude]");
+             %this.addLine("EXAMPLE: 10 62 0.1");
+        default:
+            if (math.Floor($p0) $= $p0) { //check it's a number but need string compare
+                if (%count == 1) {
+                    MelodyDel(%this.melody, $p0);
+                } else {
+                    if (math.Floor($p1) $= $p1) {
+                        MelodyAdd(%this.melody, {$p0,$p1,$p2,$p3}); //castet to floats so strings are not problem
+                    } else {
+                        %this.addLine(sprintf( "PARSE ERROR: PARAMETER 1 IS NOT A NUMBER: %s", %text));
+                    }
+
+                }
+            } else {
+                %this.addLine(sprintf("INVALID COMMAND: %s", $p0));
+            }
+    }
+
+    // clean the array
+    for (%i in Range %count) {
+        $p[%i] = "";
+    }
+}
+//----------------------------------------------------------------------
+function MelodyMaker::onReturnPressed(%this) {
+    if (%this.Lines.size() > 0) {
+        %this.parser(%this.Lines.last().text);
+    }
+
+
+    %this.AddLine("");
+}
+//----------------------------------------------------------------------
+function MelodyMaker::AddLine(%this, %text) {
+    %text = strupr(getSubStr( %text, 0, %this.maxLineLength));
+    if (%this.Lines.size() > 0) {
+        %cur = %this.Lines.last();
+        if (%cur.text $= "") return;
+    }
+
+    if (%this.Lines.size() >= %this.maxLines) %this.Lines.pop_Front();
+
+
+    %this.Lines.push_back(new Object() { TypeString text = %text; });
+}
+//----------------------------------------------------------------------
+function MelodyMaker::test(%this) {
+    printSeparator();
+    $melody = MelodyBegin();
+    MelodyAdd($melody, {10, 77}); // will not be used
+    MelodyAdd($melody, {10, 60}); // overwrite test
+    MelodyAdd($melody, {20, 64,0.4}); // overwrite test
+    MelodyAdd($melody, {30, 0});  // silence
+    MelodyAdd($melody, {40, 60});
+    MelodyList($melody); printSeparator();
+    MelodyDel($melody, 30);
+    MelodyDel($melody, 40);
+    MelodyList($melody); printSeparator();
+    MelodyAdd($melody, {15,0});  // silence
+    MelodyList($melody);
+    MelodyRun($melody);
+
+    Audio_UnLoadWav(%this.wav);
+    %this.wav = MelodyGen($melody);
+
+    MelodyEnd($melody);
+
+}
+//----------------------------------------------------------------------
+function MelodyMaker::Render(%this) {
+    if (!%this.renderer) return;
+    // SDL_SetRenderDrawColor(%this.renderer, 80, 100, 10);
+    SDL_SetRenderDrawColor(%this.renderer, 10, 10, 80);
+    SDL_RenderClear(%this.renderer);
+
+    %this.RenderEditor();
+
+}
+//----------------------------------------------------------------------
+function MelodyMaker::onSDLTextInputEvent(%this, %text) {
+    // print("New Text:", %text);
+    %this.AppendText(%text);
+}
+//----------------------------------------------------------------------
+function  MelodyMaker::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+
+    if (%isDown) {
+        switch (%scancode) {
+            case SDL_SCANCODE_RETURN: %this.onReturnPressed();
+            case SDL_SCANCODE_KP_ENTER: %this.onReturnPressed();
+            case SDL_SCANCODE_BACKSPACE: %this.onBackSpacePressed();
+
+        }
+
+    }
+
+}
+function  MelodyMaker::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function  MelodyMaker::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+

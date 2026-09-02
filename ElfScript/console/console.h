@@ -1067,7 +1067,7 @@ namespace Con
    ///
    /// @param  name  Name of the variable.
    /// @param  def   Default value to supply if no matching variable is found.
-   F32  getFloatVariable(const char* name, F32 def = .0f);
+   F32  getFloatVariable(const char* name, F32 def = 0.0f);
 
    /// @}
 

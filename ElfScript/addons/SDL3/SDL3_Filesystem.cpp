@@ -122,6 +122,7 @@ DefineEngineFunction(SDL_RenamePath, bool, (const char *oldpath, const char *new
 DefineEngineFunction(SDL_RemovePath, bool, (const char *path),,"rename a path/file.") {
     return SDL_RemovePath(path);
 }
+
 // -----------------------------------------------------------------------------
 DefineEngineFunction(SDL_GetUserFolder, const char* , (S32 sdl_folder),,"get the user folder. see also SDL_FOLDER_") {
     return SDL_GetUserFolder((SDL_Folder)sdl_folder);
@@ -144,6 +145,17 @@ DefineEngineFunction(SDL_GetPrefPath,  String , (const char* org, const char* ap
 
     return resultPath;
 }
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_SaveFile, bool, (const char *path, const char* data, U32 size),(0),"save data to a file.") {
+    if (size == 0) size = dStrlen(data);
+    return SDL_SaveFile(path, data, (size_t)size);
+}
 
+DefineEngineFunction(SDL_LoadFile, const char*, (const char *path),,"load data from a file.") {
+    size_t size = 0;
+    void* data = SDL_LoadFile(path, &size);
+    if (size == 0 || !data) return "";
+    return (const char*)data;
+}
 
 } //namespace

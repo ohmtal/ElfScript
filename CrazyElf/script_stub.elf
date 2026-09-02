@@ -504,6 +504,40 @@ class  SimSet : public SimObject {
     * @return bool
     */
       function acceptsAsChild( SimObject obj );
+   /** --- S32 size ---
+    * Get the number of objects contained in the set.
+    * @return The number of objects contained in the set.
+    * @return S32
+    */
+      function size();
+   /** --- S32 last ---
+    * Get the last object in the set.
+    * @return S32
+    */
+      function last();
+   /** --- S32 first ---
+    * Get the first object in the set.
+    * @return S32
+    */
+      function first();
+   /** --- S32 at ---
+    * Get the object ID at the specified index.
+    * @return The object ID, or 0 if index is out of bounds.
+    * @return S32
+    */
+      function at( int index );
+   /** --- void remove_at ---
+    * Remove the object at the specified index from the set.
+    */
+      function remove_at( int index );
+   /** --- void push_back ---
+    * push a object (ID!)to the end of the list
+    */
+      function push_back( int SimObjectId );
+   /** --- void pop_front ---
+    * pop the first object
+    */
+      function pop_front();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
    // --- Group: Persistence ---
@@ -1748,6 +1782,11 @@ class  NeuralNetObject : public SimObject {
     * @return bool
     */
       function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
+   /** --- bool Copy ---
+    * deep copy the of a other network
+    * @return bool
+    */
+      function Copy( uint parentObjID );
    /** --- bool Load ---
     * load network and check parameter to match the loaded data.
     * @return bool
@@ -3247,12 +3286,6 @@ namespace Global {
     * @return const char*
     */
       function getTimestamp();
-   /** --- S32 toObject ---
-    * Convert an string to Object with v[] fields
-    * tab separated (default) or space separated
-    * @return S32
-    */
-      function toObject( string text );
    /** --- void backtrace ---
     * @brief Prints the scripting call stack to the console log.
     * Used to trace functions called from within functions. Can help discover what functions were called (and not yet exited) before the current point in scripts.
@@ -3523,12 +3556,20 @@ namespace Global {
     * look up the function where i'am called from
     */
       function whereAmI();
-   /** --- S32 toArray ---
+   /** --- S32 explodeGlobal ---
+    * WARNING works only with Global Variable '$' !!!!!!
     * Convert an string content of varname to an set typed of variables with varName[0..count] fields
     * tab separated (default) or space separated@return the count of variables
     * @return S32
     */
-      function toArray( string varName, bool debugOut=false );
+      function explodeGlobal( string varName, bool debugOut=false );
+   /** --- S32 explodeObject ---
+    * Convert an string to Object with v[] fields
+    * tab separated (default) or space separated
+    * WARNING you need to delete the object after it's not longer needed.
+    * @return S32
+    */
+      function explodeObject( string text );
    /** --- void dumpStringMemStats ---
     * @brief Dumps information about String memory usage
     * @ingroup Debugging
@@ -3992,6 +4033,16 @@ namespace Global {
     * @return String
     */
       function SDL_GetPrefPath( string org, string app );
+   /** --- bool SDL_SaveFile ---
+    * save data to a file.
+    * @return bool
+    */
+      function SDL_SaveFile( string path, string data, uint size=0 );
+   /** --- const char* SDL_LoadFile ---
+    * load data from a file.
+    * @return const char*
+    */
+      function SDL_LoadFile( string path );
    /** --- void SDL_RENDERER_INIT ---
     * initialize the ElfSDL3::SDL3_Render System
     */
@@ -4045,6 +4096,16 @@ namespace Global {
     * @return bool
     */
       function SDL_SetWindowSize( int WindowID, int width, int height );
+   /** --- bool SDL_StartTextInput ---
+    * start text input mode for input onSDLTextInputEvent(%text)
+    * @return bool
+    */
+      function SDL_StartTextInput( int WindowID );
+   /** --- bool SDL_StopTextInput ---
+    * STOP text input mode for input onSDLTextInputEvent(%text)
+    * @return bool
+    */
+      function SDL_StopTextInput( int WindowID );
    /** --- bool SDL_SetWindowMinimumSize ---
     * Set the Window minimum Size
     * @return bool
@@ -4346,21 +4407,53 @@ namespace Global {
     * @return F32
     */
       function Audio_GetMasterVolume();
+   /** --- S32 TestMidi ---
+    * make a midi test ....
+    * @return S32
+    */
+      function TestMidi();
+   /** --- S32 MelodyBegin ---
+    * create a melody maker
+    * @return S32
+    */
+      function MelodyBegin();
+   /** --- bool MelodyAdd ---
+    * data: {(int)LINENUMBER, (int)MIDITONE, (float) duration=0.2f, (float)amplitude=0.2f}
+    * add a tone at line number - in line exists it will be overwritten
+    * @return bool
+    */
+      function MelodyAdd( int MelodyID, ConsoleVector data );
+   /** --- bool MelodyDel ---
+    * Delete tone at linenumber
+    * @return bool
+    */
+      function MelodyDel( int MelodyID, int lineNumber );
+   /** --- String MelodyList ---
+    * list the melody
+    * @return String
+    */
+      function MelodyList( int MelodyID, int lineNumberStart=-1, int lineNumberEnd=-1 );
+   /** --- bool MelodyRun ---
+    * run = play the melody
+    * @return bool
+    */
+      function MelodyRun( int MelodyID, float gain=1.0 );
+   /** --- S32 MelodyGen ---
+    * gen = generate wavData from this melody
+    * @return S32
+    */
+      function MelodyGen( int MelodyID );
+   /** --- bool MelodyEnd ---
+    * remove this melody - if you used MelodyGen: the wave data will not be touched
+    * @return bool
+    */
+      function MelodyEnd( int MelodyID );
 };
 //------------------------------------------------------------------
 //                  C O N S T A N T S 
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
-  CANVAS_HEIGHT = 200.0
-  CANVAS_WIDTH = 250.0
-  UPDATE_TIME = 0.05
-  PIXEL_SIZE = 4.0
-  VECTOR = TypeVector
-  FLOAT = TypeF32
-  INT = TypeS32
-  PIXELS_VERSION = "0.260818"
-  MAX_BLOCK_SIZE = 48
   SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
   SDL_BLENDFACTOR_DST_ALPHA = 9
   SDL_BLENDFACTOR_SRC_COLOR = 3
@@ -4369,7 +4462,6 @@ namespace Global {
   SDL_BLENDOPERATION_MINIMUM = 4
   SDL_BLENDOPERATION_SUBTRACT = 2
   SDL_BLENDMODE_BLEND_PREMULTIPLIED = 16
-  INITAL_COUNT = 50
   SDL_BLENDMODE_NONE = 0
   SDL_SCALEMODE_PIXELART = 2
   SDL_SCALEMODE_LINEAR = 1
@@ -4403,7 +4495,6 @@ namespace Global {
   SDL_PIXELFORMAT_XRGB8888 = 370546692
   SDL_TEXTUREACCESS_STREAMING = 1
   SDL_WINDOW_NOT_FOCUSABLE = 2147483648
-  STRING = TypeString
   SDL_WINDOW_METAL = 536870912
   SDL_WINDOW_VULKAN = 268435456
   SDL_WINDOW_FILL_DOCUMENT = 2097152
@@ -4688,7 +4779,6 @@ namespace Global {
   SDL_SCANCODE_F22 = 113
   SDL_SCANCODE_LEFTBRACKET = 47
   SDL_SCANCODE_KP_D = 191
-  MIN_BLOCK_SIZE = 8
   SDL_COLORSPACE_BT709_LIMITED = 554697761
   SDL_SCANCODE_MEDIA_PLAY = 262
   SDL_SCANCODE_KP_E = 192
@@ -4749,5 +4839,5 @@ namespace Global {
   SDL_SCANCODE_RIGHTBRACKET = 48
   SDL_KMOD_CAPS = 8192
   SDL_KMOD_SCROLL = 32768
---- End of Dump (397 items) ---
+--- End of Dump (385 items) ---
 */

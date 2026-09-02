@@ -36,6 +36,12 @@
     , ( wheelX, wheelY)
     ,"Event triggered when mouse wheel is moved" );
 
+    IMPLEMENT_GLOBAL_CALLBACK(onSDLTextInputEvent,void
+    , (const char* text)
+    , ( text)
+    ,"Event triggered when text input is enabled" );
+
+
 namespace ElfSDL3 {
 
 namespace {
@@ -61,6 +67,8 @@ namespace {
     float s_MouseDeltaY = 0.0f;
     float s_MouseWheelX = 0.0f;
     float s_MouseWheelY = 0.0f;
+
+    String s_TextInput  = "";
 
     // --- init ----
     bool s_initialized = false; //NOTE not used at the moment
@@ -150,8 +158,13 @@ void onEvent(const SDL_Event& event) {
         case SDL_EVENT_KEY_DOWN:
         {
             _onKeyEvent(event);
+            break;
         }
-        break;
+        case  SDL_EVENT_TEXT_INPUT: {
+            s_TextInput = event.text.text;
+            onSDLTextInputEvent_callback(s_TextInput.c_str());
+            break;
+        }
     }
 
 }

@@ -340,7 +340,7 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
             return;
       }
 
-      F64 targetValue = 0.f;
+      F64 targetValue = 0.0;
 #ifdef  ENABLE_CONSOLE_VECTOR
        if (srcValue->type == cvVector) {
              targetValue = (F64)srcValue->v.points[componentIndex];
@@ -2036,10 +2036,10 @@ handle_OP_INC: {
       ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
       if ( stackRef.type == ConsoleValueType::cvFloat) {
             // stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
-            stackRef.f += 1.0f;
+            stackRef.f += 1.0;
       } else {
-            stackRef.setFastFloat(stackRef.getFloat() + 1.0f);
-            // stackRef.setFloat(stackRef.getFloat() + 1.0f);
+            stackRef.setFastFloat(stackRef.getFloat() + 1.0);
+            // stackRef.setFloat(stackRef.getFloat() + 1.0);
       }
 
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) + 1.0);
@@ -2053,10 +2053,10 @@ handle_OP_DEC: { // 0.5a OP_DEC fast path
       ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
       if ( stackRef.type == ConsoleValueType::cvFloat) {
             // stackRef.setFastFloat(stackRef.getFastFloat() + 1.0);
-            stackRef.f -= 1.0f;
+            stackRef.f -= 1.0;
       } else {
-            stackRef.setFastFloat(stackRef.getFloat() - 1.0f);
-            // stackRef.setFloat(stackRef.getFloat() - 1.0f);
+            stackRef.setFastFloat(stackRef.getFloat() - 1.0);
+            // stackRef.setFloat(stackRef.getFloat() - 1.0);
       }
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) - 1.0);
       DISPATCH();
@@ -2105,7 +2105,7 @@ handle_OP_ASSIGN_DIV: {
       ConsoleValue& stackRef = Script::gEvalState.currentRegisterArray->values[reg];
       ConsoleValue& extrVal = stack[_STK];
       F64 f = extrVal.getFloat();
-      if (f == 0.0f) {
+      if (f == 0.0) {
             Con::errorf("Error division by zero!!");
             DISPATCH();
       }
