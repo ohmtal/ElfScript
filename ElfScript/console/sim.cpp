@@ -50,15 +50,6 @@
 
 
 
-namespace Sim
-{
-
-   //XXTH auto garbageCollection
-#ifdef ELFSCRIPT_GARBAGECOLLECTION
-   ImplementNamedSet(GarbageCollectionSet); //XXTH
-#endif
-}
-
 //-----------------------------------------------------------------------------
 // Console Functions
 //-----------------------------------------------------------------------------

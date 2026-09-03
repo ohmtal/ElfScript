@@ -1,0 +1,59 @@
+// clone is a bit slower, i guess because i set all values
+
+#define COUNT 100000
+
+
+$useClone = false;
+for (%i in range $Main::argc) {
+    if ($Main::argv[%i] $= "clone" ) {
+      $useClone = true;
+      break;
+    }
+}
+
+// // dumpLocals();
+
+
+print("This i a different test - creating objects to a list! useClone = ", $useClone);
+
+%baseData = new Object() {
+    TypeString str = "myString";
+    TypeF64     d   = 199.99;
+    TypeS64     l   = 0;
+    TypeVector  v   = {math.randomf(), math.randomf(), math.randomf(), math.randomf()};
+};
+
+// %group = new Group();
+%group = new Simset();
+// using simobject does hang on the end if list is not deleted manually
+
+
+for (%i in range COUNT) {
+    if ($useClone) {
+        %newData = %baseData.clone();
+        %newData.d = math.randomf();
+        %newData.l = %i;
+        %newData.v = {math.randomf(), math.randomf(), math.randomf(), math.randomf()};
+
+    } else {
+        %newData = new Object() {
+            TypeString str = "myString";
+            TypeF64     d   =  math.randomf();
+            TypeS64     l   = %i;
+            TypeVector  v   = {math.randomf(), math.randomf(), math.randomf(), math.randomf()};
+        };
+    }
+
+    %group.push_back(%newData);
+}
+
+forEach(%obj in %group) {
+    printf("Object #%d %f %s", %obj.l, %obj.d, %obj.v);
+}
+
+
+
+// delete is manually else we stuck in a delete notify loop of each object..
+print("Cleanup...");
+%group.delete();
+print("Done...");

@@ -552,33 +552,12 @@ void init()
    initEventQueue();
    initRoot();
 
-#ifdef ELFSCRIPT_GARBAGECOLLECTION
-   InstantiateNamedSet(GarbageCollectionSet); //XXTH
-#endif
-
    SimPersistID::init();
 }
 
 void shutdown()
 {
    sgIsShuttingDown = true;
-
-#ifdef ELFSCRIPT_GARBAGECOLLECTION
-   //XXTH auto GarbageCollection
-   if (Sim::getGarbageCollectionSet())
-   {
-#ifdef TORQUE_DEBUG
-         dPrintf(" * Shutdown Script GarbageCollection on %d Object(s).\n", Sim::getGarbageCollectionSet()->size());
-#endif
-         while (Sim::getGarbageCollectionSet()->size() > 0)
-         {
-               SimObject* obj = Sim::getGarbageCollectionSet()->at(0);
-               Sim::getGarbageCollectionSet()->removeObject(obj);
-               obj->deleteObject();
-         }
-   }
-#endif
-
 
    shutdownRoot();
    shutdownEventQueue();

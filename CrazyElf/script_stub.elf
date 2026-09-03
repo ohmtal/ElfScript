@@ -1876,6 +1876,15 @@ class  NeuralNetObject : public SimObject {
    // --- Group: Object ---
    // --- Group: Persistence ---
 };
+class  ConsoleLogObject : public SimObject {
+  public:
+      /*! Called when a log line is pushed
+Level: Normal=0, Warning=1, Error=2; Info=3; Debug=4 */
+      void onLog( string text, uint level );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
 /*!
 @brief Provides access to a zip file.
 A ZipObject add, delete and extract files that are within a zip archive.  You may also read and write directly to the files within the archive by obtaining a StreamObject for the file.@tsexample
@@ -2992,6 +3001,13 @@ namespace Global {
     * @ingroup Logging
     */
       function error( string message... );
+   /** --- void info ---
+    * @brief Logs an info message to the console.
+    * Concatenates all given arguments to a single string and prints the string to the console as an error message (in the in-game console, these will show up using a red font by default). A newline is added automatically after the text.
+    * @param message Any number of string arguments.
+    * @ingroup Logging
+    */
+      function info( string message... );
    /** --- void debugv ---
     * @brief Logs the value of the given variable to the console.
     * Prints a string of the form "<variableName> = <variable value>" to the console.
@@ -3549,7 +3565,7 @@ namespace Global {
     */
       function varDump( string variableName );
    /** --- void dumpLocals ---
-    * dump local variables
+    * dump local and global  variables
     */
       function dumpLocals();
    /** --- void whereAmI ---
@@ -3570,6 +3586,10 @@ namespace Global {
     * @return S32
     */
       function explodeObject( string text );
+   /** --- void TEST_VAR_CREATE ---
+    * must be test inside and outside a function!
+    */
+      function TEST_VAR_CREATE();
    /** --- void dumpStringMemStats ---
     * @brief Dumps information about String memory usage
     * @ingroup Debugging
@@ -3945,6 +3965,11 @@ namespace Global {
     * @return bool
     */
       function SDL_IsMouseButtonUp( int button );
+   /** --- String SDL_GetInputText ---
+    * Return the current input text only valid at the same frame see also: SDL_StartTextInput
+    * @return String
+    */
+      function SDL_GetInputText();
    /** --- F32 SDL_GetMouseDeltaX ---
     * Get mouse movement delta X for this frame.
     * @return F32
@@ -3970,6 +3995,11 @@ namespace Global {
     * @return F32
     */
       function SDL_GetMouseY();
+   /** --- ConsoleVector SDL_GetMousePoint ---
+    * Get absolute mouse position as ConsoleVector
+    * @return ConsoleVector
+    */
+      function SDL_GetMousePoint();
    /** --- const char* SDL_GetError ---
     * Get the last SDL Error.
     * @return const char*
@@ -4211,6 +4241,11 @@ namespace Global {
     * @return bool
     */
       function SDL_SetRenderDrawColor( int rendererID, U8 r, U8 g, U8 b, U8 a=255 );
+   /** --- bool SDL_SetRenderDrawColorVec ---
+    * set the render color
+    * @return bool
+    */
+      function SDL_SetRenderDrawColorVec( int rendererID, ConsoleVector colorVec );
    /** --- bool SDL_SetRenderDrawBlendMode ---
     * set the blendmode, without parameter NONE = disabled is set.
     * @return bool
@@ -4287,10 +4322,10 @@ namespace Global {
     */
       function SDL_RenderDebugText( int rendererID, float x, float y, string str );
    /** --- bool SDL_PointInRect ---
-    * Check a point is in rect --- Integer Rect !! --
+    * Check a point is in rect
     * @return bool
     */
-      function SDL_PointInRect( Point2I p, RectI rect );
+      function SDL_PointInRect( Point2F p, RectF rect );
    /** --- bool SDL_PointInRectFloat ---
     * Check a point is in rect
     * @return bool
@@ -4367,6 +4402,15 @@ namespace Global {
     * Wait a specified number of nanoseconds before returning.
     */
       function SDL_DelayPrecise( U64 ns );
+   /** --- void SDL_SetClipboardText ---
+    * Push text into the Clipboard.
+    */
+      function SDL_SetClipboardText( string text );
+   /** --- const char* SDL_GetClipboardText ---
+    * Get text from the Clipboard.
+    * @return const char*
+    */
+      function SDL_GetClipboardText();
    /** --- bool Audio_Init ---
     * Init Audio Device for playback
     * @return bool
@@ -4840,4 +4884,34 @@ namespace Global {
   SDL_KMOD_CAPS = 8192
   SDL_KMOD_SCROLL = 32768
 --- End of Dump (385 items) ---
+*/
+//------------------------------------------------------------------
+//                  Inline Functions 
+//------------------------------------------------------------------
+/*
+void print(..);
+void printf(fmt,..);
+const char* sprintf(fmt, ..);
+double math.randomf()
+double math.randomf(double limit )
+double math.randomf(double from. double to )
+double math.floor(double value)
+double math.ceil(double  value)
+double math.fabs(double value)
+double math.sin(double value)
+double math.cos(double value)
+double math.atan(double value)
+double math.tanh(double value)
+double math.sqrt(double value)
+bool math.iszero(double value)
+double math.fmod(double value1, double value2)
+double math.min(double value1, double value2)
+double math.max(double value1, double value2)
+double math.atan2(double value1, double value2)
+double math.pow(double value1, double value2)
+double math.clamp(double value1, double value2, double value2)
+double math.clampf(double value1, double value2, double value2)
+double math.lerp(double value1, double value2, double value2)
+double math.smoothstep(double value1, double value2, double value2)
+
 */

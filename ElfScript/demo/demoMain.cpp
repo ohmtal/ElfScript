@@ -46,6 +46,10 @@ DefineEngineFunction(getFrameTime, S32, (), , "get the time in ms the last loop 
 
 // ----------------------------------------------------------------------------
 int argParser(int argc, char* argv[]) {
+    Con::setIntVariable("$Main::argc", argc);
+    for (S32 i = 0; i < argc; i++)
+        Con::setVariable(avar("$Main::argv%d", i), argv[i]);
+
 
     gShutDownRequest = true; //default no loop!
     String argStr;

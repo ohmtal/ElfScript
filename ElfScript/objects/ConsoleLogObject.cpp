@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // ElfScript ConsoleLogObject
 // can be used to work with the console log inside a script
-// NOTE WiP
+// usage is simple create the object with new and use onLog
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
@@ -36,6 +36,7 @@ namespace ConsoleLogParty{
 IMPLEMENT_CONOBJECT(ConsoleLogObject);
 IMPLEMENT_CALLBACK( ConsoleLogObject, onLog, void, ( const char* text, U32 level), (  text,level),
                     "Called when a log line is pushed\n"
+                    "Level: Normal=0, Warning=1, Error=2; Info=3; Debug=4"
 );
 
 bool ConsoleLogObject::onAdd() {

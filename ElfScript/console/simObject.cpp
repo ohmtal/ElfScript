@@ -2164,9 +2164,6 @@ bool SimObject::onAdd()
    //
    // Con::warnf("Sim::getGarbageCollectionSet() is %p", (void*)Sim::getGarbageCollectionSet());
 
-   #ifdef ELFSCRIPT_GARBAGECOLLECTION
-   if ( Sim::getGarbageCollectionSet() ) Sim::getGarbageCollectionSet()->addObject(this);
-   #endif
    return true;
 }
 
@@ -2338,6 +2335,8 @@ void SimObject::clearNotify(SimObject* obj)
 
 void SimObject::processDeleteNotifies()
 {
+
+
    // clear out any delete notifies and
    // object refs.
 

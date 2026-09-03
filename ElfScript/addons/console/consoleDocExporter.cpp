@@ -110,6 +110,41 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool humanread
     Con::executef("dumpScriptConstants");
     Con::printf("*/");
 
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("//                  Inline Functions ");
+    Con::printf("//------------------------------------------------------------------");
+    Con::printf("/*");
+    Con::printf("void print(..);");
+    Con::printf("void printf(fmt,..);");
+    Con::printf("const char* sprintf(fmt, ..);");
+    Con::printf(
+    "double math.randomf()\n"
+    "double math.randomf(double limit )\n"
+    "double math.randomf(double from. double to )\n"
+    "double math.floor(double value)\n"
+    "double math.ceil(double  value)\n"
+    "double math.fabs(double value)\n"
+    "double math.sin(double value)\n"
+    "double math.cos(double value)\n"
+    "double math.atan(double value)\n"
+    "double math.tanh(double value)\n"
+    "double math.sqrt(double value)\n"
+    "bool math.iszero(double value)\n"
+
+    "double math.fmod(double value1, double value2)\n"
+    "double math.min(double value1, double value2)\n"
+    "double math.max(double value1, double value2)\n"
+    "double math.atan2(double value1, double value2)\n"
+    "double math.pow(double value1, double value2)\n"
+
+    "double math.clamp(double value1, double value2, double value2)\n"
+    "double math.clampf(double value1, double value2, double value2)\n"
+    "double math.lerp(double value1, double value2, double value2)\n"
+    "double math.smoothstep(double value1, double value2, double value2)\n"
+         );
+    Con::printf("*/");
+
+
     bool ok = ExportConsoleLines(fileName,  append);
     EndConsoleLines();
     Con::ConsoleDocForStub = false;

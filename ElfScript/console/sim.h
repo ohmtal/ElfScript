@@ -119,9 +119,6 @@ namespace Sim
    //
    // DeclareNamedSet(sgMissionLightingFilterSet);
 
-#ifdef ELFSCRIPT_GARBAGECOLLECTION
-   DeclareNamedSet(GarbageCollectionSet); //XXTH
-#endif
    void init();
    void shutdown();
    
