@@ -45,12 +45,14 @@ function testWidget::onAdd(%this) {
     );
     %this.editor.backgroundColor={30,30,30,255};
     %this.editor.fontColor={205,255,205,255};
-    %this.editor.fontScale = {0.6, 0.6};
+    %this.editor.fontScale = {0.8, 0.8};
     %this.editor.updateBounds();
-    %this.editor.cls("ElfScript retro console - execute code with [SHIFT]+[RETURN]");
     %this.editor.setFocus(true);
 
-    %this.add(%this.logger = new ConsoleLogObject(){ TypeU32 Editor = %this.editor;} );
+    //DEBUG:
+    $editor = %this.editor;
+
+    // bad for testing:P %this.add(%this.logger = new ConsoleLogObject(){ TypeU32 Editor = %this.editor;} );
     return true;
 }
 //----------------------------------------------------------------------

@@ -131,6 +131,34 @@ SimSet::~SimSet()
 }
 
 //-----------------------------------------------------------------------------
+// ElfScript 0.7
+void SimSet::insertObject( S32& position, SimObject* obj) {
+
+      if (position < 0 || position > size())
+      {
+            Con::errorf("Set::insertObject - position (%d) out of range (%d).", position, size());
+            return ;
+      }
+
+      if( obj == this )
+            return;
+
+      lock();
+
+      const bool added = mObjectList.insertObject( obj, position );
+      if( added )
+            deleteNotify( obj );
+
+      unlock();
+
+      if( added )
+      {
+            getSetModificationSignal().trigger( SetObjectAdded, this, obj );
+            if( obj->isProperlyAdded() )
+                  onObjectAdded_callback( obj );
+      }
+}
+//-----------------------------------------------------------------------------
 
 void SimSet::addObject( SimObject* obj )
 {
@@ -619,6 +647,55 @@ SimGroup::~SimGroup()
 }
 
 //-----------------------------------------------------------------------------
+// ElfScript 0.7
+void SimGroup::_insertObject( S32& position, SimObject* obj) {
+
+      if (position < 0 || position > size())
+      {
+            Con::errorf("Set::insertObject - position (%d) out of range (%d).", position, size());
+            return ;
+      }
+
+      // Make sure we aren't adding ourself.  This isn't the most robust check
+      // but it should be good enough to prevent some self-foot-shooting.
+      if( obj == this )
+      {
+            Con::errorf( "SimGroup::insertObject - (%d) can't add self!", getIdString() );
+            return;
+      }
+
+      if( obj->getGroup() == this )
+            return;
+
+      lock();
+
+      obj->incRefCount();
+
+      if( obj->getGroup() )
+            obj->getGroup()->removeObject( obj );
+
+      const bool added = mObjectList.insertObject( obj, position );
+
+      if( added )
+      {
+            mNameDictionary.insert( obj );
+            obj->mGroup = this;
+
+            obj->onGroupAdd();
+
+            getSetModificationSignal().trigger( SetObjectAdded, this, obj );
+            if( obj->isProperlyAdded() )
+                  onObjectAdded_callback( obj );
+      }
+      else
+            obj->decRefCount();
+
+      unlock();
+
+      // SimObjects will automatically remove them from their group
+      // when deleted so we don't hook up a delete notification.
+}
+//-----------------------------------------------------------------------------
 
 void SimGroup::_addObject( SimObject* obj, bool forcePushBack )
 {
@@ -661,6 +738,10 @@ void SimGroup::_addObject( SimObject* obj, bool forcePushBack )
 }
 
 //-----------------------------------------------------------------------------
+void SimGroup::insertObject( S32& position, SimObject* obj) {
+      _insertObject(position, obj);
+}
+
 
 void SimGroup::addObject( SimObject* obj )
 {
@@ -849,7 +930,7 @@ SimObject* SimGroup::getObject(const S32& index)
 {
    if (index < 0 || index >= size())
    {
-      Con::errorf("Set::getObject - index out of range.");
+      Con::errorf("Set::getObject - index (%d) out of range (%d).", index, size());
       return NULL;
    }
 
@@ -1044,7 +1125,7 @@ DefineEngineMethod( SimSet, getObject, SimObject*, ( U32 index ),,
 {
    if( index < 0 || index >= object->size() )
    {
-      Con::errorf( "Set::getObject - index out of range." );
+      Con::errorf("Set::getObject - index (%d) out of range (%d).", index, object->size());
       return NULL;
    }
    
@@ -1165,6 +1246,8 @@ DefineEngineMethod( SimSet, first, S32, (),,
       return object->first()->getId();
 }
 
+
+
 DefineEngineMethod( SimSet, at, S32, (S32 index),,
                     "Get the object ID at the specified index.\n"
                     "@return The object ID, or 0 if index is out of bounds." )
@@ -1189,11 +1272,20 @@ DefineEngineMethod( SimSet, push_back, void, (S32 SimObjectId),,
       object->addObject(obj);
 }
 
+DefineEngineMethod( SimSet, insert, void, (S32 position, S32 SimObjectId),,
+                    "insert a object (ID!)to the index of the list")
+{
+      SimObject *obj = Sim::findObject( SimObjectId );
+      if (!obj) return ;
+      object->insertObject(position, obj);
+}
+
 DefineEngineMethod( SimSet, pop_front, void, (),,
                     "pop the first object")
 {
       if (object->size() < 1 ) return;
       SimObject *obj = object->first();
       object->removeObject(obj);
+
 
 }

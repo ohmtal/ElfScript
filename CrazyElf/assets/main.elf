@@ -217,7 +217,7 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
     if (%isDown) {
         if (%scancode == SDL_SCANCODE_RETURN && %alt) ToggleFullScreen();
 
-        if (%scancode == SDL_SCANCODE_HOME) ToggleVSync();
+        if (%scancode == SDL_SCANCODE_HOME && %modifiers & SDL_KMOD_ALT) ToggleVSync();
 
         if (%scancode == SDL_SCANCODE_R && %ctrl) {
             echo("Shortcut detected! Reload");

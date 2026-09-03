@@ -42,6 +42,26 @@ bool SimObjectList::pushBack(SimObject* obj)
    return false;
 }
 
+bool SimObjectList::insertObject(SimObject* obj, S32 index) {
+      // sanity
+      if (index < 0 || index > size() || obj == nullptr)
+      {
+            return false ;
+      }
+
+      // already added ?
+      if (T3D::find(begin(),end(),obj) != end())
+      {
+            return false;
+      }
+
+      // add
+      VectorPtr<SimObject*>::iterator it = begin() + index;
+
+      insert(it, obj);
+      return true;
+}
+
 bool SimObjectList::pushBackForce(SimObject* obj)
 {
    iterator itr = T3D::find(begin(),end(),obj);

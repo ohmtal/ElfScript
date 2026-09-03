@@ -177,6 +177,10 @@ class SimSet : public SimObject
       /// Add the given object to the set.
       /// @param object Object to add to the set.
       virtual void addObject( SimObject* object );
+
+      // ElfScript 0.7
+      virtual void insertObject(  S32& position, SimObject* obj );
+
       
       /// Remove the given object from the set.
       /// @param object Object to remove from the set.
@@ -417,6 +421,8 @@ class SimGroup: public SimSet
 
       SimNameDictionary mNameDictionary;
 
+      void _insertObject( S32& position, SimObject* obj);
+
       void _addObject( SimObject* object, bool forcePushBack = false );
       void _removeObjectNoLock( SimObject* );
 
@@ -427,13 +433,16 @@ class SimGroup: public SimSet
       void addObject( SimObject* object, SimObjectId id);
       void addObject( SimObject* object, const char* name );
 
+
       // SimSet.
       void addObject( SimObject* object ) override;
       void removeObject( SimObject* object ) override;
       void pushObject( SimObject* object ) override;
       void popObject() override;
       void clear() override;
-      
+      // ElfScript 0.7
+      void insertObject( S32& position, SimObject* obj) override;
+
       SimGroup* clone() override;
       SimGroup* deepClone() override;
 
@@ -459,6 +468,8 @@ inline void SimGroup::addObject(SimObject *obj, const char *name)
    addObject( obj );
    obj->assignName(name);
 }
+
+
 
 /// An iterator that recursively and exhaustively traverses all objects
 /// in an SimGroup object tree.

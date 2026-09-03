@@ -4173,7 +4173,7 @@ handle_OP_INLINE_COMMAND_1P:
 {
       U32 commandID = code[ip++];
 
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f1 = stack[_STK].getFloat();POP_STK();
 
       ConsoleValue& rv = stack[_STK + 1];
 
@@ -4204,8 +4204,8 @@ handle_OP_INLINE_COMMAND_1P:
 handle_OP_INLINE_COMMAND_2P:
 {
       U32 commandID = code[ip++];
-      F64 f2 = stack[_STK].getFastFloat();POP_STK();
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f2 = stack[_STK].getFloat();POP_STK();
+      F64 f1 = stack[_STK].getFloat();POP_STK();
       ConsoleValue& rv = stack[_STK + 1];
 
       //FIXME FILL ....
@@ -4241,9 +4241,9 @@ handle_OP_INLINE_COMMAND_3P:
             DISPATCH();
       }
 
-      F64 f3 = stack[_STK].getFastFloat();POP_STK();
-      F64 f2 = stack[_STK].getFastFloat();POP_STK();
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f3 = stack[_STK].getFloat();POP_STK();
+      F64 f2 = stack[_STK].getFloat();POP_STK();
+      F64 f1 = stack[_STK].getFloat();POP_STK();
       ConsoleValue& rv = stack[_STK + 1];
 
 
@@ -4264,8 +4264,8 @@ handle_OP_INLINE_COMMAND_3P:
 // ------------------------------------
 handle_OP_MATH_RANDOMF_2:
 {
-      F64 f2 = stack[_STK].getFastFloat();POP_STK();
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f2 = stack[_STK].getFloat();POP_STK();
+      F64 f1 = stack[_STK].getFloat();POP_STK();
       stack[_STK + 1].setFastFloat(ElfMath::mRandF64(f1,f2));
       PUSH_STK();
       DISPATCH();
@@ -4273,7 +4273,7 @@ handle_OP_MATH_RANDOMF_2:
 
 handle_OP_MATH_RANDOMF_1:
 {
-      F64 f1 = stack[_STK].getFastFloat();POP_STK();
+      F64 f1 = stack[_STK].getFloat();POP_STK();
       stack[_STK + 1].setFastFloat(ElfMath::mRandF64(0.0,f1));
       PUSH_STK();
       DISPATCH();

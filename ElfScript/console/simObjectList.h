@@ -60,6 +60,9 @@ public:
    bool pushFront(SimObject*);      ///< Add the SimObject* to the start of the list.
    bool remove(SimObject*);         ///< Remove the SimObject* from the list; may disrupt order of the list.
 
+   // ElfScript 0.7
+   bool insertObject(SimObject*, S32 index);  ///< insert a SimObject* at the index of the list, unless it's already in the list.
+
    SimObject* at(S32 index) const {  if(index >= 0 && index < size()) return (*this)[index]; return NULL; }
    
    /// Remove the SimObject* from the list; guaranteed to preserve list order.
