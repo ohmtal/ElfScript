@@ -25,6 +25,7 @@
 #include "core/util/uuid.h"
 #include "torquescript/runtime.h"
 #include <core/volume.h>
+#include "localVar.h"
 
 // This is a temporary hack to get tools using the library to
 // link in this module which contains no other references.
@@ -2315,7 +2316,29 @@ DefineEngineStringlyVariadicFunction( error, void, 2, 0, "( string message... ) 
    Con::errorf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;
 }
+//-----------------------------------------------------------------------------
 
+DefineEngineStringlyVariadicFunction( info, void, 2, 0, "( string message... ) "
+"@brief Logs an info message to the console.\n\n"
+"Concatenates all given arguments to a single string and prints the string to the console as an error "
+"message (in the in-game console, these will show up using a red font by default). "
+"A newline is added automatically after the text.\n\n"
+"@param message Any number of string arguments.\n\n"
+"@ingroup Logging" )
+{
+      U32 len = 0;
+      S32 i;
+      for(i = 1; i < argc; i++)
+            len += dStrlen(argv[i]);
+
+      char *ret = Con::getReturnBuffer(len + 1);
+      ret[0] = 0;
+      for(i = 1; i < argc; i++)
+            dStrcat(ret, argv[i], (U64)(len + 1));
+
+      Con::infof( "%s", ret);
+      ret[0] = 0;
+}
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( debugv, void, ( const char* variableName ),,
@@ -2328,10 +2351,13 @@ DefineEngineFunction( debugv, void, ( const char* variableName ),,
    "@endtsexample\n\n"
    "@ingroup Debugging" )
 {
-   if( variableName[ 0 ] == '%' )
-      Con::errorf( "%s = %s", variableName, Con::getLocalVariable( variableName ) );
-   else
-      Con::errorf( "%s = %s", variableName, Con::getVariable( variableName ) );
+
+      ElfScript::varDump(variableName);
+
+   // if( variableName[ 0 ] == '%' )
+   //    Con::errorf( "%s = %s", variableName, Con::getLocalVariable( variableName ) );
+   // else
+   //    Con::errorf( "%s = %s", variableName, Con::getVariable( variableName ) );
 }
 
 //-----------------------------------------------------------------------------

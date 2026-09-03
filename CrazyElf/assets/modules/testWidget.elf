@@ -10,6 +10,32 @@ function createtestWidget(%renderer, %window) {
     return %obj;
 }
 //----------------------------------------------------------------------
+function ConsoleLogObject::onLog(%this, %text, %level) {
+
+    // enum Level
+    // {
+    //     Normal = 0,
+    //     Warning,
+    //     Error,
+    //     Info,
+    //     Debug,
+    //     NUM_CLASS
+    // } mLevel;
+
+    switch (%level) {
+        case 1: %color = { 0,255,250,255}; //warning
+        case 2: %color = {255,10,10,255};  //error
+        case 3: %color = { 0,200,10,255};  //info
+        default: %color = %this.editor.fontcolor;
+    }
+
+    // %this.editor.addline(sprintf("#%d %s %s", %level,%color, %text), %color);
+    %this.editor.addline(%text, %color);
+}
+function GuiTextWidgetVintage::parser(%this, %text, %modifiers) {
+    if (%modifiers & SDL_KMOD_SHIFT) eval(%text);
+}
+//----------------------------------------------------------------------
 function testWidget::onAdd(%this) {
 
     %bounds = {0,10,$Global::ScreenSize.x,$Global::ScreenSize.y-10};
@@ -18,9 +44,13 @@ function testWidget::onAdd(%this) {
         %this.editor = createGuiTextWidgetVintage(%this.renderer, %this.window , %bounds)
     );
     %this.editor.backgroundColor={30,30,30,255};
-    %this.editor.fontScale = {0.8, 0.8};
-    %this.updateBounds();
+    %this.editor.fontColor={205,255,205,255};
+    %this.editor.fontScale = {0.6, 0.6};
+    %this.editor.updateBounds();
+    %this.editor.cls("ElfScript retro console - execute code with [SHIFT]+[RETURN]");
     %this.editor.setFocus(true);
+
+    %this.add(%this.logger = new ConsoleLogObject(){ TypeU32 Editor = %this.editor;} );
     return true;
 }
 //----------------------------------------------------------------------

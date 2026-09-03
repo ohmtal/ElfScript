@@ -76,5 +76,18 @@ DefineEngineFunction(SDL_DelayPrecise, void, (U64 ns),,"Wait a specified number 
 }
 
 
+// ------------ Clipboard -----------
+DefineEngineFunction(SDL_SetClipboardText, void, (const char* text),,"Push text into the Clipboard.") {
+    SDL_SetClipboardText(text);
+}
+
+DefineEngineFunction(SDL_GetClipboardText, const char* , (),,"Get text from the Clipboard.") {
+    char* tmpClip = SDL_GetClipboardText();
+    if (!tmpClip) return "";
+    String text = tmpClip;
+    SDL_free(tmpClip);
+    return text.c_str();
+}
+
 
 } // namespace

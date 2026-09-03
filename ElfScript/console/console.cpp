@@ -84,6 +84,9 @@ char* ConsoleValue::convertToBuffer() const
 
 const char* ConsoleValue::getConsoleData() const
 {
+   // ElfScript: usally there is a problem in the script if we enter here
+   //            but at least is should check cvConsoleValueType else we Segfault here
+   if (type != cvConsoleValueType) return "";
    return Con::getData(type, dataPtr, 0, /* FIXME enumTable*/ nullptr);
 }
 

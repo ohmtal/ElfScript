@@ -219,6 +219,7 @@ set ( OBJECTS_SRC
     ${CMAKE_CURRENT_LIST_DIR}/objects/valueStorageObject.cpp
     ${CMAKE_CURRENT_LIST_DIR}/objects/objectAliases.cpp
     ${CMAKE_CURRENT_LIST_DIR}/objects/NeuralNetObject.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleLogObject.cpp
 
 
 )

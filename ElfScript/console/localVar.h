@@ -29,10 +29,10 @@ namespace ElfScript {
     ConsoleVector getLocalVector(const char* variableName);
     bool setLocalVector(const char* variableName, ConsoleVector& value);
 #endif
-}
     void varDumpGlobals(const char* variableName);
     void varDumpLocals(const char* variableName);
     void varDumpDynamicField(const char* variableName);
     void dumpAllLocalVariables();
     void dumpAllGlobalVariables();
     void varDump(const char* variableName);
+}

@@ -385,7 +385,7 @@ public:
       case ConsoleValueType::cvInteger:
          return convertToBuffer();
       default:
-         return getConsoleData();
+         return getConsoleData(); //this usally crash ^^
       }
    }
 

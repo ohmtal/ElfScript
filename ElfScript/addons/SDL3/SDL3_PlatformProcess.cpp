@@ -101,7 +101,11 @@ namespace Platform
     return SDL_SetClipboardText(text);
   }
   const char* getClipboard() {
-    return SDL_GetClipboardText();
+    char* tmpClip = SDL_GetClipboardText();
+    if (!tmpClip) return "";
+    String text = tmpClip;
+    SDL_free(tmpClip);
+    return text.c_str();
   }
   //---------------------------------------------------------------------------
   void debugBreak()
