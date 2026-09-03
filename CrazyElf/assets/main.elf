@@ -1,4 +1,4 @@
-$MODULES = "MelodyMaker Pixels NativSDL blank StarField StarField2 PlayGround StreetAI OnOffAI Squash";
+$MODULES = "MelodyMaker Pixels NativSDL blank StarField StarField2 PlayGround StreetAI OnOffAI Squash testWidget";
 
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};

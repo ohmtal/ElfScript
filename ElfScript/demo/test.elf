@@ -607,6 +607,17 @@ function TestAI(%loops = 10000, %filename = "myAITest.elfdata") {
     %Net.delete();
 }
 
+// ---------------------  VAR CREATE TEST -------------
+printSeparator();
+print(" -------------- EXPLODE --------------- ");
+function testInside() {
+    %foo = 1;
+    TEST_VAR_CREATE();
+}
+
+$bla = {"Hello", "world"};
+printf("explodeGlobal $bla count is: %d",explodeGlobal("$bla", true));
+
 printSeparator();
 print("script load completed..... no parse errors....");
 // $Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");

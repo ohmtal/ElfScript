@@ -329,9 +329,14 @@ namespace Audio {
             if (lineStart > 0 && melody[i].LineNumber < lineStart) continue;
             if (lineEnd > 0 && melody[i].LineNumber > lineEnd) continue;
 
-            result.format("%d %d %.2f %.2f\n",
-                          melody[i].LineNumber, melody[i].tone.midiNote,
-                          melody[i].tone.duration, melody[i].tone.amplitute);
+            if ( melody[i].tone.duration != 0.2f || melody[i].tone.amplitute != 0.2f) {
+
+                result.format("%d %d %.2f %.2f\n",
+                            melody[i].LineNumber, melody[i].tone.midiNote,
+                            melody[i].tone.duration, melody[i].tone.amplitute);
+            } else {
+                result.format("%d %d\n", melody[i].LineNumber, melody[i].tone.midiNote);
+            }
             // result.format("#%03d Note: %03d | Dur: %.2f | Vol: %.2f\n",
             //             melody[i].LineNumber, melody[i].tone.midiNote,
             //             melody[i].tone.duration, melody[i].tone.amplitute);

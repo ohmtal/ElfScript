@@ -617,6 +617,20 @@ DefineEngineFunction(SDL_SetRenderDrawColor, bool , (S32 rendererID, U8 r, U8 g,
     return SDL_SetRenderDrawColor(renderer, r,g,b,a);
 }
 
+DefineEngineFunction(SDL_SetRenderDrawColorVec, bool , (S32 rendererID, ConsoleVector colorVec),
+,"set the render color") {
+    SDL_Renderer* renderer = getRendererByID(rendererID);
+    if (!renderer) return false;
+    if (colorVec.points[3] == 0.f) colorVec.points[3] = 255.f;
+
+    return SDL_SetRenderDrawColor(renderer,
+            (U8) colorVec.points[0]
+            ,(U8) colorVec.points[1]
+            ,(U8) colorVec.points[2]
+            ,(U8) colorVec.points[3]
+    );
+}
+
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderDrawColorFloat(SDL_Renderer *renderer, float r, float g, float b, float a);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderDrawColor(SDL_Renderer *renderer, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a);
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderDrawColorFloat(SDL_Renderer *renderer, float *r, float *g, float *b, float *a);
@@ -819,9 +833,14 @@ DefineEngineFunction(SDL_RenderDebugText, bool , (S32 rendererID, F32 x, F32 y, 
 // Rect stuff - copied from BaseElf and renamed to SDL_ names so it's redundant
 //              in BaseElf
 // -----------------------------------------------------------------------------
-DefineEngineFunction(SDL_PointInRect, bool , (Point2I p, RectI rect),
-                     ,"Check a point is in rect --- Integer Rect !! --") {
-    return SDL_PointInRect(&p, &rect);
+// // DefineEngineFunction(SDL_PointInRect, bool , (Point2I p, RectI rect),
+// //                      ,"Check a point is in rect --- Integer Rect !! --") {
+// //     return SDL_PointInRect(&p, &rect);
+// // }
+// ElfScript 0.7 also changed to float!
+DefineEngineFunction(SDL_PointInRect, bool , (Point2F p, RectF rect),
+                     ,"Check a point is in rect") {
+    return SDL_PointInRectFloat(&p, &rect);
 }
 DefineEngineFunction(SDL_PointInRectFloat, bool , (Point2F p, RectF rect),
                      ,"Check a point is in rect") {

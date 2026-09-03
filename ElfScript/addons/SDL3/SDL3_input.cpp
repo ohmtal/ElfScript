@@ -87,6 +87,8 @@ void ClearInputFrameTicks() {
     s_MouseDeltaY = 0.0f;
     s_MouseWheelX = 0.0f;
     s_MouseWheelY = 0.0f;
+
+    s_TextInput   = "";
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -168,11 +170,7 @@ void onEvent(const SDL_Event& event) {
     }
 
 }
-
-
-
 // -----------------------------------------------------------------------------
-
 bool IsKeyPressed(SDL_Scancode key) {
     return (s_KeyState[key] & KF_Pressed) != 0;
 }
@@ -265,6 +263,11 @@ DefineEngineFunction(SDL_IsMouseButtonUp, bool, (S32 button),, "Return true if t
     return ElfSDL3::IsMouseButtonUp((U32)button);
 }
 
+DefineEngineFunction(SDL_GetInputText, String, (),, "Return the current input text only valid at the same frame see also: SDL_StartTextInput") {
+    return ElfSDL3::s_TextInput;
+}
+
+
 
 DefineEngineFunction(SDL_GetMouseDeltaX, F32, (),, "Get mouse movement delta X for this frame.") { return ElfSDL3::GetMouseDeltaX(); }
 DefineEngineFunction(SDL_GetMouseDeltaY, F32, (),, "Get mouse movement delta Y for this frame.") { return ElfSDL3::GetMouseDeltaY(); }
@@ -273,6 +276,9 @@ DefineEngineFunction(SDL_GetMouseWheelY, F32, (),, "Get vertical mouse wheel scr
 // this can be used also when polling is disabled
 DefineEngineFunction(SDL_GetMouseX, F32, (),, "Get absolute mouse X position.") { return ElfSDL3::GetMouseX(); }
 DefineEngineFunction(SDL_GetMouseY, F32, (),, "Get absolute mouse Y position.") { return ElfSDL3::GetMouseY(); }
+DefineEngineFunction(SDL_GetMousePoint, ConsoleVector, (),, "Get absolute mouse position as ConsoleVector") {
+    return {ElfSDL3::GetMouseX(), ElfSDL3::GetMouseY(),0.f,0.f};
+}
 // -----------------------------------------------------------------------------
 // Keyboard Constants ...
 // -----------------------------------------------------------------------------

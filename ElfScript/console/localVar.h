@@ -11,11 +11,6 @@ namespace ElfScript {
     const char* getConsoleValueTypeName(S32 type);
     S32 findLocalVarRegisterInCurrentScope(const char* variableName);
 
-    void varDumpGlobals(const char* variableName);
-    void varDumpLocals(const char* variableName);
-    void varDumpDynamicField(const char* variableName);
-    void dumpAllLocalVariables();
-    void dumpAllGlobalVariables();
 
 
     bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg);
@@ -35,3 +30,9 @@ namespace ElfScript {
     bool setLocalVector(const char* variableName, ConsoleVector& value);
 #endif
 }
+    void varDumpGlobals(const char* variableName);
+    void varDumpLocals(const char* variableName);
+    void varDumpDynamicField(const char* variableName);
+    void dumpAllLocalVariables();
+    void dumpAllGlobalVariables();
+    void varDump(const char* variableName);

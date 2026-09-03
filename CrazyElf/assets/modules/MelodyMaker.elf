@@ -14,14 +14,22 @@
 //      - [ ] ADDline when cursor is up ! << test with List
 //
 // ------ not related -----
-//  - [ ] make editor a class
-//  - [ ] @engine: move Melody into it's own source out of SDL_audio?
+//  - [ ] make editor a reusable class
+//  - [~] @engine: move Melody into it's own source out of SDL_audio?
+//  - [ ] haha insane: Basic interpreter written in ElfScript!!
+//          10 FOR I = 1 TO 10
+//          15 IF I = 5 THEN PRINT "FIVE"
+//          17 IF I > 7 THEN 50
+//          20 PRINT I
+//          30 NEXT I
+//          40 PRINT "HAHA"
+//          50 GOTO 40
 //----------------------------------------------------------------------
 function createMelodyMaker(%renderer, %window) {
     %obj = new Group() {
         class = "MelodyMaker";
         // dynamic:
-        TypeString appName = "Melody Maker 0.92";
+        TypeString appName = "Melody Maker 0.95";
 
         TypeS32 renderer = %renderer;
         TypeS32 window   = %window;
@@ -37,7 +45,7 @@ function createMelodyMaker(%renderer, %window) {
         TypeVector cursorScreenPos = {0,0,0,0};
 
         TypeU32 Melody = 0;
-        TypeBool debugParser = true;
+        TypeBool debugParser = false;
     };
 
     return %obj;
@@ -117,6 +125,7 @@ function MelodyMaker::AppendText(%this, %text) {
     }
 
     %len = strLen(%cur.text);
+    if ( %len >= %this.maxLineLength) return;
     if (%len == 0) {
         %cur.text = %text;
     } else {
@@ -199,7 +208,7 @@ function MelodyMaker::parser(%this, %text) {
         case "run" :
             if (%this.wav > 0 ) Audio_UnLoadWav(%this.wav);
             %this.wav = MelodyGen(%this.melody);
-            Audio_Play(%this.wav, $p1>0 ? $p1 : 1000.0); //default gain 1000 add little distortion
+            Audio_Play(%this.wav, $p1>0 ? $p1 : 1000.0, $p2); //default gain 1000 add little distortion
         case "break":
             if (%this.wav > 0 ) Audio_Stop(%this.wav);
         case "reset":
@@ -208,8 +217,9 @@ function MelodyMaker::parser(%this, %text) {
              %this.cls();
 
         case "help":
-             %this.addLine("COMMANDS: cls, list [start,end], run, break, help, reset");
-             %this.addLine("DEF: linenumer notenumber [tonelen] [amplitude]");
+             %this.addLine("COMMANDS: cls, list [start,end], break, help, reset");
+             %this.addLine("COMMANDS: run [gain] [loop],save [file],load [file]");
+             %this.addLine("DEF: linenumer notenumber [len] [amplitude]");
              %this.addLine("EXAMPLE: 10 62 0.1");
         default:
             if (math.Floor($p0) $= $p0) { //check it's a number but need string compare
@@ -255,9 +265,7 @@ function MelodyMaker::onReturnPressed(%this) {
 }
 //----------------------------------------------------------------------
 function MelodyMaker::moveCursor(%this, %requestX,%requestY) {
-    //FIXME
-    printf("FIXME MOVE CURSOR REQUEST: %d, %d CUR: %s", %requestX, %requestY, %this.cursorPos);
-    // %this.cursorPos.y = %this.Lines.size();
+    // // printf("FIXME MOVE CURSOR REQUEST: %d, %d CUR: %s", %requestX, %requestY, %this.cursorPos);
 
     %this.cursorPos.y += %requestY;
     if (%this.cursorPos.y < 1 ) {
@@ -355,8 +363,8 @@ function MelodyMaker::Render(%this) {
 
     %this.RenderEditor();
 
-    SDL_SetRenderDrawColor(%this.renderer, 60, 10, 80);
-    SDL_RenderDebugText(%this.renderer, 0,0,%this.cursorPos );
+    // SDL_SetRenderDrawColor(%this.renderer, 60, 10, 80);
+    // SDL_RenderDebugText(%this.renderer, 0,0,%this.cursorPos );
 
 }
 //----------------------------------------------------------------------

@@ -1,0 +1,53 @@
+exec("assets/include/GuiTextWidgetVintageSDL3.elf");
+
+function createtestWidget(%renderer, %window) {
+    %obj = new Group() {
+        class = "testWidget";
+        TypeS32 renderer = %renderer;
+        TypeS32 window   = %window;
+    };
+
+    return %obj;
+}
+//----------------------------------------------------------------------
+function testWidget::onAdd(%this) {
+
+    %bounds = {0,10,$Global::ScreenSize.x,$Global::ScreenSize.y-10};
+    print($Global::ScreenSize, "bounds:", %bounds);
+    %this.add(
+        %this.editor = createGuiTextWidgetVintage(%this.renderer, %this.window , %bounds)
+    );
+    %this.editor.backgroundColor={30,30,30,255};
+    %this.editor.fontScale = {0.8, 0.8};
+    %this.updateBounds();
+    %this.editor.setFocus(true);
+    return true;
+}
+//----------------------------------------------------------------------
+function testWidget::OnRemove(%this) { }
+//----------------------------------------------------------------------
+function testWidget::Render(%this) {
+    if (!%this.renderer) return;
+    SDL_SetRenderDrawColor(%this.renderer, 10, 10, 60);
+    SDL_RenderClear(%this.renderer);
+
+    if (%this.editor > 0 ) %this.editor.render();
+
+    SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
+    SDL_RenderDebugText(%this.renderer, 0, 0, "Vintage Gui Text Test");
+}
+//----------------------------------------------------------------------
+function testWidget::onSDLTextInputEvent(%this, %text) {
+     if (%this.editor > 0 )  %this.editor.onSDLTextInputEvent(%text);
+}
+function  testWidget::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+     if (%this.editor > 0 )  %this.editor.onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat);
+
+}
+function  testWidget::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {
+     if (%this.editor > 0 )  %this.editor.onSDLMouseButtonEvent(%button, %isDown, %x, %y);
+
+}
+function  testWidget::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
+
+
