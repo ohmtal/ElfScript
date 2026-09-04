@@ -1,6 +1,10 @@
 function rl() {
     // exec("ElfScript/demo/test.elf");
-    exec($Con::File);
+    if ($Con::File !$= "") exec($Con::File);
+    else {
+        error("RELOAD: fallback to hardcoded filename");
+        exec("ElfScript/demo/test.elf");
+    }
 }
 
 

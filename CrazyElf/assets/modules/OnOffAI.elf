@@ -35,7 +35,7 @@ function OnOffAI::onAdd(%this) {
     // We only need 1 Input and one output ...
     // added time so it take off at day and on at night
     // hidden neuros can be also 1 - i guess.
-    %this.ai.init(2, 1, 1, 1);
+    %this.ai.init(2, 1, 5, 1);
 
 
     return true;
@@ -57,7 +57,7 @@ function OnOffAI::Think(%this) {
         // print("Day");
     }
     // printf("IN 0:%.3f 1:%.3f TRAIN:%.4f", %this.ai.getIn(0), %this.ai.getIn(1), %this.ai.getOut(0) );
-    %this.ai.train(0.3); //using train. 3.0 is a good learning rate
+    %this.ai.train(3.0/*0.3*/); //using train. 3.0 is a good learning rate
     %this.ai.Run();
     %this.ai.LastResult = %this.ai.getOut(0);
     %this.setButtonState(%this.ai.LastResult);

@@ -84,8 +84,8 @@ function GuiTextWidgetVintage::onAdd(%this) {
 
     %this.add(%this.Lines = new Group() { });
     %this.updateBounds();
-
-    %this.schedule(100, AddLine,"");
+    %this.addLine("");
+    // %this.schedule(100, AddLine,"");
     // %this.schedule(110, AddLine,"");
 
     return true;
@@ -272,13 +272,13 @@ function GuiTextWidgetVintage::onDeletePressed(%this) {
 }
 
 // no idea why but cls sucks!
-// // // // // //----------------------------------------------------------------------
-// // // // // function GuiTextWidgetVintage::cls(%this, %initialLine = "") {
-// // // // //     %this.Lines.clear();
-// // // // //     %this.Lines.push_back(new Object() { TypeString text = %initialLine; TypeVector color = %this.fontcolor; });
-// // // // //     %this.moveCursor(-1000,1);
-// // // // //     %this.addLine();
-// // // // // }
+//----------------------------------------------------------------------
+function GuiTextWidgetVintage::cls(%this, %initialLine = "") {
+    %this.Lines.clear();
+    %this.Lines.push_back(new Object() { TypeString text = %initialLine; TypeVector color = %this.fontcolor; });
+    %this.moveCursor(-1000,-1000);
+    %this.addLine("");
+}
 //----------------------------------------------------------------------
 function GuiTextWidgetVintage::parser(%this, %text, %modifiers) {
     // This can be overwritten !
@@ -299,7 +299,7 @@ function GuiTextWidgetVintage::_newLine(%this) {
     %cursorWasAtBottom = %this.cursorPos.y == %this.Lines.size();
 
     // sysprint("_newLine at bottom:" SPC %cursorWasAtBottom);
-    if (%cursorWasAtBottom &&  %this.cursorPos.x > %len ) {
+    if (%cursorWasAtBottom && %this.cursorPos.x > %len ) {
         sysprint("AN ADD!");
         %this.AddLine("");
         %this.moveCursor(-1000,1000);

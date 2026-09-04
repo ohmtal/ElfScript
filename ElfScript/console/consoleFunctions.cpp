@@ -3120,6 +3120,54 @@ DefineEngineFunction( trace, void, ( bool enable ), ( true ),
 // }
 
 //-----------------------------------------------------------------------------
+DefineEngineFunction ( listFeatures, void, (),,"List compiled features") {
+      Con::printSeparator();
+      #ifdef TORQUE_DEBUG
+      Con::printf("%20s:%s", "Build", "Debug");
+      #else
+      Con::printf("%20s:%s", "Build", "Release");
+      #endif
+
+      #ifdef ENABLE_CONSOLE_VECTOR
+      Con::printf("%20s:%s", "Console Vector", "ON");
+      #else
+      Con::printf("%20s:%s", "Console Vector", "OFF");
+      #endif
+
+      #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
+      Con::printf("%20s:%s", "FieldCache", "ON");
+      #else
+      Con::printf("%20s:%s", "FieldCache", "OFF");
+      #endif
+
+      #ifdef ENABLE_ZIP_SUPPORT
+      Con::printf("%20s:%s", "Zip support", "ON");
+      #else
+      Con::printf("%20s:%s", "Zip support", "OFF");
+      #endif
+
+      #ifndef TORQUE_NO_DSO_GENERATION
+      Con::printf("%20s:%s", "DSO Generation", "ON");
+      #else
+      Con::printf("%20s:%s", "DSO Generation", "OFF");
+      #endif
+
+      #ifdef ELFSCRIPT_EXEC_OVERWRITE
+      Con::printf("%20s:%s", "Exec Overwrite", "ON");
+      #else
+      Con::printf("%20s:%s", "Exec Overwrite", "OFF");
+      #endif
+
+
+      #ifdef ELFSCRIPT_SLIM_OBJECT
+      Con::printf("%20s:%s", "Slim Object", "ON");
+      #else
+      Con::printf("%20s:%s", "Slim Object", "OFF");
+      #endif
+
+      Con::printBlankLine();
+}
+
 
 DefineEngineFunction( isDebugBuild, bool, (),,
    "Test whether the engine has been compiled with TORQUE_DEBUG, i.e. if it includes debugging functionality.\n\n"

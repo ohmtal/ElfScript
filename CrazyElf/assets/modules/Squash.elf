@@ -98,11 +98,11 @@ function Squash::BallOut(%this) {
 
     if (%this.AI.active ) {
 
-        // if (%this.AI.Learn) {
-        //     %this.AI.fitness = 0;
-        //     %this.startGame();
-        //     return;
-        // }
+        if (%this.AI.Learn) {
+            %this.AI.fitness = 0;
+            %this.startGame();
+            return;
+        }
 
         printf("Generation %d - Agent %d died. Fitness:%.1f", %this.AI.CurrentGeneration,%this.AI.CurrentAgentIndex,%this.AI.fitness);
 
@@ -124,12 +124,12 @@ function Squash::BallOut(%this) {
                 printf("--> New Best Fitness Record: %.3f",%this.AI.BestFitness);
                 %this.AI.save(%this.AIFile);
             } else {
-                // if (!%this.AI.Learn) {
+                if (!%this.AI.Learn) {
                     // load previous best file
                     %this.AI.load(%this.AIFile);
                     %this.AI.mutate(0.15, 0.3);
                     // %this.AI.WarmUP(); // call run with empty inputs after mutate
-                // }
+                }
             }
         }
         %this.AI.fitness = 0;
@@ -186,8 +186,9 @@ function Squash::UpdateAI(%this) {
 
         %this.AI.setout( 0, %value);
 
-        // printf("LEARN VALUE IS : %.4f %%div=%.4f", %value, %div);
-        for (%i in RANGE 1000) %this.AI.train(0.3);
+        printf("LEARN VALUE IS : %.4f %%div=%.4f", %value, %div);
+        // for (%i in RANGE 1000) %this.AI.train(0.3 /*0.3*/);
+        %this.AI.train(3.0 /*0.3*/);
 
 
     }

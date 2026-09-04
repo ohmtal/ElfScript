@@ -2,12 +2,12 @@
 #define ENABLE_INLINE_CACHE_LOAD
 #define ENABLE_INLINE_CACHE_SAVE
 
+// #define TORQUE_DEBUG_TOOMUCH
+
 #define ENABLE_COMPONENT_CACHE_LOAD
 #define ENABLE_COMPONENT_CACHE_SAVE
 #endif
 
-// haha later ... need to think about the syntax
-#define ENABLE_AUTO_ARRAY_OBJECT
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -2481,7 +2481,7 @@ handle_OP_LOADFIELD_FASTPATH:
       ConsoleValue* stackPtr = &stack[_STK + 1];
 
 #ifndef ENABLE_COMPONENT_CACHE_LOAD
-      // we got a component which cant be cached :(
+      // we got a component but compment cache is disabled
 
       if (!curObject) {
             ip+=2; //FieldCache emitted ...
@@ -2513,8 +2513,6 @@ handle_OP_LOADFIELD_FASTPATH:
                   // new FrameID!!!!
                   if ( currentRegister >=0 && cachePtr->cacheIndex != Script::gEvalState.mFrameID )
                         fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
-
-
             }
 
             if (cachePtr->type == componentVectorField) {
@@ -2537,11 +2535,11 @@ handle_OP_LOADFIELD_FASTPATH:
 #endif
       if (!cachePtr) {
             cachePtr = new FieldCache();
-                  cachePtr->objectPtr = curObject;
+            cachePtr->objectPtr = curObject;
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
             cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
-#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG_TOOMUCH
             Con::printf("LOAD: %s object: %d [%p] cached field: %s[%s]  (%d)",
                         cachePtr->cacheFailed ? "!FAILED!" : "OK",
                         curObject ? curObject->getId() : -666
@@ -2550,7 +2548,8 @@ handle_OP_LOADFIELD_FASTPATH:
 
             if (cachePtr->cacheFailed) {
                   #ifdef TORQUE_DEBUG
-                  Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
+                  Con::warnf("LOAD: object: %d [%p]:: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0
+                    ,(void*)curObject, curField, curObject->getId());
                   #endif
                   // simply reset the cache again .. it's a bad practice to not init field variables but ...
                   cachePtr->objectPtr = nullptr;
@@ -2563,7 +2562,7 @@ handle_OP_LOADFIELD_FASTPATH:
             if (cachePtr->objectPtr != curObject) {
                   cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
-#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG_TOOMUCH
                   Con::printf("LOAD II: %s object: %d [%p] cached field: %s[%s]  (%d)",
                               cachePtr->cacheFailed ? "!FAILED!" : "OK",
                               curObject ? curObject->getId() : -666
@@ -2571,7 +2570,8 @@ handle_OP_LOADFIELD_FASTPATH:
 #endif
                   if (cachePtr->cacheFailed) {
                         #ifdef TORQUE_DEBUG
-                        Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
+                        Con::warnf("LOAD II: object: %d [%p]:: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 ,
+                                   (void*)curObject, curField, curObject->getId());
                         #endif
                         // simply reset the cache again .. it's a bad practice to not init field variables but ...
                         cachePtr->objectPtr = nullptr;
@@ -2737,6 +2737,16 @@ handle_OP_SAVEFIELD_FASTPATH:
       }
       else // we have a object!
 #endif
+      // DO NOT CACHE new ..
+      if (curObject->getId() == 0) {
+#ifdef TORQUE_DEBUG_TOOMUCH
+      Con::printf("SAVE SKIP: object: 0 [%p] cached field: %s[%s]" ,(void*)curObject, curField,curFieldArray);
+
+#endif
+           curObject->pushDataField(curField, curFieldArray, &stack[_STK]);
+           DISPATCH();
+      }
+
       if (!cachePtr  ) {
             cachePtr = new FieldCache();
             if (curObject) cachePtr->objectPtr = curObject;
@@ -2753,27 +2763,24 @@ handle_OP_SAVEFIELD_FASTPATH:
                         DISPATCH();
                   } else {
 
-#ifdef TORQUE_DEBUG
-                        String typeName = "";
-                        switch(cachePtr->type) {
-                              case  staticField: typeName = "static Field"; break;
-                              case  staticField_NoFastPath: typeName = "static Field but no fast path available"; break;
-                              case  dynamicField_WithArray: typeName = "dynamic Field but with array available"; break;
-                              case  dynamicField: typeName = "dynamic field"; break;
-                              default: typeName = "ERROR ?!! check fillFieldCache!!!!"; break;
-                        }
-                        Con::printf("SAVE: object: %d [%p] cached field: %s[%s] type: %s (%d)", curObject ? curObject->getId() : -666
-                                    ,(void*)curObject , curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
+#ifdef TORQUE_DEBUG_TOOMUCH
+                        Con::printf("SAVE: object: %d [%p] cached field: %s[%s] type: %d", curObject ? curObject->getId() : -666
+                                    ,(void*)curObject , curField,curFieldArray,  (S32)cachePtr->type);
 #endif
                   }
       } else {
             if (cachePtr->objectPtr != curObject) {
+                  void* oldPrt = (void*) cachePtr->objectPtr;
                   cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
+#ifdef TORQUE_DEBUG_TOOMUCH
+                  Con::printf("SAVE II: object: %d [%p] old:[%p] cached field: %s[%s] type: %d", curObject ? curObject->getId() : -666
+                  ,(void*)curObject, oldPrt , curField,curFieldArray,  (S32)cachePtr->type);
 
+#endif
                   if (cachePtr->cacheFailed) {
                         Con::printSeparator();
-                        Con::errorf("SAVE: error invalid field detected : %s[%s] object:%d", curField, curFieldArray, curObject ? curObject->getId() : 0 );
+                        Con::errorf("SAVE II: error invalid field detected : %s[%s] object:%d", curField, curFieldArray, curObject ? curObject->getId() : 0 );
                         Con::printSeparator();
                         DISPATCH();
                   }

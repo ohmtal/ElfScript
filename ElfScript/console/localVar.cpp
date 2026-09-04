@@ -413,7 +413,7 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
     return count;
 }
 // ElfScript 0.7f - see also
-DefineEngineFunction(explodeObject,S32, (const char* text),
+DefineEngineFunction(explodeToObject,S32, (const char* text),
                      ,"Convert an string to Object with v[] fields\n"
                      "tab separated (default) or space separated\n"
                      "WARNING you need to delete the object after it's not longer needed."

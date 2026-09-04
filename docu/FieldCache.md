@@ -1,3 +1,27 @@
+# Fieldcache ElfScript 0.7g
+
+LOAD:
+
+When writing the GuiTextWidgetVintage (CrazyElf). Load cache sometimes missed to find
+the fields. This ends up in unstable behaviour. 
+Unforutally I cant reproduce this with my test scripts so find the reason. 
+
+SAVE:
+
+When load cache is off and only save cache is on it works - maybe because save is
+less used in GuiTextWidgetVintage than load (rendering the lines).
+
+I just found out the problems begin, when i use this editor as Console. Then 
+Load and Save are in a bad condition.
+
+I think the problems begin when it cache a field from a "new Object(){field..}"
+The SimID is zero at this moment so i skip this on save. 
+
+This fixed it ?! 
+
+
+
+--- old: 
 # Fieldcache ElfScript 0.6
 
 ## Prepare OPCodes

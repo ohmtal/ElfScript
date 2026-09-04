@@ -21,7 +21,8 @@
  Unforually i can not reproduce it in a test enviroment, so far. This is also bad
  for Components speed since it's embedded into the FieldCache - but not effected.
  Maybe i put it in parts so i can enable Components cache without object field 
- cache. 
+ cache. **2026-09-04:** I think i fixed this, skiping objects without ID (new Object ...)
+ on save. 
  - Fixed math inline commands to use getFloat instead of getFastFloat. 
  - Added inline commands to docu generator (stub file)
  - SDL3 Colors (baseElf) changed to ConsoleVector

@@ -592,8 +592,6 @@ class SimObject: public ConsoleObject
                               #endif
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
-
-
                   }
                   if (entry)
                   {
@@ -604,9 +602,6 @@ class SimObject: public ConsoleObject
             }
             return false;
       }
-
-
-
 
       // -----------------------------------------------------------------------
       bool stackDynamicField(StringTableEntry slotName, const char* array, ConsoleValue* stackP) {

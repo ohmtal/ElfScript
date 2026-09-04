@@ -200,7 +200,7 @@ public:
 // #endif
 
    S32 type;            // 4 Byte - used a 8 without padding
-   char padding[4];     // 4 Byte ... i may can use this for something ;)
+   char padding[4];     // 4 Byte ... i  can use this for something else ;)
 
    static DataChunker sConversionAllocator;
 

@@ -16,13 +16,13 @@ option(ELF_ENABLE_SLIMOBJECT "ElfScript: Disable Torque3D Editor methods." ON)
 
 
 option(ELF_ENABLE_EXEC_OVERWRITE "ElfScript: Disable the default exec to overwrite it with custom function" OFF)
-option(ELF_ENABLE_GARBAGECOLLECTION "ElfScript: Auto Garbage Collection - not recommended when using lot of objects" OFF)
+# option(ELF_ENABLE_GARBAGECOLLECTION "ElfScript: Auto Garbage Collection - not recommended when using lot of objects" OFF)
 option(ELF_ENABLE_DSO_GENERATION "ElfScript: Enable generation of byte code dso files" OFF)
 
 set(ELF_FILE_EXTENSION "elf" CACHE STRING "ElfScript: File extension")
 set(ELF_APP_NAME "ElfApp" CACHE STRING "ElfScript: App-Name used in scripts")
-set(ELF_APP_VERSION "600" CACHE STRING "ElfScript: App-Version used in scripts")
-set(ELF_APP_VERSION_STRING "Version 0.6f" CACHE STRING "ElfScript: App-Version String used in scripts")
+set(ELF_APP_VERSION "700" CACHE STRING "ElfScript: App-Version used in scripts")
+set(ELF_APP_VERSION_STRING "Version 0.7" CACHE STRING "ElfScript: App-Version String used in scripts")
 
 
 # overwrite example:  set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)
@@ -305,6 +305,7 @@ if (ELF_ENABLE_CONSOLE_VECTOR)
 endif()
 
 if (ELF_ENABLE_ZIP)
+     add_compile_definitions(ENABLE_ZIP_SUPPORT)
      list(APPEND ELFSCRIPT_SRC ${ZIP_SRC})
      add_compile_definitions(TORQUE_LOWER_ZIPCASE)
 else()
@@ -334,9 +335,9 @@ add_compile_definitions(TORQUE_APP_NAME="${ELF_APP_NAME}")
 add_compile_definitions(TORQUE_APP_VERSION=${ELF_APP_VERSION})
 add_compile_definitions(TORQUE_APP_VERSION_STRING="${ELF_APP_VERSION_STRING}")
 
-if (ELF_ENABLE_GARBAGECOLLECTION)
-     add_compile_definitions(ELFSCRIPT_GARBAGECOLLECTION)
-endif()
+# # if (ELF_ENABLE_GARBAGECOLLECTION)
+# #      add_compile_definitions(ELFSCRIPT_GARBAGECOLLECTION)
+# # endif()
 
 if ( ELF_ENABLE_FIELDCACHE )
      add_compile_definitions(ELFSCRIPT_ENABLE_FIELDCACHE)
