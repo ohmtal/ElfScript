@@ -1256,7 +1256,7 @@ DefineEngineMethod( SimSet, at, S32, (S32 index),,
       return object->at(index)->getId();
 }
 
-DefineEngineMethod( SimSet, remove_at, void, (S32 index),,
+DefineEngineMethod( SimSet, erase, void, (S32 index),,
                     "Remove the object at the specified index from the set." )
 {
       if (index < 0 || index >= object->size()) return;

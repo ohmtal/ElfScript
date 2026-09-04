@@ -47,6 +47,10 @@ IMPLEMENT_PRIMITIVE( U8*,                   ptr_ubyte,,   "Pointer to an unsigne
 IMPLEMENT_PRIMITIVE( U32*,                  ptr_uint,,    "Pointer to an unsigned 32bit int." );
 IMPLEMENT_PRIMITIVE( S32*,                  ptr_int,,     "Pointer to a 32bit int." );
 IMPLEMENT_PRIMITIVE( F32*,                  ptr_float,,   "Pointer to a 32bit float." );
+
+// IMPLEMENT_PRIMITIVE( S64*,                  ptr_long,,   "Pointer to a 64bit integer." );
+// IMPLEMENT_PRIMITIVE( F64*,                  ptr_double,,   "Pointer to a 64bit float." );
+
 // IMPLEMENT_PRIMITIVE( Point3F*,              ptr_Point3F,, "Pointer to a Point3F struct." );
 // IMPLEMENT_PRIMITIVE( PlaneF*,               ptr_PlaneF,,  "Pointer to a PlaneF struct." );
 // IMPLEMENT_PRIMITIVE( PolyhedronData::Edge*, ptr_Edge,,    "Pointer to an Edge struct." );

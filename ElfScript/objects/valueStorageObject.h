@@ -8,6 +8,7 @@
 #pragma once
 #include "console/engineAPI.h"
 
+
 class ValueStorageObject: public SimObject
 {
     typedef SimObject Parent;
@@ -19,7 +20,7 @@ public:
 
     // ------------------------------------------------------------------------
     inline bool isIndexValid(S32 index) {
-        return index < 0 || index >= mValues.size();
+        return index >= 0 && index < mValues.size();
     }
     // ------------------------------------------------------------------------
     inline void setStorageSize(U32 size) {
