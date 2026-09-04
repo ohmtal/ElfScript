@@ -84,8 +84,9 @@ function GuiTextWidgetVintage::onAdd(%this) {
 
     %this.add(%this.Lines = new Group() { });
     %this.updateBounds();
+
     %this.schedule(100, AddLine,"");
-    %this.schedule(110, AddLine,"");
+    // %this.schedule(110, AddLine,"");
 
     return true;
 }
@@ -165,9 +166,10 @@ function GuiTextWidgetVintage::RenderEditor(%this) {
     SDL_RenderDebugText(%this.renderer
                         , (%this.EditorBounds.x + 3) /%infoscale
                         , (%this.EditorBounds.y + %this.EditorBounds.height - 4) / %infoscale
-                        ,sprintf("%02d[%02d] : %02d[%02d] ",
+                        ,sprintf("cur: %02d[%02d] : %02d[%02d] L:%-3d",
                                    %this.cursorPos.x,%this.getScreenX()
                                  , %this.cursorPos.y,%this.getScreenY()
+                                 , %this.Lines.size()
 
                          ));
     SDL_SetRenderScale(%this.renderer);
@@ -250,7 +252,7 @@ function GuiTextWidgetVintage::onBackSpacePressed(%this) {
 }
 //----------------------------------------------------------------------
 function GuiTextWidgetVintage::onDeletePressed(%this) {
-    if (%this.Lines.size() == 0 || %this.cursorpos.x <= 1) return;
+    if (%this.Lines.size() == 0 ) return;
     // %cur = %this.Lines.last();
     %cur = %this.Lines.at(%this.cursorPos.y - 1);
     if (!%cur) {
@@ -280,10 +282,12 @@ function GuiTextWidgetVintage::onDeletePressed(%this) {
 //----------------------------------------------------------------------
 function GuiTextWidgetVintage::parser(%this, %text, %modifiers) {
     // This can be overwritten !
+    // if it return true onReturnPressed skip newline
+    return false;
 }
 //----------------------------------------------------------------------
-function GuiTextWidgetVintage::onReturnPressed(%this, %modifiers) {
-    %cursorWasAtBottom = %this.cursorPos.y == %this.Lines.size();
+// new line based on cursorpos
+function GuiTextWidgetVintage::_newLine(%this) {
     %curLine = %this.Lines.at(%this.cursorPos.y - 1);
     if (!%curLine) {
         error("onReturnPressed: SYSTEM ERROR: CURSORPOS.Y");
@@ -291,19 +295,21 @@ function GuiTextWidgetVintage::onReturnPressed(%this, %modifiers) {
     }
 
     %len = strlen(%curLine.text);
-    if (%len > 0 && %this.isMethod("parser")) %this.parser(%curLine.text, %modifiers);
 
-    sysprint("onReturnPressed at bottom:" SPC %cursorWasAtBottom);
-    if (%cursorWasAtBottom) {
+    %cursorWasAtBottom = %this.cursorPos.y == %this.Lines.size();
+
+    // sysprint("_newLine at bottom:" SPC %cursorWasAtBottom);
+    if (%cursorWasAtBottom &&  %this.cursorPos.x > %len ) {
+        sysprint("AN ADD!");
         %this.AddLine("");
         %this.moveCursor(-1000,1000);
     } else {
         if ( %this.cursorPos.x <= %len || %len == 0) {
-            sysprint("AN INSERT!");
+             sysprint("AN INSERT!");
             %post = getSubStr(%curLine.text, 0, %this.cursorPos.x - 1);
             %pre = getSubStr(%curLine.text,%this.cursorPos.x - 1);
-            sysprint("PRE" SPC %pre);
-            sysprint("POST" SPC %post);
+            // sysprint("PRE" SPC %pre);
+            // sysprint("POST" SPC %post);
             %curLine.text = %pre;
             %this.AddLine(%post,"", true);
             %this.moveCursor(-1000,1);
@@ -312,12 +318,29 @@ function GuiTextWidgetVintage::onReturnPressed(%this, %modifiers) {
           %this.moveCursor(-1000,1);
         }
     }
+}
+//----------------------------------------------------------------------
+function GuiTextWidgetVintage::onReturnPressed(%this, %modifiers) {
+    %curLine = %this.Lines.at(%this.cursorPos.y - 1);
+    if (!%curLine) {
+        error("onReturnPressed: SYSTEM ERROR: CURSORPOS.Y");
+        return;
+    }
 
+    %len = strlen(%curLine.text);
+
+    if (%len > 0 && %this.isMethod("parser")) {
+        // parser handled the return
+        if (%this.parser(%curLine.text, %modifiers)) return;
+    }
+
+    %this._newLine();
 
 }
 //----------------------------------------------------------------------
 function GuiTextWidgetVintage::moveCursor(%this, %requestX,%requestY) {
     // // printf("MOVE CURSOR REQUEST: %d, %d CUR: %s", %requestX, %requestY, %this.cursorPos);
+    if (%this.Lines.size() == 0) return;
 
     %this.cursorPos.y += %requestY;
     if (%this.cursorPos.y < 1 ) {
@@ -329,11 +352,11 @@ function GuiTextWidgetVintage::moveCursor(%this, %requestX,%requestY) {
 
     if (%this.cursorPos.y  - 1 < %this.ScrollY) {
         %this.ScrollY = %this.cursorPos.y - 1;
-        sysPrint("lower new scrollY = ", %this.ScrollY);
+        // sysPrint("lower new scrollY = ", %this.ScrollY);
     }
     else if (%this.cursorPos.y > %this.maxLines) {
         %this.ScrollY =  %this.cursorPos.y - %this.maxLines;
-        sysPrint( "%this.lines.size()=",%this.lines.size(),   "  %this.cursorPos.y= ",%this.cursorPos.y, "  %this.maxLines= ", %this.maxLines, " new scrollY = ", %this.ScrollY);
+        // sysPrint( "%this.lines.size()=",%this.lines.size(),   "  %this.cursorPos.y= ",%this.cursorPos.y, "  %this.maxLines= ", %this.maxLines, " new scrollY = ", %this.ScrollY);
     }
 
     %curLine = %this.Lines.at(%this.cursorPos.y - 1);
@@ -389,10 +412,10 @@ function GuiTextWidgetVintage::AddLine(%this, %text, %color = "", %insert=false)
         };
 
         if (%insert && %this.cursorPos.y - 1 >= 0 ) {
-            sysPrint("INSERT LINE (",%obj,") AT " SPC %this.cursorPos.y - 1 SPC %text);
+            // sysPrint("INSERT LINE (",%obj,") AT " SPC %this.cursorPos.y - 1 SPC %text);
             %this.Lines.insert(%this.cursorPos.y - 1, %obj);
         } else {
-            sysPrint("ADDLINE LINE (",%obj,") AFTER " SPC %this.cursorPos.y - 1 SPC %text);
+            // sysPrint("ADDLINE LINE (",%obj,") AFTER " SPC %this.cursorPos.y - 1 SPC %text);
             // if (%this.Lines.size() == 0) %obj.dumpFields();
             %this.Lines.push_back(%obj);
             %this.moveCursor(0,1);

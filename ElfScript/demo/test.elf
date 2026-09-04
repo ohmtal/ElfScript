@@ -657,7 +657,7 @@ for (%i in range 10) {
 }
 
 printSeparator();
-print("script load completed..... no parse errors....");
+printf("script %s load completed..... no parse errors....", $Con::File);
 
 
 

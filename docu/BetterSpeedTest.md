@@ -10,11 +10,24 @@
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
 
-
-## Version 0.7g
+## Version 0.7g - stability tests for first release - 
+ - Added **Neural Network** bindings using genann - demo added to CrazyElf.
+ - SDL3 got a **"melody maker"** - demo added to CrazyElf.
+ - SDL3 got some more bindings like Clipboard text handling. 
+ - Added some methods to Simset/Group to make it more like an "std::"Vector object 
+ - **Set Fieldcache default off** - marked as experimental again! When working on scripts I 
+ had a strange behavoiur - cache failed and dynamic  fields of just created objects  where 
+ not written / could not be read. So it's fast, but not production ready. 
+ Unforually i can not reproduce it in a test enviroment, so far. This is also bad
+ for Components speed since it's embedded into the FieldCache - but not effected.
+ Maybe i put it in parts so i can enable Components cache without object field 
+ cache. 
+ - Fixed math inline commands to use getFloat instead of getFastFloat. 
+ - Added inline commands to docu generator (stub file)
  - SDL3 Colors (baseElf) changed to ConsoleVector
  - Short if: Vector (PoD) parser: true ? {0} : {0} || true ? {0} : expr || true ? expr : {0}
- - MiniElf Demo - linking a lib with only a script loader 
+ - MiniElf Demo - showcase how to embed it - without anything else. Lib failed - need some
+ research why. 
  
 ## Version 0.7f
 

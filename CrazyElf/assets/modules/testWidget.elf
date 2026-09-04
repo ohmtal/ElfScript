@@ -33,7 +33,11 @@ function ConsoleLogObject::onLog(%this, %text, %level) {
     %this.editor.addline(%text, %color);
 }
 function GuiTextWidgetVintage::parser(%this, %text, %modifiers) {
-    if (%modifiers & SDL_KMOD_SHIFT) eval(%text);
+    if (%modifiers & SDL_KMOD_SHIFT) {
+        eval(%text);
+        return true;
+    }
+    return false;
 }
 //----------------------------------------------------------------------
 function testWidget::onAdd(%this) {
