@@ -10,8 +10,9 @@ add_compile_definitions(ELFSCRIPT_VERSION_0_7)
 
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)
-option(ELF_ENABLE_FIELDCACHE "ElfScript: Enable FieldCache - - this is faster but you need to initialize the fields to get a good result. Disable this is you use old lazy written scripts or need to save memory" ON)
-option(ELF_ENABLE_SLIMOBJECT "ElfScript: Disable Torque3D Editor methods" ON)
+
+option(ELF_ENABLE_FIELDCACHE "ElfScript: !!EXPERIMENTAL!! Enable FieldCache - - this is faster but you need to initialize the fields to get a good result. Disable this is you use old lazy written scripts or need to save memory" OFF)
+option(ELF_ENABLE_SLIMOBJECT "ElfScript: Disable Torque3D Editor methods." ON)
 
 
 option(ELF_ENABLE_EXEC_OVERWRITE "ElfScript: Disable the default exec to overwrite it with custom function" OFF)

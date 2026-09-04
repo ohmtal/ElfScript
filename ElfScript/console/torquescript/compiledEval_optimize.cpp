@@ -2541,6 +2541,13 @@ handle_OP_LOADFIELD_FASTPATH:
             mFieldCache.push_back(cachePtr);
             *cacheSlot = cachePtr;
             cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
+#ifdef TORQUE_DEBUG
+            Con::printf("LOAD: %s object: %d [%p] cached field: %s[%s]  (%d)",
+                        cachePtr->cacheFailed ? "!FAILED!" : "OK",
+                        curObject ? curObject->getId() : -666
+                        ,(void*)curObject , curField,curFieldArray, (S32)cachePtr->type);
+#endif
+
             if (cachePtr->cacheFailed) {
                   #ifdef TORQUE_DEBUG
                   Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
@@ -2556,6 +2563,12 @@ handle_OP_LOADFIELD_FASTPATH:
             if (cachePtr->objectPtr != curObject) {
                   cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr,stackPtr, true);
+#ifdef TORQUE_DEBUG
+                  Con::printf("LOAD II: %s object: %d [%p] cached field: %s[%s]  (%d)",
+                              cachePtr->cacheFailed ? "!FAILED!" : "OK",
+                              curObject ? curObject->getId() : -666
+                              ,(void*)curObject , curField,curFieldArray, (S32)cachePtr->type);
+#endif
                   if (cachePtr->cacheFailed) {
                         #ifdef TORQUE_DEBUG
                         Con::warnf("LOAD: object: %d :: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 , curField, curObject->getId());
@@ -2722,7 +2735,7 @@ handle_OP_SAVEFIELD_FASTPATH:
             prevObject = NULL;
             DISPATCH();
       }
-      else
+      else // we have a object!
 #endif
       if (!cachePtr  ) {
             cachePtr = new FieldCache();
@@ -2740,7 +2753,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                         DISPATCH();
                   } else {
 
-#ifdef TORQUE_DEBUG_TOO_MUCH
+#ifdef TORQUE_DEBUG
                         String typeName = "";
                         switch(cachePtr->type) {
                               case  staticField: typeName = "static Field"; break;
@@ -2749,7 +2762,8 @@ handle_OP_SAVEFIELD_FASTPATH:
                               case  dynamicField: typeName = "dynamic field"; break;
                               default: typeName = "ERROR ?!! check fillFieldCache!!!!"; break;
                         }
-                        Con::printf("SAVE: object: %d cached field: %s[%s] type: %s (%d)", curObject ? curObject->getId() : 0 , curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
+                        Con::printf("SAVE: object: %d [%p] cached field: %s[%s] type: %s (%d)", curObject ? curObject->getId() : -666
+                                    ,(void*)curObject , curField,curFieldArray, typeName.c_str(), (S32)cachePtr->type);
 #endif
                   }
       } else {

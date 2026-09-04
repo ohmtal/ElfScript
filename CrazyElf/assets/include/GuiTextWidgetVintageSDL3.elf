@@ -84,7 +84,8 @@ function GuiTextWidgetVintage::onAdd(%this) {
 
     %this.add(%this.Lines = new Group() { });
     %this.updateBounds();
-    %this.AddLine("");
+    %this.schedule(100, AddLine,"");
+    %this.schedule(110, AddLine,"");
 
     return true;
 }
@@ -214,19 +215,36 @@ function GuiTextWidgetVintage::AppendText(%this, %text) {
 }
 //----------------------------------------------------------------------
 function GuiTextWidgetVintage::onBackSpacePressed(%this) {
-    if (%this.Lines.size() == 0 || %this.cursorpos.x <= 1) return;
+    if (%this.Lines.size() == 0 ) return;
     // %cur = %this.Lines.last();
     %cur = %this.Lines.at(%this.cursorPos.y - 1);
     if (!%cur) {
         error("onBackSpacePressed: SYSTEM ERROR CURSORPOS.Y");
         return;
     }
-    %len = strLen(%cur.text);
-    if (%len == 0) return;
-    %pre = getSubStr(%cur.text, 0, %this.cursorpos.x - 2);
-    %post = getSubStr(%cur.text,%this.cursorpos.x - 1);
-    %cur.text = %pre @ %post;
-    %this.moveCursor(-1,0);
+    if (%this.cursorPos.x == 1 ) // on the left we want to move up
+    {
+        if (%this.cursorPos.y <= 1) // we are on top ignore ir
+            return;
+
+        %prev = %this.Lines.at(%this.cursorPos.y - 2);
+        if (! %prev ) {
+            error("onBackSpacePressed: SYSTEM ERROR CURSORPOS.Y PREV!");
+            return;
+        }
+        %prevLen = strLen(%prev.text);
+        %prev.text = %prev.text @ %cur.text;
+        %cur.delete();
+        %this.moveCursor(%prevLen,-1);
+    } else {
+        %len = strLen(%cur.text);
+        if (%len == 0) return;
+        %pre = getSubStr(%cur.text, 0, %this.cursorpos.x - 2);
+        %post = getSubStr(%cur.text,%this.cursorpos.x - 1);
+        %cur.text = %pre @ %post;
+        %this.moveCursor(-1,0);
+    }
+
 
     %this.dirty = true;
 }
@@ -272,14 +290,27 @@ function GuiTextWidgetVintage::onReturnPressed(%this, %modifiers) {
         return;
     }
 
-    if (%this.isMethod("parser")) %this.parser(%curLine.text, %modifiers);
+    %len = strlen(%curLine.text);
+    if (%len > 0 && %this.isMethod("parser")) %this.parser(%curLine.text, %modifiers);
 
+    sysprint("onReturnPressed at bottom:" SPC %cursorWasAtBottom);
     if (%cursorWasAtBottom) {
         %this.AddLine("");
         %this.moveCursor(-1000,1000);
     } else {
-        %this.AddLine("","", true);
-        %this.moveCursor(-1000,1);
+        if ( %this.cursorPos.x <= %len || %len == 0) {
+            sysprint("AN INSERT!");
+            %post = getSubStr(%curLine.text, 0, %this.cursorPos.x - 1);
+            %pre = getSubStr(%curLine.text,%this.cursorPos.x - 1);
+            sysprint("PRE" SPC %pre);
+            sysprint("POST" SPC %post);
+            %curLine.text = %pre;
+            %this.AddLine(%post,"", true);
+            %this.moveCursor(-1000,1);
+
+        } else {
+          %this.moveCursor(-1000,1);
+        }
     }
 
 
@@ -357,12 +388,12 @@ function GuiTextWidgetVintage::AddLine(%this, %text, %color = "", %insert=false)
             TypeVector color = %color !$= "" ?  %color : %this.fontColor;
         };
 
-        if (%insert && %this.cursorPos.y - 1 > 0 ) {
+        if (%insert && %this.cursorPos.y - 1 >= 0 ) {
             sysPrint("INSERT LINE (",%obj,") AT " SPC %this.cursorPos.y - 1 SPC %text);
             %this.Lines.insert(%this.cursorPos.y - 1, %obj);
         } else {
             sysPrint("ADDLINE LINE (",%obj,") AFTER " SPC %this.cursorPos.y - 1 SPC %text);
-            if (%this.Lines.size() == 0) %obj.dumpFields();
+            // if (%this.Lines.size() == 0) %obj.dumpFields();
             %this.Lines.push_back(%obj);
             %this.moveCursor(0,1);
         }
