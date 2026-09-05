@@ -137,6 +137,11 @@ void ConsoleConstructor::init( const char *cName, const char *fName, const char 
 #ifdef ENABLE_CONSOLE_VECTOR
    mVecC = 0;
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+   mValueC = 0;
+#endif
+
+
    mCallback = mGroup = false;
    mNext = mFirst;
    mNS = false;
@@ -166,6 +171,10 @@ void ConsoleConstructor::setup()
 #ifdef ENABLE_CONSOLE_VECTOR
       else if( walk->mVecC)
         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVecC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+#endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      else if( walk->mValueC)
+        Con::addCommand( walk->mClassName, walk->mFuncName, walk->mValueC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
 #endif
       else if( walk->mGroup )
          Con::markCommandGroup( walk->mClassName, walk->mFuncName, walk->mUsage);
@@ -219,6 +228,14 @@ ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcNa
 {
       init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
       mVecC = bfunc;
+}
+#endif
+// --------------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
+{
+      init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
+      mValueC = bfunc;
 }
 #endif
 // --------------------------------------------------------------------------------
@@ -1352,6 +1369,14 @@ void addCommand( const char *nsName, const char *name,VectorCallback cb, const c
 }
 #endif
 // -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+void addCommand( const char *nsName, const char *name,ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
+{
+      Namespace *ns = lookupNamespace(nsName);
+      ns->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
+}
+#endif
+// -----------------------------------------------------------------------------
 
 void addCommand( const char *nsName, const char *name,BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
@@ -1411,8 +1436,15 @@ void addCommand( const char *name,VectorCallback cb,const char *usage, S32 minAr
 {
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
-// -----------------------------------------------------------------------------
 #endif
+// -----------------------------------------------------------------------------
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+void addCommand( const char *name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
+{
+      Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
+}
+#endif
+
 //------------------------------------------------------------------------------
 
 // Internal execute for global function which does not save the stack

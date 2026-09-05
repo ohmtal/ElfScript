@@ -53,6 +53,8 @@ typedef U32 StringStackPtr;
 template< typename T > S32 TYPEID();
 
 
+
+
 /// @defgroup console_system Console System
 /// The Console system is the basis for logging, SimObject, and TorqueScript itself.
 ///
@@ -390,6 +392,7 @@ public:
    }
 
    TORQUE_FORCEINLINE operator const char* () const { return getString(); }
+   // ENABLE_CONSOLE_VALUE_CALLBACK ==> NOT ==> TORQUE_FORCEINLINE explicit operator const char* () const { return getString(); }
 
 #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
@@ -579,7 +582,7 @@ public:
    static void init();
    static void resetConversionBuffer();
 
-private:
+//ElfScript need them  // private:
    /// Deep-copy from `other` into `this` (assumes `this` has already been
   /// cleaned up or is freshly constructed).
    void copyFrom(const ConsoleValue& other)
@@ -672,6 +675,10 @@ private:
    }
 }; // end of console value
 
+
+
+
+
 // Transparently converts ConsoleValue[] to const char**
 class ConsoleValueToStringArrayWrapper
 {
@@ -730,6 +737,10 @@ typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 
 #ifdef ENABLE_CONSOLE_VECTOR
 typedef ConsoleVector(*VectorCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
+#endif
+
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+typedef ConsoleValue(*ConsoleValueCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 #endif
 
 typedef void(*ConsumerCallback)(U32 level, const char *consoleLine);
@@ -1092,22 +1103,39 @@ namespace Con
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand( const char* name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
-                                                                                                                                                                   /// @}
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+   void addCommand( const char* name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+#endif
 
-                                                                                                                                                                   /// @name Namespace Function Registration
-                                                                                                                                                                   /// @{
+/// @name Namespace Function Registration
+/// @{
 
-                                                                                                                                                                   /// Register a C++ function with the console making it callable
-                                                                                                                                                                   /// as a method of the given namespace from the scripting engine.
-                                                                                                                                                                   ///
-                                                                                                                                                                   /// @param nameSpace Name of the namespace to associate the new function with; this is usually the name of a class.
-                                                                                                                                                                   /// @param name      Name of the new function.
-                                                                                                                                                                   /// @param cb        Pointer to the function implementing the scripting call; a console callback function returning a specific type value.
-                                                                                                                                                                   /// @param usage     Documentation for this function. @ref console_autodoc
-                                                                                                                                                                   /// @param minArgs   Minimum number of arguments this function accepts
-                                                                                                                                                                   /// @param maxArgs   Maximum number of arguments this function accepts
-                                                                                                                                                                   /// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
-                                                                                                                                                                   /// @param header    The extended function header.
+/// Register a C++ function with the console making it callable
+/// as a method of the given namespace from the scripting engine.
+///
+/// @param nameSpace Name of the namespace to associate the new function with; this is usually the name of a class.
+/// @param name      Name of the new function.
+/// @param cb        Pointer to the function implementing the scripting call; a console callback function returning a specific type value.
+/// @param usage     Documentation for this function. @ref console_autodoc
+/// @param minArgs   Minimum number of arguments this function accepts
+/// @param maxArgs   Maximum number of arguments this function accepts
+/// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
+/// @param header    The extended function header.                                                                                                                                                         /// @}
+
+/// @name Namespace Function Registration
+/// @{
+
+/// Register a C++ function with the console making it callable
+/// as a method of the given namespace from the scripting engine.
+///
+/// @param nameSpace Name of the namespace to associate the new function with; this is usually the name of a class.
+/// @param name      Name of the new function.
+/// @param cb        Pointer to the function implementing the scripting call; a console callback function returning a specific type value.
+/// @param usage     Documentation for this function. @ref console_autodoc
+/// @param minArgs   Minimum number of arguments this function accepts
+/// @param maxArgs   Maximum number of arguments this function accepts
+/// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
+/// @param header    The extended function header.
    void addCommand(const char *nameSpace, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 
    void addCommand(const char *nameSpace, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
@@ -1117,7 +1145,9 @@ namespace Con
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(const char *nameSpace, const char *name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
-                                                                                                                                                                                        /// @}
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+  void addCommand(const char *nameSpace, const char *name, ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+#endif                                                                                                                                                                                        /// @}
 
                                                                                                                                                                                         /// @name Special Purpose Registration
                                                                                                                                                                                         ///
@@ -1395,6 +1425,10 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    VectorCallback mVecC;     ///< A function/method that returns a ConsoleVector.
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      ConsoleValueCallback mValueC;     ///< A function/method that returns a ConsoleVector.
+#endif
+
 
    bool mGroup;          ///< Indicates that this is a group marker.
    bool mNS;             ///< Indicates that this is a namespace marker.
@@ -1508,6 +1542,10 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+   ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
+#endif
+
    /// @}
 
    /// @name Magic Console Constructors

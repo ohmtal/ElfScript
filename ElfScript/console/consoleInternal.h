@@ -96,6 +96,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
         , VectorCallbackType
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      , ConsoleValueCallbackType
+#endif
 
       };
 
@@ -153,6 +156,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
          VectorCallback mVectorCallbackFunc;
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+         ConsoleValueCallback mConsoleValueCallbackFunc;
+#endif
          const char *mGroupName;
          const char *mCallbackName;
       } cb;
@@ -202,6 +208,9 @@ public:
    void addCommand(StringTableEntry name, BoolCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(StringTableEntry name, VectorCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+#endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+ void addCommand(StringTableEntry name, ConsoleValueCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 #endif
    void addScriptCallback(const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);
 

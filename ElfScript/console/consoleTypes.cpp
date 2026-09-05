@@ -1234,3 +1234,25 @@ ConsoleSetType( TypeVector )
       else
             Con::printf("ConsoleVector must be set as { x, y, z, w } or \"x y width height\"");
 }
+
+// ----------------------------------------------------------------------------
+IMPLEMENT_STRUCT( ConsoleValue, TypeValue,,
+                  "the powerfull console vale" )
+END_IMPLEMENT_STRUCT;
+
+ConsoleType(TypeValue, TypeValue, ConsoleValue, "")
+ImplementConsoleTypeCasters( TypeValue, ConsoleValue )
+
+ConsoleGetType( TypeValue )
+{
+      ConsoleValue *cv = (ConsoleValue *) dptr;
+      return cv->getString();
+}
+
+ConsoleSetType( TypeValue )
+{
+      if(argc == 1)
+            ((ConsoleValue *)dptr)->setString(argv[0]);
+      else
+            Con::printf("failed to set Value!");
+}

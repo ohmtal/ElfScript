@@ -3134,6 +3134,16 @@ handle_OP_CALLFUNC:
                               break;
                         }
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+                        case Namespace::Entry::ConsoleValueCallbackType:
+                        {
+                              ConsoleValue result = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
+                              gCallStack.popFrame();
+                              stack[_STK + 1].copyFrom( result) ;
+                              PUSH_STK();
+                              break;
+                        }
+#endif
 
                         case Namespace::Entry::StringCallbackType:
                         {

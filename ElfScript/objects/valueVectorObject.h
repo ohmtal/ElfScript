@@ -12,8 +12,7 @@
 #include "console/enginePrimitives.h"
 #include "console/dynamicTypes.h"
 
-DefineConsoleType( TypeValue, ConsoleValue )
-DECLARE_STRUCT( ConsoleValue );
+
 
 class ValueVector: public SimObject
 {

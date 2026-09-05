@@ -88,14 +88,15 @@ DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, const char*)
 
 //ElfScript
-DECLARE_STRUCT( ConsoleVector );
-
-//THIS ??? not or ?ConsoleMappedType( TypeVector, ConsoleVector, cvVector, ConsoleVector, "noIdea" ))
-
 DefineConsoleType( TypeVector, ConsoleVector)
+DECLARE_STRUCT( ConsoleVector );
 IMPLEMENT_ENGINE_TYPE_TRAITS(ConsoleVector);
 // TEST: IMPLEMENT_PRIMITIVE(ConsoleVector, ConsoleVector,, "A Point Vector");
 
+// ElfScript 0.7:
+DefineConsoleType( TypeValue, ConsoleValue )
+DECLARE_STRUCT( ConsoleValue ); // Why do i need this ?
+IMPLEMENT_ENGINE_TYPE_TRAITS(ConsoleValue);
 
 
 // DefineConsoleType(TypeRotationF, RotationF)

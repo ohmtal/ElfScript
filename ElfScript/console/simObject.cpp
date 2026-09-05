@@ -3402,6 +3402,17 @@ namespace {
                      mPadding[ 4 ] = 0;
                      break;
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+               case Namespace::Entry::ConsoleValueCallbackType:
+                     mReturnType = "ConsoleValue";
+                     // NOTE no idea what to set here ...
+                     mPadding[ 0 ] = ' ';
+                     mPadding[ 1 ] = ' ';
+                     mPadding[ 2 ] = ' ';
+                     mPadding[ 3 ] = ' ';
+                     mPadding[ 4 ] = 0;
+                     break;
+#endif
             }
          }
       }

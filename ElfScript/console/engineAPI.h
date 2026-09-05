@@ -474,6 +474,13 @@ inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
 // // // }
 
 #endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+inline ConsoleValue _EngineConsoleThunkReturnValue( ConsoleValue value )
+{
+      return value;
+}
+
+#endif
 // -----------------------------------------------------------------------------
 inline S32 _EngineConsoleThunkReturnValue( S32 value )
 {
@@ -542,6 +549,14 @@ struct _EngineConsoleThunkType< ConsoleVector >
 {
       typedef ConsoleVector ReturnType;
       typedef VectorCallback CallbackType;
+};
+#endif
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+template<>
+struct _EngineConsoleThunkType< ConsoleValue >
+{
+      typedef ConsoleValue ReturnType;
+      typedef ConsoleValueCallback CallbackType;
 };
 #endif
 // -----------------------------------------------------------------------------
