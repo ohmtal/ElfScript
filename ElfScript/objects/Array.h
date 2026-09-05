@@ -2,8 +2,7 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// ElfScript ValueVectorObject
-// Experimental !
+// ElfScript Array
 //-----------------------------------------------------------------------------
 #pragma once
 
@@ -14,11 +13,11 @@
 
 
 
-class ValueVector: public SimObject
+class Array: public SimObject
 {
     typedef SimObject Parent;
 public:
-    DECLARE_CONOBJECT(ValueVector);
+    DECLARE_CONOBJECT(Array);
     Vector<ConsoleValue> mValues;
 
 

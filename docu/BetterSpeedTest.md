@@ -11,6 +11,7 @@
 
 
 ## Version 0.7g - stability tests for first release - 
+ - Implemented direct handling getter/setter for ConsoleValue (used by ValueVector)
  - Added **Neural Network** bindings using genann - demo added to CrazyElf.
  - SDL3 got a **"melody maker"** - demo added to CrazyElf.
  - SDL3 got some more bindings like Clipboard text handling. 

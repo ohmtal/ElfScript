@@ -621,10 +621,10 @@ namespace Script
 // Elfscript PoD (XXTH) --------------------------------------------
 struct VectorConstructorNode : ExprNode
 {
-   // Vector<ExprNode*> elements;
-   ExprNode* argList;
+   ExprNode* argList = nullptr;
+   bool isArrayConstuctor = false;
 
-   static VectorConstructorNode* alloc(S32 lineNumber);
+   static VectorConstructorNode* alloc(S32 lineNumber, bool arrayConstuctor = false);
 
 
    U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;

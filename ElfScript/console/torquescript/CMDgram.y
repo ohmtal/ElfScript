@@ -685,6 +685,15 @@ stmt_expr
          vecNode->argList = (ExprNode*)$4;
          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
       }
+
+   /* ==================== new Array Constructor ==================== */
+   | VAR '=' '[' expr_list ']'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
+      }
+
    /* ============================================================================== */
 
    | VAR '[' aidx_expr ']' '=' expr

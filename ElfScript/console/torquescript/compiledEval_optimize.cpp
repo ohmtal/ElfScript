@@ -53,6 +53,8 @@
 #include <math/mMathRand.h>
 // #include "console/telnetDebugger.h"
 
+#include "objects/Array.h"
+
 
 using namespace Compiler;
 
@@ -81,26 +83,17 @@ struct IterStackRecord
    // // bool mIsGlobalVariable;
 
    ConsoleValue* mConsoleValue = nullptr;
-   // union
-   // {
-   //
-   //
-   //    // /// The iterator variable if we are a global variable
-   //    Dictionary::Entry* mVariable;
-   //    //
-   //    // /// The register variable if we are a local variable
-   //    S32 mRegister;
-   // } mVar;
 
    /// Information for an object iterator loop.
    struct ObjectPos
    {
       /// The set being iterated over.
-      SimSet* mSet;
+      // SimSet* mSet;
+      SimObject* mObjPtr; //ElfScript 0.7
 
       /// Current index in the set.
       U32 mIndex;
-   };
+   }; // 12 bytes
 
    /// Information for a string iterator loop.
    struct StringPos
@@ -110,22 +103,22 @@ struct IterStackRecord
 
       /// Current parsing position.
       U32 mIndex;
-   };
+   }; // 12 bytes
 
    struct RangePos
    {
-      bool isPositive;
       S32  mStart; // first number (included)
       S32  mEnd;  // last number (included)
       S32  mInc;  // -1, +1 maybe we can add STEP :)
       S32  mStop; //we stop at ...
-   };
+      bool isPositive; // 4 bytes NOTE can be chaged to U32 flags
+   }; // 20bytes
 
    union
    {
       ObjectPos mObj;
       StringPos mStr;
-      RangePos  mRange;
+      RangePos  mRange; //break the union .. mhh
    } mData;
 };
 
@@ -1406,6 +1399,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
          &&handle_OP_ITER_STRING,
          &&handle_OP_ITER_SIMOBJECT,
+         &&handle_OP_ITER_ARRAY,
          &&handle_OP_ITER_FOR_INT,
          &&handle_OP_ITER_FOR_INT_RANGE,
          &&handle_OP_ITER_FOR_INT_RANGE_NEG,
@@ -1414,6 +1408,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
 
          &&handle_OP_BUILD_VECTOR_STRING,
+         &&handle_OP_ARRAY_CONSTUCTOR,
          &&handle_OP_SAVEFIELD_FASTPATH,
          &&handle_OP_LOADFIELD_FASTPATH,
 
@@ -3383,6 +3378,9 @@ handle_OP_ITER_BEGIN:
 {
       U32 mode = code[ip]; ip++; // i emmit the mode now
 
+      // ElfScript 0.7 IP of LOOP ITER
+      U32 loopOpcodeIp = code[ip]; ip++;
+
       bool isGlobal = code[ip];
 
       U32 failIp = code[ip + (isGlobal ? 3 : 2)];
@@ -3395,15 +3393,11 @@ handle_OP_ITER_BEGIN:
       if (isGlobal)
       {
             StringTableEntry varName = CodeToSTE(code, ip + 1);
-
             iter.mConsoleValue = Con::gGlobalVars.add(varName)->getValuePtr();
-            // iter.mVar.mVariable = Con::gGlobalVars.add(varName);
-
       }
       else
       {
             iter.mConsoleValue = Script::gEvalState.getLocalConsoleValuePtr(code[ip + 1]);
-            // iter.mVar.mRegister = code[ip + 1];
       }
 
       // cast to integer
@@ -3501,27 +3495,54 @@ handle_OP_ITER_BEGIN:
             }
             break;
 
-            default: //0/default => SimObject
+            default: //0/default => SimObject || Array
             {
                   // Look up the object.
+                  SimObject *objPtr = Sim::findObject(stack[_STK]);
+                  if (!objPtr) {
+                        // we use string foreach$ is stupid and why post an error here instead of go ahead
+                        iter.mData.mStr.mString = stack[_STK].getString();
+                        iter.mData.mStr.mIndex = 0;
+                        code[loopOpcodeIp] = OP_ITER_STRING;
+                  } else {
+                        if (dynamic_cast<SimSet*>(objPtr)) {
+                              code[loopOpcodeIp] = OP_ITER_SIMOBJECT;
+                        }
+                        else  if (dynamic_cast<Array*>(objPtr)) {
+                              code[loopOpcodeIp] = OP_ITER_ARRAY;
+                        } else {
+                              Con::errorf(ConsoleLogEntry::General, "Object: %s is not valid using foreach!",stack[_STK].getString() );
+                              ip = failIp;
+                              POP_STK();
+                              DISPATCH();
 
-                  SimSet* set;
-                  if (!Sim::findObject(stack[_STK].getString(), set))
-                  {
-                        Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
-                        Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
-                        ip = failIp;
-                        // Pop the iterated value
-                        POP_STK();
-                        DISPATCH(); // continue;
+                        }
+                        iter.mData.mObj.mObjPtr = objPtr;
+                        iter.mData.mObj.mIndex = 0;
+                        iter.mConsoleValue->setInt(0);
                   }
 
-                  // Set up.
 
-                  iter.mData.mObj.mSet = set;
-                  iter.mData.mObj.mIndex = 0;
 
-                  iter.mConsoleValue->setInt(0);
+                  // // SimSet* set;
+                  // // if (!Sim::findObject(stack[_STK].getString(), set))
+                  // // {
+                  // //       Con::errorf(ConsoleLogEntry::General, "No SimSet object '%s'", stack[_STK].getString());
+                  // //       Con::errorf(ConsoleLogEntry::General, "Did you mean to use 'foreach$' instead of 'foreach'?");
+                  // //       ip = failIp;
+                  // //       // Pop the iterated value
+                  // //       POP_STK();
+                  // //       DISPATCH(); // continue;
+                  // // }
+                  // //
+                  // //
+                  // // // Set up.
+                  // //
+                  // // // iter.mData.mObj.mSet = set;
+                  // // iter.mData.mObj.mObjPtr = set;
+                  // // iter.mData.mObj.mIndex = 0;
+                  // //
+                  // // iter.mConsoleValue->setInt(0);
 
             }
             break;
@@ -3585,12 +3606,34 @@ handle_OP_ITER_STRING:
       DISPATCH();
 }
 
+// --------------------------------------------------------
+handle_OP_ITER_ARRAY:
+{
+      U32 breakIp = code[ip];
+      IterStackRecord& iter = iterStack[_ITER - 1];
+      U32 index = iter.mData.mObj.mIndex;
+      Array* array = static_cast<Array*>( iter.mData.mObj.mObjPtr);
+
+      if (index >= array->mValues.size())
+      {
+            ip = breakIp;
+            DISPATCH(); // continue;
+      }
+
+      iter.mConsoleValue->copyFrom( array->mValues[index] );
+
+      iter.mData.mObj.mIndex = index + 1;
+
+      ++ip;
+      DISPATCH();
+}
+// --------------------------------------------------------
 handle_OP_ITER_SIMOBJECT:
 {
       U32 breakIp = code[ip];
       IterStackRecord& iter = iterStack[_ITER - 1];
       U32 index = iter.mData.mObj.mIndex;
-      SimSet* set = iter.mData.mObj.mSet;
+      SimSet* set = static_cast<SimSet*>( iter.mData.mObj.mObjPtr);
 
       if (index >= set->size())
       {
@@ -3605,7 +3648,7 @@ handle_OP_ITER_SIMOBJECT:
       iter.mData.mObj.mIndex = index + 1;
 
       ++ip;
-      DISPATCH(); // fettisch
+      DISPATCH();
 }
 
 handle_OP_ITER_FOR_INT:
@@ -3984,6 +4027,25 @@ handle_OP_ITER_END:
       DISPATCH();;
 }
 
+
+// ~~~~~~~~~~~~~~~~~ Array Constructor
+// Example: $foo = [1,2,3,4,5,"Hello"];$foo.list();
+handle_OP_ARRAY_CONSTUCTOR: {
+
+      U32 count = code[ip++];
+      // FIXME garbage collection ?
+      Array* newArrayObj = new Array();
+      newArrayObj->registerObject();
+
+      // get values from stack and fill ConsoleVector or TAB separated String
+      for (S32 i = count - 1; i >= 0; i--) {
+            newArrayObj->mValues.push_front(stack[_STK]);
+            POP_STK();
+      }
+
+      stack[_STK].setInt(newArrayObj->getId());
+      DISPATCH();
+}
 // ~~~~~~~~~~~~~~~~~ VECTOR_STRING
 #ifdef ENABLE_CONSOLE_VECTOR
 // PoD !! :D if count < 4 we get into vector mode :)

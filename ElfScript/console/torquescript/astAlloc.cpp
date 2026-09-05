@@ -469,12 +469,13 @@ FunctionDeclStmtNode* FunctionDeclStmtNode::alloc(S32 lineNumber, StringTableEnt
 }
 
 // Elfscript PoD (XXTH) --------------------------------------------
-VectorConstructorNode* VectorConstructorNode::alloc(S32 lineNumber)
+VectorConstructorNode* VectorConstructorNode::alloc(S32 lineNumber,bool arrayConstuctor)
 {
       VectorConstructorNode* ret = (VectorConstructorNode*)consoleAlloc(sizeof(VectorConstructorNode));
       constructInPlace(ret);
       ret->dbgLineNumber = lineNumber;
       ret->argList = NULL;
+      ret->isArrayConstuctor = arrayConstuctor;
       return ret;
 }
 
@@ -498,7 +499,11 @@ U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             elementCount++;
       }
 
-      codeStream.emit(OP_BUILD_VECTOR_STRING);
+      if (this->isArrayConstuctor) {
+            codeStream.emit(OP_ARRAY_CONSTUCTOR);
+      } else {
+            codeStream.emit(OP_BUILD_VECTOR_STRING);
+      }
       codeStream.emit(elementCount);
 
       return codeStream.tell();

@@ -31,7 +31,7 @@ was some rough-edged but as he write on his github page that it's not finished.
 ### Porting from Torque3D
 After some time using KorkScript i missed the new stuff from Torque3D I worked 
 with, when porting parts of my source from Auteria/TGE to Torque3D. I had 
-started extracing TorqueScript some times over the years but now i became 
+started extracting TorqueScript some times over the years but now i became 
 **subborn** and did not stop until it started to show up a heartbeat. 
 
 ### Elfscript was born

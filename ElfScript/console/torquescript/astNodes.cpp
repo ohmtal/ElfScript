@@ -350,7 +350,6 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
    codeStream.pushFixScope(true);
 
    bool isGlobal = varName[0] == '$';
-   // TypeReq varType = isStringIter ? TypeReqString : TypeReqUInt;
    TypeReq varType = (mode==1) ? TypeReqString : TypeReqUInt;
 
    const U32 startIp = ip;
@@ -433,6 +432,7 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
             break;
 
          default:
+            varType = TypeReqString; //ElfScript 0.7
             startExpr->compile(codeStream, startIp, TypeReqString);
             iterOPCode =OP_ITER_SIMOBJECT;
             break;
@@ -441,6 +441,10 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
    codeStream.emit(OP_ITER_BEGIN);
    codeStream.emit(mode); //instead of different OP_ codes i emmit the mode
+
+   // ElfScript 0.7 for changing loop iter at runtime
+   // if i had known how easy this is earlier ....
+   U32 patchIpPos = codeStream.emit(0);  //Backpack Loop call
 
    codeStream.emit(isGlobal);
    if (isGlobal)
@@ -457,6 +461,9 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
     */
    const U32 continueIp = codeStream.emit(iterOPCode);
    // const U32 continueIp = codeStream.emit(OP_ITER);
+
+   // ElfScript 0.7 for changing loop iter OP_ITER_ARRAY :D
+   codeStream.patch(patchIpPos, continueIp); //set loop call
 
 
    codeStream.emitFix(CodeStream::FIXTYPE_BREAK);

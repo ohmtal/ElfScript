@@ -167,6 +167,7 @@ namespace Compiler
       // Elfscript 0.6f
       OP_ITER_STRING,
       OP_ITER_SIMOBJECT,
+      OP_ITER_ARRAY, // ElfScript 0.7
       OP_ITER_FOR_INT,
       OP_ITER_FOR_INT_RANGE,
       OP_ITER_FOR_INT_RANGE_NEG,
@@ -175,6 +176,7 @@ namespace Compiler
 
 
       OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
+      OP_ARRAY_CONSTUCTOR,    // ElfScript 0.7
       OP_SAVEFIELD_FASTPATH,
       OP_LOADFIELD_FASTPATH,
 
@@ -203,6 +205,7 @@ namespace Compiler
       OP_MATH_RANDOMF,
       OP_MATH_RANDOMF_1,
       OP_MATH_RANDOMF_2,
+
 
       OP_INVALID,   //
 
