@@ -444,7 +444,7 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
    // ElfScript 0.7 for changing loop iter at runtime
    // if i had known how easy this is earlier ....
-   U32 patchIpPos = codeStream.emit(0);  //Backpack Loop call
+   const U32 patchIpPos = codeStream.emit(0);  //Backpack Loop call
 
    codeStream.emit(isGlobal);
    if (isGlobal)

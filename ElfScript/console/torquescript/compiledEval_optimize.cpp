@@ -4043,6 +4043,7 @@ handle_OP_ARRAY_CONSTUCTOR: {
             POP_STK();
       }
 
+      PUSH_STK();
       stack[_STK].setInt(newArrayObj->getId());
       DISPATCH();
 }
