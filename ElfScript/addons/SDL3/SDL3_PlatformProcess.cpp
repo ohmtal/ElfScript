@@ -24,10 +24,10 @@ namespace Platform
 #ifndef ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC
   // Called from console functions quit..
   void postQuitMessage(const S32 in_quitVal) {
-    ElfSDL3::shutDownRequested = true;
+    ElfSDL3::ShutDownRequested = true;
   }
   void forceShutdown(S32 returnValue) {
-    ElfSDL3::shutDownRequested = true;
+    ElfSDL3::ShutDownRequested = true;
   }
 #endif
 

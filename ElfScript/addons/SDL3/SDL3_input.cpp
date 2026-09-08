@@ -11,6 +11,7 @@
 
 #include <SDL3/SDL.h>
 #include <console/script.h>
+#include "SDL3_input.h"
 
 #ifndef ElfSDL3_DISABLE_POLL
 #define ElfSDL3_ENABLE_POLL
@@ -212,6 +213,39 @@ bool IsShortcutPressed(Uint16 modifiers, SDL_Scancode key) {
     return true;
 }
 
+// -----------------------------------------------------------------------------
+// Game Controller
+// -----------------------------------------------------------------------------
+DefineEngineFunction(SDL_OpenJoystick, bool, (S32 which),
+                     , "Open a joystick and return the internal JoyStickId") {
+
+    return OpenElfContoller(which) != 0;
+}
+// ----
+DefineEngineFunction(SDL_GetJoystickName, const char* , (S32 which),
+                     , "Get the name of joystick ") {
+    return GetElfControllerNameByWhich(which);
+}
+// ----
+DefineEngineFunction(SDL_CloseJoystick, void , (S32 which),
+                     , "Close the joystick") {
+    CloseElfControllerByWhich(which);
+}
+DefineEngineFunction(SDL_OpenGamepad, bool, (S32 which),
+                     , "Open a joystick and return the internal JoyStickId") {
+
+    return OpenElfContoller(which) != 0;
+}
+// ----
+DefineEngineFunction(SDL_GetGamepadName, const char* , (S32 which),
+                     , "Get the name of joystick ") {
+    return GetElfControllerNameByWhich(which);
+}
+// ----
+DefineEngineFunction(SDL_CloseGamepad, void , (S32 which),
+                     , "Close the joystick") {
+    CloseElfControllerByWhich(which);
+}
 
 // -----------------------------------------------------------------------------
 #ifdef ElfSDL3_ENABLE_POLL

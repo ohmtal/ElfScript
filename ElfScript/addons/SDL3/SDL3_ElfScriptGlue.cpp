@@ -83,6 +83,10 @@ namespace ElfSDL3 {
         ElfSDL3::InitRenderer();
         // ElfSDL3::Audio::Init(); << must be done in script! via  Audio_Init();
         ElfSDL3::InitEvents();
+
+        Con::addVariable( "$SDL::ShutDownRequested", TypeBool, &ElfSDL3::ShutDownRequested, "Script request ShutDown");
+        Con::addVariable( "$SDL::EnableSDLEvents", TypeBool, &ElfSDL3::EnableSDLEvents, "Set EnableSDLEvents for onSDLEvent");
+
     }
 
     // DefineEngineFunction(InitSDLBindings, void, (), ,"Init the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
@@ -90,6 +94,7 @@ namespace ElfSDL3 {
     // void ShutdownSDLBindings(){
     void Shutdown(){
         ElfSDL3::ShutDownEvents();
+        ElfSDL3::ShutDownInput();
         ElfSDL3::ShutDownRenderer();
         ElfSDL3::Audio::ShutDown();
     }
@@ -106,7 +111,7 @@ namespace ElfSDL3 {
     "to match the mouse position to the scaled screen."
     ) {
 
-        if (ElfSDL3::shutDownRequested) return false;
+        if (ElfSDL3::ShutDownRequested) return false;
 
         static U32 lastTicks = SDL_GetTicks();
 
@@ -152,9 +157,9 @@ namespace ElfSDL3 {
                     return false;
                     break;
             };
-            // TODO should be merged ?
+            //  should be merged ? but then i cant use them separatly
             ElfSDL3::onEvent(event); // SDL3_input
-            ElfSDL3::FireSDLEvent(event); // SDL3_event
+            if (ElfSDL3::EnableSDLEvents) ElfSDL3::FireSDLEvent(event); // SDL3_event
 
         }
 

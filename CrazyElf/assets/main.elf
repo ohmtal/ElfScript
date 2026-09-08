@@ -291,6 +291,8 @@ echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 
 while ($Global::running) {
 
+    if (!%main) break;
+
     %tickCount = SDL_GetPerformanceCounter();
 
     $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
@@ -300,6 +302,7 @@ while ($Global::running) {
     // Main::Render(%main); //not really >>Fast call we are in a critical loop
     if (!SDL_MainLoop(%mainLoopParam)) {
         echo("quit by SDL_MainLoop");
+        %main = 0;
         break;
     }
 

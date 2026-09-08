@@ -73,13 +73,13 @@ function  sdlTests::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){}
 
 function onSDLEvent(%event) {
     // printf("NEW SDL EVENT TYPE: %d", %event.type);
-    switch (%event.type) {
-        case SDL_EVENT_MOUSE_MOTION:
-            printf("x:%.2f y:%.2f xrel:%.2f yrel:%.2f",
-                   %event.motion.x, %event.motion.y,
-                   %event.motion.xrel, %event.motion.yrel);
-
-    }
+    // switch (%event.type) {
+    //     case SDL_EVENT_MOUSE_MOTION:
+    //         printf("x:%.2f y:%.2f xrel:%.2f yrel:%.2f",
+    //                %event.motion.x, %event.motion.y,
+    //                %event.motion.xrel, %event.motion.yrel);
+    //
+    // }
 }
 
 

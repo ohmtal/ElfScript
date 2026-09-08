@@ -19,7 +19,9 @@ namespace ElfSDL3 {
     void Init() ;
     void Shutdown();
 
-    inline bool shutDownRequested = false;
+    inline bool ShutDownRequested = false;
+
+    inline bool EnableSDLEvents = true;
 
     // FrameTime
     inline F64 FrameTime = 0.f;

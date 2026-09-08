@@ -27,7 +27,7 @@
 //      event.motion_x ... this is only one object to handle but breaks the
 //   idea of "close to SDL3" implementation
 //
-//
+// * Finally i used only one object and linked the group with all names to this.
 //
 //
 //-----------------------------------------------------------------------------
@@ -38,6 +38,7 @@
 #include "SDL3_events.h"
 
 #include <SDL3/SDL.h>
+#include <console/script.h>
 
 namespace ElfSDL3 {
 
@@ -60,11 +61,11 @@ public:
     }
 
     inline void setFloat(const char* fieldName, F32 value) {
-        mWorkerValue.setFloat(value);
+        mWorkerValue.setFloat((F64)value);
         pushDynamicField(StringTable->insert(fieldName), nullptr, &mWorkerValue);
     }
     inline void setInt(const char* fieldName, S32 value) {
-        mWorkerValue.setInt(value);
+        mWorkerValue.setInt((S64)value);
         pushDynamicField(StringTable->insert(fieldName), nullptr, &mWorkerValue);
     }
     inline void setLong(const char* fieldName, S64 value) {
@@ -79,8 +80,8 @@ public:
     inline void setEventType( U32 newType) {
         if (mLastEventType != newType) {
             mLastEventType = newType;
-            setInt("type", newType);
             resetFields();
+            setInt("type", newType);
         }
     }
 private:
@@ -122,7 +123,7 @@ void CreateEventDataObjects() {
     EventDataObj->AddCommonFields();
     Event->addObject(EventDataObj);
 
-    Con::addVariable( "SDL::Event", TypeSimObjectPtr, &EventObjects::Event, "");
+    Con::addVariable( "$SDL::Event", TypeSimObjectPtr, &EventObjects::Event, "Data from the last Event");
 
     Con::debugf("SDL EVENTS: Event Worker Object created: %d", Event->getId());
 
@@ -234,13 +235,12 @@ EventObjects::EventDataObj->setInt(#field, (S32)event.structName.field)
 EventObjects::EventDataObj->setFloat(#field, event.structName.field)
 
 #define SET_STRING(structName, field) \
-EventObjects::EventDataObj->setInt(#field, event.structName.field)
+EventObjects::EventDataObj->setString(#field, event.structName.field)
 
 // -----------------------------------------------------------------------------
 void FireSDLEvent(const SDL_Event& event) {
     using namespace EventObjects;
     if (!EventObjects::Event || !EventObjects::EventDataObj) return ; //assert..
-    if (!Con::isFunction("onSDLEvent")) return; //TODO cache ...
     ConsoleValue v;
     v.setInt(event.type);
     EventObjects::Event->pushDynamicField(StringTable->insert("type"), nullptr, &v);
@@ -249,7 +249,7 @@ void FireSDLEvent(const SDL_Event& event) {
     switch (event.type) {
 
         // -------------- KEYS --------------------
-        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_DOWN: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_KEY_UP: {
             SET_LONG(key, timestamp);
             SET_INT(key, windowID);
@@ -263,7 +263,7 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
         // -------------- MOUSE --------------------
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_MOUSE_BUTTON_UP: {
             SET_LONG(button, timestamp);
             SET_INT(button, windowID);
@@ -299,8 +299,8 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
         // -------------- JOYSTICK --------------------
-        case SDL_EVENT_JOYSTICK_ADDED:
-        case SDL_EVENT_JOYSTICK_REMOVED:
+        case SDL_EVENT_JOYSTICK_ADDED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_JOYSTICK_REMOVED: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE: {
             SET_LONG(jdevice, timestamp);
             SET_INT(jdevice, which); // Instance ID for newly discovered devices
@@ -332,7 +332,7 @@ void FireSDLEvent(const SDL_Event& event) {
             break;
         }
 
-        case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+        case SDL_EVENT_JOYSTICK_BUTTON_DOWN: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_JOYSTICK_BUTTON_UP: {
             SET_LONG(jbutton, timestamp);
             SET_INT(jbutton, which);
@@ -350,10 +350,10 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
 
-        case SDL_EVENT_GAMEPAD_ADDED:
-        case SDL_EVENT_GAMEPAD_REMOVED:
-        case SDL_EVENT_GAMEPAD_REMAPPED:
-        case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE:
+        case SDL_EVENT_GAMEPAD_ADDED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_GAMEPAD_REMOVED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_GAMEPAD_REMAPPED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED:
         {
             SET_LONG(gdevice, timestamp);
@@ -369,7 +369,7 @@ void FireSDLEvent(const SDL_Event& event) {
             break;
         }
 
-        case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+        case SDL_EVENT_GAMEPAD_BUTTON_DOWN: TORQUE_CASE_FALLTHROUGH;
         case SDL_EVENT_GAMEPAD_BUTTON_UP: {
             SET_LONG(gbutton, timestamp);
             SET_INT(gbutton, which);
@@ -378,29 +378,92 @@ void FireSDLEvent(const SDL_Event& event) {
             break;
         }
         // -------------- WINDOW  --------------------
-        case SDL_EVENT_WINDOW_MOVED:
-        case SDL_EVENT_WINDOW_RESIZED:
-        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
+        case SDL_EVENT_WINDOW_SHOWN:    TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_HIDDEN:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_EXPOSED:  TORQUE_CASE_FALLTHROUGH;
+
+        case SDL_EVENT_WINDOW_MOVED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_RESIZED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:  TORQUE_CASE_FALLTHROUGH;
+
+        case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_MINIMIZED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_MAXIMIZED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_RESTORED:  TORQUE_CASE_FALLTHROUGH;
+
+        case SDL_EVENT_WINDOW_MOUSE_ENTER:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_MOUSE_LEAVE:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_FOCUS_GAINED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_FOCUS_LOST:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:  TORQUE_CASE_FALLTHROUGH;
+
+        case SDL_EVENT_WINDOW_HIT_TEST:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_ICCPROF_CHANGED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_DISPLAY_CHANGED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_SAFE_AREA_CHANGED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_OCCLUDED:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:  TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_WINDOW_DESTROYED:
+        {
             SET_LONG(window, timestamp);
             SET_INT(window, windowID);
             SET_INT(window, data1);
             SET_INT(window, data2);
             break;
         }
-        case SDL_EVENT_WINDOW_FOCUS_GAINED:
-        case SDL_EVENT_WINDOW_FOCUS_LOST:
-        case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
-            SET_LONG(window, timestamp);
-            SET_INT(window, windowID);
+
+        case SDL_EVENT_MOUSE_ADDED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_MOUSE_REMOVED:
+            SET_LONG(mdevice, timestamp);
+            SET_INT(mdevice, which);
             break;
-        }
+
+        case SDL_EVENT_KEYBOARD_ADDED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_KEYBOARD_REMOVED:
+            SET_LONG(kdevice, timestamp);
+            SET_INT(kdevice, which);
+            break;
+
+        case SDL_EVENT_AUDIO_DEVICE_ADDED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_AUDIO_DEVICE_REMOVED: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED:
+            SET_LONG(adevice, timestamp);
+            SET_INT(adevice, which);
+            SET_BOOL(adevice, recording);
+            break;
+
+        case SDL_EVENT_CLIPBOARD_UPDATE:
+            SET_LONG(clipboard, timestamp);
+            SET_BOOL(clipboard, owner);
+            // Sint32 num_mime_types
+            // const char **mime_types
+            break;
+
+        // -------------- Drop Files --------------------
+        case SDL_EVENT_DROP_FILE: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_DROP_TEXT: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_DROP_BEGIN: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_DROP_COMPLETE: TORQUE_CASE_FALLTHROUGH;
+        case SDL_EVENT_DROP_POSITION:
+            SET_LONG(drop, timestamp);
+            SET_INT(drop, windowID);
+            SET_FLOAT(drop, x);
+            SET_FLOAT(drop, y);
+            SET_STRING(drop, source);
+            SET_STRING(drop, data);
+            break;
+
 
         // -------------- OTHERS --------------------
         case SDL_EVENT_QUIT:
             SET_LONG(quit, timestamp);
             break;
+
         default: {
             SET_LONG(common, timestamp);
+            // // //some are missing but this is too much:
             Con::debugf("TODO EVENT TYPE: %d", event.type);
         }
 
@@ -409,37 +472,7 @@ void FireSDLEvent(const SDL_Event& event) {
     Con::executef("onSDLEvent", EventObjects::Event);
 
 }
-// -----------------------------------------------------------------------------
-DefineEngineFunction(SDL_OpenJoystick, bool, (S32 which),
-                     , "Open a joystick and return the internal JoyStickId") {
 
-    return OpenElfContoller(which) != 0;
-}
-// ----
-DefineEngineFunction(SDL_GetJoystickName, const char* , (S32 which),
-                     , "Get the name of joystick ") {
-    return GetElfControllerNameByWhich(which);
-}
-// ----
-DefineEngineFunction(SDL_CloseJoystick, void , (S32 which),
-                     , "Close the joystick") {
-    CloseElfControllerByWhich(which);
-}
-DefineEngineFunction(SDL_OpenGamepad, bool, (S32 which),
-                     , "Open a joystick and return the internal JoyStickId") {
-
-    return OpenElfContoller(which) != 0;
-}
-// ----
-DefineEngineFunction(SDL_GetGamepadName, const char* , (S32 which),
-                     , "Get the name of joystick ") {
-    return GetElfControllerNameByWhich(which);
-}
-// ----
-DefineEngineFunction(SDL_CloseGamepad, void , (S32 which),
-                     , "Close the joystick") {
-    CloseElfControllerByWhich(which);
-}
 // -----------------------------------------------------------------------------
 void RegisterEventConst() {
     /* Application events */
@@ -647,11 +680,17 @@ void RegisterEventConst() {
 void InitEvents() {
     RegisterEventConst();
     EventObjects::CreateEventDataObjects();
+
+    // implement script stub
+    Con::evaluate( R"(
+     function onSDLEvent(%event) {}
+    )"
+    );
 }
 // -----------------------------------------------------------------------------
 void ShutDownEvents() {
     if (EventObjects::Event) EventObjects::Event->deleteObject();
-    ControllerMap.clear();
+
 }
 
 // -----------------------------------------------------------------------------

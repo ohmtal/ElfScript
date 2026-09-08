@@ -37,15 +37,14 @@ function StarField::OnAdd(%this) {
 
     %this.updateSize();
 
-    %this.add( new PointStorageObject(starPoints) {
+    %this.add( %starPoints = new PointStorageObject(starPoints) {
         storageSize = STAR_COUNT;
     });
 
 
     for(%i in range STAR_COUNT)
     {
-        starPoints.setPoint(%i, GetRandom($minH , $maxH),GetRandom($minW , $maxW), 1.0 );
-        // starPoints.setPoint(%i, math::randomf($minH , $maxH),math::randomf($minW , $maxW), 1.0 );
+        %starPoints.setPoint(%i, math.randomf($minH , $maxH),math.randomf($minW , $maxW), 1.0 );
     }
 
     return true;
