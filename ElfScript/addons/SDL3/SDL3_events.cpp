@@ -67,6 +67,10 @@ public:
         mWorkerValue.setInt(value);
         pushDynamicField(StringTable->insert(fieldName), nullptr, &mWorkerValue);
     }
+    inline void setLong(const char* fieldName, S64 value) {
+        mWorkerValue.setInt(value);
+        pushDynamicField(StringTable->insert(fieldName), nullptr, &mWorkerValue);
+    }
     inline void setString(const char* fieldName, const char* str) {
         mWorkerValue.setString(str);
         pushDynamicField(StringTable->insert(fieldName), nullptr, &mWorkerValue);
@@ -220,6 +224,9 @@ void CreateEventDataObjects() {
 #define SET_INT(structName, field) \
 EventObjects::EventDataObj->setInt(#field, event.structName.field)
 
+#define SET_LONG(structName, field) \
+EventObjects::EventDataObj->setLong(#field, event.structName.field)
+
 #define SET_BOOL(structName, field) \
 EventObjects::EventDataObj->setInt(#field, (S32)event.structName.field)
 
@@ -244,7 +251,7 @@ void FireSDLEvent(const SDL_Event& event) {
         // -------------- KEYS --------------------
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP: {
-            SET_INT(key, timestamp);
+            SET_LONG(key, timestamp);
             SET_INT(key, windowID);
             SET_INT(key, which);
             SET_INT(key, scancode);
@@ -258,7 +265,7 @@ void FireSDLEvent(const SDL_Event& event) {
         // -------------- MOUSE --------------------
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP: {
-            SET_INT(button, timestamp);
+            SET_LONG(button, timestamp);
             SET_INT(button, windowID);
             SET_INT(button, which);
             SET_INT(button, button);
@@ -269,7 +276,7 @@ void FireSDLEvent(const SDL_Event& event) {
             break;
         }
         case SDL_EVENT_MOUSE_WHEEL: {
-            SET_INT(wheel, timestamp);
+            SET_LONG(wheel, timestamp);
             SET_INT(wheel, windowID);
             SET_INT(wheel, which);
             SET_FLOAT(wheel, x);
@@ -280,7 +287,7 @@ void FireSDLEvent(const SDL_Event& event) {
 
         case SDL_EVENT_MOUSE_MOTION: {
             // type is set by setEventType
-            SET_INT(motion, timestamp);
+            SET_LONG(motion, timestamp);
             SET_INT(motion, windowID);
             SET_INT(motion, which);
             SET_INT(motion, state);
@@ -295,13 +302,13 @@ void FireSDLEvent(const SDL_Event& event) {
         case SDL_EVENT_JOYSTICK_ADDED:
         case SDL_EVENT_JOYSTICK_REMOVED:
         case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE: {
-            SET_INT(jdevice, timestamp);
+            SET_LONG(jdevice, timestamp);
             SET_INT(jdevice, which); // Instance ID for newly discovered devices
             break;
         }
 
         case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
-            SET_INT(jaxis, timestamp);
+            SET_LONG(jaxis, timestamp);
             SET_INT(jaxis, which);
             SET_INT(jaxis, axis);    // Raw index of the hardware axis
             SET_INT(jaxis, value);   // Raw Sint16 position
@@ -309,7 +316,7 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
         case SDL_EVENT_JOYSTICK_BALL_MOTION: {
-            SET_INT(jball, timestamp);
+            SET_LONG(jball, timestamp);
             SET_INT(jball, which);
             SET_INT(jball, ball);    // Raw index of the trackball component
             SET_INT(jball, xrel);   // Relative horizontal change
@@ -318,7 +325,7 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
         case SDL_EVENT_JOYSTICK_HAT_MOTION: {
-            SET_INT(jhat, timestamp);
+            SET_LONG(jhat, timestamp);
             SET_INT(jhat, which);
             SET_INT(jhat, hat);      // Raw index of the hardware D-pad / hat
             SET_INT(jhat, value);    // Direction mask flag (SDL_HAT_UP, etc.)
@@ -327,7 +334,7 @@ void FireSDLEvent(const SDL_Event& event) {
 
         case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
         case SDL_EVENT_JOYSTICK_BUTTON_UP: {
-            SET_INT(jbutton, timestamp);
+            SET_LONG(jbutton, timestamp);
             SET_INT(jbutton, which);
             SET_INT(jbutton, button); // Raw index of the pressed physical button
             SET_BOOL(jbutton, down);
@@ -335,7 +342,7 @@ void FireSDLEvent(const SDL_Event& event) {
         }
 
         case SDL_EVENT_JOYSTICK_BATTERY_UPDATED: {
-            SET_INT(jbattery, timestamp);
+            SET_LONG(jbattery, timestamp);
             SET_INT(jbattery, which);
             SET_INT(jbattery, state); // Represents an SDL_PowerState value
             SET_INT(jbattery, percent); // Remaining charge ratio
@@ -349,13 +356,13 @@ void FireSDLEvent(const SDL_Event& event) {
         case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE:
         case SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED:
         {
-            SET_INT(gdevice, timestamp);
+            SET_LONG(gdevice, timestamp);
             SET_INT(gdevice, which); // Maps to SDL_JoystickID instance ID
             break;
         }
 
         case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
-            SET_INT(gaxis, timestamp);
+            SET_LONG(gaxis, timestamp);
             SET_INT(gaxis, which);
             SET_INT(gaxis, axis);    // Represents an SDL_GamepadAxis enum value
             SET_INT(gaxis, value);   // Sint16 ranging from -32768 to 32767
@@ -364,7 +371,7 @@ void FireSDLEvent(const SDL_Event& event) {
 
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         case SDL_EVENT_GAMEPAD_BUTTON_UP: {
-            SET_INT(gbutton, timestamp);
+            SET_LONG(gbutton, timestamp);
             SET_INT(gbutton, which);
             SET_INT(gbutton, button); // Represents an SDL_GamepadButton enum value
             SET_BOOL(gbutton, down);  // Engine-specific boolean assignment
@@ -374,7 +381,7 @@ void FireSDLEvent(const SDL_Event& event) {
         case SDL_EVENT_WINDOW_MOVED:
         case SDL_EVENT_WINDOW_RESIZED:
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
-            SET_INT(window, timestamp);
+            SET_LONG(window, timestamp);
             SET_INT(window, windowID);
             SET_INT(window, data1);
             SET_INT(window, data2);
@@ -383,16 +390,18 @@ void FireSDLEvent(const SDL_Event& event) {
         case SDL_EVENT_WINDOW_FOCUS_GAINED:
         case SDL_EVENT_WINDOW_FOCUS_LOST:
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
-            SET_INT(window, timestamp);
+            SET_LONG(window, timestamp);
             SET_INT(window, windowID);
             break;
         }
 
         // -------------- OTHERS --------------------
         case SDL_EVENT_QUIT:
+            SET_LONG(quit, timestamp);
+            break;
         default: {
-            SET_INT(quit, timestamp);
-            // Con::debugf("TODO EVENT TYPE: %d", event.type);
+            SET_LONG(common, timestamp);
+            Con::debugf("TODO EVENT TYPE: %d", event.type);
         }
 
     };
