@@ -142,6 +142,11 @@ namespace ElfSDL3 {
                 // }
                 //
 
+                case SDL_EVENT_QUIT:
+                    Con::debugf("******* Quit Event ********");
+                    return false;
+                break;
+
                 case SDL_EVENT_TERMINATING:
                     Con::debugf("******* SDL_EVENT_TERMINATING ********");
                     return false;

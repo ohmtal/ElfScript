@@ -104,8 +104,8 @@ if(NOT EXISTS ${ELF_CMAKE})
 else()
 
  set(ELF_APP_NAME "CrazyElf" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
- set(ELF_APP_VERSION "500" CACHE STRING "ElfScript: App-Version used in scripts" FORCE)
- set(ELF_APP_VERSION_STRING "Version 26.08" CACHE STRING "ElfScript: App-Version String used in scripts" FORCE)
+ set(ELF_APP_VERSION "700" CACHE STRING "ElfScript: App-Version used in scripts" FORCE)
+ set(ELF_APP_VERSION_STRING "Version 08.09" CACHE STRING "ElfScript: App-Version String used in scripts" FORCE)
 
  include(${ELF_CMAKE})
  include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
