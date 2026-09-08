@@ -185,6 +185,7 @@ SDL_Texture* getTextureByID(S32 textureID){
     return texture;
 }
 
+} // NAMESPACE ElfSDL3
 // -----------------------------------------------------------------------------
 // Bindings
 // -----------------------------------------------------------------------------
@@ -211,8 +212,8 @@ DefineEngineFunction( SDL_CreateWindowAndRenderer, ConsoleVector,
     SDL_Window* window;
     ConsoleVector result = {0};
     if (SDL_CreateWindowAndRenderer(title, width, height, window_flags, &window, &renderer)) {
-       result.points[0] = (F32) WindowMap.add(window);
-       result.points[1] = (F32) RendererMap.add(renderer);
+       result.points[0] = (F32) ElfSDL3::WindowMap.add(window);
+       result.points[1] = (F32) ElfSDL3::RendererMap.add(renderer);
     }
     return result;
 }
@@ -223,7 +224,7 @@ DefineEngineFunction( SDL_CreateWindow, S32,
     ,"This create a SDL_Window and SDL_Renderer\n@return S32 WindowID") {
     SDL_Window* window  = SDL_CreateWindow(title, width, height, window_flags);
     if (window) {
-       return  WindowMap.add(window);
+       return  ElfSDL3::WindowMap.add(window);
     }
 
     Con::errorf("SDL_CreateWindow: Failed to create Window: %s", SDL_GetError());
@@ -232,7 +233,7 @@ DefineEngineFunction( SDL_CreateWindow, S32,
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowTitle(SDL_Window *window, const char *title);
 DefineEngineFunction( SDL_SetWindowTitle, bool, (S32 WindowID, const char* title ), ,"Set a Window Title") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return false;
 
     return SDL_SetWindowTitle(window, title);
@@ -240,7 +241,7 @@ DefineEngineFunction( SDL_SetWindowTitle, bool, (S32 WindowID, const char* title
 
 // extern SDL_DECLSPEC const char * SDLCALL SDL_GetWindowTitle(SDL_Window *window);
 DefineEngineFunction( SDL_GetWindowTitle, String, (S32 WindowID), ,"Get a Window Title") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_GetWindowTitle(window);
@@ -248,9 +249,9 @@ DefineEngineFunction( SDL_GetWindowTitle, String, (S32 WindowID), ,"Get a Window
 
 // SDL_video: extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowIcon(SDL_Window *window, SDL_Surface *icon);
 DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,"Set a Window Icon from Surface") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return false;
-    SDL_Surface* surface = SurfaceMap.getValue(SurfaceID);
+    SDL_Surface* surface = ElfSDL3::SurfaceMap.getValue(SurfaceID);
     if (!surface) {
         Con::errorf("Failed to get Surface by SurfaceID: %d", SurfaceID);
         return false;
@@ -259,11 +260,39 @@ DefineEngineFunction( SDL_SetWindowIcon, bool, (S32 WindowID, S32 SurfaceID ), ,
 }
 
 
+// --------------------- Window ID's >>>>>>>>>>>>>>>>
+
+DefineEngineFunction( SDL_GetWindowID, S32, (S32 WindowID),
+                      ,"get SDL_WindowID by internal WindowID")
+{
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
+    if (!window) return 0;
+
+    return SDL_GetWindowID(window);
+}
+
+DefineEngineFunction( SDL_GetWindowFromID, S32, (S32 SDL_WindowID),
+        ,"get the internal window object id from the event SDL_WindowID")
+{
+    SDL_Window* window =  SDL_GetWindowFromID(SDL_WindowID);
+    if (!window) return 0;
+    return ElfSDL3::WindowMap.getId(window);
+}
+
+DefineEngineFunction( SDL_GetWindowParent, S32, (S32 WindowID),
+                      ,"get internal WindowID of the parent of this internal WindowID")
+{
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
+    if (!window) return 0;
+
+    return ElfSDL3::WindowMap.getId(SDL_GetWindowParent(window));
+}
+// --------------------- Window ID's <<<<<<<<<<<<<
 
 // SDL_Video!! FIXME add SDL3_video!!
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowPosition(SDL_Window *window, int x, int y);
 DefineEngineFunction( SDL_SetWindowPosition, bool, (S32 WindowID, S32 x, S32 y), ,"Set the Window position") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowPosition(window, x, y);
@@ -272,7 +301,7 @@ DefineEngineFunction( SDL_SetWindowPosition, bool, (S32 WindowID, S32 x, S32 y),
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowPosition(SDL_Window *window, int *x, int *y);
 DefineEngineFunction( SDL_GetWindowPosition, ConsoleVector, (S32 WindowID), ,"Get the Window position") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int x; int y;
     if (!SDL_GetWindowPosition(window, &x, &y)) return result;
@@ -284,7 +313,7 @@ DefineEngineFunction( SDL_GetWindowPosition, ConsoleVector, (S32 WindowID), ,"Ge
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowSize(SDL_Window *window, int w, int h);
 DefineEngineFunction( SDL_SetWindowSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window Size") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowSize(window, width, height);
@@ -292,12 +321,12 @@ DefineEngineFunction( SDL_SetWindowSize, bool, (S32 WindowID, S32 width, S32 hei
 
 
 DefineEngineFunction(SDL_StartTextInput, bool, (S32 WindowID),, "start text input mode for input onSDLTextInputEvent(%text)"){
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return false;
     return SDL_StartTextInput(window);
 }
 DefineEngineFunction(SDL_StopTextInput, bool, (S32 WindowID),, "STOP text input mode for input onSDLTextInputEvent(%text)"){
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return false;
     return SDL_StopTextInput(window);
 }
@@ -306,7 +335,7 @@ DefineEngineFunction(SDL_StopTextInput, bool, (S32 WindowID),, "STOP text input 
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSize(SDL_Window *window, int *w, int *h);
 DefineEngineFunction( SDL_GetWindowSize, ConsoleVector, (S32 WindowID), ,"Get the Window Size") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int w; int h;
     if (!SDL_GetWindowSize(window, &w, &h)) return result;
@@ -319,7 +348,7 @@ DefineEngineFunction( SDL_GetWindowSize, ConsoleVector, (S32 WindowID), ,"Get th
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSafeArea(SDL_Window *window, SDL_Rect *rect);
 DefineEngineFunction( SDL_GetWindowSafeArea, ConsoleVector, (S32 WindowID), ,"") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     SDL_Rect r;
     if (!SDL_GetWindowSafeArea(window, &r)) return result;
@@ -330,7 +359,7 @@ DefineEngineFunction( SDL_GetWindowSafeArea, ConsoleVector, (S32 WindowID), ,"")
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAspectRatio(SDL_Window *window, float min_aspect, float max_aspect);
 DefineEngineFunction( SDL_SetWindowAspectRatio, bool, (S32 WindowID, F32 min, F32 max), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowAspectRatio(window, min, max);
@@ -339,7 +368,7 @@ DefineEngineFunction( SDL_SetWindowAspectRatio, bool, (S32 WindowID, F32 min, F3
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowAspectRatio(SDL_Window *window, float *min_aspect, float *max_aspect);
 DefineEngineFunction( SDL_GetWindowAspectRatio, ConsoleVector, (S32 WindowID), ,"") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     float min,max;
     if (!SDL_GetWindowAspectRatio(window, &min, &max)) return result;
@@ -353,7 +382,7 @@ DefineEngineFunction( SDL_GetWindowAspectRatio, ConsoleVector, (S32 WindowID), ,
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowBordersSize(SDL_Window *window, int *top, int *left, int *bottom, int *right);
 DefineEngineFunction( SDL_GetWindowBordersSize, ConsoleVector, (S32 WindowID), ,"Get the Window border size: top, left, bottom, right") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int t,l,b,r;
     if (!SDL_GetWindowBordersSize(window, &t, &l, &b, &r)) return result;
@@ -369,7 +398,7 @@ DefineEngineFunction( SDL_GetWindowBordersSize, ConsoleVector, (S32 WindowID), ,
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowSizeInPixels(SDL_Window *window, int *w, int *h);
 DefineEngineFunction( SDL_GetWindowSizeInPixels, ConsoleVector, (S32 WindowID), ,"Get the Window Size in pixels") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int w; int h;
     if (!SDL_GetWindowSizeInPixels(window, &w, &h)) return result;
@@ -380,7 +409,7 @@ DefineEngineFunction( SDL_GetWindowSizeInPixels, ConsoleVector, (S32 WindowID), 
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMinimumSize(SDL_Window *window, int min_w, int min_h);
 DefineEngineFunction( SDL_SetWindowMinimumSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window minimum Size") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowMinimumSize(window, width, height);
@@ -389,7 +418,7 @@ DefineEngineFunction( SDL_SetWindowMinimumSize, bool, (S32 WindowID, S32 width, 
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMinimumSize(SDL_Window *window, int *w, int *h);
 DefineEngineFunction( SDL_GetWindowMinimumSize, ConsoleVector, (S32 WindowID), ,"Get the Window minimum Size") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int w; int h;
     if (!SDL_GetWindowMinimumSize(window, &w, &h)) return result;
@@ -401,7 +430,7 @@ DefineEngineFunction( SDL_GetWindowMinimumSize, ConsoleVector, (S32 WindowID), ,
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowMaximumSize(SDL_Window *window, int max_w, int max_h);
 DefineEngineFunction( SDL_SetWindowMaximumSize, bool, (S32 WindowID, S32 width, S32 height), ,"Set the Window maximum Size") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowMaximumSize(window, width, height);
@@ -410,7 +439,7 @@ DefineEngineFunction( SDL_SetWindowMaximumSize, bool, (S32 WindowID, S32 width, 
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetWindowMaximumSize(SDL_Window *window, int *w, int *h);
 DefineEngineFunction( SDL_GetWindowMaximumSize, ConsoleVector, (S32 WindowID), ,"Get the Window maximum Size") {
     ConsoleVector result = {};
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return result;
     int w; int h;
     if (!SDL_GetWindowMaximumSize(window, &w, &h)) return result;
@@ -422,7 +451,7 @@ DefineEngineFunction( SDL_GetWindowMaximumSize, ConsoleVector, (S32 WindowID), ,
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowBordered(SDL_Window *window, bool bordered);
 DefineEngineFunction( SDL_SetWindowBordered, bool, (S32 WindowID, bool bordered), ,"Set bordered") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowBordered(window, bordered);
@@ -430,7 +459,7 @@ DefineEngineFunction( SDL_SetWindowBordered, bool, (S32 WindowID, bool bordered)
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowResizable(SDL_Window *window, bool resizable);
 DefineEngineFunction( SDL_SetWindowResizable, bool, (S32 WindowID, bool resizable), ,"Set resizable") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowResizable(window, resizable);
@@ -439,63 +468,63 @@ DefineEngineFunction( SDL_SetWindowResizable, bool, (S32 WindowID, bool resizabl
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowAlwaysOnTop(SDL_Window *window, bool on_top);
 DefineEngineFunction( SDL_SetWindowAlwaysOnTop, bool, (S32 WindowID, bool value), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowAlwaysOnTop(window, value);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFillDocument(SDL_Window *window, bool fill);
 DefineEngineFunction( SDL_SetWindowFillDocument, bool, (S32 WindowID, bool value), ,"Emscripten only") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowFillDocument(window, value);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_ShowWindow(SDL_Window *window);
 DefineEngineFunction( SDL_ShowWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_ShowWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_HideWindow(SDL_Window *window);
 DefineEngineFunction( SDL_HideWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_HideWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_RaiseWindow(SDL_Window *window);
 DefineEngineFunction( SDL_RaiseWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_RaiseWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_MaximizeWindow(SDL_Window *window);
 DefineEngineFunction( SDL_MaximizeWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_MaximizeWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_MinimizeWindow(SDL_Window *window);
 DefineEngineFunction( SDL_MinimizeWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_MinimizeWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_RestoreWindow(SDL_Window *window);
 DefineEngineFunction( SDL_RestoreWindow, bool, (S32 WindowID), ,"") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_RestoreWindow(window);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetWindowFullscreen(SDL_Window *window, bool fullscreen);
 DefineEngineFunction( SDL_SetWindowFullscreen, bool, (S32 WindowID, bool fullscreen), ,"Set fullscreen") {
-    SDL_Window* window  = WindowMap.getValue(WindowID);
+    SDL_Window* window  = ElfSDL3::WindowMap.getValue(WindowID);
     if (!window) return "";
 
     return SDL_SetWindowFullscreen(window, fullscreen);
@@ -539,15 +568,15 @@ DefineEngineFunction( SDL_CreatePopupWindow, S32,
     (S32 parentWindowID, S32 offset_x, S32 offset_y, S32 w, S32 h, U64 window_flags),
     (SDL_WINDOW_POPUP_MENU) ,"This create a SDL_Window and SDL_Renderer\n@return S32 WindowID") {
 
-    SDL_Window* parentWindow = WindowMap.getValue(parentWindowID);
+    SDL_Window* parentWindow = ElfSDL3::WindowMap.getValue(parentWindowID);
     if (!parentWindow) {
         Con::errorf("SDL_CreatePopupWindow invalid window id: %d", parentWindowID);
-        WindowMap.dump();
+        ElfSDL3::WindowMap.dump();
         return 0;
     }
     SDL_Window* window  = SDL_CreatePopupWindow(parentWindow, offset_x, offset_y, w, h, window_flags);
     if (window) {
-       return  WindowMap.add(window);
+       return  ElfSDL3::WindowMap.add(window);
     }
 
     Con::errorf("SDL_CreatePopupWindow: Failed to create Window: %s", SDL_GetError());
@@ -558,21 +587,21 @@ DefineEngineFunction( SDL_CreatePopupWindow, S32,
 
 // NOTE:SDL_video.h!! extern SDL_DECLSPEC void SDLCALL SDL_DestroyWindow(SDL_Window *window);
 DefineEngineFunction( SDL_DestroyWindow, bool, (S32 windowID),,"destroy a window") {
-    return WindowMap.remove(windowID);
+    return ElfSDL3::WindowMap.remove(windowID);
 }
 
 
 // extern SDL_DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRenderer(SDL_Window *window, const char *name);
 DefineEngineFunction( SDL_CreateRenderer, S32, (S32 windowID, const char* name),("")
     ,"Create a renderer for a Window. If name is empty SDL decide the renderer (default)\n@return S32 RendererID") {
-    SDL_Window* window = WindowMap.getValue(windowID);
+    SDL_Window* window = ElfSDL3::WindowMap.getValue(windowID);
     if (!window) {
         Con::errorf("SDL_CreateRenderer invalid window id: %d", windowID);
         return 0;
     }
     SDL_Renderer* renderer = SDL_CreateRenderer(window, dStrlen(name) == 0 ? nullptr : name);
     if (renderer) {
-        return RendererMap.add(renderer);
+        return ElfSDL3::RendererMap.add(renderer);
     }
     Con::errorf("SDL_CreateRenderer Failed to create Renderer: %s", SDL_GetError());
     return 0;
@@ -595,14 +624,14 @@ DefineEngineFunction( SDL_CreateRenderer, S32, (S32 windowID, const char* name),
 DefineEngineFunction( SDL_CreateTexture, S32,
                       (S32 rendererID, S32 pixelFormat, S32 textureAccces, S32 w, S32 h ),
                       ,"This create a Texture.\n@return S32 TextureID") {
-    SDL_Renderer* renderer  = getRendererByID(rendererID);
+    SDL_Renderer* renderer  = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return 0;
     SDL_Texture *texture = SDL_CreateTexture(renderer,(SDL_PixelFormat)pixelFormat, (SDL_TextureAccess) textureAccces, w, h );
     if (!texture) {
         Con::errorf("SDL_CreateTexture: Failed to create Texture: %s", SDL_GetError());
         return 0;
     }
-    return TextureMap.add(texture);
+    return ElfSDL3::TextureMap.add(texture);
 }
 
 //NOTE SDL_surface.c :: SDL_Surface *SDL_LoadSurface(const char *file)
@@ -612,19 +641,19 @@ DefineEngineFunction(SDL_LoadSurface, S32, (const char* filename), , "load a sur
         Con::errorf("SDL_LoadSurface failed for file: %s. Error:%s", filename, SDL_GetError());
         return 0;
     }
-    return SurfaceMap.add(surface);
+    return ElfSDL3::SurfaceMap.add(surface);
 }
 DefineEngineFunction(SDL_DestroySurface, bool, (S32 SurfaceID), , "unload a surface") {
-    return SurfaceMap.remove(SurfaceID);
+    return ElfSDL3::SurfaceMap.remove(SurfaceID);
 }
 
 // extern SDL_DECLSPEC SDL_Texture * SDLCALL SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
 DefineEngineFunction( SDL_CreateTextureFromSurface, S32,
                       (S32 rendererID, S32 SurfaceID ),
                       ,"This create a Texture by SurfaceID.\n@return S32 TextureID") {
-    SDL_Renderer* renderer  = getRendererByID(rendererID);
+    SDL_Renderer* renderer  = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return 0;
-    SDL_Surface* surface = SurfaceMap.getValue(SurfaceID);
+    SDL_Surface* surface = ElfSDL3::SurfaceMap.getValue(SurfaceID);
     if (!surface) {
         Con::errorf("Failed to get Surface by SurfaceID: %d", SurfaceID);
         return 0;
@@ -634,7 +663,7 @@ DefineEngineFunction( SDL_CreateTextureFromSurface, S32,
         Con::errorf("SDL_CreateTextureFromSurface: Failed to create Texture: %s", SDL_GetError());
         return 0;
     }
-    return TextureMap.add(texture);
+    return ElfSDL3::TextureMap.add(texture);
 }
 
 
@@ -646,7 +675,7 @@ DefineEngineFunction( SDL_CreateTextureFromSurface, S32,
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetTextureSize(SDL_Texture *texture, float *w, float *h);
 DefineEngineFunction(SDL_GetTextureSize, /*Point2F*/ ConsoleVector, (S32 textureID),,"get the size of a texture as float Point" ) {
     ConsoleVector result = {0};
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return result;
 
     SDL_GetTextureSize(texture, &result.points[0], &result.points[1]);
@@ -658,7 +687,7 @@ DefineEngineFunction(SDL_GetTextureSize, /*Point2F*/ ConsoleVector, (S32 texture
 // not nativ SDL:
 DefineEngineFunction(SDL_GetTextureRect, /*RectF*/ ConsoleVector, (S32 textureID),,"get the size of a texture as float Rectangle (ElfSDL3 extension)" ) {
     ConsoleVector result = {0.f,0.f, 0.f, 0.f};
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return result;
     result.points[2] = texture->w;
     result.points[3] = texture->h;
@@ -672,7 +701,7 @@ DefineEngineFunction(SDL_GetTextureRect, /*RectF*/ ConsoleVector, (S32 textureID
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetTextureColorMod(SDL_Texture *texture, Uint8 r, Uint8 g, Uint8 b);
 DefineEngineFunction(SDL_SetTextureColorMod, bool, (S32 textureID, U8 r, U8 g, U8 b),(255,255,255)
 ,"set the color for a texture. default white for reset" ) {
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return false;
 
     return SDL_SetTextureColorMod(texture, r,g,b);
@@ -686,7 +715,7 @@ DefineEngineFunction(SDL_SetTextureColorMod, bool, (S32 textureID, U8 r, U8 g, U
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetTextureAlphaMod(SDL_Texture *texture, Uint8 alpha);
 DefineEngineFunction(SDL_SetTextureAlphaMod, bool, (S32 textureID, U8 a),(255)
         ,"set the alpha for a texture, default 255 for reset" ) {
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return false;
 
     return SDL_SetTextureAlphaMod(texture, a);
@@ -700,7 +729,7 @@ DefineEngineFunction(SDL_SetTextureAlphaMod, bool, (S32 textureID, U8 a),(255)
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetTextureBlendMode(SDL_Texture *texture, SDL_BlendMode blendMode);
 DefineEngineFunction(SDL_SetTextureBlendMode, bool, (S32 textureID, U32 blendMode),(SDL_BLENDMODE_NONE)
     ,"set the BlendMode for a texture, default SDL_BLENDMODE_NONE" ) {
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return false;
 
     return SDL_SetTextureBlendMode(texture, blendMode);
@@ -723,7 +752,7 @@ DefineEngineFunction(SDL_SetRenderLogicalPresentation, bool, (S32 RendererID,  S
                      ((S32)SDL_LOGICAL_PRESENTATION_STRETCH) ,
                      "Set SDL_SetRenderLogicalPresentation which does scale the screen.\n"
                      "Warning: ImGui windows (like console) looks a bit strange than!") {
-    SDL_Renderer* renderer = getRendererByID(RendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(RendererID);
     if (!renderer) return false;
    return SDL_SetRenderLogicalPresentation(renderer, logicalWidth, logicalHeight
             ,(SDL_RendererLogicalPresentation) mode);
@@ -748,7 +777,7 @@ DefineEngineFunction(SDL_SetRenderLogicalPresentation, bool, (S32 RendererID,  S
 // NOTE Mouse:   SDL_ConvertEventToRenderCoordinates(getRenderer(), &event);
 DefineEngineFunction(SDL_SetRenderScale, bool , (S32 rendererID, F32 scaleX, F32 scaleY), (1.f, 1.f)
 ,"set the render scale - default 1.f") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_SetRenderScale(renderer, scaleX, scaleY);
@@ -760,7 +789,7 @@ DefineEngineFunction(SDL_SetRenderScale, bool , (S32 rendererID, F32 scaleX, F32
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderDrawColor(SDL_Renderer *renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 DefineEngineFunction(SDL_SetRenderDrawColor, bool , (S32 rendererID, U8 r, U8 g, U8 b, U8 a), (255)
                      ,"set the render color") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_SetRenderDrawColor(renderer, r,g,b,a);
@@ -769,7 +798,7 @@ DefineEngineFunction(SDL_SetRenderDrawColor, bool , (S32 rendererID, U8 r, U8 g,
 // ElfScript
 DefineEngineFunction(SDL_SetRenderDrawColorVec, bool , (S32 rendererID, ConsoleVector colorVec),
 ,"set the render color") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
     if (colorVec.points[3] == 0.f) colorVec.points[3] = 255.f;
 
@@ -785,7 +814,7 @@ DefineEngineFunction(SDL_SetRenderDrawColorVec, bool , (S32 rendererID, ConsoleV
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderDrawColorFloat(SDL_Renderer *renderer, float r, float g, float b, float a);
 DefineEngineFunction(SDL_SetRenderDrawColorFloat, bool , (S32 rendererID, F32 r, F32 g, F32 b, F32 a), (1.f)
 ,"set the render color using float") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_SetRenderDrawColorFloat(renderer, r,g,b,a);
@@ -795,7 +824,7 @@ DefineEngineFunction(SDL_SetRenderDrawColorFloat, bool , (S32 rendererID, F32 r,
 DefineEngineFunction(SDL_GetRenderDrawColor, ConsoleVector , (S32 rendererID),
 ,"get the render color") {
     ConsoleVector colorVec = {0};
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return colorVec;
     U8 r,g,b,a;
 
@@ -811,7 +840,7 @@ DefineEngineFunction(SDL_GetRenderDrawColor, ConsoleVector , (S32 rendererID),
 DefineEngineFunction(SDL_GetRenderDrawColorFloat, ConsoleVector , (S32 rendererID),
 ,"get the render color") {
     ConsoleVector colorVec = {0};
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return colorVec;
     float r,g,b,a;
 
@@ -825,14 +854,14 @@ DefineEngineFunction(SDL_GetRenderDrawColorFloat, ConsoleVector , (S32 rendererI
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderColorScale(SDL_Renderer *renderer, float scale);
 DefineEngineFunction(SDL_SetRenderColorScale,  bool , (S32 rendererID,F32 scale),,"") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
     return SDL_SetRenderColorScale(renderer, scale);
 }
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderColorScale(SDL_Renderer *renderer, float *scale);
 DefineEngineFunction(SDL_GetRenderColorScale,  F32 , (S32 rendererID),,"") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
     F32 scale = 0.f;
     if (!SDL_GetRenderColorScale(renderer, &scale)) return 0.f;
@@ -842,7 +871,7 @@ DefineEngineFunction(SDL_GetRenderColorScale,  F32 , (S32 rendererID),,"") {
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderDrawBlendMode(SDL_Renderer *renderer, SDL_BlendMode blendMode);
 DefineEngineFunction(SDL_SetRenderDrawBlendMode, bool , (S32 rendererID,U32 blendMode), (SDL_BLENDMODE_NONE)
 ,"set the blendmode, without parameter NONE = disabled is set.") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_SetRenderDrawBlendMode(renderer,blendMode);
@@ -852,7 +881,7 @@ DefineEngineFunction(SDL_SetRenderDrawBlendMode, bool , (S32 rendererID,U32 blen
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderDrawBlendMode(SDL_Renderer *renderer, SDL_BlendMode *blendMode);
 DefineEngineFunction(SDL_GetRenderDrawBlendMode, U32 , (S32 rendererID),
 ,"get the blendmode return U32_MAX if failed") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
     U32 blendMode = 0;
     if (!SDL_GetRenderDrawBlendMode(renderer, &blendMode)) return U32_MAX;
@@ -862,7 +891,7 @@ DefineEngineFunction(SDL_GetRenderDrawBlendMode, U32 , (S32 rendererID),
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderClear(SDL_Renderer *renderer);
 DefineEngineFunction(SDL_RenderClear, bool , (S32 rendererID),
 ,"clear the current render device - called before the drawing begin - see also SDL_SetRenderDrawColor") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderClear(renderer);
@@ -873,7 +902,7 @@ DefineEngineFunction(SDL_RenderClear, bool , (S32 rendererID),
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderPoint(SDL_Renderer *renderer, float x, float y);
 DefineEngineFunction(SDL_RenderPoint, bool , (S32 rendererID, F32 x, F32 y),
                      ,"render a Point") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderPoint(renderer, x, y);
@@ -885,7 +914,7 @@ DefineEngineFunction(SDL_RenderPoints, bool , (S32 rendererID, Array* pointsArra
         ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
          "no that fast, since we need to fill the points every call."
 ) {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer || !pointsArray || pointsArray->mValues.size() == 0) return false;
     Vector<SDL_FPoint> points;
     S32 count = pointsArray->mValues.size();
@@ -907,7 +936,7 @@ DefineEngineFunction(SDL_RenderPoints, bool , (S32 rendererID, Array* pointsArra
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderLine(SDL_Renderer *renderer, float x1, float y1, float x2, float y2);
 DefineEngineFunction(SDL_RenderLine, bool , (S32 rendererID, F32 x1, F32 y1, F32 x2, F32 y2),
         ,"render a Line") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderLine(renderer, x1, y1, x2, y2);
@@ -916,7 +945,7 @@ DefineEngineFunction(SDL_RenderLine, bool , (S32 rendererID, F32 x1, F32 y1, F32
 // ElfScript
 DefineEngineFunction(SDL_RenderLineRect, bool , (S32 rendererID, RectF pointsRect),
         ,"render a Line where (w)idth == x2 and (h)eight == y2") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderLine(renderer, pointsRect.x, pointsRect.y, pointsRect.w, pointsRect.h);
@@ -927,7 +956,7 @@ DefineEngineFunction(SDL_RenderLines, bool , (S32 rendererID, Array* pointsArray
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
 ) {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer || !pointsArray || pointsArray->mValues.size() == 0) return false;
     Vector<SDL_FPoint> points;
     S32 count = pointsArray->mValues.size();
@@ -949,7 +978,7 @@ DefineEngineFunction(SDL_RenderLines, bool , (S32 rendererID, Array* pointsArray
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderRect(SDL_Renderer *renderer, const SDL_FRect *rect);
 DefineEngineFunction(SDL_RenderRect, bool , (S32 rendererID, RectF rect),
         ,"render a Rect (unfilled)") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderRect(renderer, &rect);
@@ -961,7 +990,7 @@ DefineEngineFunction(SDL_RenderRects, bool , (S32 rendererID, Array* pointsArray
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
 ) {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer || !pointsArray || pointsArray->mValues.size() == 0) return false;
     Vector<SDL_FRect> points;
     S32 count = pointsArray->mValues.size();
@@ -981,7 +1010,7 @@ DefineEngineFunction(SDL_RenderRects, bool , (S32 rendererID, Array* pointsArray
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderFillRect(SDL_Renderer *renderer, const SDL_FRect *rect);
 DefineEngineFunction(SDL_RenderFillRect, bool , (S32 rendererID, RectF rect),
         ,"render a Rect (filled)") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderFillRect(renderer, &rect);
@@ -990,7 +1019,7 @@ DefineEngineFunction(SDL_RenderFillRect, bool , (S32 rendererID, RectF rect),
 // RenderRect with float params instead of rect and bool filled
 DefineEngineFunction(SDL_RenderRectF, bool , (S32 rendererID, F32 x, F32 y, F32 w, F32 h, bool filled),(true)
         ,"render a Rect  with float parameters and filled or not (not nativ SDL3)") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
     static RectF rect = {};
     rect = {x,y,w,h};
@@ -1003,7 +1032,7 @@ DefineEngineFunction(SDL_RenderFillRects, bool , (S32 rendererID, Array* pointsA
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
 ) {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer || !pointsArray || pointsArray->mValues.size() == 0) return false;
     Vector<SDL_FRect> points;
     S32 count = pointsArray->mValues.size();
@@ -1025,9 +1054,9 @@ DefineEngineFunction(SDL_RenderFillRects, bool , (S32 rendererID, Array* pointsA
 //                      const SDL_FRect *srcrect, const SDL_FRect *dstrect);
 DefineEngineFunction(SDL_RenderTexture, bool , (S32 rendererID, S32 textureID,  RectF srcRect,  RectF dstRect),
         ,"render texture from src Rect to dstRect") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return false;
 
     return SDL_RenderTexture(renderer, texture, isValid(srcRect) ? &srcRect : nullptr, isValid(dstRect) ? &dstRect : nullptr);
@@ -1043,9 +1072,9 @@ DefineEngineFunction(SDL_RenderTextureRotated, bool ,
          F64 angle, Point2F centerPoint,
          S32 sdl_flipmode),
         ,"render texture rotated and flipped from srcRect to dstRect") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
-    SDL_Texture* texture = getTextureByID(textureID);
+    SDL_Texture* texture = ElfSDL3::getTextureByID(textureID);
     if (!texture) return false;
 
     return SDL_RenderTextureRotated(renderer, texture
@@ -1068,7 +1097,7 @@ DefineEngineFunction(SDL_RenderTextureRotated, bool ,
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderPresent(SDL_Renderer *renderer);
 DefineEngineFunction(SDL_RenderPresent, bool , (S32 rendererID),
         ,"called all the rendering(drawing) is done") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderPresent(renderer);
@@ -1077,14 +1106,14 @@ DefineEngineFunction(SDL_RenderPresent, bool , (S32 rendererID),
 // extern SDL_DECLSPEC void SDLCALL SDL_DestroyTexture(SDL_Texture *texture);
 DefineEngineFunction(SDL_DestroyTexture, bool , (S32 TextureID),
         ,"remove a renderer") {
-    return TextureMap.remove(TextureID);
+    return ElfSDL3::TextureMap.remove(TextureID);
 }
 
 
 // extern SDL_DECLSPEC void SDLCALL SDL_DestroyRenderer(SDL_Renderer *renderer);
 DefineEngineFunction(SDL_DestroyRenderer, bool , (S32 rendererID),
         ,"remove a renderer") {
-    return RendererMap.remove(rendererID);
+    return ElfSDL3::RendererMap.remove(rendererID);
 }
 
 //TODO:
@@ -1096,7 +1125,7 @@ DefineEngineFunction(SDL_DestroyRenderer, bool , (S32 rendererID),
 // extern SDL_DECLSPEC bool SDLCALL SDL_SetRenderVSync(SDL_Renderer *renderer, int vsync);
 DefineEngineFunction(SDL_SetRenderVSync, bool , (S32 rendererID, S32 value),
         ,"set vertical sync on/off") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_SetRenderVSync(renderer, value);
@@ -1104,7 +1133,7 @@ DefineEngineFunction(SDL_SetRenderVSync, bool , (S32 rendererID, S32 value),
 // extern SDL_DECLSPEC bool SDLCALL SDL_GetRenderVSync(SDL_Renderer *renderer, int *vsync);
 DefineEngineFunction(SDL_GetRenderVSync, S32 , (S32 rendererID),
         ,"get vertical sync is on/off") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return 0;
 
     S32 result = 0;
@@ -1115,7 +1144,7 @@ DefineEngineFunction(SDL_GetRenderVSync, S32 , (S32 rendererID),
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderDebugText(SDL_Renderer *renderer, float x, float y, const char *str);
 DefineEngineFunction(SDL_RenderDebugText, bool , (S32 rendererID, F32 x, F32 y, const char* str),
         ,"called all the rendering(drawing) is done") {
-    SDL_Renderer* renderer = getRendererByID(rendererID);
+    SDL_Renderer* renderer = ElfSDL3::getRendererByID(rendererID);
     if (!renderer) return false;
 
     return SDL_RenderDebugText(renderer, x, y, str);
@@ -1188,4 +1217,4 @@ DefineEngineFunction(SDL_GetStringProperty, const char*, (S32 propertiesID, cons
         "get string for a property.") {
     return SDL_GetStringProperty((SDL_PropertiesID)propertiesID, key, "");
 }
-} //namespace
+

@@ -82,12 +82,14 @@ namespace ElfSDL3 {
         ElfSDL3::RegisterFileSystemConstants();
         ElfSDL3::InitRenderer();
         // ElfSDL3::Audio::Init(); << must be done in script! via  Audio_Init();
+        ElfSDL3::InitEvents();
     }
 
     // DefineEngineFunction(InitSDLBindings, void, (), ,"Init the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
 
     // void ShutdownSDLBindings(){
     void Shutdown(){
+        ElfSDL3::ShutDownEvents();
         ElfSDL3::ShutDownRenderer();
         ElfSDL3::Audio::ShutDown();
     }
@@ -158,6 +160,7 @@ namespace ElfSDL3 {
                     break;
             };
             ElfSDL3::onEvent(event);
+            ElfSDL3::FireSDLEvent(event);
 
         }
 

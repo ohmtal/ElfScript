@@ -289,8 +289,16 @@ public:
 
    TORQUE_FORCEINLINE void reset()
    {
-      setEmptyString();
+      // ElfScript 0.7 reset depending on type: orig setEmptyString();
+      switch (type)
+      {
+            case ConsoleValueType::cvVector: v = {0}; break;
+            case ConsoleValueType::cvFloat:  f = 0.0; break;
+            case ConsoleValueType::cvInteger: i = 0; break;
+            default: setEmptyString(); break;
+      }
    }
+
 
 
    TORQUE_FORCEINLINE F64 getFloat() const

@@ -1,0 +1,6 @@
+while(true) {
+    if (!SDL_MainLoop()) {
+        break;
+    }
+
+}

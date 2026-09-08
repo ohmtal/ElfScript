@@ -11,6 +11,7 @@
 #include "addons/SDL3/SDL3_audio.h"
 #include "addons/SDL3/SDL3_input.h"
 #include "addons/SDL3/SDL3_Filesystem.h"
+#include "addons/SDL3/SDL3_events.h"
 
 #include <functional> //<< bad boy ;)
 

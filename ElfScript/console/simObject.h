@@ -655,6 +655,45 @@ class SimObject: public ConsoleObject
 
 
       // --------------------------------------------------------------------------------------
+      // ElfScript 0.7
+      // add a Dynamic fields based on a ConsoleValueType
+      // or update and 0  the type if found
+      inline bool addDynamicField(StringTableEntry fieldName, ConsoleValueType type) {
+            SimFieldDictionary::Entry* entry = nullptr;
+            if(!mFieldDictionary) {
+                  mFieldDictionary = new SimFieldDictionary;
+            } else {
+                  entry = mFieldDictionary->findDynamicField(fieldName);
+            }
+
+            if (!entry) {
+                 entry = mFieldDictionary->addEntry(fieldName, 0 );
+                 entry->mValue.type = type;
+            }
+            switch (type)  {
+                  case ConsoleValueType::cvInteger:
+                        entry->type = ConsoleBaseType::getType(TypeS64);
+                        entry->mValue.setInt( 0 );
+                        break;
+                  case ConsoleValueType::cvFloat:
+                        entry->type = ConsoleBaseType::getType(TypeF64);
+                        entry->mValue.setFloat( 0.0 );
+                        break;
+                  #ifdef ENABLE_CONSOLE_VECTOR
+                  case ConsoleValueType::cvVector:
+                        entry->mValue.setVector({0});
+                        entry->type = ConsoleBaseType::getType(TypeVector);
+                        break;
+                  #endif
+                  default:
+                        entry->mValue.setEmptyString();
+                        entry->type = ConsoleBaseType::getType(TypeString);
+                        break;
+            }
+
+            return true;
+      }
+      // --------------------------------------------------------------------------------------
       inline bool pushDynamicField(StringTableEntry slotName, const char *array, ConsoleValue* stackP)
       {
             StringTableEntry dynamicFieldName = nullptr;

@@ -88,6 +88,20 @@ struct ElfStorage {
         return true;
     }
     // -------------------------------------------------------------------------
+    bool remove(const T& item) {
+
+        if (!item) return false;
+        for (const auto& [key, val] : mMap) {
+            if (val == item) {
+                UnloadFunc(val);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // -------------------------------------------------------------------------
     bool removeId(S32 id) {
         if (id <= 0) return false;
         auto it = mMap.find(id);

@@ -4,6 +4,8 @@
 //-----------------------------------------------------------------------------
 // SDL3 Keyboard (via scancodes) and Mouse event handling
 //-----------------------------------------------------------------------------
+// NOTE GamePad and JoyStick is implemented in Eventsystem only so far
+//-----------------------------------------------------------------------------
 #include "console/scriptPreprocessor.h"
 #include "console/engineAPI.h"
 
@@ -588,6 +590,58 @@ void RegisterInputConstants() {
     Con::REGISTER_CONST_S32(SDL_BUTTON_RIGHT);
     Con::REGISTER_CONST_S32(SDL_BUTTON_X1);
     Con::REGISTER_CONST_S32(SDL_BUTTON_X2);
+
+
+    // ------ GAMEPAD ---------------------
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_SOUTH);        // Xbox: A, PS: Cross, Switch: B
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_EAST);         // Xbox: B, PS: Circle, Switch: A
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_WEST);         // Xbox: X, PS: Square, Switch: Y
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_NORTH);        // Xbox: Y, PS: Triangle, Switch: X
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_BACK);         // Back / View / Share
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_GUIDE);        // Xbox Home / PS Button
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_START);        // Start / Menu / Options
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_LEFT_STICK);    // Left stick click
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_RIGHT_STICK);   // Right stick click
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER); // LB / L1
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);// RB / R1
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_DPAD_UP);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_MISC1);         // Xbox Share, PS5 Microphone, Switch Capture
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1); // Back paddles for pro controllers
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_LEFT_PADDLE1);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_LEFT_PADDLE2);
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_BUTTON_TOUCHPAD);      // PS4/PS5 Touchpad click
+
+
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_LEFTX);        // Left Stick Horizontal (-32768 to 32767)
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_LEFTY);        // Left Stick Vertical
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_RIGHTX);       // Right Stick Horizontal
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_RIGHTY);       // Right Stick Vertical
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_LEFT_TRIGGER);  // LT / L2 (0 to 32767)
+    Con::REGISTER_CONST_S32(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER); // RT / R2 (0 to 32767)
+
+
+    // -----------JoyStick ------------------
+    Con::REGISTER_CONST_S32(SDL_HAT_CENTERED);  // No direction pressed (0)
+    Con::REGISTER_CONST_S32(SDL_HAT_UP);        // Pressed Up (1)
+    Con::REGISTER_CONST_S32(SDL_HAT_RIGHT);     // Pressed Right (2)
+    Con::REGISTER_CONST_S32(SDL_HAT_DOWN);      // Pressed Down (4)
+    Con::REGISTER_CONST_S32(SDL_HAT_LEFT);      // Pressed Left (8)
+
+    // Diagonals (Pre-calculated combinations)
+    Con::REGISTER_CONST_S32(SDL_HAT_RIGHTUP);   // Up + Right
+    Con::REGISTER_CONST_S32(SDL_HAT_RIGHTDOWN); // Down + Right
+    Con::REGISTER_CONST_S32(SDL_HAT_LEFTUP);    // Up + Left
+    Con::REGISTER_CONST_S32(SDL_HAT_LEFTDOWN);  // Down + Left
+
+    Con::REGISTER_CONST_S32(SDL_POWERSTATE_UNKNOWN);      // Cannot determine state
+    Con::REGISTER_CONST_S32(SDL_POWERSTATE_ON_BATTERY);   // Not plugged in, running on battery
+    Con::REGISTER_CONST_S32(SDL_POWERSTATE_NO_BATTERY);   // Plugged in, no battery available
+    Con::REGISTER_CONST_S32(SDL_POWERSTATE_CHARGING);     // Plugged in, battery is charging
+    Con::REGISTER_CONST_S32(SDL_POWERSTATE_CHARGED);      // Plugged in, battery is fully charged
 
 }
 // -----------------------------------------------------------------------------

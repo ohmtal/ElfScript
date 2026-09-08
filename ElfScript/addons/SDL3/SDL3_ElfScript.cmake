@@ -13,5 +13,7 @@
    # ELFSCRIPT_CUSTOM_PLATFORMPROCESS - overwrite all functions
    # ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC - overwrite shutdown functions only
    ${CMAKE_CURRENT_LIST_DIR}/SDL3_PlatformProcess.cpp
+
+   ${CMAKE_CURRENT_LIST_DIR}/SDL3_events.cpp
  )
 
