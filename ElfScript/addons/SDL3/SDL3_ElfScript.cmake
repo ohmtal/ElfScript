@@ -14,6 +14,7 @@
    # ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC - overwrite shutdown functions only
    ${CMAKE_CURRENT_LIST_DIR}/SDL3_PlatformProcess.cpp
 
+   # // i finally decided to add a onSDLEvent
    ${CMAKE_CURRENT_LIST_DIR}/SDL3_events.cpp
  )
 

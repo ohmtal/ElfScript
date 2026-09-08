@@ -422,7 +422,7 @@ DefineEngineFunction(SDL_OpenGamepad, bool, (S32 which),
     return OpenElfContoller(which) != 0;
 }
 // ----
-DefineEngineFunction(SDL_GetJoystickName, const char* , (S32 which),
+DefineEngineFunction(SDL_GetGamepadName, const char* , (S32 which),
                      , "Get the name of joystick ") {
     return GetElfControllerNameByWhich(which);
 }

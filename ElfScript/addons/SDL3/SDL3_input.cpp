@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // SDL3 Keyboard (via scancodes) and Mouse event handling
 //-----------------------------------------------------------------------------
-// NOTE GamePad and JoyStick is implemented in Eventsystem only so far
+// NOTE GamePad and JoyStick is implemented in SDL3_event.cpp/h only so far
 //-----------------------------------------------------------------------------
 #include "console/scriptPreprocessor.h"
 #include "console/engineAPI.h"
