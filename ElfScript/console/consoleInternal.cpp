@@ -1,5 +1,10 @@
+// ElfScript 0.8 -  TEST not sure if this is better
+// current used entries are moved to top
+#define DICT_MOVE_TO_FRONT
+
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -34,7 +39,9 @@
 
 //#define DEBUG_SPEW
 
-#define ST_INIT_SIZE 15
+// ElfScript changed to 29
+#define ST_INIT_SIZE 29
+// #define ST_INIT_SIZE 15
 
 static char scratchBuffer[1024];
 U32 Namespace::mCacheSequence = 0;
@@ -277,21 +284,57 @@ U32 HashPointer(StringTableEntry ptr)
 {
    return (U32)(((dsize_t)ptr) >> 2);
 }
+// -----------------------------------------------------------------------------
+#ifdef DICT_MOVE_TO_FRONT //ElfScript 0.8 optimize attempt:
 
-Dictionary::Entry *Dictionary::lookup(StringTableEntry name)
+Dictionary::Entry* Dictionary::lookup(StringTableEntry name)
 {
+      if (mLastWalkCache && mLastWalkCache->name == name)
+            return mLastWalkCache;
+
+      U32 idx = HashPointer(name) % hashTable->size;
+      Entry *walk = hashTable->data[idx];
+      Entry *prev = nullptr;
+      while (walk)
+      {
+            if (walk->name == name) {
+                  mLastWalkCache = walk;
+                  if (prev != nullptr) {
+                        prev->nextEntry = walk->nextEntry; //detach
+                        walk->nextEntry = hashTable->data[idx]; // reset
+                        hashTable->data[idx] = walk; // new start
+                  }
+
+                  return walk;
+            } else {
+                  prev = walk;
+                  walk = walk->nextEntry;
+            }
+      }
+      return NULL;
+}
+
+
+#else
+Dictionary::Entry* Dictionary::lookup(StringTableEntry name)
+{
+   if (mLastWalkCache && mLastWalkCache->name == name)
+         return mLastWalkCache;
+
    Entry *walk = hashTable->data[HashPointer(name) % hashTable->size];
    while (walk)
    {
-      if (walk->name == name)
+      if (walk->name == name) {
+         mLastWalkCache = walk;
          return walk;
-      else
+      } else {
          walk = walk->nextEntry;
+      }
    }
-
    return NULL;
 }
-
+#endif
+// -----------------------------------------------------------------------------
 Dictionary::Entry *Dictionary::add(StringTableEntry name)
 {
    // Try to find an existing match.
@@ -319,6 +362,7 @@ Dictionary::Entry *Dictionary::add(StringTableEntry name)
          for (Entry* entry = hashTable->data[i]; entry != NULL; )
          {
             Entry* next = entry->nextEntry;
+            // ElfScript FIXME replace modulo with fibonacci sequence
             U32 index = HashPointer(entry->name) % newTableSize;
 
             entry->nextEntry = newTableData[index];
@@ -328,6 +372,8 @@ Dictionary::Entry *Dictionary::add(StringTableEntry name)
          }
 
       // Switch the tables.
+
+      mLastWalkCache = nullptr;
 
       delete[] hashTable->data;
       hashTable->data = newTableData;

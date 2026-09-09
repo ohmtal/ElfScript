@@ -527,8 +527,10 @@ public:
    Dictionary();
    ~Dictionary();
 
-   Entry *lookup(StringTableEntry name);
-   Entry *add(StringTableEntry name);
+   Entry* mLastWalkCache = nullptr;
+   Entry* lookup(StringTableEntry name);
+   Entry* add(StringTableEntry name);
+
    void setState(Dictionary* ref = NULL);
    void remove(Entry *);
    void reset();

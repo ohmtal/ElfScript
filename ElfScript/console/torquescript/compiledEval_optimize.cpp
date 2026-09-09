@@ -408,15 +408,18 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
 
       }
 
-      switch ( targetType ) {
-            // case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
-#ifdef  ENABLE_CONSOLE_VECTOR
-            case cvVector: TORQUE_CASE_FALLTHROUGH;
-#endif
-            case cvInteger: TORQUE_CASE_FALLTHROUGH;
-            case cvFloat: pStack->setFastFloat(targetValue); break;
-            default: pStack->setFloat(targetValue); break;
-      }
+       pStack->setFloat(targetValue);
+
+      // 2.8 setFloat only because we have no cleanup anymore
+//       switch ( targetType ) {
+//             // case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
+// #ifdef  ENABLE_CONSOLE_VECTOR
+//             case cvVector: TORQUE_CASE_FALLTHROUGH;
+// #endif
+//             case cvInteger: TORQUE_CASE_FALLTHROUGH;
+//             case cvFloat: pStack->setFastFloat(targetValue); break;
+//             default: pStack->setFloat(targetValue); break;
+//       }
 
 }
 // -----------------------------------------------------------------------------
@@ -2791,7 +2794,9 @@ handle_OP_SAVEFIELD_FASTPATH:
                   }
       } else {
             if (cachePtr->objectPtr != curObject) {
+#ifdef TORQUE_DEBUG_TOOMUCH
                   void* oldPrt = (void*) cachePtr->objectPtr;
+#endif
                   cachePtr->objectPtr = curObject;
                   cachePtr->cacheFailed = !curObject->fillFieldCache(curField, curFieldArray,cachePtr, &stack[_STK], false);
 #ifdef TORQUE_DEBUG_TOOMUCH

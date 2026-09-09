@@ -123,11 +123,13 @@ function StarField::Render(%this) {
         %this.starArray.set(%i, %pointVec);
     }
 
+    // vardump("%pointVec");
+
     %fontScale = 0.7;
     SDL_SetRenderDrawColor(%renderer, 128,20,255);
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("Points in a Array - %d FPS",$Global::FPS));
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("[III] Points in a Array - %d FPS",$Global::FPS));
     SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%this.speed));
     SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
     ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));

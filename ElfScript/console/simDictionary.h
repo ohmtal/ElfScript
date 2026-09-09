@@ -1,3 +1,6 @@
+// ElfScript 0.8 added here let see what happen
+// #define USE_NEW_SIMDICTIONARY
+// << objectName does not exists !
 //-----------------------------------------------------------------------------
 // Copyright (c) 2012 GarageGames, LLC
 //
