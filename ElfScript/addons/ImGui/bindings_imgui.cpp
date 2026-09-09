@@ -437,7 +437,10 @@ void RegisterColorConstants() {
 }
 
 // -----------------------------------------------------------------------------
+bool _InitBindings_ImGuiDone = false;
 void InitBindings_ImGui() {
+    if (_InitBindings_ImGuiDone) return;
+    _InitBindings_ImGuiDone = true;
     //real constant using preprocessor*
      Con::setScriptConstant("FLT_MIN", (F64)FLT_MIN);
      Con::setScriptConstant("FLT_MAX", (F64)FLT_MAX);
@@ -455,6 +458,11 @@ void InitBindings_ImGui() {
 }
 // -----------------------------------------------------------------------------
 ConsoleFunctionGroupBegin( ImGui, "ImGui/BaseFlux functions");
+// -----------------------------------------------------------------------------
+// Every platform need it's own code so it can be done in C
+// DefineEngineFunction(ImInit, void, (), , "Initialize Imgui ElfScript Bindings once") {
+//     InitBindings_ImGui();
+// }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(ImSetNextWindowSize, void, (ImVec2 size, S32 condition ),(0),"Set the next Window Size if not saved.")
 {

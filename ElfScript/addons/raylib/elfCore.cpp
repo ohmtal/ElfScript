@@ -319,12 +319,15 @@ DefineEngineFunction(IsCursorOnScreen, bool, (), , "Check if cursor is on the sc
 DefineEngineFunction(ClearBackground, void, (Color color),(RAYWHITE),"Clear background (framebuffer) to color"){
     ClearBackground(color);
 }
+
+#ifndef BEGIN_END_DRAWING_OVERWRITE // required for ImGui
 DefineEngineFunction(BeginDrawing, void, (),,"Begin canvas (framebuffer) drawing"){
     BeginDrawing();
 }
 DefineEngineFunction(EndDrawing, void, (),," End canvas (framebuffer) drawing and swap buffers (double buffering)"){
     EndDrawing();
 }
+#endif
 
 // RLAPI void BeginTextureMode(RenderTexture2D target);
 // Begins drawing to render texture

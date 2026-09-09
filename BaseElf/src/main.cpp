@@ -115,17 +115,22 @@ int argParser(int argc, char* argv[]) {
             }
             continue;
         }
-        // filename test
-        if (argStr.equal("--script")) {
-            if (i + 1 < argc) {
-                gScriptFile= argv[++i];
-                dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
-            } else {
-                dPrintf("--script but no file parameter usage: --script myFile.cs\n");
-                return 1;
-            }
-            continue;
+
+        // last one should be the script file
+        if (i == argc - 1 ) {
+            gScriptFile= argv[i];
+            dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
         }
+        // if (argStr.equal("--script")) {
+        //     if (i + 1 < argc) {
+        //         gScriptFile= argv[++i];
+        //         dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
+        //     } else {
+        //         dPrintf("--script but no file parameter usage: --script myFile.cs\n");
+        //         return 1;
+        //     }
+        //     continue;
+        // }
 
 
     } //for ...

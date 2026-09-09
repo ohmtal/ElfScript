@@ -11,6 +11,7 @@
 #include "main/engineGlue.h"
 #include "console/script.h"
 #include "console/engineAPI.h"
+#include <functional>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -19,6 +20,9 @@
 String gScriptFile = "assets/main.elf";
 bool gShutDownRequest = false;
 bool gEnableConsole = false;
+
+std::function<void()> OnLoop = nullptr;
+
 
 extern void initEnum();  //elfEnum.cpp
 extern void CustomTraceLog(int msgType, const char *text, va_list args); //elfBase.cpp
@@ -76,6 +80,9 @@ void defaultLoop(void*) {
     timeAccumulator = currentMs - (F32)dtMs;
     engineGlue::process(dtMs);
 
+    // On Look Callback ...
+    if (OnLoop) OnLoop();
+
     #ifdef __EMSCRIPTEN__
     emscripten_sleep(1);
     #endif
@@ -112,7 +119,6 @@ int defaultMain(int argc, char* argv[])
         Con::errorf("main script not found.");
         return 1;
     }
-
 
 
     // -------- finallize

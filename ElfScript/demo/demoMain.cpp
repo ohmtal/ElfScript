@@ -63,16 +63,23 @@ int argParser(int argc, char* argv[]) {
             continue;
         }
 
+
         // filename test
-        if (argStr.equal("--script")) {
-            if (i + 1 < argc) {
-                gScriptFile = argv[++i];
-                Con::infof("Script File: %s", gScriptFile.c_str());
-            } else {
-                Con::errorf("--script but no file parameter usage: --script myFile.elf");
-                return 1;
-            }
-            continue;
+        // if (argStr.equal("--script")) {
+        //     if (i + 1 < argc) {
+        //         gScriptFile = argv[++i];
+        //         Con::infof("Script File: %s", gScriptFile.c_str());
+        //     } else {
+        //         Con::errorf("--script but no file parameter usage: --script myFile.elf");
+        //         return 1;
+        //     }
+        //     continue;
+        // }
+
+        // last one should be the script file
+        if (i == argc - 1 ) {
+            gScriptFile= argv[i];
+            dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
         }
 
     } //for ...

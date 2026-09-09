@@ -13,7 +13,7 @@
 #include "addons/SDL3/SDL3_Filesystem.h"
 #include "addons/SDL3/SDL3_events.h"
 
-#include <functional> //<< bad boy ;)
+#include <functional>
 
 namespace ElfSDL3 {
     void Init() ;

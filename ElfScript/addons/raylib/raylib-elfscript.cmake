@@ -11,11 +11,16 @@ if (RAYLIB_FETCH)
 
     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+    if (RAYLIB_GIT_MASTER)
+        set(RAY_TAG master)
+    else()
+        set(RAY_TAG 6.0)
+    endif()
+
     FetchContent_Declare(
         raylib
         GIT_REPOSITORY https://github.com/raysan5/raylib.git
-        # GIT_TAG        master
-        GIT_TAG        6.0
+        GIT_TAG        ${RAY_TAG}
     )
     FetchContent_MakeAvailable(raylib)
 endif()
@@ -54,3 +59,7 @@ if (RAYELF_DKCONSOLE)
     list(APPEND RAYLIB_ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/consoledk/ConsoleGuiObject.cpp)
 endif()
 
+# i need that when adding ImGui!
+if (RAYELF_BEGINEND_DRAWING_OVERWRITE)
+    add_compile_definitions(BEGIN_END_DRAWING_OVERWRITE)
+endif()

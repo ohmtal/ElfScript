@@ -43,17 +43,22 @@ namespace engineGlue
                 }
                 continue;
             }
-            // filename test
-            if (argStr.equal("--script")) {
-                if (i + 1 < argc) {
-                    ScriptFile= argv[++i];
-                    dPrintf("Custom Script File: %s\n", ScriptFile.c_str());
-                } else {
-                    dPrintf("--script but no file parameter usage: --script myFile.cs\n");
-                    return 1;
-                }
-                continue;
+
+            // last one should be the script file
+            if (i == argc - 1 ) {
+                ScriptFile= argv[i];
+                dPrintf("Custom Script File: %s\n", ScriptFile.c_str());
             }
+            // if (argStr.equal("--script")) {
+            //     if (i + 1 < argc) {
+            //         ScriptFile= argv[++i];
+            //         dPrintf("Custom Script File: %s\n", ScriptFile.c_str());
+            //     } else {
+            //         dPrintf("--script but no file parameter usage: --script myFile.cs\n");
+            //         return 1;
+            //     }
+            //     continue;
+            // }
 
 
         } //for ...
