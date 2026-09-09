@@ -3,9 +3,7 @@ $MODULES = "lights_script models_first_person_maze textures_sprite_animation tex
 $MODULES = $MODULES SPC "textures_mouse_painting";
 $MODULES = $MODULES SPC "DeltaTime";
 $MODULES = $MODULES SPC "RenderMap";
-// $MODULES = $MODULES SPC "shapes_starfield_effect";
-$MODULES = $MODULES SPC "shapes_starfield_effect_v4";
-// $MODULES = $MODULES SPC "looptest blank ";
+$MODULES = $MODULES SPC "shapes_starfield_effect";
 
 
 function Main::init(%this) {
@@ -101,7 +99,9 @@ function Main::loop(%this) {
 }
 
 // -----------------------------------------------------------------------------
-function rl() { exec("assets/main.elf");}
+function rl() {
+    exec("assets/main.elf");
+}
 
 function updateDocu() {
     %file = "assets/script_stub.elf";
@@ -121,29 +121,33 @@ function updateDocu() {
 // ~~~~~~~~~~~~~~~~~~~ MAIN ~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%Main = new ScriptObject() {
-    class = "Main";
-    // dynamic fields:
-    // TypeString caption = "raylib-elfScript Demo Loader";
-    TypeString caption = "RayElf Test Loader";
-    TypeS32 screenWidth = 1152;
-    TypeS32 screenHeight = 648;
-    TypeS32 currentFps = 60;
-    TypeS32 flags = FLAG_WINDOW_RESIZABLE;
-    TypeS32 moduleIndex = 0;
-    TypeS32 module = 0;
-};
+function Main() {
+    %Main = new ScriptObject() {
+        class = "Main";
+        // dynamic fields:
+        // TypeString caption = "raylib-elfScript Demo Loader";
+        TypeString caption = "raylib-ElfScript Demo Loader";
+        TypeS32 screenWidth = 800;
+        TypeS32 screenHeight = 450;
+        TypeS32 currentFps = 60;
+        TypeS32 flags = FLAG_WINDOW_RESIZABLE;
+        TypeS32 moduleIndex = 0;
+        TypeS32 module = 0;
+    };
+
+    $Global::Main = %main;
+
+    %Main.init();
+
+    while ( !WindowShouldClose() ) {
+        %Main.loop();
+    }
 
 
-%Main.init();
-
-while ( !WindowShouldClose() ) {
-     %Main.loop();
+    %Main.delete();
+    CloseWindow();
 }
 
-
-&Main.delete();
-CloseWindow();
-
-
+if ( !isObject( $Global::Main ) ) Main();
+print("Main Module Loader ready.");
 

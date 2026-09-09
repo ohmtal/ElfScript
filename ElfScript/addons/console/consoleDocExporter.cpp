@@ -137,7 +137,7 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool humanread
     "double math.atan2(double value1, double value2)\n"
     "double math.pow(double value1, double value2)\n"
 
-    "double math.clamp(double value1, double value2, double value2)\n"
+    "long math.clamp(long value1, long value2, long value2)\n"
     "double math.clampf(double value1, double value2, double value2)\n"
     "double math.lerp(double value1, double value2, double value2)\n"
     "double math.smoothstep(double value1, double value2, double value2)\n"

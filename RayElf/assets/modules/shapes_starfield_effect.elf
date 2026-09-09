@@ -1,37 +1,21 @@
 // -----------------------------------------------------------------------------
-// attempt to optimize speed with global variables
-// the loop over starcount is not really the best idea when using interpreted
-// script.
-// -----------------------------------------------------------------------------
-// Benchmark Debug build!! (weak: only looking on fps)
-// with 420 stars (lines mode) on a i5-7200U (Thinkpad T570 running arch):
-// nativ c gpu limit lines ~ 2500fps Circles ~ 1000fps
-// optimized torquescript ~75fps cpu limit
-//  => 2026-08-01 ElfScript 0.4a ~ 180fps (rel: 360fps) ( fastPath lite on global vars )
-// not optimizes torquescript ~60fps cpu limit
-// -----------------------------------------------------------------------------
-// more optimations local variables are much faster than global
-// batched is a bit better and release build make a big difference
+// Starfield Demo
 // -----------------------------------------------------------------------------
 
 // orig 420
 #define STAR_COUNT 420
+#define STARTDIV 0.03125
 
 function createshapes_starfield_effect() {
-    %obj = new ScriptObject() {
+    %obj = new Group() {
         class = "shapes_starfield_effect";
-        // TypeF32 speed = 10.0/9.0;
         TypeColor bgColor = 0;
-
         TypeBool drawLines = true;
     };
     return %obj;
 }
 // -----------------------------------------------------------------------------
 function shapes_starfield_effect::onRemove(%this) {
- // unload the variables
-  deleteVariables("$starPoints*");
-   // deleteVariables("$starPointsScreenPos*");
   SetTargetFPS(60);
 }
 // -----------------------------------------------------------------------------
@@ -52,18 +36,21 @@ function shapes_starfield_effect::UpdateSize(%this) {
 function shapes_starfield_effect::OnAdd(%this) {
     %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
     %this.updateSize();
+
+    %this.add(%this.starPoints = new Array());
+
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        $starPoints_X[%i] = GetRandomValue($minH , $maxH);
-        $starPoints_Y[%i] = GetRandomValue($minW , $maxW);
-        $starPoints_Z[%i] = 1.0;
-
-        // echo("STAR #" @ %i SPC $starPoints_X[%i] SPC $starPoints_Y[%i] SPC $starPoints_Z[%i]
-        // SPC "rand" SPC GetRandomValue($minH ,  $maxH));
+        %this.starPoints.push_back(
+            {
+                math.randomf($minH , $maxH)
+                , math.randomf($minW , $maxW)
+                , 1.0
+            }
+        );
     }
 
     $speed = 10.0/9.0;
-// echo("initial speed is:" SPC $speed);
 
     SetTargetFPS(0);
 
@@ -78,7 +65,7 @@ function shapes_starfield_effect::Render(%this) {
     if (%mouseMove != 0) $speed += %mouseMove / 10.0;
 
 
-    $speed = mClampF($speed, 0.05, 5.0);
+    $speed = math.clampf($speed, 0.05, 5.0);
 
 
     // Toggle lines / points with space bar
@@ -102,60 +89,52 @@ function shapes_starfield_effect::Render(%this) {
 
     ClearBackground( %this.bgColor);
 
-    %startDiv = 1.0 / 32.0;
     %drawLines = %this.drawLines;
 
-    for ( %i = 0; %i < STAR_COUNT; %i++)
+    for ( %i in range STAR_COUNT)
     {
-        // put into local variables ... did not change so much as the %screenPos_Y variables
-        %x = $starPoints_X[%i];
-        %y = $starPoints_Y[%i];
-        %z = $starPoints_Z[%i];
-
+        %point = %this.starPoints.at(%i);
         // >>>>>>>>>>>>>>>> update point
-        %z -= %dt * $speed;
+        %point.z -= %dt * $speed;
 
         // Calculate the screen position
-        %invZ = 1.0 / %z;
-        %screenPos_X = $hW + (%x * %invZ);
-        %screenPos_Y = $hH + (%y * %invZ);
+        %invZ = 1.0 / %point.z;
+        %screenPos_X = $hW + (%point.x * %invZ);
+        %screenPos_Y = $hH + (%point.y * %invZ);
 
-// echo("x/y/z" SPC %x SPC %y SPC %z  SPC "invZ:" SPC %invZ SPC "screen pos:" SPC %screenPos_X SPC %screenPos_Y);
 
-        if ( %z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0 || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
+        if ( %point.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+             || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
         {
-            %x = GetRandomValue($minH, $maxH);
-            %y = GetRandomValue($minW, $maxW);
-            %z = 1.0;
+            %point = {
+                math.randomf($minH , $maxH)
+                , math.randomf($minW , $maxW)
+                , 1.0
+            };
 
-            // store new values
-            $starPoints_X[%i] = %x;
-            $starPoints_Y[%i] = %y;
-
-            %screenPos_X = $hW + %x;
-            %screenPos_Y = $hH + %y;
+            %screenPos_X = $hW + %point.x;
+            %screenPos_Y = $hH + %point.y;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%drawLines)
         {
-            %t = mClampF(%z + %startDiv , 0.0 , 1.0 );
-            if ( (%t - %z) > 1e-3)
+            %t = math.clampf(%point.z + STARTDIV , 0.0 , 1.0 );
+            if ( (%t - %point.z) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = $hW + (%x * %invT);
-                %startY = $hH + (%y * %invT);
+                %startX = $hW + (%point.x * %invT);
+                %startY = $hH + (%point.y * %invT);
 
                 DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, RAYWHITE);
             }
         }
         else
         {
-            %radius = mLerp(3.0, 1.0, %z);
+            %radius = math.lerp(3.0, 1.0, %point.z);
             DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
         }
 
-        // store back z it change every time
-        $starPoints_Z[%i] = %z;
+        %this.starPoints.set(%i, %point);
     }
 
 

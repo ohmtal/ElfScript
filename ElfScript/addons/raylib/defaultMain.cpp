@@ -45,16 +45,22 @@ int argParser(int argc, char* argv[]) {
             continue;
         }
 
-        if (argStr.equal("--script")) {
-            if (i + 1 < argc) {
-                gScriptFile= argv[++i];
-                dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
-            } else {
-                dPrintf("--script but no file parameter usage: --script myFile.elf\n");
-                return 1;
-            }
-            continue;
+        // last one should be the script file
+        if (i == argc - 1 ) {
+            gScriptFile= argv[i];
+            dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
         }
+
+        // // if (argStr.equal("--script")) {
+        // //     if (i + 1 < argc) {
+        // //         gScriptFile= argv[++i];
+        // //         dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
+        // //     } else {
+        // //         dPrintf("--script but no file parameter usage: --script myFile.elf\n");
+        // //         return 1;
+        // //     }
+        // //     continue;
+        // // }
 
 
     } //for ...
@@ -77,8 +83,10 @@ void defaultLoop(void*) {
 }
 // -----------------------------------------------------------------------------
 DefineEngineFunction(WindowShouldClose, bool, (),,
-                     "Main Loop for Raylib ElfScript - keeping scheduler running\n"
-                     "Return true if shutDown request is set."
+                     "Main Loop for Raylib ElfScript\n"
+                     "keeping ElfScript scheduler and Garbage Collection running\n"
+                     "See also $RAY::ShutDownRequested\n"
+                     "@return true if shutDown request is set."
 ) {
 
     if (WindowShouldClose()) return true;

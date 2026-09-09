@@ -7,12 +7,6 @@
  */
 class  SimObject {
   public:
-      /*! Generic callback for when an object is edited */
-      void onInspectPostApply( SimObject obj );
-      /*! Generic callback for when an object is selected */
-      void onSelected( SimObject obj );
-      /*! Generic callback for when an object is un-selected */
-      void onUnselected( SimObject obj );
       /*! Called when this SimObject is added to the system.
 @param ID Unique object ID assigned when created (%this in script).
  */
@@ -61,28 +55,6 @@ class  SimObject {
     * @param name The name of the 'superClass' namespace for this object.
     */
       function setSuperClassNamespace( string name );
-   /** --- bool isSelected ---
-    * Get whether the object has been marked as selected. (in editor)
-    * @return True if the object is currently selected.
-    * @return bool
-    */
-      function isSelected();
-   /** --- void setIsSelected ---
-    * Set whether the object has been marked as selected. (in editor)
-    * @param state True if object is to be marked selected; false if not.
-    */
-      function setIsSelected( bool state=true );
-   /** --- bool isExpanded ---
-    * Get whether the object has been marked as expanded. (in editor)
-    * @return True if the object is marked expanded.
-    * @return bool
-    */
-      function isExpanded();
-   /** --- void setIsExpanded ---
-    * Set whether the object has been marked as expanded. (in editor)
-    * @param state True if the object is to be marked expanded; false if not.
-    */
-      function setIsExpanded( bool state=true );
    /** --- const char* GetFileName ---
     * Returns the filename the object is attached to.
     * @return The name of the file the object is associated with; usually the file the object was loaded from.
@@ -121,17 +93,6 @@ class  SimObject {
     * @param value If true, the object will be included in saves; if false, it will be excluded.
     */
       function setCanSave( bool value=true );
-   /** --- bool isEditorOnly ---
-    * Return true if the object is only used by the editor.
-    * @return True if this object exists only for the sake of editing.
-    * @return bool
-    */
-      function isEditorOnly();
-   /** --- void setEditorOnly ---
-    * Set/clear the editor-only flag on this object.
-    * @param value If true, the object is marked as existing only for the editor.
-    */
-      function setEditorOnly( bool value=true );
    /** --- bool isNameChangeAllowed ---
     * Get whether this object may be renamed.
     * @return True if this object can be renamed; false otherwise.
@@ -155,17 +116,7 @@ class  SimObject {
     * @return SimObject*
     */
       function deepClone();
-   /** --- void setLocked ---
-    * Lock/unlock the object in the editor.
-    * @param value If true, the object will be locked; if false, the object will be unlocked.
-    */
-      function setLocked( bool value=true );
-   /** --- void setHidden ---
-    * Hide/unhide the object.
-    * @param value If true, the object will be hidden; if false, the object will be unhidden.
-    */
-      function setHidden( bool value=true );
-   /** --- ArrayObject* dumpMethods ---
+   /** --- KeyValueStringTable* getMethods ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - Minimum number of arguments.
@@ -174,17 +125,17 @@ class  SimObject {
     * - Full script file path (if script method).
     * - Line number of method definition in script (if script method).
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
-      function dumpMethods();
-   /** --- ArrayObject* getMethodSigs ---
+      function getMethods();
+   /** --- KeyValueStringTable* getMethodSigs ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - method prototype string.
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
       function getMethodSigs( bool commands=false );
    /** --- void dump ---
@@ -192,14 +143,14 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dump( bool detailed=false );
-   /** --- bool save ---
+   /** --- bool Save ---
     * Save out the object to the given file.
     * @param fileName The name of the file to save to.@param selectedOnly If true, only objects marked as selected will be saved out.
     * @param preAppendString Text which will be preprended directly to the object serialization.
     * @param True on success, false on failure.
     * @return bool
     */
-      function save( string fileName, bool selectedOnly=false, string preAppendString="" );
+      function Save( string fileName, bool selectedOnly=false, string preAppendString="" );
    /** --- void setName ---
     * Set the global name of the object.
     * @param newName The new global name to assign to the object.
@@ -242,7 +193,7 @@ class  SimObject {
     * @return bool
     */
       function setFieldValue( string fieldName, string value, int index=-1 );
-   /** --- bool addTypeField ---
+   /** --- bool addField ---
     * Set the value and console type of the given field on this object.
     * NOTE: this cant be used with arrays like setFieldValue@param fieldName The name of the field to assign to.  If it includes an array index, the index will be parsed out.
     * @param type The name of the console type.
@@ -250,13 +201,18 @@ class  SimObject {
     * @return True.
     * @return bool
     */
-      function addTypeField( string fieldName, string type, string value );
+      function addField( string fieldName, string type, string value );
    /** --- const char* getFieldType ---
     * Get the console type code of the given field.
     * @return The numeric type code for the underlying console type of the given field.
     * @return const char*
     */
       function getFieldType( string fieldName );
+   /** --- const char* getFieldDoc ---
+    * Get the console documentation of the given field.
+    * @return const char*
+    */
+      function getFieldDoc( string fieldName );
    /** --- void setFieldType ---
     * Set the console type code for the given field.
     * @param fieldName The name of the dynamic field to change to type for.
@@ -271,7 +227,7 @@ class  SimObject {
     * @return The result of the method call.
     * @return string
     */
-      function call( string method, string args... )...;
+      function call( string method, string args... );
    /** --- void setInternalName ---
     * Set the internal name of the object.
     * @param newInternalName The new internal name for the object.
@@ -327,7 +283,7 @@ class  SimObject {
     * @return The numeric ID of the created schedule.  Can be used to cancel the call.
     * @return int
     */
-      function schedule( float time, string method, string args... )...;
+      function schedule( float time, string method, string args... );
    /** --- S32 getDynamicFieldCount ---
     * Get the number of dynamic fields defined on the object.
     * @return The number of dynamic fields defined on the object.
@@ -359,22 +315,17 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dumpFields( bool staticFields=true, bool dynamicFields=true, bool detailed=false );
+   /** --- void dumpMethods ---
+    * Dump a description of all methods and callbacks defined on this object to the console.
+    * @param detailed Whether to print detailed information about members.
+    */
+      function dumpMethods( bool detailed=false );
    // --- Group: Ungrouped ---
    /*!
    Optional global name of this object.
    
     */
    string name;
-   /*!
-   Optional Name of object to inherit from as a parent.
-   
-    */
-   string inheritFrom;
-   /*!
-   Prototype Methods
-   
-    */
-   bool Prototype;
    // --- Group: Object ---
    /*!
    Optional name that may be used to lookup this object within a SimSet.
@@ -396,22 +347,6 @@ class  SimObject {
    
     */
    string superClass;
-   /*!
-   Script class of object.
-   
-    */
-   string className;
-   // --- Group: Editing ---
-   /*!
-   Whether the object is visible.
-   
-    */
-   bool hidden;
-   /*!
-   Whether the object can be edited.
-   
-    */
-   bool locked;
    // --- Group: Persistence ---
    /*!
    Whether the object can be saved out. If false, the object is purely transient in nature.
@@ -428,62 +363,6 @@ class  SimObject {
    
     */
    pid persistentId;
-};
-/*!
-@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
-ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
-a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
-@tsexample
-new ScriptObject(Game)
-{
-   class = "DeathMatchGame";
-   superClass = GameCore;
-   genre = "Action FPS"; // Note the new, non-Torque variable
-};
-@endtsexample
-@see SimObject
-@ingroup Console
- */
-class  ScriptObject : public SimObject {
-  public:
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
-class  LightsDemo : public ScriptObject {
-  public:
-   /** --- Script render ---
-    * @return Script
-    */
-      function render( string this )...;
-   /** --- Script toggleLight ---
-    * @return Script
-    */
-      function toggleLight( string this, string id )...;
-   /** --- Script onRemove ---
-    * @return Script
-    */
-      function onRemove( string this )...;
-   /** --- Script onAdd ---
-    * @return Script
-    */
-      function onAdd( string this )...;
-};
-class  Main : public ScriptObject {
-  public:
-   /** --- Script loop ---
-    * @return Script
-    */
-      function loop( string this )...;
-   /** --- Script loadModule ---
-    * @return Script
-    */
-      function loadModule( string this, string setNewModuleIndex )...;
-   /** --- Script init ---
-    * @return Script
-    */
-      function init( string this )...;
 };
 /*!
 @brief A collection of SimObjects.
@@ -510,12 +389,12 @@ class  SimSet : public SimObject {
     * Add the given objects to the set.
     * @param objects The objects to add to the set.
     */
-      function add( SimObject objects... )...;
+      function add( SimObject objects... );
    /** --- void remove ---
     * Remove the given objects from the set.
     * @param objects The objects to remove from the set.
     */
-      function remove( SimObject objects... )...;
+      function remove( SimObject objects... );
    /** --- void clear ---
     * Remove all objects from the set.
     */
@@ -541,7 +420,7 @@ class  SimSet : public SimObject {
     * @note This method recurses into all SimSets that are children to the set.
     * @see callOnChildrenNoRecurse
     */
-      function callOnChildren( string method, string args... )...;
+      function callOnChildren( string method, string args... );
    /** --- void callOnChildrenNoRecurse ---
     * Call a method on all objects contained in the set.
     * @param method The name of the method to call.
@@ -549,7 +428,7 @@ class  SimSet : public SimObject {
     * @note This method does not recurse into child SimSets.
     * @see callOnChildren
     */
-      function callOnChildrenNoRecurse( string method, string args... )...;
+      function callOnChildrenNoRecurse( string method, string args... );
    /** --- void reorderChild ---
     * Make sure child1 is ordered right before child2 in the set.
     * @param child1 The first child.  The object must already be contained in the set.
@@ -619,17 +498,47 @@ class  SimSet : public SimObject {
     * @return bool
     */
       function acceptsAsChild( SimObject obj );
+   /** --- S32 size ---
+    * Get the number of objects contained in the set.
+    * @return The number of objects contained in the set.
+    * @return S32
+    */
+      function size();
+   /** --- S32 last ---
+    * Get the last object in the set.
+    * @return S32
+    */
+      function last();
+   /** --- S32 first ---
+    * Get the first object in the set.
+    * @return S32
+    */
+      function first();
+   /** --- S32 at ---
+    * Get the object ID at the specified index.
+    * @return The object ID, or 0 if index is out of bounds.
+    * @return S32
+    */
+      function at( int index );
+   /** --- void erase ---
+    * Remove the object at the specified index from the set.
+    */
+      function erase( int index );
+   /** --- void push_back ---
+    * push a object (ID!)to the end of the list
+    */
+      function push_back( int SimObjectId );
+   /** --- void insert ---
+    * insert a object (ID!)to the index of the list
+    */
+      function insert( int position, int SimObjectId );
+   /** --- void pop_front ---
+    * pop the first object
+    */
+      function pop_front();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
-};
-/// Stub class
-/// 
-/// @note This is a stub class to ensure a proper class hierarchy. No 
-///       information was available for this class.
-class  GarbageCollectionSet : public SimSet {
-  public:
 };
 /*!
 @brief A collection of SimObjects that are owned by the group.
@@ -668,8 +577,92 @@ class  SimGroup : public SimSet {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
+};
+class  Group : public SimGroup {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  LightsDemo : public Group {
+  public:
+   /** --- Script render ---
+    * @return Script
+    */
+      function render( string this );
+   /** --- Script toggleLight ---
+    * @return Script
+    */
+      function toggleLight( string this, string id );
+   /** --- Script onRemove ---
+    * @return Script
+    */
+      function onRemove( string this );
+   /** --- Script onAdd ---
+    * @return Script
+    */
+      function onAdd( string this );
+   /** --- Script CreateLight ---
+    * @return Script
+    */
+      function CreateLight( string this, string type, string position, string target, string color, string caption );
+};
+class  Object : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  Light : public Object {
+  public:
+   /** --- Script UpdateLightValues ---
+    * @return Script
+    */
+      function UpdateLightValues( string this );
+};
+/*!
+@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
+ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
+a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
+@tsexample
+new ScriptObject(Game)
+{
+   class = "DeathMatchGame";
+   superClass = GameCore;
+   genre = "Action FPS"; // Note the new, non-Torque variable
+};
+@endtsexample
+@see SimObject
+@ingroup Console
+ */
+class  ScriptObject : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  Main : public ScriptObject {
+  public:
+   /** --- Script loop ---
+    * @return Script
+    */
+      function loop( string this );
+   /** --- Script loadModule ---
+    * @return Script
+    */
+      function loadModule( string this, string setNewModuleIndex );
+   /** --- Script init ---
+    * @return Script
+    */
+      function init( string this );
+};
+/// Stub class
+/// 
+/// @note This is a stub class to ensure a proper class hierarchy. No 
+///       information was available for this class.
+class  GarbageCollectionGroup : public SimGroup {
+  public:
 };
 /// Stub class
 /// 
@@ -711,326 +704,6 @@ class  ScriptGroup : public SimGroup {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
-class  ConsoleGuiObject : public SimObject {
-  public:
-   /** --- bool setFont ---
-    * set the console font
-    * @return bool
-    */
-      function setFont( int fontId );
-   /** --- void update ---
-    * update the console
-    */
-      function update();
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-   Shortcut to open console
-   
-    */
-   int key;
-   /*!
-   font size
-   
-    */
-   float fontSize;
-   /*!
-   2=half height, 1= full heigth
-   
-    */
-   float heightDiv;
-};
-/*!
-@brief Data structure for storing indexed sequences of key/value pairs.
-This is a powerful array class providing PHP style arrays in TorqueScript.
-The following features are supported:<ul>
-<li>array pointers: this allows you to move forwards or backwards through the array as if it was a list, including jumping to the start or end.</li>
-<li>sorting: the array can be sorted in either alphabetic or numeric mode, on the key or the value, and in ascending or descending order</li>
-<li>add/remove elements: elements can be pushed/popped from the start or end of the array, or can be inserted/erased from anywhere in the middle</li>
-<li>removal of duplicates: remove duplicate keys or duplicate values</li>
-<li>searching: search the array and return the index of a particular key or value</li>
-<li>counting: count the number of instaces of a particular value or key in the array, as well as the total number of elements</li>
-<li>advanced features: array append, array crop and array duplicate</li>
-</ul>
-Array element keys and values can be strings or numbers
- */
-class  ArrayObject : public SimObject {
-  public:
-   /** --- S32 getIndexFromValue ---
-    * Search the array from the current position for the element @param value Array value to search for
-    * @return Index of the first element found, or -1 if none
-    * @return S32
-    */
-      function getIndexFromValue( string value );
-   /** --- S32 getIndexFromKey ---
-    * Search the array from the current position for the key @param value Array key to search for
-    * @return Index of the first element found, or -1 if none
-    * @return S32
-    */
-      function getIndexFromKey( string key );
-   /** --- const char* getValueFromKey ---
-    * Search the array from the current position for the Key @param value Array key to search for
-    * @return Value of the first element found, or -1 if none
-    * @return const char*
-    */
-      function getValueFromKey( string key );
-   /** --- const char* getKeyFromValue ---
-    * Search the array from the current position for the Value @param value Array key to search for
-    * @return Key of the first element found, or -1 if none
-    * @return const char*
-    */
-      function getKeyFromValue( string key );
-   /** --- const char* getValue ---
-    * Get the value of the array element at the submitted index.
-    * @param index 0-based index of the array element to get
-    * @return The value of the array element at the specified index, or "" if the index is out of range
-    * @return const char*
-    */
-      function getValue( int index );
-   /** --- const char* getKey ---
-    * Get the key of the array element at the submitted index.
-    * @param index 0-based index of the array element to get
-    * @return The key associated with the array element at the specified index, or "" if the index is out of range
-    * @return const char*
-    */
-      function getKey( int index );
-   /** --- void setKey ---
-    * Set the key at the given index.
-    * @param key New key value
-    * @param index 0-based index of the array element to update
-    */
-      function setKey( string key, int index );
-   /** --- void setValue ---
-    * Set the value at the given index.
-    * @param value New array element value
-    * @param index 0-based index of the array element to update
-    */
-      function setValue( string value, int index );
-   /** --- S32 count ---
-    * Get the number of elements in the array.
-    * @return S32
-    */
-      function count();
-   /** --- S32 countValue ---
-    * Get the number of times a particular value is found in the array.
-    * @param value Array element value to count
-    * @return S32
-    */
-      function countValue( string value );
-   /** --- S32 countKey ---
-    * Get the number of times a particular key is found in the array.
-    * @param key Key value to count
-    * @return S32
-    */
-      function countKey( string key );
-   /** --- void add ---
-    * Adds a new element to the end of an array (same as push_back()).
-    * @param key Key for the new element
-    * @param value Value for the new element
-    */
-      function add( string key, string value="" );
-   /** --- void push_back ---
-    * Adds a new element to the end of an array.
-    * @param key Key for the new element
-    * @param value Value for the new element
-    */
-      function push_back( string key, string value="" );
-   /** --- void push_front ---
-    * Adds a new element to the front of an array
-    */
-      function push_front( string key, string value="" );
-   /** --- void insert ---
-    * Adds a new element to a specified position in the array.
-    * - @a index = 0 will insert an element at the start of the array (same as push_front())
-    * - @a index = %array.count() will insert an element at the end of the array (same as push_back())
-    * @param key Key for the new element
-    * @param value Value for the new element
-    * @param index 0-based index at which to insert the new element
-    */
-      function insert( string key, string value, int index );
-   /** --- void pop_back ---
-    * Removes the last element from the array
-    */
-      function pop_back();
-   /** --- void pop_front ---
-    * Removes the first element from the array
-    */
-      function pop_front();
-   /** --- void erase ---
-    * Removes an element at a specific position from the array.
-    * @param index 0-based index of the element to remove
-    */
-      function erase( int index );
-   /** --- void empty ---
-    * Emptys all elements from an array
-    */
-      function empty();
-   /** --- void uniqueValue ---
-    * Removes any elements that have duplicated values (leaving the first instance)
-    */
-      function uniqueValue();
-   /** --- void uniqueKey ---
-    * Removes any elements that have duplicated keys (leaving the first instance)
-    */
-      function uniqueKey();
-   /** --- void uniquePair ---
-    * Removes any elements that have duplicated key and value pairs (leaving the first instance)
-    */
-      function uniquePair();
-   /** --- bool duplicate ---
-    * Alters array into an exact duplicate of the target array.
-    * @param target ArrayObject to duplicate
-    * @return bool
-    */
-      function duplicate( ArrayObject target );
-   /** --- bool crop ---
-    * Removes elements with matching keys from array.
-    * @param target ArrayObject containing keys to remove from this array
-    * @return bool
-    */
-      function crop( ArrayObject target );
-   /** --- bool append ---
-    * Appends the target array to the array object.
-    * @param target ArrayObject to append to the end of this array
-    * @return bool
-    */
-      function append( ArrayObject target );
-   /** --- void sort ---
-    * Alpha sorts the array by value
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sort( bool ascending=false );
-   /** --- void sorta ---
-    * Alpha sorts the array by value in ascending order
-    */
-      function sorta();
-   /** --- void sortd ---
-    * Alpha sorts the array by value in descending order
-    */
-      function sortd();
-   /** --- void sortk ---
-    * Alpha sorts the array by key
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortk( bool ascending=false );
-   /** --- void sortka ---
-    * Alpha sorts the array by key in ascending order
-    */
-      function sortka();
-   /** --- void sortkd ---
-    * Alpha sorts the array by key in descending order
-    */
-      function sortkd();
-   /** --- void sortn ---
-    * Numerically sorts the array by value
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortn( bool ascending=false );
-   /** --- void sortna ---
-    * Numerically sorts the array by value in ascending order
-    */
-      function sortna();
-   /** --- void sortnd ---
-    * Numerically sorts the array by value in descending order
-    */
-      function sortnd();
-   /** --- void sortnk ---
-    * Numerically sorts the array by key
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortnk( bool ascending=false );
-   /** --- void sortnka ---
-    * Numerical sorts the array by key in ascending order
-    */
-      function sortnka();
-   /** --- void sortnkd ---
-    * Numerical sorts the array by key in descending order
-    */
-      function sortnkd();
-   /** --- void sortf ---
-    * Sorts the array by value in ascending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.
-    * @tsexample
-    * function mySortCallback(%a, %b)
-    * {
-    *    return strcmp( %a.name, %b.name );
-    * }
-    * %array.sortf( "mySortCallback" );
-    * @endtsexample
-    */
-      function sortf( string functionName );
-   /** --- void sortfk ---
-    * Sorts the array by key in ascending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfk( string functionName );
-   /** --- void sortfd ---
-    * Sorts the array by value in descending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfd( string functionName );
-   /** --- void sortfkd ---
-    * Sorts the array by key in descending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfkd( string functionName );
-   /** --- S32 moveFirst ---
-    * Moves array pointer to start of array
-    * @return Returns the new array pointer
-    * @return S32
-    */
-      function moveFirst();
-   /** --- S32 moveLast ---
-    * Moves array pointer to end of array
-    * @return Returns the new array pointer
-    * @return S32
-    */
-      function moveLast();
-   /** --- S32 moveNext ---
-    * Moves array pointer to next position
-    * @return Returns the new array pointer, or -1 if already at the end
-    * @return S32
-    */
-      function moveNext();
-   /** --- S32 movePrev ---
-    * Moves array pointer to prev position
-    * @return Returns the new array pointer, or -1 if already at the start
-    * @return S32
-    */
-      function movePrev();
-   /** --- S32 getCurrent ---
-    * Gets the current pointer index
-    * @return S32
-    */
-      function getCurrent();
-   /** --- void setCurrent ---
-    * Sets the current pointer index.
-    * @param index New 0-based pointer index
-    */
-      function setCurrent( int index );
-   /** --- void echo ---
-    * Echos the array contents to the console
-    */
-      function echo();
-   /*!
-   Makes the keys and values case-sensitive.
-By default, comparison of key and value strings will be case-insensitive.
-   
-    */
-   bool caseSensitive;
-   /*!
-   Helper field which allows you to add new key['keyname'] = value pairs.
-   
-    */
-   caseString key;
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1072,7 +745,6 @@ class  ScriptTickObject : public ScriptObject {
    bool callOnAdvanceTime;
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1088,7 +760,6 @@ class  SimPersistSet : public SimSet {
       function resolvePersistentIds();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1273,7 +944,6 @@ class  FileObject : public SimObject {
       function writeObject( string simName, string objName="" );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1521,7 +1191,6 @@ class  StreamObject : public SimObject {
       function copyFrom( SimObject other );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1580,7 +1249,6 @@ class  FileStreamObject : public StreamObject {
       function close();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1631,7 +1299,670 @@ function Message::onRemove(%this)
       function freeReference();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
+   // --- Group: Persistence ---
+};
+class  PointStorageObject : public SimObject {
+  public:
+   /** --- ConsoleVector getPosVec ---
+    * get the position as Vector 
+    * @return ConsoleVector
+    */
+      function getPosVec();
+   /** --- void setPosVec ---
+    * set the position by Vector (String)
+    */
+      function setPosVec( ConsoleVector vector );
+   /** --- void setPos ---
+    * Set position by method 
+    */
+      function setPos( float x, float y, float z=0.f, float w=0.f );
+   /** --- void normalizeXZ ---
+    * normalize the current position
+    */
+      function normalizeXZ();
+   /** --- F32 getLen ---
+    * len of current position
+    * @return F32
+    */
+      function getLen();
+   /** --- bool setPoint ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
+   /** --- bool setPoint3 ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint3( uint index, float x, float y, float z );
+   /** --- bool setPoint2 ---
+    * Set a  point at index in the point storage.
+    * @return bool
+    */
+      function setPoint2( uint index, float x, float y );
+   /** --- void getPointByReference ---
+    * get the point at index  by Reference from 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void setPointByReference ---
+    * set the point at index  by Reference to 2-4 Variables
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointByReference( uint index, string varX, string varY, string varZ="", string varW="" );
+   /** --- void getPointVecByReference ---
+    * get the point at index and push it into vecVar
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function getPointVecByReference( uint index, string vecVar );
+   /** --- void setPointVecByReference ---
+    * use the data from vecVar to save a point at index
+    * NOTE: the variables must exists before this is called it does NOT create them.
+    */
+      function setPointVecByReference( uint index, string vecVar );
+   /** --- F32 getPointX ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.points[2] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.points[3] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.points[0] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.points[1] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
+   /** --- ConsoleVector getPointVec ---
+    * get the point from the point storage at index as Vector (String)
+    * @return ConsoleVector
+    */
+      function getPointVec( uint index );
+   /** --- bool setPointVec ---
+    * set the point in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPointVec( uint index, ConsoleVector vec4 );
+   /** --- String getPoint2Vec ---
+    * get the point xy from the point storage at index as Vector (String)
+    * @return String
+    */
+      function getPoint2Vec( uint index );
+   /** --- bool setPoint2Vec ---
+    * set the point xy in the Point Storage at index by Vector (String)
+    * @return bool
+    */
+      function setPoint2Vec( uint index, String strVector );
+   /** --- bool storePoint ---
+    * store the current values x,y,z,w, to the point storage
+    * @return bool
+    */
+      function storePoint( uint index );
+   /** --- bool fetchPoint ---
+    * fetch the point from the point storage at index to the current values x,y,z,w
+    * @return bool
+    */
+      function fetchPoint( uint index );
+   /** --- bool applyMathOnPoints ---
+    * Apply a Math expression on point Storage.
+    * expected format: "x+5; y*2; z; w" separated by ';'
+    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
+    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
+    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
+    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+    * @return bool
+    */
+      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   TypeVector point;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float z;
+   /*!
+    */
+   float w;
+   /*!
+   alias for z
+   
+    */
+   float width;
+   /*!
+   alias for w - yes w.
+   
+    */
+   float height;
+   /*!
+   alias for x
+   
+    */
+   float r;
+   /*!
+   alias for y
+   
+    */
+   float g;
+   /*!
+   alias for z
+   
+    */
+   float b;
+   /*!
+   alias for w
+   
+    */
+   float a;
+   /*!
+   Set the storage size (how many points we can work with) Max:1000000.
+   
+    */
+   uint storageSize;
+};
+class  NeuralNetObject : public SimObject {
+  public:
+   /** --- bool init ---
+    * initialize network
+    * @return bool
+    */
+      function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
+   /** --- bool Copy ---
+    * deep copy the of a other network
+    * @return bool
+    */
+      function Copy( uint parentObjID );
+   /** --- bool Load ---
+    * load network and check parameter to match the loaded data.
+    * @return bool
+    */
+      function Load( string filename, int inputs=0, int hidden_layers=0, int hidden_neuros=0, int outputs=0 );
+   /** --- bool Save ---
+    * Save a network to file
+    * @return bool
+    */
+      function Save( string filename );
+   /** --- bool WarmUP ---
+    * Run with empty input to warmup the network
+    * @return bool
+    */
+      function WarmUP();
+   /** --- bool Run ---
+    * Run with your input data and set output data
+    * @return bool
+    */
+      function Run();
+   /** --- bool Train ---
+    * Tain (Backpropagation) your network with your input data and output data
+    * @return bool
+    */
+      function Train( F64 learningRate );
+   /** --- bool Mutate ---
+    * Mutate (Evolutuion) modify the weight of your network
+    * @return bool
+    */
+      function Mutate( F64 mutationRate, F64 mutationAmount );
+   /** --- bool Crossover ---
+    * Crossover (Evolutuion) from 2 parents
+    * @return bool
+    */
+      function Crossover( uint parentAObjID, uint parentBObjID );
+   /** --- F64 getIn ---
+    * Get the input value at index
+    * @return F64
+    */
+      function getIn( int index );
+   /** --- bool setIn ---
+    * Set the input value at index
+    * @return bool
+    */
+      function setIn( int index, F64 value );
+   /** --- F64 getOut ---
+    * Get the output value at index
+    * @return F64
+    */
+      function getOut( int index );
+   /** --- bool setOut ---
+    * Set the output value at index
+    * @return bool
+    */
+      function setOut( int index, F64 value );
+   /** --- void setActivationHidden ---
+    * Sets the hidden layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationHidden( int type );
+   /** --- void setActivationOutput ---
+    * Sets the output layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationOutput( int type );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  ConsoleLogObject : public SimObject {
+  public:
+      /*! Called when a log line is pushed
+Level: Normal=0, Warning=1, Error=2; Info=3; Debug=4 */
+      void onLog( string text, uint level );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  Array : public SimObject {
+  public:
+   /** --- ConsoleValue at ---
+    * fetch a value at index
+    * @return ConsoleValue
+    */
+      function at( int index );
+   /** --- ConsoleValue first ---
+    * fetch first 
+    * @return ConsoleValue
+    */
+      function first();
+   /** --- ConsoleValue last ---
+    * fetch last 
+    * @return ConsoleValue
+    */
+      function last();
+   /** --- S32 size ---
+    * get the size
+    * @return S32
+    */
+      function size();
+   /** --- void clear ---
+    * clear the Vector
+    */
+      function clear();
+   /** --- void reserve ---
+    * reserve elements in the array
+    */
+      function reserve( uint size );
+   /** --- void fill ---
+    * fill the array with value
+    */
+      function fill( ConsoleValue value );
+   /** --- void push_back ---
+    * push back a value
+    */
+      function push_back( ConsoleValue value );
+   /** --- S32 fromString ---
+    * add values from a TAB or SPC speparated String
+    * @param doAdd true = add values, false = fill with this and clean before@return count of the added values
+    * @return S32
+    */
+      function fromString( string text, bool doAdd=true );
+   /** --- bool set ---
+    * set a value at index
+    * @return bool
+    */
+      function set( int index, ConsoleValue value );
+   /** --- bool insert ---
+    * insert a value at index
+    * @return bool
+    */
+      function insert( int position, ConsoleValue value );
+   /** --- bool erase ---
+    * @return bool
+    */
+      function erase( int position );
+   /** --- ConsoleValue pop_front ---
+    * pop the first and return the removed value
+    * @return ConsoleValue
+    */
+      function pop_front();
+   /** --- ConsoleValue pop_back ---
+    * pop the last and return the remove value
+    * @return ConsoleValue
+    */
+      function pop_back();
+   /** --- void toFields ---
+    * Copy Array to dynamic fields fieldnames start with _p
+    */
+      function toFields();
+   /** --- void fromFields ---
+    * fill Array from dynamic fields
+    * fieldnames start with _p and count is in _populate
+    * this is used by save automaticly
+    */
+      function fromFields( bool deleteFieldAfterAdd=false );
+   /** --- bool concat ---
+    * Concat (append) a other array to this one
+    * @param Array* other the other array
+    * @param bool deleteOther delete other object after merge
+    * @return bool !failed
+    * @return bool
+    */
+      function concat( Array other, bool deleteOther=false );
+   /** --- void list ---
+    * List the values
+    */
+      function list();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+/*!
+@brief Data structure for storing indexed sequences of key/value pairs.
+This is a powerful array class providing PHP style arrays in TorqueScript.
+The following features are supported:<ul>
+<li>array pointers: this allows you to move forwards or backwards through the array as if it was a list, including jumping to the start or end.</li>
+<li>sorting: the array can be sorted in either alphabetic or numeric mode, on the key or the value, and in ascending or descending order</li>
+<li>add/remove elements: elements can be pushed/popped from the start or end of the array, or can be inserted/erased from anywhere in the middle</li>
+<li>removal of duplicates: remove duplicate keys or duplicate values</li>
+<li>searching: search the array and return the index of a particular key or value</li>
+<li>counting: count the number of instaces of a particular value or key in the array, as well as the total number of elements</li>
+<li>advanced features: array append, array crop and array duplicate</li>
+</ul>
+Array element keys and values can be strings or numbers
+ */
+class  KeyValueStringTable : public SimObject {
+  public:
+   /** --- S32 getIndexFromValue ---
+    * Search the array from the current position for the element @param value Array value to search for
+    * @return Index of the first element found, or -1 if none
+    * @return S32
+    */
+      function getIndexFromValue( string value );
+   /** --- S32 getIndexFromKey ---
+    * Search the array from the current position for the key @param value Array key to search for
+    * @return Index of the first element found, or -1 if none
+    * @return S32
+    */
+      function getIndexFromKey( string key );
+   /** --- const char* getValueFromKey ---
+    * Search the array from the current position for the Key @param value Array key to search for
+    * @return Value of the first element found, or -1 if none
+    * @return const char*
+    */
+      function getValueFromKey( string key );
+   /** --- const char* getKeyFromValue ---
+    * Search the array from the current position for the Value @param value Array key to search for
+    * @return Key of the first element found, or -1 if none
+    * @return const char*
+    */
+      function getKeyFromValue( string key );
+   /** --- const char* getValue ---
+    * Get the value of the array element at the submitted index.
+    * @param index 0-based index of the array element to get
+    * @return The value of the array element at the specified index, or "" if the index is out of range
+    * @return const char*
+    */
+      function getValue( int index );
+   /** --- const char* getKey ---
+    * Get the key of the array element at the submitted index.
+    * @param index 0-based index of the array element to get
+    * @return The key associated with the array element at the specified index, or "" if the index is out of range
+    * @return const char*
+    */
+      function getKey( int index );
+   /** --- void setKey ---
+    * Set the key at the given index.
+    * @param key New key value
+    * @param index 0-based index of the array element to update
+    */
+      function setKey( string key, int index );
+   /** --- void setValue ---
+    * Set the value at the given index.
+    * @param value New array element value
+    * @param index 0-based index of the array element to update
+    */
+      function setValue( string value, int index );
+   /** --- S32 count ---
+    * Get the number of elements in the array.
+    * @return S32
+    */
+      function count();
+   /** --- S32 countValue ---
+    * Get the number of times a particular value is found in the array.
+    * @param value Array element value to count
+    * @return S32
+    */
+      function countValue( string value );
+   /** --- S32 countKey ---
+    * Get the number of times a particular key is found in the array.
+    * @param key Key value to count
+    * @return S32
+    */
+      function countKey( string key );
+   /** --- void add ---
+    * Adds a new element to the end of an array (same as push_back()).
+    * @param key Key for the new element
+    * @param value Value for the new element
+    */
+      function add( string key, string value="" );
+   /** --- void push_back ---
+    * Adds a new element to the end of an array.
+    * @param key Key for the new element
+    * @param value Value for the new element
+    */
+      function push_back( string key, string value="" );
+   /** --- void push_front ---
+    * Adds a new element to the front of an array
+    */
+      function push_front( string key, string value="" );
+   /** --- void insert ---
+    * Adds a new element to a specified position in the array.
+    * - @a index = 0 will insert an element at the start of the array (same as push_front())
+    * - @a index = %array.count() will insert an element at the end of the array (same as push_back())
+    * @param key Key for the new element
+    * @param value Value for the new element
+    * @param index 0-based index at which to insert the new element
+    */
+      function insert( string key, string value, int index );
+   /** --- void pop_back ---
+    * Removes the last element from the array
+    */
+      function pop_back();
+   /** --- void pop_front ---
+    * Removes the first element from the array
+    */
+      function pop_front();
+   /** --- void erase ---
+    * Removes an element at a specific position from the array.
+    * @param index 0-based index of the element to remove
+    */
+      function erase( int index );
+   /** --- void empty ---
+    * Emptys all elements from an array
+    */
+      function empty();
+   /** --- void uniqueValue ---
+    * Removes any elements that have duplicated values (leaving the first instance)
+    */
+      function uniqueValue();
+   /** --- void uniqueKey ---
+    * Removes any elements that have duplicated keys (leaving the first instance)
+    */
+      function uniqueKey();
+   /** --- void uniquePair ---
+    * Removes any elements that have duplicated key and value pairs (leaving the first instance)
+    */
+      function uniquePair();
+   /** --- bool duplicate ---
+    * Alters array into an exact duplicate of the target array.
+    * @param target KeyValueStringTable to duplicate
+    * @return bool
+    */
+      function duplicate( KeyValueStringTable target );
+   /** --- bool crop ---
+    * Removes elements with matching keys from array.
+    * @param target KeyValueStringTable containing keys to remove from this array
+    * @return bool
+    */
+      function crop( KeyValueStringTable target );
+   /** --- bool append ---
+    * Appends the target array to the array object.
+    * @param target KeyValueStringTable to append to the end of this array
+    * @return bool
+    */
+      function append( KeyValueStringTable target );
+   /** --- void sort ---
+    * Alpha sorts the array by value
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sort( bool ascending=false );
+   /** --- void sorta ---
+    * Alpha sorts the array by value in ascending order
+    */
+      function sorta();
+   /** --- void sortd ---
+    * Alpha sorts the array by value in descending order
+    */
+      function sortd();
+   /** --- void sortk ---
+    * Alpha sorts the array by key
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortk( bool ascending=false );
+   /** --- void sortka ---
+    * Alpha sorts the array by key in ascending order
+    */
+      function sortka();
+   /** --- void sortkd ---
+    * Alpha sorts the array by key in descending order
+    */
+      function sortkd();
+   /** --- void sortn ---
+    * Numerically sorts the array by value
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortn( bool ascending=false );
+   /** --- void sortna ---
+    * Numerically sorts the array by value in ascending order
+    */
+      function sortna();
+   /** --- void sortnd ---
+    * Numerically sorts the array by value in descending order
+    */
+      function sortnd();
+   /** --- void sortnk ---
+    * Numerically sorts the array by key
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortnk( bool ascending=false );
+   /** --- void sortnka ---
+    * Numerical sorts the array by key in ascending order
+    */
+      function sortnka();
+   /** --- void sortnkd ---
+    * Numerical sorts the array by key in descending order
+    */
+      function sortnkd();
+   /** --- void sortf ---
+    * Sorts the array by value in ascending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.
+    * @tsexample
+    * function mySortCallback(%a, %b)
+    * {
+    *    return strcmp( %a.name, %b.name );
+    * }
+    * %array.sortf( "mySortCallback" );
+    * @endtsexample
+    */
+      function sortf( string functionName );
+   /** --- void sortfk ---
+    * Sorts the array by key in ascending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfk( string functionName );
+   /** --- void sortfd ---
+    * Sorts the array by value in descending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfd( string functionName );
+   /** --- void sortfkd ---
+    * Sorts the array by key in descending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfkd( string functionName );
+   /** --- S32 moveFirst ---
+    * Moves array pointer to start of array
+    * @return Returns the new array pointer
+    * @return S32
+    */
+      function moveFirst();
+   /** --- S32 moveLast ---
+    * Moves array pointer to end of array
+    * @return Returns the new array pointer
+    * @return S32
+    */
+      function moveLast();
+   /** --- S32 moveNext ---
+    * Moves array pointer to next position
+    * @return Returns the new array pointer, or -1 if already at the end
+    * @return S32
+    */
+      function moveNext();
+   /** --- S32 movePrev ---
+    * Moves array pointer to prev position
+    * @return Returns the new array pointer, or -1 if already at the start
+    * @return S32
+    */
+      function movePrev();
+   /** --- S32 getCurrent ---
+    * Gets the current pointer index
+    * @return S32
+    */
+      function getCurrent();
+   /** --- void setCurrent ---
+    * Sets the current pointer index.
+    * @param index New 0-based pointer index
+    */
+      function setCurrent( int index );
+   /** --- void echo ---
+    * Echos the array contents to the console
+    */
+      function echo();
+   /*!
+   Makes the keys and values case-sensitive.
+By default, comparison of key and value strings will be case-insensitive.
+   
+    */
+   bool caseSensitive;
+   /*!
+   Helper field which allows you to add new key['keyname'] = value pairs.
+   
+    */
+   caseString key;
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
    // --- Group: Persistence ---
 };
 class  RenderTextureObject : public SimObject {
@@ -1651,7 +1982,6 @@ class  RenderTextureObject : public SimObject {
       function EndTextureMode();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
    Set the width of the RenderTexture
@@ -1688,7 +2018,6 @@ class  Camera2DObject : public SimObject {
       function getCameraMatrix();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
    Camera screen offset
@@ -1713,10 +2042,10 @@ class  Camera2DObject : public SimObject {
 };
 class  Camera3DObject : public SimObject {
   public:
-   /** --- void update ---
+   /** --- void Update ---
     * Update camera position for selected mode (e.g. $CAMERA_FIRST_PERSON, $CAMERA_FREE)
     */
-      function update( int mode );
+      function Update( int mode );
    /** --- void updatePro ---
     * Update camera movement/rotation with pro parameters
     */
@@ -1809,7 +2138,6 @@ class  Camera3DObject : public SimObject {
       function getProjectionMatrix( float aspect );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
    Camera position in world space
@@ -1837,42 +2165,52 @@ class  Camera3DObject : public SimObject {
     */
    int projection;
 };
+class  ConsoleGuiObject : public SimObject {
+  public:
+   /** --- bool setFont ---
+    * set the console font
+    * @return bool
+    */
+      function setFont( int fontId );
+   /** --- void Update ---
+    * update the console
+    */
+      function Update();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+   Shortcut to open console
+   
+    */
+   int key;
+   /*!
+   font size
+   
+    */
+   float fontSize;
+   /*!
+   2=half height, 1= full heigth
+   
+    */
+   float heightDiv;
+};
 //------------------------------------------------------------------
 //                  F U N C T I O N S 
 //------------------------------------------------------------------
 namespace Global {
-   /** --- Script CreateLight ---
-    * @return Script
-    */
-      function CreateLight( string type, string position, string target, string color, string shader )...;
-   /** --- Script UpdateLightValues ---
-    * @return Script
-    */
-      function UpdateLightValues( string light )...;
    /** --- Script createlights_script ---
     * @return Script
     */
-      function createlights_script()...;
+      function createlights_script();
    /** --- Script updateDocu ---
     * @return Script
     */
-      function updateDocu()...;
+      function updateDocu();
    /** --- Script rl ---
     * @return Script
     */
-      function rl()...;
-   /** --- Script MainLoop ---
-    * @return Script
-    */
-      function MainLoop()...;
-   /** --- Script MainShutDown ---
-    * @return Script
-    */
-      function MainShutDown()...;
-   /** --- Script MainInit ---
-    * @return Script
-    */
-      function MainInit()...;
+      function rl();
    /** --- String getOS ---
     * return the OS where it was compiled.Win64 | Win32 | Linux | OpenBSD | FreeBSD | MacOSX | Android | Emscripten
     * @return String
@@ -1929,6 +2267,11 @@ namespace Global {
     * @return int
     */
       function strasc( string chr );
+   /** --- string formatString ---
+    * like strFormat but with up to 31 parameters!
+    * @return string
+    */
+      function formatString(string format, ...);
    /** --- const char* strformat ---
     * Format the given value as a string using printf-style formatting.
     * @param format A printf-style format string.
@@ -2417,7 +2760,7 @@ namespace Global {
    /** --- void addCaseSensitiveStrings ---
     * [string1, string2, ...]Adds case sensitive strings to the StringTable.
     */
-      function addCaseSensitiveStrings...;
+      function addCaseSensitiveStrings();
    /** --- const char* getWord ---
     * Extract the word at the given @a index in the whitespace-separated list in @a text.
     * Words in @a text must be separated by newlines, spaces, and/or tabs.
@@ -2515,9 +2858,9 @@ namespace Global {
     */
       function weekdayNumToStr( int num, bool abbreviate=false );
    /** --- const char* getField ---
-    * Extract the field at the given @a index in the newline and/or tab separated list in @a text.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Extract the field at the given @a index in the  tab separated list in @a text.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param index The zero-based index of the field to extract.
     * @return The field at the given index or "" if the index is out of range.
     * @tsexample
@@ -2533,8 +2876,8 @@ namespace Global {
       function getField( string text, int index );
    /** --- const char* getFields ---
     * Extract a range of fields from the given @a startIndex onwards thru @a endIndex.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param startIndex The zero-based index of the first field to extract from @a text.
     * @param endIndex The zero-based index of the last field to extract from @a text.  If this is -1, all fields beginning with @a startIndex are extracted from @a text.
     * @return A string containing the specified range of fields from @a text or "" if @a startIndex is out of range or greater than @a endIndex.
@@ -2551,8 +2894,8 @@ namespace Global {
       function getFields( string text, int startIndex, int endIndex=-1 );
    /** --- const char* setField ---
     * Replace the field in @a text at the given @a index with @a replacement.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by  tabs.
+    * @param text A list of fields separated by  tabs.
     * @param index The zero-based index of the field to replace.
     * @param replacement The string with which to replace the field.
     * @return A new string with the field at the given @a index replaced by @a replacement or the original string if @a index is out of range.
@@ -2568,8 +2911,8 @@ namespace Global {
       function setField( string text, int index, string replacement );
    /** --- const char* removeField ---
     * Remove the field in @a text at the given @a index.
-    * Fields in @a text must be separated by newlines and/or tabs.
-    * @param text A list of fields separated by newlines and/or tabs.
+    * Fields in @a text must be separated by tabs.
+    * @param text A list of fields separated by tabs.
     * @param index The zero-based index of the field in @a text.
     * @return A new string with the field at the given index removed or the original string if @a index is out of range.
     * @tsexample
@@ -2582,9 +2925,9 @@ namespace Global {
     */
       function removeField( string text, int index );
    /** --- S32 getFieldCount ---
-    * Return the number of newline and/or tab separated fields in @a text.
-    * @param text A list of fields separated by newlines and/or tabs.
-    * @return The number of newline and/or tab sepearated elements in @a text.
+    * Return the number of  tab separated fields in @a text.
+    * @param text A list of fields separated by  tabs.
+    * @return The number of  tab sepearated elements in @a text.
     * @tsexample
     * getFieldCount( "a b" TAB "c d" TAB "e f" ) // Returns 3
     * @endtsexample
@@ -2845,21 +3188,39 @@ namespace Global {
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function echo( string message... )...;
+      function echo( string message... );
+   /** --- void printSeparator ---
+    * Print a separator line
+    */
+      function printSeparator();
+   /** --- void sysprint ---
+    * @brief Logs a message to std out only 
+    * Concatenates all given arguments to a single string and prints the string to the console.
+    * A newline is added automatically after the text.
+    * @param message Any number of string arguments.
+    */
+      function sysprint( string message... );
    /** --- void warn ---
     * @brief Logs a warning message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as a warning message (in the in-game console, these will show up using a turquoise font by default). A newline is added automatically after the text.
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function warn( string message... )...;
+      function warn( string message... );
    /** --- void error ---
     * @brief Logs an error message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as an error message (in the in-game console, these will show up using a red font by default). A newline is added automatically after the text.
     * @param message Any number of string arguments.
     * @ingroup Logging
     */
-      function error( string message... )...;
+      function error( string message... );
+   /** --- void info ---
+    * @brief Logs an info message to the console.
+    * Concatenates all given arguments to a single string and prints the string to the console as an error message (in the in-game console, these will show up using a red font by default). A newline is added automatically after the text.
+    * @param message Any number of string arguments.
+    * @ingroup Logging
+    */
+      function info( string message... );
    /** --- void debugv ---
     * @brief Logs the value of the given variable to the console.
     * Prints a string of the form "<variableName> = <variable value>" to the console.
@@ -2963,7 +3324,7 @@ namespace Global {
     * @ingroup Scripting
     * @return string
     */
-      function call( string functionName, string args... )...;
+      function call( string functionName, string args... );
    /** --- const char* getDSOPath ---
     * Get the absolute path to the file in which the compiled code for the given script file will be stored.
     * @param scriptFileName %Path to the .elf script file.
@@ -3078,20 +3439,6 @@ namespace Global {
     * @return const char *
     */
       function getModNameFromPath( string path );
-   /** --- void pushInstantGroup ---
-    * @brief Pushes the current $instantGroup on a stack and sets it to the given value (or clears it).
-    * @note Currently only used for editors
-    * @ingroup Editors
-    * @internal
-    */
-      function pushInstantGroup( String group="" );
-   /** --- void popInstantGroup ---
-    * @brief Pop and restore the last setting of $instantGroup off the stack.
-    * @note Currently only used for editors
-    * @ingroup Editors
-    * @internal
-    */
-      function popInstantGroup();
    /** --- const char * getPrefsPath ---
     * @note Appears to be useless in Torque 3D, should be deprecated
     * @internal
@@ -3143,26 +3490,10 @@ namespace Global {
     * @ingroup Debugging
     */
       function trace( bool enable=true );
-   /** --- void debug ---
-    * Drops the engine into the native C++ debugger.
-    * This function triggers a debug break and drops the process into the IDE's debugger.  If the process is not running with a debugger attached it will generate a runtime error on most platforms.
-    * @note This function is not available in shipping builds.@ingroup Debugging
+   /** --- void listFeatures ---
+    * List compiled features
     */
-      function debug();
-   /** --- bool isPlayerBuild ---
-    * Test whether the engine has been compiled with TORQUE_PLAYER.
-    * @return True if this is a playback only build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isPlayerBuild();
-   /** --- bool isShippingBuild ---
-    * Test whether the engine has been compiled with TORQUE_SHIPPING, i.e. in a form meant for final release.
-    * @return True if this is a shipping build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isShippingBuild();
+      function listFeatures();
    /** --- bool isDebugBuild ---
     * Test whether the engine has been compiled with TORQUE_DEBUG, i.e. if it includes debugging functionality.
     * @return True if this is a debug build; false otherwise.
@@ -3170,18 +3501,25 @@ namespace Global {
     * @return bool
     */
       function isDebugBuild();
-   /** --- bool isToolBuild ---
-    * Test whether the engine has been compiled with TORQUE_TOOLS, i.e. if it includes tool-related functionality.
-    * @return True if this is a tool build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isToolBuild();
    /** --- S32 getStringHash ---
     * generate a hash from a string. foramt is (string, casesensitive). defaults to true
     * @return S32
     */
       function getStringHash( string _inString="", bool _sensitive=true );
+   /** --- S64 getUnixTimestamp ---
+    * Gets the unixtime as 64bit unsigned integer.
+    * @return S64
+    */
+      function getUnixTimestamp();
+   /** --- String getDateTime ---
+    * Gets ISO DateTime string.
+    * @return mode: default => YYYY-MM-DD H:M:S
+    * @return mode: 1 => YYYY-MM-DD
+    * @return mode: 2 => H:M:S
+    * @return mode: 3 => YYYYMMDDHMS
+    * @return String
+    */
+      function getDateTime( int mode=0 );
    /** --- const char* getTimestamp ---
     * Gets datetime string.
     * @return YYYY-mm-DD_hh-MM-ss formatted date time string.
@@ -3358,7 +3696,7 @@ namespace Global {
     * schedule(time, refobject|0, command, <arg1...argN>)
     * @return int
     */
-      function schedule...;
+      function schedule();
    /** --- const char* getUniqueName ---
     * @brief Returns a unique unused SimObject name based on a given base name.
     * @baseName Name to conver to a unique string if another instance exists
@@ -3383,13 +3721,13 @@ namespace Global {
     * @return bool
     */
       function isValidObjectName( string name );
-   /** --- ArrayObject* getMethodSigsNS ---
+   /** --- KeyValueStringTable* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - method prototype string.
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
       function getMethodSigsNS( StringTableEntry className, bool commands=false );
    /** --- S32 getFieldCountNS ---
@@ -3429,36 +3767,35 @@ namespace Global {
     * Dumps the script constants table to the console. Using filter for keys if not empty.
     */
       function dumpScriptConstants( String filter="" );
+   /** --- void varDumpField ---
+    * local/global variable dump. local only valid in the variables scope
+    */
+      function varDumpField( string variableName );
+   /** --- void varDump ---
+    * local/global variable dump. local only valid in the variables scope
+    */
+      function varDump( string variableName );
+   /** --- void dumpLocals ---
+    * dump local and global  variables
+    */
+      function dumpLocals();
+   /** --- void whereAmI ---
+    * look up the function where i'am called from
+    */
+      function whereAmI();
+   /** --- S32 explodeGlobal ---
+    * WARNING works only with Global Variable '$' !!!!!!
+    * Convert an string content of varname to an set typed of variables with varName[0..count] fields
+    * tab separated (default) or space separated@return the count of variables
+    * @return S32
+    */
+      function explodeGlobal( string varName, bool debugOut=false );
    /** --- void dumpStringMemStats ---
     * @brief Dumps information about String memory usage
     * @ingroup Debugging
     * @ingroup Strings
     */
       function dumpStringMemStats();
-   /** --- const char * getTemporaryDirectory ---
-    * @brief Returns the OS temporary directory, "C:/Users/Mich/AppData/Local/Temp" for example
-    * @note This can be useful to adhering to OS standards and practices, but not really used in Torque 3D right now.
-    * @note Be very careful when getting into OS level File I/O.@return String containing path to OS temp directory
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryDirectory();
-   /** --- const char * getTemporaryFileName ---
-    * @brief Creates a name and extension for a potential temporary file
-    * This does not create the actual file. It simply creates a random name for a file that does not exist.
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryFileName();
-   /** --- const char * getUserDataDirectory ---
-    * getUserDataDirectory()
-    * @return const char *
-    */
-      function getUserDataDirectory();
    /** --- const char * getUserHomeDirectory ---
     * getUserHomeDirectory()
     * @return const char *
@@ -3482,6 +3819,10 @@ namespace Global {
     * @return F32
     */
       function getRandomF( float min, float max=0.f );
+   /** --- F32 mCatmullrom ---
+    * @return F32
+    */
+      function mCatmullrom( float t, float p0, float p1, float p2, float p3 );
    /** --- S32 mFloor ---
     * Round v down to the nearest integer.
     * @param v Number to convert to integer.@returns Number converted to integer.@ingroup Math
@@ -3660,6 +4001,94 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
+   /** --- ConsoleVector getRectCentered ---
+    * return a centered rect
+    * @return ConsoleVector
+    */
+      function getRectCentered( ConsoleVector vec );
+   /** --- void Vec4Add ---
+    * v1 = v1 + v2
+    */
+      function Vec4Add( string varVec1, string varVec2 );
+   /** --- void Vec4Sub ---
+    * v1 = v1 - v2
+    */
+      function Vec4Sub( string varVec1, string varVec2 );
+   /** --- void Vec4Mul ---
+    * v1 = v1 * v2
+    */
+      function Vec4Mul( string varVec1, string varVec2 );
+   /** --- void Vec4Scale ---
+    * v1 = v1 * v2
+    */
+      function Vec4Scale( string varVec1, float scale );
+   /** --- void Vec4Div ---
+    * v1 = v1 / v2
+    */
+      function Vec4Div( string varVec1, string varVec2 );
+   /** --- F32 Vec2Distance ---
+    * distance of two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Distance( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Distance ---
+    * distance of two 3D points by variable ref 
+    * @return F32
+    */
+      function Vec3Distance( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Dot ---
+    * dot product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Dot( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Dot ---
+    * dot product two 3D points by variable ref 
+    * @return F32
+    */
+      function Vec3Dot( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Cross ---
+    * cross product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec2Cross( string varPoint1, string varPoint2 );
+   /** --- F32 Vec3Cross ---
+    * cross product two 2D points by variable ref 
+    * @return F32
+    */
+      function Vec3Cross( string varPoint1, string varPoint2 );
+   /** --- F32 Vec2Length ---
+    * length of a  3D point by variable ref 
+    * @return F32
+    */
+      function Vec2Length( string varPoint1 );
+   /** --- F32 Vec3Length ---
+    * length of a  3D point by variable ref 
+    * @return F32
+    */
+      function Vec3Length( string varPoint1 );
+   /** --- void Vec2Normalize ---
+    * Check Rect2 contains Rect1 by variable ref 
+    */
+      function Vec2Normalize( string varPoint );
+   /** --- void Vec3Normalize ---
+    * Check Rect2 contains Rect1 by variable ref 
+    */
+      function Vec3Normalize( string varPoint );
+   /** --- bool Vec4PointInRect ---
+    * Check a point is in rect by variable ref 
+    * @return bool
+    */
+      function Vec4PointInRect( string varPoint, string varRect );
+   /** --- bool Vec4Intersects ---
+    * Check a 2 rects intersects by variable ref 
+    * @return bool
+    */
+      function Vec4Intersects( string varRect1, string varRect2 );
+   /** --- bool Vec4Contains ---
+    * Check Rect2 contains Rect1 by variable ref 
+    * @return bool
+    */
+      function Vec4Contains( string varRect1, string varRect2 );
    /** --- void ConsoleDocForStub ---
     * @brief Set Con::ConsoleDocForStub - human readable output- exportConsoleDocu overwrites it.
     */
@@ -3680,11 +4109,6 @@ namespace Global {
     * Close window and unload OpenGL context
     */
       function CloseWindow();
-   /** --- bool WindowShouldClose ---
-    * Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
-    * @return bool
-    */
-      function WindowShouldClose();
    /** --- bool IsWindowReady ---
     * Check if window has been initialized successfully
     * @return bool
@@ -3793,6 +4217,11 @@ namespace Global {
     * Set window focused
     */
       function SetWindowFocused();
+   /** --- Vector2 GetScreenSize ---
+    * Get current screen size
+    * @return Vector2
+    */
+      function GetScreenSize();
    /** --- int GetScreenWidth ---
     * Get current screen width
     * @return int
@@ -4531,22 +4960,10 @@ namespace Global {
     * Draw rectangle within an image
     */
       function ImageDrawRectangleRec( int dstId, Rectangle rec, Color color );
-   /** --- void ImageDrawRectangleLines ---
-    * Draw rectangle lines within an image
-    */
-      function ImageDrawRectangleLines( int dstId, int posX, int posY, int width, int height, Color color );
-   /** --- void ImageDrawRectangleLinesEx ---
-    * Draw rectangle lines within an image with extended parameters
-    */
-      function ImageDrawRectangleLinesEx( int dstId, Rectangle rec, int thick, Color color );
    /** --- void ImageDrawTriangle ---
     * Draw triangle within an image
     */
       function ImageDrawTriangle( int dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color color );
-   /** --- void ImageDrawTriangleGradient ---
-    * Draw triangle with interpolated colors within an image
-    */
-      function ImageDrawTriangleGradient( int dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3 );
    /** --- void ImageDrawTriangleLines ---
     * Draw triangle outline within an image
     */
@@ -4559,10 +4976,6 @@ namespace Global {
     * Draw a triangle fan defined by points within an image (pointsValues format: 'x1 y1 x2 y2 ...')
     */
       function ImageDrawTriangleStrip( int dstId, Vector<F32> pointValues, int pointCount, Color color );
-   /** --- void ImageDraw ---
-    * Draw a source image within a destination image (tint applied to source)
-    */
-      function ImageDraw( int dstId, int srcId, Rectangle srcRec, Rectangle dstRec, Color tint );
    /** --- void ImageDrawText ---
     * Draw text (using default font) within an image (destination)
     */
@@ -4991,10 +5404,6 @@ namespace Global {
     * Draw a color-filled triangle (vertex in counter-clockwise order!)
     */
       function DrawTriangle( Vector2 v1, Vector2 v2, Vector2 v3, Color color=RAYWHITE );
-   /** --- void DrawTriangleGradient ---
-    * Draw triangle with interpolated colors (vertex in counter-clockwise order!)
-    */
-      function DrawTriangleGradient( Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3 );
    /** --- void DrawTriangleLines ---
     * Draw triangle outline (vertex in counter-clockwise order!)
     */
@@ -5074,11 +5483,6 @@ namespace Global {
     * @return Vector2
     */
       function GetSplinePointCatmullRom( Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t );
-   /** --- Vector2 GetSplinePointBezierQuadratic ---
-    * Get (evaluate) spline point: Quadratic Bezier
-    * @return Vector2
-    */
-      function GetSplinePointBezierQuadratic( Vector2 p1, Vector2 c2, Vector2 p3, float t );
    /** --- Vector2 GetSplinePointBezierCubic ---
     * Get (evaluate) spline point: Cubic Bezier
     * @return Vector2
@@ -5104,6 +5508,11 @@ namespace Global {
     * @return bool
     */
       function CheckCollisionCircleLine( Vector2 center, float radius, Vector2 p1, Vector2 p2 );
+   /** --- bool PointInRect ---
+    * Check if point is inside rectangle
+    * @return bool
+    */
+      function PointInRect( Vector2 point, Rectangle rec );
    /** --- bool CheckCollisionPointRec ---
     * Check if point is inside rectangle
     * @return bool
@@ -5909,6 +6318,18 @@ namespace Global {
     * @return int
     */
       function GetDirectoryFileCountEx( String basePath, String filter, bool scanSubdirs );
+   /** --- String GetWorkingDirectory ---
+    * @return String
+    */
+      function GetWorkingDirectory();
+   /** --- String GetApplicationDirectory ---
+    * @return String
+    */
+      function GetApplicationDirectory();
+   /** --- bool ChangeDirectory ---
+    * @return bool
+    */
+      function ChangeDirectory( string dirPath );
    /** --- Vector2 Vector2Add ---
     * Adds two Vector2 values together.
     * @return Vector2
@@ -6109,6 +6530,14 @@ namespace Global {
     * @return Vector3
     */
       function Vector3MoveTowards( Vector3 v1, Vector3 v2, float maxDistance );
+   /** --- bool WindowShouldClose ---
+    * Main Loop for Raylib ElfScript
+    * keeping ElfScript scheduler and Garbage Collection running
+    * See also $RAY::ShutDownRequested
+    * @return true if shutDown request is set.
+    * @return bool
+    */
+      function WindowShouldClose();
 };
 //------------------------------------------------------------------
 //                  C O N S T A N T S 
@@ -6117,7 +6546,7 @@ namespace Global {
 --- Script Constants Dump ---
   LIGHT_POINT = 1
   MAX_LIGHTS = 4
-  VEC3_ZERO = "0 0 0"
+  VEC3_ZERO = { 0.0, 0.0, 0.0 }
   GLSL_VERSION = 100
   NPATCH_THREE_PATCH_HORIZONTAL = 2
   CAMERA_ORTHOGRAPHIC = 1
@@ -6142,7 +6571,6 @@ namespace Global {
   FONT_SDF = 2
   FONT_BITMAP = 1
   CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE = 4
-  CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR = 3
   CUBEMAP_LAYOUT_LINE_HORIZONTAL = 2
   CUBEMAP_LAYOUT_LINE_VERTICAL = 1
   CUBEMAP_LAYOUT_AUTO_DETECT = 0
@@ -6173,11 +6601,14 @@ namespace Global {
   SHADER_ATTRIB_VEC3 = 2
   SHADER_ATTRIB_VEC2 = 1
   SHADER_ATTRIB_FLOAT = 0
-  KEY_KP_9 = 329
-  BROWN = "127 106 79 255"
+  SHADER_UNIFORM_SAMPLER2D = 12
+  FONT_DEFAULT = 0
+  SHADER_UNIFORM_UIVEC4 = 11
+  SHADER_UNIFORM_UIVEC3 = 10
+  SHADER_UNIFORM_UIVEC2 = 9
   KEY_KP_1 = 321
   MATERIAL_MAP_ALBEDO = 0
-  BLACK = "0 0 0 255"
+  BLACK = { 0, 0, 0, 255 }
   KEY_RIGHT_CONTROL = 345
   KEY_F2 = 291
   BLEND_ALPHA_PREMULTIPLY = 5
@@ -6185,17 +6616,11 @@ namespace Global {
   KEY_LEFT_ALT = 342
   KEY_F12 = 301
   KEY_KP_5 = 325
-  SHADER_LOC_MATRIX_VIEW = 7
-  KEY_F11 = 300
   PIXELFORMAT_UNCOMPRESSED_R32 = 8
   FLAG_WINDOW_TRANSPARENT = 16
   KEY_F8 = 297
   KEY_F4 = 293
   MATERIAL_MAP_CUBEMAP = 7
-  KEY_KP_MULTIPLY = 332
-  PIXELFORMAT_COMPRESSED_DXT3_RGBA = 16
-  KEY_DELETE = 261
-  MOUSE_BUTTON_MIDDLE = 2
   KEY_F3 = 292
   GAMEPAD_BUTTON_UNKNOWN = 0
   KEY_PAUSE = 284
@@ -6210,10 +6635,12 @@ namespace Global {
   KEY_SCROLL_LOCK = 281
   KEY_PAGE_UP = 266
   KEY_THREE = 51
-  SHADER_UNIFORM_UIVEC2 = 9
   KEY_KP_8 = 328
   GAMEPAD_BUTTON_LEFT_FACE_RIGHT = 2
-  KEY_KP_DIVIDE = 331
+  PIXELFORMAT_COMPRESSED_DXT3_RGBA = 16
+  KEY_DELETE = 261
+  KEY_KP_MULTIPLY = 332
+  MOUSE_BUTTON_MIDDLE = 2
   KEY_INSERT = 260
   GAMEPAD_BUTTON_MIDDLE_RIGHT = 15
   KEY_BACKSPACE = 259
@@ -6227,8 +6654,8 @@ namespace Global {
   PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 = 7
   KEY_RIGHT = 262
   TEXTURE_WRAP_MIRROR_REPEAT = 2
-  DARKGREEN = "0 117 44 255"
-  LIME = "0 158 47 255"
+  DARKGREEN = { 0, 117, 44, 255 }
+  LIME = { 0, 158, 47, 255 }
   KEY_SEMICOLON = 59
   KEY_SPACE = 32
   KEY_B = 66
@@ -6240,29 +6667,28 @@ namespace Global {
   GAMEPAD_BUTTON_RIGHT_FACE_LEFT = 8
   KEY_LEFT_BRACKET = 91
   KEY_BACKSLASH = 92
+  NEONPINK = { 255, 0, 128, 255 }
   KEY_Y = 89
   KEY_F6 = 295
   KEY_X = 88
   SHADER_LOC_VERTEX_COLOR = 5
   KEY_T = 84
-  KEY_M = 77
   KEY_CAPS_LOCK = 280
-  FONT_DEFAULT = 0
-  SHADER_UNIFORM_UIVEC4 = 11
   KEY_VOLUME_UP = 24
   KEY_Q = 81
-  KEY_KP_DECIMAL = 330
-  GRAY = "130 130 130 255"
-  KEY_LEFT_CONTROL = 341
-  KEY_APOSTROPHE = 39
+  KEY_P = 80
   KEY_F7 = 296
   KEY_L = 76
-  DARKBROWN = "76 63 47 255"
+  CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR = 3
+  SLATEGRAY = { 45, 45, 45, 255 }
+  DARKBROWN = { 76, 63, 47, 255 }
   KEY_NUM_LOCK = 282
   KEY_KP_6 = 326
   GAMEPAD_AXIS_RIGHT_TRIGGER = 5
   NPATCH_THREE_PATCH_VERTICAL = 1
   MATERIAL_MAP_NORMAL = 2
+  RED = { 230, 41, 55, 255 }
+  KEY_O = 79
   KEY_NINE = 57
   KEY_DOWN = 264
   BLEND_CUSTOM = 6
@@ -6272,62 +6698,70 @@ namespace Global {
   SHADER_LOC_MAP_CUBEMAP = 22
   KEY_D = 68
   KEY_PERIOD = 46
-  VIOLET = "135 60 190 255"
+  VIOLET = { 135, 60, 190, 255 }
   KEY_G = 71
+  BROWN = { 127, 106, 79, 255 }
+  KEY_KP_9 = 329
+  KEY_F11 = 300
+  SHADER_LOC_MATRIX_VIEW = 7
   KEY_LEFT = 263
-  GREEN = "0 228 48 255"
+  GREEN = { 0, 228, 48, 255 }
   NPATCH_NINE_PATCH = 0
-  BLANK = "0 0 0 0"
+  BLANK = { 0, 0, 0, 0 }
   KEY_I = 73
-  PURPLE = "200 122 255 255"
+  PURPLE = { 200, 122, 255, 255 }
   MATERIAL_MAP_DIFFUSE = 0
   MOUSE_CURSOR_POINTING_HAND = 4
   SHADER_LOC_VERTEX_BONEIDS = 26
-  LIGHTGRAY = "200 200 200 255"
+  LIGHTGRAY = { 200, 200, 200, 255 }
   GAMEPAD_BUTTON_RIGHT_THUMB = 17
   SHADER_LOC_MATRIX_NORMAL = 10
   KEY_TAB = 258
   KEY_F5 = 294
   KEY_E = 69
   KEY_LEFT_SUPER = 343
+  KEY_M = 77
+  ACIDGREEN = { 128, 255, 0, 255 }
   KEY_KP_SUBTRACT = 333
-  SKYBLUE = "102 191 255 255"
+  SKYBLUE = { 102, 191, 255, 255 }
   KEY_UP = 265
-  RED = "230 41 55 255"
-  KEY_O = 79
   GAMEPAD_BUTTON_LEFT_FACE_LEFT = 4
   PIXELFORMAT_UNCOMPRESSED_R4G4B4A4 = 6
   KEY_U = 85
   KEY_KP_7 = 327
   KEY_V = 86
-  ORANGE = "255 161 0 255"
+  ORANGE = { 255, 161, 0, 255 }
   GAMEPAD_BUTTON_MIDDLE = 14
   KEY_TWO = 50
   SHADER_UNIFORM_VEC4 = 3
   SHADER_UNIFORM_INT = 4
   KEY_KP_4 = 324
-  WHITE = "255 255 255 255"
+  WHITE = { 255, 255, 255, 255 }
   KEY_ONE = 49
+  KEY_LEFT_SHIFT = 340
+  PINK = { 255, 109, 194, 255 }
   SHADER_LOC_MAP_HEIGHT = 21
-  GOLD = "255 203 0 255"
+  GOLD = { 255, 203, 0, 255 }
   SHADER_LOC_VERTEX_INSTANCETRANSFORM = 29
   SHADER_LOC_MATRIX_MODEL = 9
+  KEY_LEFT_CONTROL = 341
+  KEY_APOSTROPHE = 39
   KEY_SLASH = 47
   KEY_S = 83
-  RAYWHITE = "245 245 245 255"
+  RAYWHITE = { 245, 245, 245, 255 }
   KEY_SEVEN = 55
   KEY_W = 87
   GAMEPAD_BUTTON_LEFT_FACE_UP = 1
-  MAGENTA = "255 0 255 255"
+  MAGENTA = { 255, 0, 255, 255 }
   KEY_A = 65
   KEY_KB_MENU = 348
   KEY_ZERO = 48
   KEY_FIVE = 53
-  SHADER_LOC_MAP_PREFILTER = 24
+  GRAY = { 130, 130, 130, 255 }
+  KEY_KP_DECIMAL = 330
+  KEY_KP_DIVIDE = 331
   KEY_J = 74
-  PINK = "255 109 194 255"
-  KEY_LEFT_SHIFT = 340
-  KEY_P = 80
+  SHADER_LOC_MAP_PREFILTER = 24
   KEY_KP_ADD = 334
   KEY_KP_ENTER = 335
   KEY_KP_EQUAL = 336
@@ -6335,7 +6769,7 @@ namespace Global {
   KEY_BACK = 4
   KEY_MENU = 5
   KEY_RIGHT_ALT = 346
-  DARKGRAY = "80 80 80 255"
+  DARKGRAY = { 80, 80, 80, 255 }
   FLAG_VSYNC_HINT = 64
   SHADER_UNIFORM_IVEC2 = 5
   FLAG_WINDOW_UNFOCUSED = 2048
@@ -6364,12 +6798,11 @@ namespace Global {
   LOG_ERROR = 5
   GAMEPAD_BUTTON_LEFT_TRIGGER_2 = 10
   SHADER_LOC_MAP_METALNESS = 16
-  DARKPURPLE = "112 31 126 255"
+  DARKPURPLE = { 112, 31, 126, 255 }
   SHADER_LOC_MAP_ROUGHNESS = 18
   LOG_FATAL = 6
   KEY_ENTER = 257
   GAMEPAD_BUTTON_MIDDLE_LEFT = 13
-  SHADER_UNIFORM_SAMPLER2D = 12
   FLAG_WINDOW_HIGHDPI = 8192
   LOG_NONE = 7
   SHADER_LOC_COLOR_DIFFUSE = 12
@@ -6386,7 +6819,7 @@ namespace Global {
   MOUSE_CURSOR_DEFAULT = 0
   MOUSE_CURSOR_ARROW = 1
   CAMERA_FIRST_PERSON = 3
-  DARKBLUE = "0 82 172 255"
+  DARKBLUE = { 0, 82, 172, 255 }
   MATERIAL_MAP_ROUGHNESS = 3
   MOUSE_CURSOR_IBEAM = 2
   LIGHT_DIRECTIONAL = 0
@@ -6395,7 +6828,7 @@ namespace Global {
   MATERIAL_MAP_METALNESS = 1
   GESTURE_PINCH_IN = 256
   MOUSE_CURSOR_RESIZE_EW = 5
-  YELLOW = "253 249 0 255"
+  YELLOW = { 253, 249, 0, 255 }
   KEY_H = 72
   SHADER_LOC_VERTEX_TEXCOORD02 = 2
   MOUSE_CURSOR_RESIZE_NS = 6
@@ -6417,7 +6850,6 @@ namespace Global {
   KEY_EQUAL = 61
   MATERIAL_MAP_EMISSION = 5
   SHADER_UNIFORM_FLOAT = 0
-  SHADER_UNIFORM_UIVEC3 = 10
   MATERIAL_MAP_HEIGHT = 6
   MATERIAL_MAP_IRRADIANCE = 8
   MATERIAL_MAP_PREFILTER = 9
@@ -6431,9 +6863,9 @@ namespace Global {
   SHADER_LOC_VERTEX_NORMAL = 3
   KEY_C = 67
   SHADER_LOC_VERTEX_TANGENT = 4
-  MAROON = "190 33 55 255"
+  MAROON = { 190, 33, 55, 255 }
   SHADER_LOC_MATRIX_PROJECTION = 8
-  BEIGE = "211 176 131 255"
+  BEIGE = { 211, 176, 131, 255 }
   SHADER_LOC_COLOR_SPECULAR = 13
   SHADER_LOC_COLOR_AMBIENT = 14
   KEY_R = 82
@@ -6443,14 +6875,45 @@ namespace Global {
   SHADER_LOC_MAP_EMISSION = 20
   SHADER_LOC_MAP_BRDF = 25
   PIXELFORMAT_COMPRESSED_DXT5_RGBA = 17
+  SEABLUE = { 20, 20, 50, 255 }
   SHADER_LOC_VERTEX_BONEWEIGHTS = 27
   TEXTURE_WRAP_CLAMP = 1
   PIXELFORMAT_UNCOMPRESSED_R32G32B32A32 = 10
   SHADER_UNIFORM_VEC2 = 1
   SHADER_UNIFORM_VEC3 = 2
-  BLUE = "0 121 241 255"
+  BLUE = { 0, 121, 241, 255 }
   SHADER_LOC_MAP_NORMAL = 17
   SHADER_UNIFORM_IVEC4 = 7
   SHADER_UNIFORM_UINT = 8
---- End of Dump (337 items) ---
+--- End of Dump (341 items) ---
+*/
+//------------------------------------------------------------------
+//                  Inline Functions 
+//------------------------------------------------------------------
+/*
+void print(..);
+void printf(fmt,..);
+const char* sprintf(fmt, ..);
+double math.randomf()
+double math.randomf(double limit )
+double math.randomf(double from. double to )
+double math.floor(double value)
+double math.ceil(double  value)
+double math.fabs(double value)
+double math.sin(double value)
+double math.cos(double value)
+double math.atan(double value)
+double math.tanh(double value)
+double math.sqrt(double value)
+bool math.iszero(double value)
+double math.fmod(double value1, double value2)
+double math.min(double value1, double value2)
+double math.max(double value1, double value2)
+double math.atan2(double value1, double value2)
+double math.pow(double value1, double value2)
+double math.clamp(double value1, double value2, double value2)
+double math.clampf(double value1, double value2, double value2)
+double math.lerp(double value1, double value2, double value2)
+double math.smoothstep(double value1, double value2, double value2)
+
 */
