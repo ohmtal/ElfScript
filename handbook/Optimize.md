@@ -2,6 +2,12 @@
 
 [Back to Main](./Main.md)
 
+## ElfScript since 0.7 
+
+Local variables are still by far the fastest. But global variable and fields 
+are optimized, too. So it is not longer required to only use local variables
+to get a good performance result. 
+
 
 ## local variables
 
@@ -52,8 +58,12 @@ Common Types are:
 
 if you set nothing it's set as string. 
 
-When you do calculations on that field TypeF32 is much faster then you did not 
-define it == string. 
+~~When you do calculations on that field TypeF32 is much faster then you did not 
+define it == string.~~
+
+ElfScript 0.7: Fields does now auto set the field type like the other variables do. 
+You can still define it which is more clean or set the type which addField or
+change it with setFieldType. 
 
 Example:
 

@@ -11,6 +11,36 @@
 
 
 ## Version 0.7g - stability tests for first release - 
+
+#ElfScript 0.7 
+
+One of the fastest, easy-to-embed interpreted script languages. 
+
+How it differs from TorqueScript: 
+
+- Highly optimized fast Virtual Machine with Direct Threading 
+- New ConsoleVector (4-point float) initialized with `%vec = {1};`
+- New flat Array class with constructor initialized like `%arr = [1, 4.0, "Hello"];`
+- Almost no more usage of string conversion for datatypes
+- Fast `for (%i in  ..)` iterators
+- Inline FieldCache for fields and components 
+- Statements can be case-insensitive 
+- Dynamic Fields are typed (not just strings), just like local and global variables
+- Several fast-path implementations to directly write data
+- Script preprocessor to use `#define` constants
+- Included Addons (bindings): SDL3, ImGui, Neural Network (genann)
+- And much more ;)
+
+
+SpeedTest (2026-09-09) **output piped to /dev/null** 
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.357u 0.003s 0:01.36 99.2%     0+0k 0+0io 0pf+0w |
+| test_global.elf       | 3.048u 0.002s 0:03.05 99.6%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.262u 0.002s 0:04.27 99.7%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.734u 0.005s 0:03.75 99.4%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 4.068u 0.002s 0:04.07 99.7%     0+0k 0+0io 0pf+0w |
+
  - SlotAssignNode::compile auto detect field type when field is created, but 
  initialize with type is better! 
  - SlotAssignNode::better ConsoleVector assign and Array constructor asign
