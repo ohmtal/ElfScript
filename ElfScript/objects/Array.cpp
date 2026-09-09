@@ -18,6 +18,10 @@ bool Array::onAdd()  {
     fromFields(true); //check if we have fields to merge
     return Parent::onAdd();
 }
+
+void Array::onRemove() {
+    Parent::onRemove();
+}
 // -------------------------------------------------------------------------
 void Array::write(Stream& stream, U32 tabStop, U32 flags)
 {

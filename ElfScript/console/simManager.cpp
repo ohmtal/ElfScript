@@ -278,6 +278,7 @@ U32 getTargetTime()
 //---------------------------------------------------------------------------
 
 SimGroup *gRootGroup = NULL;
+SimGroup *gGarbageCollectionGroup = NULL; //Elfscript 0.7 for array and maybe more
 SimManagerNameDictionary *gNameDictionary;
 SimIdDictionary *gIdDictionary;
 U32 gNextObjectId;
@@ -293,6 +294,14 @@ static void initRoot()
    gRootGroup->setId(RootGroupId);
    gRootGroup->assignName("RootGroup");
    gRootGroup->registerObject();
+
+   //ElfScript 0.7
+   gGarbageCollectionGroup = new SimGroup();
+   gGarbageCollectionGroup->setId(GarbageCollectionGroupId);
+   gGarbageCollectionGroup->assignName("GarbageCollectionGroup");
+   gGarbageCollectionGroup ->registerObject();
+   gRootGroup->addObject(gGarbageCollectionGroup);
+
 
    gNextObjectId = DynamicObjectIdFirst;
 }
@@ -360,7 +369,7 @@ SimObject* findObject(const char* name)
       } else {
           return nullptr;
       }
-      // ElfScipt this does not work!!!
+      // ElfScript this does not work!!!
       // if (!Con::getFrameStack().empty())
       // {
       //    Dictionary::Entry* ent = Con::getCurrentStackFrame()->lookup(StringTable->insert(name));
@@ -447,6 +456,14 @@ SimGroup *getRootGroup()
 {
    return gRootGroup;
 }
+
+//ElfScript 0.7
+SimGroup *getGarbageCollectionGroup()
+{
+      return gGarbageCollectionGroup;
+}
+
+
 
 String getUniqueName( const char *inName )
 {

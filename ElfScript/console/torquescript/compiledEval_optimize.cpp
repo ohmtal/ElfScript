@@ -4061,9 +4061,12 @@ handle_OP_ITER_END:
 handle_OP_ARRAY_CONSTUCTOR: {
 
       U32 count = code[ip++];
-      // garbage collection is done be RootGroup :D
       Array* newArrayObj = new Array();
       newArrayObj->registerObject();
+
+      // garbage collection is done be RootGroup :D
+      SimGroup* grp = Sim::getGarbageCollectionGroup();
+      if (grp) grp->addObject(newArrayObj);
 
       // get values from stack and fill ConsoleVector or TAB separated String
       for (S32 i = count - 1; i >= 0; i--) {

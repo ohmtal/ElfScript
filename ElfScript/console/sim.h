@@ -74,6 +74,7 @@ enum SimObjectsConstants : U32
    DynamicObjectIdFirst = MessageObjectIdLast + 1,
    InvalidEventId = 0,
    RootGroupId = 0xFFFFFFFF,
+   GarbageCollectionGroupId = 0xFFFFFFFE, //ElfScript 0.7
 };
 
 //---------------------------------------------------------------------------
@@ -126,6 +127,7 @@ namespace Sim
 
    // SimDataBlockGroup *getDataBlockGroup();
    SimGroup* getRootGroup();
+   SimGroup *getGarbageCollectionGroup(); //ElfScript 0.7 used for auto created Arrays at the moment
 
    SimObject* findObject(SimObjectId);
    SimObject* findObject(const ConsoleValue&);

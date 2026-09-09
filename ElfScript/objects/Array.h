@@ -21,6 +21,7 @@ public:
     Vector<ConsoleValue> mValues;
 
     bool onAdd() override;
+    void onRemove() override;
     void write(Stream &stream, U32 tabStop, U32 flags) override;
     void toFields(); // save array to _p fields
     void fromFields(bool removeFields = true); // load array from _p fields

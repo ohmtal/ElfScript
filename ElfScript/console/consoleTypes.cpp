@@ -475,7 +475,8 @@ ConsoleSetType( TypeU32 )
 //-----------------------------------------------------------------------------
 // TypeS64 ElfScript
 //-----------------------------------------------------------------------------
-ConsoleType(int64_t, TypeS64, S64, "")
+// ConsoleType(int64_t, TypeS64, S64, "")
+ConsoleType(long, TypeS64, S64, "")
 ImplementConsoleTypeCasters(TypeS64, S64)
 
 ConsoleGetType( TypeS64 )
