@@ -2,8 +2,7 @@
 
 The really minimalistic Demo how to add ElfScript to your project. 
 
-I only contains the CMakeLists.txt and a small main.cpp - which could be even
-smaller if i did not overwrite the argument parser and added two example bindings.
+I only contains the CMakeLists.txt and a small main.cpp.
 
 In source you need up to three includes: 
 

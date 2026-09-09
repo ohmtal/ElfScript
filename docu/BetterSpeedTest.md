@@ -11,7 +11,8 @@
 
 
 ## Version 0.8a 
-
+- Cache last entry on Dictionary lookup .. this speed up global var test but 
+there is only one variable which is not the same as in a normal enviroment
 - Enabled inline cache as default ON again
 - Added Raylib bindings here as addon - will be merged with raylib-ElfScript later.
 
