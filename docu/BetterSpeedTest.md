@@ -13,7 +13,7 @@
 ## Version 0.8a 
 
 - Enabled inline cache as default ON again
-
+- Added Raylib bindings here as addon - will be merged with raylib-ElfScript later.
 
 ## Version 0.7g - stability tests for first release - 
 

@@ -12,6 +12,15 @@ Don't miss my [Why?](docu/why.md) Story where I explain why I work on this proje
 
 Started writing a 📔[HandBook for ElfScript Scripting](./handbook/Main.md)
 
+***The famous hello world***
+```
+// 
+// The famous hello world 
+// 
+
+print("Hello World :)");
+```
+
 ## Folder: ElfScript
 
 The folder where the beast lives: 
