@@ -1,7 +1,8 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
-//-----------------------------------------------------------------------------#include "raylib.h"
+//-----------------------------------------------------------------------------
+#include "raylib.h"
 #include "ConsoleTypes.h"
 #include <console/console.h>
 #include <console/engineAPI.h>

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // New Version without the MainInit, MainLoop, MainShutdown callbacks
-// but with a RayLib_MainLoop call
+// but with a WindowShouldClose overwrite call
 //
 // NOTE Emscripten must use -sASYNCIFY
 //-----------------------------------------------------------------------------
