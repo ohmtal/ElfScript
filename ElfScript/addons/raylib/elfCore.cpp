@@ -7,6 +7,11 @@
 #include "ConsoleTypes.h"
 #include "elfResource.h"
 
+// i add the mayor version check here
+#if !defined(RAYLIB_VERSION_MAJOR) || RAYLIB_VERSION_MAJOR != 6
+#error Sorry only running with raylib 6!
+#endif
+
 //====================================================================================
 // Window and Graphics Device Functions (Module: core)
 //====================================================================================
@@ -21,10 +26,14 @@ DefineEngineFunction(InitWindow, void, (S32 width, S32 height, String title),,"I
 DefineEngineFunction(CloseWindow, void, (),,"Close window and unload OpenGL context"){
     CloseWindow();
 }
+
+// NOTE RayLib-ElfScript 0.8 this is done in default MAIN!
+#ifndef RAYELF_OVERWRITE_WINDOWSHOULDCLOSE
 // RLAPI bool WindowShouldClose(void);                               // Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
 DefineEngineFunction(WindowShouldClose, bool, (), , "Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)"){
     return WindowShouldClose();
 }
+#endif
 
 // RLAPI bool IsWindowReady(void);                                   // Check if window has been initialized successfully
 DefineEngineFunction(IsWindowReady, bool, (), , "Check if window has been initialized successfully"){

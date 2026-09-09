@@ -586,6 +586,7 @@ namespace ElfTextures {
     }
 
     // RLAPI void ImageDrawRectangleLines(Image *dst, int posX, int posY, int width, int height, Color color);
+#if RAYLIB_VERSION_MINOR > 0
     DefineEngineFunction(ImageDrawRectangleLines, void, (S32 dstId, S32 posX, S32 posY, S32 width, S32 height, Color color), ,
                         "Draw rectangle lines within an image") {
         Image* dst = ImageMap.get(dstId);
@@ -599,6 +600,14 @@ namespace ElfTextures {
         if (dst) ImageDrawRectangleLinesEx(dst, rec, thick, color);
     }
 
+    // RLAPI void ImageDrawTriangleGradient(Image *dst, Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3);
+    DefineEngineFunction(ImageDrawTriangleGradient, void, (S32 dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3), ,
+                        "Draw triangle with interpolated colors within an image") {
+        Image* dst = ImageMap.get(dstId);
+        if (dst) ImageDrawTriangleGradient(dst, v1, v2, v3, c1, c2, c3);
+    }
+#endif
+
     // RLAPI void ImageDrawTriangle(Image *dst, Vector2 v1, Vector2 v2, Vector2 v3, Color color);
     DefineEngineFunction(ImageDrawTriangle, void, (S32 dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color color), ,
                         "Draw triangle within an image") {
@@ -606,12 +615,6 @@ namespace ElfTextures {
         if (dst) ImageDrawTriangle(dst, v1, v2, v3, color);
     }
 
-    // RLAPI void ImageDrawTriangleGradient(Image *dst, Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3);
-    DefineEngineFunction(ImageDrawTriangleGradient, void, (S32 dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3), ,
-                        "Draw triangle with interpolated colors within an image") {
-        Image* dst = ImageMap.get(dstId);
-        if (dst) ImageDrawTriangleGradient(dst, v1, v2, v3, c1, c2, c3);
-    }
 
     // RLAPI void ImageDrawTriangleLines(Image *dst, Vector2 v1, Vector2 v2, Vector2 v3, Color color);
     DefineEngineFunction(ImageDrawTriangleLines, void, (S32 dstId, Vector2 v1, Vector2 v2, Vector2 v3, Color color), ,
@@ -619,7 +622,6 @@ namespace ElfTextures {
         Image* dst = ImageMap.get(dstId);
         if (dst) ImageDrawTriangleLines(dst, v1, v2, v3, color);
     }
-
     // ------------------------------------------------------------------------
     // Triangle Fan und Strip mit String-Parsing for PointData
     // ------------------------------------------------------------------------
@@ -647,15 +649,33 @@ namespace ElfTextures {
     }
 
 
+    // obsolete: raylib-ElfScript 0.8
     // RLAPI void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec, Color tint);
-    DefineEngineFunction(ImageDraw, void, (S32 dstId, S32 srcId, Rectangle srcRec, Rectangle dstRec, Color tint), ,
-                        "Draw a source image within a destination image (tint applied to source)") {
+    // not longer in 6.1-dev
+    // // DefineEngineFunction(ImageDraw, void, (S32 dstId, S32 srcId, Rectangle srcRec, Rectangle dstRec, Color tint), ,
+    // //                     "Draw a source image within a destination image (tint applied to source)") {
+    // //     Image* dst = ImageMap.get(dstId);
+    // //     Image* src = ImageMap.get(srcId);
+    // //     if (dst && src) {
+    // //         ImageDraw(dst, *src, srcRec, dstRec, tint);
+    // //     }
+    // // }
+
+#if RAYLIB_VERSION_MINOR > 0
+    // new raylib-ElfScript 0.8
+    // RLAPI void ImageDrawImagePro(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec, Vector2 origin, float rotation, Color tint); // Draw a part of an image defined by a rectangle into destination rectangle, with scaling and rotation, within an image
+    DefineEngineFunction(ImageDrawImagePro, void, (S32 dstId, S32 srcId
+                , Rectangle srcRec, Rectangle dstRec
+                , Vector2 origin, float rotation
+                , Color tint), ,
+        "Draw a part of an image defined by a rectangle into destination rectangle, with scaling and rotation, within an image") {
         Image* dst = ImageMap.get(dstId);
         Image* src = ImageMap.get(srcId);
         if (dst && src) {
-            ImageDraw(dst, *src, srcRec, dstRec, tint);
+            ImageDrawImagePro(dst, *src, srcRec, dstRec,origin, rotation,  tint);
         }
     }
+#endif
 
     // RLAPI void ImageDrawText(Image *dst, const char *text, int posX, int posY, int fontSize, Color color);
     DefineEngineFunction(ImageDrawText, void, (S32 dstId, String text, S32 posX, S32 posY, S32 fontSize, Color color), ,

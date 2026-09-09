@@ -2,6 +2,11 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
+// New Version without the MainInit, MainLoop, MainShutdown callbacks
+// but with a RayLib_MainLoop call
+//
+// NOTE Emscripten must use -sASYNCIFY
+//-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "main/engineGlue.h"
 #include "console/script.h"
@@ -13,7 +18,6 @@
 
 String gScriptFile = "assets/main.elf";
 bool gShutDownRequest = false;
-bool gNoDefaultCalls  = false;
 bool gEnableConsole = false;
 
 extern void initEnum();  //elfEnum.cpp
@@ -21,6 +25,7 @@ extern void CustomTraceLog(int msgType, const char *text, va_list args); //elfBa
 namespace ElfResource { extern void shutDown(); }
 
 
+// -----------------------------------------------------------------------------
 int argParser(int argc, char* argv[]) {
 
     // pass to script in TGE/OGE3D  it is called Game::!,
@@ -29,20 +34,17 @@ int argParser(int argc, char* argv[]) {
         Con::setVariable(avar("Main::argv%d", i), argv[i]);
 
     String argStr;
-    // argv[0] is program name
+
     for (S32 i = 1; i < argc; ++i) {
         if (!argv[i]) continue;
         argStr = argv[i];
 
-        if (argStr.equal("--noloop")) {
-            gNoDefaultCalls = true;
-            continue;
-        }
+
         if (argStr.equal("--console")) {
             gEnableConsole = true;
             continue;
         }
-        // filename test
+
         if (argStr.equal("--script")) {
             if (i + 1 < argc) {
                 gScriptFile= argv[++i];
@@ -58,26 +60,43 @@ int argParser(int argc, char* argv[]) {
     } //for ...
     return 0;
 }
-
-
+// -----------------------------------------------------------------------------
 void defaultLoop(void*) {
-    // --------- advance time for scheduler this should be placed in the main loop
+    // --------- advance time for scheduler this should be called from main loop
 
-    Con::executef("MainLoop");
     static F32 timeAccumulator = 0.0f;
     F32 currentMs = (GetFrameTime() * 1000.0f) + timeAccumulator;
     U32 dtMs = (U32)currentMs;
     timeAccumulator = currentMs - (F32)dtMs;
     engineGlue::process(dtMs);
 
-}
+    #ifdef __EMSCRIPTEN__
+    emscripten_sleep(1);
+    #endif
 
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(WindowShouldClose, bool, (),,
+                     "Main Loop for Raylib ElfScript - keeping scheduler running\n"
+                     "Return true if shutDown request is set."
+) {
+
+    if (WindowShouldClose()) return true;
+
+    defaultLoop(nullptr);
+    if (gShutDownRequest) return true;
+
+    return false;
+}
+// -----------------------------------------------------------------------------
 int defaultMain(int argc, char* argv[])
 {
     argParser(argc, argv);
-    engineGlue::init(nullptr, GetApplicationDirectory()); // FIXME command line path => --path
+    engineGlue::init(nullptr, GetApplicationDirectory());
     initEnum();
     SetTraceLogCallback(CustomTraceLog);
+
+    Con::addVariable( "$RAY::ShutDownRequested", TypeBool, &gShutDownRequest, "Script request ShutDown");
 
 
 
@@ -86,34 +105,6 @@ int defaultMain(int argc, char* argv[])
         return 1;
     }
 
-    if (!gNoDefaultCalls) {
-
-
-        if (!Con::isFunction("MainLoop")) {
-            Con::errorf("MainLoop function is missing!");
-            return 1;
-        }
-
-        ConsoleValue initResult = Con::executef("MainInit");
-        if (initResult.getBool() == false) {
-            Con::errorf("init failed");
-            return 1;
-        }
-
-#if defined(PLATFORM_WEB)
-        // emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
-        emscripten_set_main_loop_arg(defaultLoop, nullptr, 0, 1);
-        emscripten_set_main_loop_timing(EM_TIMING_RAF, 1); //force RAF
-#else
-        while (!WindowShouldClose())    // Detect window close button or ESC key
-        {
-            defaultLoop(nullptr);
-            if (gShutDownRequest) break;
-        }
-#endif
-
-        Con::executef("MainShutdown");
-    } // !gNoDefaultCalls
 
 
     // -------- finallize

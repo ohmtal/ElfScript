@@ -233,12 +233,14 @@ DefineEngineFunction( DrawTriangle, void, (Vector2 v1, Vector2 v2, Vector2 v3, C
 }
 
 // RLAPI void DrawTriangleGradient(Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3);       // Draw triangle with interpolated colors (vertex in counter-clockwise order!)
+#if RAYLIB_VERSION_MINOR > 0
 DefineEngineFunction( DrawTriangleGradient, void, (
         Vector2 v1, Vector2 v2, Vector2 v3,
         Color c1, Color c2, Color c3), ,
         "Draw triangle with interpolated colors (vertex in counter-clockwise order!)") {
     DrawTriangleGradient(v1, v2, v3, c1, c2, c3);
 }
+#endif
 
 // RLAPI void DrawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color);                           // Draw triangle outline (vertex in counter-clockwise order!)
 DefineEngineFunction( DrawTriangleLines, void, (Vector2 v1, Vector2 v2, Vector2 v3, Color color), (RAYWHITE), "Draw triangle outline (vertex in counter-clockwise order!)") {
@@ -357,10 +359,12 @@ DefineEngineFunction( GetSplinePointCatmullRom, Vector2, (Vector2 p1, Vector2 p2
     return GetSplinePointCatmullRom(p1, p2, p3, p4, t);
 }
 
+#if RAYLIB_VERSION_MINOR > 0
 // RLAPI Vector2 GetSplinePointBezierQuadratic(Vector2 p1, Vector2 c2, Vector2 p3, float t);                // Get (evaluate) spline point: Quadratic Bezier
 DefineEngineFunction( GetSplinePointBezierQuadratic, Vector2, (Vector2 p1, Vector2 c2, Vector2 p3, float t), , "Get (evaluate) spline point: Quadratic Bezier") {
     return GetSplinePointBezierQuadratic(p1, c2, p3, t);
 }
+#endif
 
 // RLAPI Vector2 GetSplinePointBezierCubic(Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t);        // Get (evaluate) spline point: Cubic Bezier
 DefineEngineFunction( GetSplinePointBezierCubic, Vector2, (Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t), , "Get (evaluate) spline point: Cubic Bezier") {
