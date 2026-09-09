@@ -11,6 +11,8 @@
 
 
 ## Version 0.7g - stability tests for first release - 
+ - SlotAssignNode::compile auto detect field type when field is created, but 
+ initialize with type is better! 
  - Added Array object. A flat array holding ConsoleValues - This is now my universal
  Swiss Army Knife :D ! I added a constructor in lexer to do `%foo = [1,2,3];` with the 
  limitation: I can not add ConsoleVector's in this constructor. But `%foo.push_back({1,2,3,4});` 

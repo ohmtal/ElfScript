@@ -1414,13 +1414,15 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_ITER_BEGIN:
       {
          U32 iterMode = code[ip]; ip++;
+         U32 loopOpcodeIp = code[ip]; ip++;
          bool isGlobal = code[ip];
          if (isGlobal)
          {
             StringTableEntry varName = CodeToSTE(code, ip + 1);
             U32 failIp = code[ip + 3];
 
-            Con::printf("%i: OP_ITER_BEGIN mode:%u varName=%s failIp=%i isGlobal=%s",  ip - 2, iterMode,varName, failIp, "true");
+            Con::printf("%i: OP_ITER_BEGIN mode:%u varName=%s failIp=%i isGlobal=%s LOOP_OP_CODE:%d"
+                  ,  ip - 2, iterMode,varName, failIp, "true", loopOpcodeIp);
 
             ip += 4;
          }
@@ -1429,70 +1431,13 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             S32 reg = code[ip + 1];
             U32 failIp = code[ip + 2];
 
-            Con::printf("%i: OP_ITER_BEGIN mode:%u varRegister=%d failIp=%i isGlobal=%s", ip - 2,iterMode, reg, failIp, "false");
+            Con::printf("%i: OP_ITER_BEGIN mode:%u varRegister=%d failIp=%i isGlobal=%s LOOP_OP_CODE:%d"
+                  , ip - 2,iterMode, reg, failIp, "false", loopOpcodeIp);
 
             ip += 3;
          }
          break;
       }
-
-      // case OP_ITER_BEGIN_INT:
-      //       Con::printf("%i: OP_ITER_BEGIN_INT MODE", ip - 1);
-      //       TORQUE_CASE_FALLTHROUGH;
-      // case OP_ITER_BEGIN_RANGE:
-      // {
-      //       bool isGlobal = code[ip];
-      //       if (isGlobal)
-      //       {
-      //             StringTableEntry varName = CodeToSTE(code, ip + 1);
-      //             U32 failIp = code[ip + 3];
-      //
-      //             Con::printf("%i: OP_ITER_BEGIN_RANGE stk=0 varName=%s failIp=%i isGlobal=%s", ip - 1, varName, failIp, "true");
-      //             Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
-      //
-      //             ip += 4;
-      //       }
-      //       else
-      //       {
-      //             S32 reg = code[ip + 1];
-      //             U32 failIp = code[ip + 2];
-      //
-      //             Con::printf("%i: OP_ITER_BEGIN_RANGE stk=0 varRegister=%d failIp=%i isGlobal=%s", ip - 1, reg, failIp, "false");
-      //             Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
-      //
-      //             ip += 3;
-      //       }
-      //
-      //       break;
-      // }
-      //
-      //
-      // case OP_ITER_BEGIN_STR:
-      // {
-      //    bool isGlobal = code[ip];
-      //    if (isGlobal)
-      //    {
-      //       StringTableEntry varName = CodeToSTE(code, ip + 1);
-      //       U32 failIp = code[ip + 3];
-      //
-      //       Con::printf("%i: OP_ITER_BEGIN_STR stk=0 varName=%s failIp=%i isGlobal=%s", ip - 1, varName, failIp, "true");
-      //       Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
-      //
-      //       ip += 4;
-      //    }
-      //    else
-      //    {
-      //       S32 reg = code[ip + 1];
-      //       U32 failIp = code[ip + 2];
-      //
-      //       Con::printf("%i: OP_ITER_BEGIN_STR stk=0 varRegister=%d failIp=%i isGlobal=%s", ip - 1, reg, failIp, "false");
-      //       Con::printf("    OP_ITER_BEGIN stk=0 (fallthrough)");
-      //
-      //       ip += 3;
-      //    }
-      //
-      //    break;
-      // }
 
       case OP_ITER_STRING:
       {
@@ -1512,10 +1457,24 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             ++ip;
             break;
       }
+      case OP_ITER_ARRAY:
+      {
+            U32 breakIp = code[ip];
+            Con::printf("%i: OP_ITER_ARRAY stk=0 breakIp=%i", ip - 1, breakIp);
+            ++ip;
+            break;
+      }
       case OP_ITER_FOR_INT:
       {
             U32 breakIp = code[ip];
             Con::printf("%i: OP_ITER_FOR_INT stk=0 breakIp=%i", ip - 1, breakIp);
+            ++ip;
+            break;
+      }
+      case OP_ITER_FOR_INT_NEG:
+      {
+            U32 breakIp = code[ip];
+            Con::printf("%i: OP_ITER_FOR_INT_NEG stk=0 breakIp=%i", ip - 1, breakIp);
             ++ip;
             break;
       }
@@ -1541,12 +1500,18 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       }
 
       case OP_BUILD_VECTOR_STRING: {
-         Con::printf("%i: OP_BUILD_VECTOR_STRING stk=-1", ip - 1);
-          ++ip;
+         U32 count = code[ip++];
+         Con::printf("%i: OP_BUILD_VECTOR_STRING , count:%d stk=-1", ip - 1, count);
+          // ++ip;
          break;
       }
 
-
+      case OP_ARRAY_CONSTUCTOR: {
+            U32 count = code[ip++];
+            Con::printf("%i: OP_ARRAY_CONSTUCTOR count:%d stk=-1", ip - 1, count);
+            // ++ip;
+            break;
+      }
 
       case OP_LOADFIELD_FASTPATH: {
             U32 curCodeIP = code[ip];

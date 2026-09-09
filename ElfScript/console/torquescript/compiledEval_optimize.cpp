@@ -3418,9 +3418,6 @@ handle_OP_ITER_BEGIN:
       U32 failIp = code[ip + (isGlobal ? 3 : 2)];
 
       IterStackRecord& iter = iterStack[_ITER];
-      // iter.mIsGlobalVariable = isGlobal;
-
-      // obsolete iter.mMode = mode;
 
       if (isGlobal)
       {

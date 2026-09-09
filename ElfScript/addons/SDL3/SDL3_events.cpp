@@ -261,6 +261,11 @@ void FireSDLEvent(const SDL_Event& event) {
             SET_BOOL(key, repeat);
             break;
         }
+        case SDL_EVENT_TEXT_INPUT:
+            SET_LONG(text, timestamp);
+            SET_INT(text, windowID);
+            SET_STRING(text,text);
+            break;
 
         // -------------- MOUSE --------------------
         case SDL_EVENT_MOUSE_BUTTON_DOWN: TORQUE_CASE_FALLTHROUGH;

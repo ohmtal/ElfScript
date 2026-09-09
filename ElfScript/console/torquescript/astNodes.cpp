@@ -1497,38 +1497,67 @@ U32 SlotAssignNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
    precompileIdent(slotName);
 
+// ElfScript 0.7 (26-09-09) changed gram!
    // enable PoD { 10, 20 }
-   bool isVectorInit = (valueExpr && valueExpr->next != nullptr);
-   if (isVectorInit)
+   // NOTE if we do {0} it's auto set to int!!!
+   // but if it was initialized with TypeVector it works fine
+   // bool isVectorInit = (valueExpr && valueExpr->next != nullptr);
+   // if (isVectorInit)
+   // {
+   //       U32 elementCount = 0;
+   //       for (ExprNode* expr = valueExpr; expr; expr = (ExprNode*)(expr->next))
+   //       {
+   //             // ElfScript 0.7 here also TEST auto detect!
+   //             TypeReq lPreferedType = TypeReqString;
+   //             if (valueExpr) {
+   //                   lPreferedType = valueExpr->getPreferredType();
+   //                   // 0 is bad !
+   //                   if (lPreferedType == 0) lPreferedType = TypeReqString;
+   //             }
+   //             ip = expr->compile(codeStream, ip, lPreferedType);
+   //
+   //             //ORIG:
+   //             // ip = expr->compile(codeStream, ip, TypeReqString);
+   //             elementCount++;
+   //       }
+   //
+   //       if (elementCount > 16)
+   //       {
+   //             const char* errStr = avar(
+   //                   "Script Error: Vector initialization for slot '%s' has too many elements (%d). "
+   //                   "Maximum is 16.\nFile: %s\nLine Num: %d",
+   //                   slotName,
+   //                   elementCount,
+   //                   CodeBlock::smCurrentParser->getCurrentFile(),
+   //                                       dbgLineNumber
+   //             );
+   //             scriptErrorHandler(errStr);
+   //       }
+   //
+   //
+   //       codeStream.emit(OP_BUILD_VECTOR_STRING);
+   //       codeStream.emit(elementCount);
+   // }
+   // else
    {
-         U32 elementCount = 0;
-         for (ExprNode* expr = valueExpr; expr; expr = (ExprNode*)(expr->next)) // <- Hier 'next' anpassen
-         {
-               ip = expr->compile(codeStream, ip, TypeReqString);
-               elementCount++;
+         // ElfScript 0.7
+         // Auto assign TEST .. works but
+         // case a crash in loops because the PreferedType
+         // seams to be broken!
+         // There is garbage in the stack then !!
+         // When it's unsure it set it to TypeReqNone
+         // Bad idea we kill the stack!!
+         TypeReq lPreferedType = TypeReqString;
+         if (valueExpr) {
+            lPreferedType = valueExpr->getPreferredType();
+            // 0 is bad !
+            if (lPreferedType == 0) lPreferedType = TypeReqString;
          }
+         ip = valueExpr->compile(codeStream, ip, lPreferedType);
 
-         if (elementCount > 16)
-         {
-               const char* errStr = avar(
-                     "Script Error: Vector initialization for slot '%s' has too many elements (%d). "
-                     "Maximum is 16.\nFile: %s\nLine Num: %d",
-                     slotName,
-                     elementCount,
-                     CodeBlock::smCurrentParser->getCurrentFile(),
-                                         dbgLineNumber
-               );
-               scriptErrorHandler(errStr);
-         }
-
-
-         codeStream.emit(OP_BUILD_VECTOR_STRING);
-         codeStream.emit(elementCount);
-   }
-   else
-   {
+         // TEST ORIG:
          // with only one parameter
-         ip = valueExpr->compile(codeStream, ip, TypeReqString);
+         // ip = valueExpr->compile(codeStream, ip, TypeReqString);
    }
 
    if (arrayExpr)

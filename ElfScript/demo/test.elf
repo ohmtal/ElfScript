@@ -326,6 +326,7 @@ print (" ----- FIELD TEST ----- ");
 %obj2 = %obj1.clone();
 // %obj2.dumpFields();
 
+
 for (%i in range 10) {
     %obj1.myX = %i;
     %obj1.x = %obj1.myX * 1.0;
@@ -711,4 +712,7 @@ $arr.push_back({1,47.22, 2, 3});
 
 printSeparator();
 printf("script %s load completed..... no parse errors....", $Con::File);
-// $Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");
+
+$o = new Object();
+
+$Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");

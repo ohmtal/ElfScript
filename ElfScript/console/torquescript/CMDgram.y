@@ -716,8 +716,23 @@ stmt_expr
       { $$ = SlotAssignOpNode::alloc( $1.lineNumber, $1.object, $1.slotName, $1.array, $2.token, $2.expr); }
    | slot_acc '=' expr
       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $3); }
+//    | slot_acc '=' '{' expr_list '}'
+//       { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $4); }
    | slot_acc '=' '{' expr_list '}'
-      { $$ = SlotAssignNode::alloc( $1.lineNumber, $1.object, $1.array, $1.slotName, $4); }
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, false);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = SlotAssignNode::alloc($1.lineNumber, $1.object, $1.array, $1.slotName, vecNode);
+      }
+   ;
+
+   /* ==================== Array Constructor: ==================== */
+   | slot_acc '=' '[' expr_list ']'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = SlotAssignNode::alloc($1.lineNumber, $1.object, $1.array, $1.slotName, vecNode);
+      }
    ;
 
 // XXTH orig:
@@ -901,7 +916,14 @@ slot_assign
          vecNode->argList = (ExprNode*)$4;
          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
       }
-   /* ======================================================================= */
+   /* ==================== Array Constructor: ==================== */
+   | IDENT '=' '[' expr_list ']' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
+      }
+  /* ======================================================================= */
 
    | TYPEIDENT IDENT '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, $4, $1.value); }
@@ -928,7 +950,6 @@ slot_assign
          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, vecNode);
       }
    /* ======================================================================= */
-
    | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $4, $2.value, $7, $1.value); }
    ;
