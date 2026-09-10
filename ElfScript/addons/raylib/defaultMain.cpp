@@ -84,9 +84,10 @@ void defaultLoop(void*) {
     if (OnLoop) OnLoop();
 
 
-    #ifdef __EMSCRIPTEN__
-    emscripten_sleep(1);
-    #endif
+    // WindowShouldClose raylib does also sleep so not again ...
+    // #ifdef __EMSCRIPTEN__
+    // emscripten_sleep(1);
+    // #endif
 
 }
 // -----------------------------------------------------------------------------
