@@ -5,7 +5,7 @@
 // New Version without the MainInit, MainLoop, MainShutdown callbacks
 // but with a WindowShouldClose overwrite call
 //
-// NOTE Emscripten must use -sASYNCIFY
+// NOTE Emscripten when  use -sASYNCIFY
 //-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "main/engineGlue.h"
@@ -82,6 +82,7 @@ void defaultLoop(void*) {
 
     // On Look Callback ...
     if (OnLoop) OnLoop();
+
 
     #ifdef __EMSCRIPTEN__
     emscripten_sleep(1);

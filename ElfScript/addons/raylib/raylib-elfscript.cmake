@@ -25,6 +25,8 @@ if (RAYLIB_FETCH)
         GIT_TAG        ${RAY_TAG}
     )
     FetchContent_MakeAvailable(raylib)
+
+    set(RAYLIB_DIR "${raylib_SOURCE_DIR}")
 endif()
 
 

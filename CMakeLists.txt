@@ -10,8 +10,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 # -----------------------------------------------------------------------------
 # ----------  options ----------
-# // only one left so obsolete option(BUILD_ELFSCRIPT "Build the ElfScript" ON)
-set(BUILD_ELFSCRIPT ON)
+option(BUILD_ELFSCRIPT "Build the ElfScript DEMO" ON)
 # -----------------------------------------------------------------------------
 # # option(ELF_ENABLE_CONSOLE_VECTOR_CALLBACK "ElfScript: Enable experimetal console vector callback" OFF)
 
