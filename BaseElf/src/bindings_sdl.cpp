@@ -13,8 +13,6 @@
 #include "math/mMathConsoleVector.h"
 #include "core/util/tDictionary.h"
 
-#include <string>
-#include <format>
 
 #include "BaseFlux/Main.h"
 #include "BaseFlux/Draw.h"
@@ -110,8 +108,10 @@ void registerColors() {
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
 
-        std::string colorString = std::format("{{ {},{},{},{} }}", value.r, value.g, value.b, value.a);
-        Con::setScriptConstant(fullName.c_str(), colorString );
+        StringBuilder colorString;
+        colorString.format("{ %d, %d, %d, %d }", value.r, value.g, value.b, value.a);
+        // std::string colorString = std::format("{{ {},{},{},{} }}", value.r, value.g, value.b, value.a);
+        Con::setScriptConstant(fullName.c_str(), colorString.end().c_str() );
         // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
 
 
@@ -418,7 +418,7 @@ public:
 
     // get the Translated mouse position !
     Point2F GetMousePosition() {
-        return ScreenToWorld(Point2F((F32)gMousePos.x, (F32)gMousePos.y));
+        return ScreenToWorld({(F32)gMousePos.x, (F32)gMousePos.y});
     }
 
 };
@@ -850,7 +850,8 @@ public:
     void moveOrbital(Point2F ankerPoint,F32 gravity, F32 softening, F32 maxSpeed, F32 dt = -1.f) {
         if (dt <= 0.f ) dt =(F32)BaseFlux::getFrameTime();
 
-        Point2F direction = ankerPoint - Point2F(mDstRect.points[0], mDstRect.points[1]);
+        Point2F p = {mDstRect.points[0], mDstRect.points[1]};
+        Point2F direction = ankerPoint - p;
 
         F32 distance = length(direction);
 
@@ -1368,20 +1369,20 @@ DefineEngineFunction(DrawLine, void, (F32 x1, F32 y1,F32 x2, F32 y2, Color color
     if (thickness != 1.f)
         BaseFlux::DrawLineThick(app.getRenderer(), x1,y1,x2,y2, thickness, color);
     else
-        BaseFlux::DrawLine(app.getRenderer(), Point2F(x1,y1),Point2F(x2,y2), color);
+        BaseFlux::DrawLine(app.getRenderer(), {x1,y1},{x2,y2}, color);
 }
 
 DefineEngineFunction(DrawLineRec, void, (RectF points, Color color, F32 thickness)
     ,(WHITE, 1.f),"Draw a Line using rect w=x2 h=y2 as parameter") {
     if (thickness != 1.f)
-        BaseFlux::DrawLineThick(app.getRenderer(), Point2F(points.x,points.y),Point2F(points.w,points.h), thickness, color);
+        BaseFlux::DrawLineThick(app.getRenderer(), {points.x,points.y},{points.w,points.h}, thickness, color);
     else
-        BaseFlux::DrawLine(app.getRenderer(), Point2F(points.x,points.y),Point2F(points.w,points.h), color);
+        BaseFlux::DrawLine(app.getRenderer(), {points.x,points.y},{points.w,points.h}, color);
 }
 
 DefineEngineFunction(DrawRect, void, (F32 x, F32 y,F32 w, F32 h, Color color, bool fill)
         ,(WHITE, true),"Draw a Rect") {
-    BaseFlux::DrawRect(app.getRenderer(), RectF(x,y,w,h), color, fill);
+    BaseFlux::DrawRect(app.getRenderer(), {x,y,w,h}, color, fill);
 }
 DefineEngineFunction(DrawRectRec, void, (RectF rect, Color color, bool fill)
 ,(WHITE, true),"Draw a Rect") {
@@ -1390,15 +1391,16 @@ DefineEngineFunction(DrawRectRec, void, (RectF rect, Color color, bool fill)
 
 DefineEngineFunction(DrawCircle, void, (F32 x, F32 y,F32 radius, Color color, bool fill)
     ,(WHITE, true),"Draw a Circle") {
-    BaseFlux::DrawCircle(app.getRenderer(), radius, Point2F(x,y), color, fill);
+    BaseFlux::DrawCircle(app.getRenderer(), radius, {x,y}, color, fill);
 }
 DefineEngineFunction(DrawArc, void, (F32 x, F32 y,F32 radius,F32 startRad, F32 endRad, Color color, bool fill)
 ,(WHITE, true),"Draw a Arc: startRad / endRad in radians ") {
-    BaseFlux::DrawArc(app.getRenderer(), radius,startRad, endRad, Point2F(x,y), color, fill);
+    BaseFlux::DrawArc(app.getRenderer(), radius,startRad, endRad, {x,y}, color, fill);
 }
 DefineEngineFunction(DrawDonut, void, (F32 x, F32 y,F32 innerRadius,F32 outerRadius, Color color, bool fill)
 ,(WHITE, true),"Draw a Arc") {
-    BaseFlux::DrawDonut(app.getRenderer(), innerRadius,outerRadius, Point2F(x,y), color, fill);
+    BaseFlux::DrawDonut(app.getRenderer(), innerRadius,outerRadius, {x,y}, color, fill);
+    // BaseFlux::DrawDonut(app.getRenderer(), innerRadius,outerRadius, Point2F(x,y), color, fill);
 }
 
 

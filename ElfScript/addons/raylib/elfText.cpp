@@ -113,7 +113,7 @@ namespace ElfText {
     {
         Font* font = ElfResource::FontMap.get(fontId);
         if (!font) return;
-        if (doShadow) DrawTextEx(*font,text, position + Vector2(1.f, 1.f), fontSize, spacing, shadowColor);
+        if (doShadow) DrawTextEx(*font,text, {position.x + 1.f, position.y + 1.f}, fontSize, spacing, shadowColor);
         DrawTextEx(*font, text, position, fontSize, spacing, tint);
     }
 

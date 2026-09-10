@@ -604,7 +604,7 @@ class SimObject: public ConsoleObject
       }
 
       // -----------------------------------------------------------------------
-      bool stackDynamicField(StringTableEntry slotName, const char* array, ConsoleValue* stackP) {
+      inline bool stackDynamicField(StringTableEntry slotName, const char* array, ConsoleValue* stackP) {
 
             bool arrayEmpty = (!array || array[0] == '\0');
             StringTableEntry dynamicFieldName = nullptr;

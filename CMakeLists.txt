@@ -48,6 +48,14 @@ if (BUILD_WITH_IPO)
                 $<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<NOT:$<BOOL:${ANDROID}>>>:-march=native>>
         >
     )
+#     target_compile_options(flux_speed_profile INTERFACE
+#         $<$<CONFIG:Release>:
+#             $<$<CXX_COMPILER_ID:MSVC>:/O2 /Oi /Ot>
+#             $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-O3 -fno-strict-aliasing -finline-limit=50000
+# --param=max-inline-insns-single=10000 --param=inline-unit-growth=400 -funroll-loops
+#                 $<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<NOT:$<BOOL:${ANDROID}>>>:-march=native>>
+#         >
+#     )
     #  -g  if you need
 endif()
 # -----------------------------------------------------------------------------

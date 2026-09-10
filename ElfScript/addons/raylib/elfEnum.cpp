@@ -15,7 +15,7 @@
 // #define MAGIC_ENUM_RANGE_MAX 348
 // compile takes ages! #define MAGIC_ENUM_RANGE_MAX 65536
 #include "console/consoleExtras.h" // registerEnum
-#include <format>
+
 
 // need more colors ;)
 
@@ -70,18 +70,10 @@ void registerRaylibColors() {
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
 
-         std::string colorString = std::format("{{ {}, {}, {}, {} }}", value.r, value.g, value.b, value.a);
-         Con::setScriptConstant(fullName.c_str(), colorString );
-         // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+        StringBuilder colorString;
+        colorString.format("{ %d, %d, %d, %d }", value.r, value.g, value.b, value.a);
+        Con::setScriptConstant(fullName.c_str(), colorString.end().c_str() );
 
-        // ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
-        //
-        // if (type) {
-        //     const char* colorStrP = type->getData(&value, nullptr, 0);
-        //     std::string colorString = std::format("\"{}\"", colorStrP);
-        //     Con::setScriptConstant(fullName.c_str(), colorString );
-        //     Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
-        // }
     }
 
 }

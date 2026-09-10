@@ -233,7 +233,7 @@ ConsoleSetType( TypeRectI )
         dSscanf(argv[0], "%d %d %d %d", &((RectI *) dptr)->x, &((RectI *) dptr)->y,
                 &((RectI *) dptr)->w, &((RectI *) dptr)->h);
         else if(argc == 4)
-            *((RectI *) dptr) = RectI(dAtoi(argv[0]), dAtoi(argv[1]), dAtoi(argv[2]), dAtoi(argv[3]));
+            *((RectI *) dptr) = {dAtoi(argv[0]), dAtoi(argv[1]), dAtoi(argv[2]), dAtoi(argv[3])};
     else
         Con::printf("RectI must be set as { x, y, w, h } or \"x y w h\"");
 }
@@ -260,7 +260,7 @@ ConsoleSetType( TypeRectF )
         dSscanf(argv[0], "%g %g %g %g", &((RectF *) dptr)->x, &((RectF *) dptr)->y,
                 &((RectF *) dptr)->w, &((RectF *) dptr)->h);
         else if(argc == 4)
-            *((RectF *) dptr) = RectF(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+            *((RectF *) dptr) = {dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3])};
     else
         Con::printf("RectF must be set as { x, y, w, h } or \"x y w h\"");
 }
@@ -298,7 +298,7 @@ ConsoleSetType( TypePoint2F )
     if(argc == 1)
         dSscanf(argv[0], "%g %g", &((Point2F *) dptr)->x, &((Point2F *) dptr)->y);
     else if(argc == 2)
-        *((Point2F *) dptr) = Point2F(dAtof(argv[0]), dAtof(argv[1]));
+        *((Point2F *) dptr) = {dAtof(argv[0]), dAtof(argv[1])};
     else
         Con::printf("Point2F must be set as { x, y } or \"x y\"");
 }

@@ -101,7 +101,7 @@ ConsoleSetType( TypeVector2 )
     if(argc == 1)
         dSscanf(argv[0], "%g %g", &((Vector2 *) dptr)->x, &((Vector2 *) dptr)->y);
     else if(argc == 2)
-        *((Vector2 *) dptr) = Vector2(dAtof(argv[0]), dAtof(argv[1]));
+        *((Vector2 *) dptr) = {dAtof(argv[0]), dAtof(argv[1])};
     else
         Con::printf("Vector2 must be set as { x, y } or \"x y\"");
 }
@@ -138,7 +138,7 @@ ConsoleSetType( TypeVector3 )
     if(argc == 1)
         dSscanf(argv[0], "%g %g %g", &((Vector3 *) dptr)->x, &((Vector3 *) dptr)->y, &((Vector3 *) dptr)->z);
     else if(argc == 3)
-        *((Vector3 *) dptr) = Vector3(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]));
+        *((Vector3 *) dptr) = {dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2])};
     else
         Con::printf("Vector3 must be set as { x, y, z } or \"x y z\"");
 }
@@ -181,7 +181,7 @@ ConsoleSetType( TypeVector4 )
     }
     else if(argc == 4)
     {
-        *((Vector4 *) dptr) = Vector4(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+        *((Vector4 *) dptr) = {dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3])};
     }
     else
     {
@@ -224,7 +224,7 @@ ConsoleSetType( TypeRectangle )
         dSscanf(argv[0], "%g %g %g %g", &((Rectangle *) dptr)->x, &((Rectangle *) dptr)->y,
                 &((Rectangle *) dptr)->width, &((Rectangle *) dptr)->height);
         else if(argc == 4)
-            *((Rectangle *) dptr) = Rectangle(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+            *((Rectangle *) dptr) = {dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3])};
     else
         Con::printf("Rectangle must be set as { x, y, w, h } or \"x y w h\"");
 }
