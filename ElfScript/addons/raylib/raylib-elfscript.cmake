@@ -9,7 +9,9 @@
 if (RAYLIB_FETCH)
     include(FetchContent)
 
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(BUILD_EXAMPLES OFF CACHE BOOL "Build raylib examples" FORCE)
+    set(BUILD_GAMES    OFF CACHE BOOL "Build raylib games"    FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 
     if (RAYLIB_GIT_MASTER)
         set(RAY_TAG master)
