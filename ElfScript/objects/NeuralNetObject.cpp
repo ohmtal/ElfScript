@@ -6,11 +6,7 @@
 // TODO: add Constants for activation type
 // NOTE: if you need better input/output handline add Array*
 //-----------------------------------------------------------------------------
-#include <SDL3/SDL.h>
-
-#include "console/scriptPreprocessor.h"
 #include "console/engineAPI.h"
-#include "console/consoleExtras.h"
 #include "math/mMathRand.h"
 
 #include "ext/genann.h"
@@ -20,7 +16,6 @@
 #define ANN_MAXOUTPUTS 100
 
 
-#include "console/engineAPI.h"
 
 class NeuralNetObject: public SimObject
 {
