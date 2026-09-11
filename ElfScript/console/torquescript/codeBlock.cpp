@@ -788,7 +788,9 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          StringTableEntry fnName = CodeToSTE(code, ip);
          StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
          StringTableEntry fnPackage = CodeToSTE(code, ip + 4);
-         bool hasBody = bool(code[ip + 6]);
+         // bool hasBody = bool(code[ip + 6]);
+         bool hasBody = (code[ip + 6] & 0x01) != 0;
+
          U32 newIp = code[ip + 7];
          U32 argc = code[ip + 8];
          U32 regCount = code[ip + 9];
@@ -799,10 +801,15 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
 
          // Skip args.
 
-         ip += 10 + argc;
+         // // ip += 10 + argc;
+         ip = newIp;
          smInFunction = true;
          break;
       }
+
+      case OP_DEFAULT_END:
+            Con::printf("%i OP_DEFAULT_END", ip-1);
+      break;
 
       case OP_CREATE_OBJECT:
       {
@@ -1242,44 +1249,6 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
 
-      // case OP_LOADFIELD_UINT:
-      // {
-      //    Con::printf("%i: OP_LOADFIELD_UINT stk=+1", ip - 1);
-      //    break;
-      // }
-      //
-      // case OP_LOADFIELD_FLT:
-      // {
-      //    Con::printf("%i: OP_LOADFIELD_FLT stk=+1", ip - 1);
-      //    break;
-      // }
-      //
-      // case OP_LOADFIELD_STR:
-      // {
-      //    Con::printf("%i: OP_LOADFIELD_STR stk=+1", ip - 1);
-      //    break;
-      // }
-      //
-      // case OP_SAVEFIELD_UINT:
-      // {
-      //        ++ip;++ip; //XXTH FieldCache
-      //    Con::printf("%i: OP_SAVEFIELD_UINT stk=0", ip - 1);
-      //    break;
-      // }
-      //
-      // case OP_SAVEFIELD_FLT:
-      // {
-      //        ++ip;++ip; //XXTH FieldCache
-      //    Con::printf("%i: OP_SAVEFIELD_FLT stk=0", ip - 1);
-      //    break;
-      // }
-      //
-      // case OP_SAVEFIELD_STR:
-      // {
-      //    Con::printf("%i: OP_SAVEFIELD_STR stk=0", ip - 1);
-      //    break;
-      // }
-
       case OP_POP_STK:
       {
          Con::printf("%i: OP_POP_STK stk=-1", ip - 1);
@@ -1337,25 +1306,73 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
 
       case OP_CALLFUNC:
       {
-         StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
-         StringTableEntry fnName = CodeToSTE(code, ip);
-         U32 callType = code[ip + 4];
+            StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
+            StringTableEntry fnName = CodeToSTE(code, ip);
+            U32 callType = code[ip + 4];
 
-         StringTableEntry callTypeName;
-         switch (callType)
-         {
-         case FuncCallExprNode::FunctionCall: callTypeName = "FunctionCall"; break;
-         case FuncCallExprNode::MethodCall:   callTypeName = "MethodCall"; break;
-         case FuncCallExprNode::ParentCall:   callTypeName = "ParentCall"; break;
-         case FuncCallExprNode::StaticCall:   callTypeName = "StaticCall"; break;
-         default:                             callTypeName = "INVALID"; break;
-         }
+            StringTableEntry callTypeName;
+            switch (callType)
+            {
+                  case FuncCallExprNode::FunctionCall: callTypeName = "FunctionCall"; break;
+                  case FuncCallExprNode::MethodCall:   callTypeName = "MethodCall"; break;
+                  case FuncCallExprNode::ParentCall:   callTypeName = "ParentCall"; break;
+                  case FuncCallExprNode::StaticCall:   callTypeName = "StaticCall"; break;
+                  default:                             callTypeName = "INVALID"; break;
+            }
 
-         Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
+            Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
 
-         ip += 5;
-         break;
+            ip += 5;
+            break;
       }
+
+
+      case OP_CALL_FUNCTION_CALL: {
+            StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
+            StringTableEntry fnName = CodeToSTE(code, ip);
+
+            StringTableEntry callTypeName;
+            callTypeName = "FunctionCall";
+            Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
+
+            ip += 6;
+            break;
+      }
+      case OP_CALL_STATIC_CALL: {
+            StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
+            StringTableEntry fnName = CodeToSTE(code, ip);
+
+            StringTableEntry callTypeName;
+            callTypeName = "StaticCall";
+            Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
+
+            ip += 6;
+            break;
+      }
+      case OP_CALL_METHOD_CALL: {
+            StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
+            StringTableEntry fnName = CodeToSTE(code, ip);
+
+            StringTableEntry callTypeName;
+            callTypeName = "MethodCall";
+            Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
+
+            ip += 6;
+            break;
+      }
+      case OP_CALL_PARENT_CALL: {
+            StringTableEntry fnNamespace = CodeToSTE(code, ip + 2);
+            StringTableEntry fnName = CodeToSTE(code, ip );
+
+            StringTableEntry callTypeName;
+            callTypeName = "ParentCall";
+            Con::printf("%i: OP_CALLFUNC stk=+1 name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace, callTypeName);
+
+            ip += 6;
+            break;
+      }
+
+
 
       case OP_ADVANCE_STR_APPENDCHAR:
       {
@@ -1500,16 +1517,16 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       }
 
       case OP_BUILD_VECTOR_STRING: {
-         U32 count = code[ip++];
+         U32 count = code[ip+1];
          Con::printf("%i: OP_BUILD_VECTOR_STRING , count:%d stk=-1", ip - 1, count);
-          // ++ip;
+          ++ip;
          break;
       }
 
       case OP_ARRAY_CONSTUCTOR: {
-            U32 count = code[ip++];
+            U32 count = code[ip+1];
             Con::printf("%i: OP_ARRAY_CONSTUCTOR count:%d stk=-1", ip - 1, count);
-            // ++ip;
+            ++ip;
             break;
       }
 
@@ -1568,7 +1585,9 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
 
       default:
          U32 curCodeIP = code[ip];
+         Con::printSeparator();
          Con::printf("%i: !!INVALID!! (curCodeIP: %u) ", ip - 1, curCodeIP);
+         Con::printSeparator();
          break;
       }
    }

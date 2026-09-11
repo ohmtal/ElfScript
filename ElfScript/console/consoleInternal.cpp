@@ -1266,15 +1266,6 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
       }
    }
 
-// #ifndef TORQUE_DEBUG
-//    // [tom, 12/13/2006] This stops tools functions from working in the console,
-//    // which is useful behavior when debugging so I'm ifdefing this out for debug builds.
-//    if (mToolOnly && !Con::isCurrentScriptToolScript())
-//    {
-//       Con::errorf(ConsoleLogEntry::Script, "%s::%s - attempting to call tools only function from outside of tools", mNamespace->mName, mFunctionName);
-//       return (ConsoleValue());
-//    }
-// #endif
 
    if ((mMinArgs && argc < mMinArgs) || (mMaxArgs && argc > mMaxArgs))
    {
@@ -1313,7 +1304,8 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
 #endif
 #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       case ConsoleValueCallbackType:
-            result.copyFrom(cb.mConsoleValueCallbackFunc(thisObj, argc, argv));
+            // result.copyFrom(cb.mConsoleValueCallbackFunc(thisObj, argc, argv));
+            result = cb.mConsoleValueCallbackFunc(thisObj, argc, argv);
         break;
 #endif
 

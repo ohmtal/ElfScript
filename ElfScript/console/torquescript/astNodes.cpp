@@ -1369,11 +1369,35 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_PUSH);
    }
 
+
+#ifdef ENABLE_EXPERIMENTAL_CALL_FUNC
+   switch (callType) {
+      case FuncCallExprNode::FunctionCall:  codeStream.emit(OP_CALL_FUNCTION_CALL);  break;
+      case FuncCallExprNode::StaticCall:    codeStream.emit(OP_CALL_STATIC_CALL);    break;
+      case FuncCallExprNode::MethodCall:    codeStream.emit(OP_CALL_METHOD_CALL);    break;
+      case FuncCallExprNode::ParentCall:    codeStream.emit(OP_CALL_PARENT_CALL);    break;
+      default:
+            Con::errorf(" FuncCallExprNode::compile something is really wrong here unknown FuncCallExprNode : %d", callType);
+            return 0;
+            break;
+   }
+
+   // 4 bytes funcName
+   codeStream.emitSTE(funcName);
+   // 4 bytes nameSpace
+   codeStream.emitSTE(nameSpace);
+
+   // NOTE ElfScript 0.8
+   // nsEntry pointer - backpack 8bytes
+   codeStream.emit( 0 );codeStream.emit( 0 );
+#else
+
    codeStream.emit(OP_CALLFUNC);
    codeStream.emitSTE(funcName);
    codeStream.emitSTE(nameSpace);
    codeStream.emit(callType);
 
+#endif
 
    if (type == TypeReqNone)
       codeStream.emit(OP_POP_STK);

@@ -738,6 +738,7 @@ public:
 
 ///
 typedef const char * (*StringCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
+//ElfScript FIXME F32 and S32 ?!?!?!
 typedef S32(*IntCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef F32(*FloatCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef void(*VoidCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]); // We have it return a value so things don't break..

@@ -1282,6 +1282,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    SimObject* prevObject = NULL;
    SimObject* curObject = NULL;
    SimObject* thisObject = NULL;
+   ConsoleValue* simObjectLookupPtr;
    Namespace::Entry* nsEntry;
    Namespace* ns = NULL;
    const char* curFNDocBlock = NULL;
@@ -1317,7 +1318,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
 
    //XXTH ElfScript ( i guess i'am insane *haha* )
-   /*static*/ const void* dispatch_table[] = {
+   const void* dispatch_table[] = {
          &&handle_OP_FUNC_DECL,
          &&handle_OP_DEFAULT_END,
          &&handle_OP_CREATE_OBJECT,
@@ -1393,13 +1394,6 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_SETCURFIELD_ARRAY,
          &&handle_OP_SETCURFIELD_TYPE,
 
-         // // &&handle_OP_LOADFIELD_UINT,
-         // // &&handle_OP_LOADFIELD_FLT,
-         // // &&handle_OP_LOADFIELD_STR,
-
-         // // &&handle_OP_SAVEFIELD_UINT,
-         // // &&handle_OP_SAVEFIELD_FLT,
-         // // &&handle_OP_SAVEFIELD_STR,
 
          &&handle_OP_POP_STK,
 
@@ -1410,8 +1404,32 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_DOCBLOCK_STR,
          &&handle_OP_LOADIMMED_IDENT,
 
+         // ------
          &&handle_OP_CALLFUNC,
 
+         &&handle_OP_CALL_FUNCTION_CALL,
+         &&handle_OP_CALL_STATIC_CALL,
+         &&handle_OP_CALL_METHOD_CALL,
+         &&handle_OP_CALL_PARENT_CALL,
+
+         &&handle_OP_CALLFUNC_CONSOLEFUNCTION,
+         &&handle_OP_CALLFUNC_VECTOR,
+         &&handle_OP_CALLFUNC_VALUE,
+         &&handle_OP_CALLFUNC_STRING,
+         &&handle_OP_CALLFUNC_INT,
+         &&handle_OP_CALLFUNC_FLOAT,
+         &&handle_OP_CALLFUNC_BOOL,
+         &&handle_OP_CALLFUNC_VOID,
+
+         &&handle_OP_CALLFUNC_VECTOR_METHOD,
+         &&handle_OP_CALLFUNC_VALUE_METHOD,
+         &&handle_OP_CALLFUNC_STRING_METHOD,
+         &&handle_OP_CALLFUNC_INT_METHOD,
+         &&handle_OP_CALLFUNC_FLOAT_METHOD,
+         &&handle_OP_CALLFUNC_BOOL_METHOD,
+         &&handle_OP_CALLFUNC_VOID_METHOD,
+
+         // -------
          &&handle_OP_ADVANCE_STR_APPENDCHAR,
          &&handle_OP_REWIND_STR,
          &&handle_OP_TERMINATE_REWIND_STR,
@@ -2982,6 +3000,573 @@ handle_OP_LOADIMMED_IDENT:
       DISPATCH();
 
 // ~~~~~~~~~~~~~~~~~ CALLFUNC
+// This routingId is set when we query the object as to whether
+// it handles this method.  It is set to an enum from the table
+// above indicating whether it handles it on a component it owns
+// or just on the object.
+#define PREPARE_CALLFUNC() \
+do { \
+      fnName = CodeToSTE(code, ip ); \
+      fnNamespace = CodeToSTE(code, ip + 2); \
+      nsEntry = *(Namespace::Entry**)&code[ip + 4]; \
+      if (!Script::gEvalState.stack.empty()) { \
+            Script::gEvalState.getCurrentFrame().module = this; \
+            Script::gEvalState.getCurrentFrame().ip = ip - 1; \
+      } \
+      ip += 6; \
+      gCallStack.argvc(fnName, callArgc, &callArgv); \
+} while(0)
+
+#define FINIT_CALLFUNC() \
+do { \
+      Script::gEvalState.currentVariable = nullptr; \
+} while(0)
+
+
+#define VALIDATE_CALL_AND_DISPATCH(isMethodCall) \
+do { \
+      if (!nsEntry || noCalls) \
+      { \
+            if (!noCalls) \
+            { \
+                  Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", getFileLine(ip - 7), fnName); \
+                  if (isMethodCall) \
+                  { \
+                        Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s", \
+                        thisObject->getName() ? thisObject->getName() : "", \
+                        thisObject->getId(), Con::getNamespaceList(ns)); \
+                  } \
+            } \
+            gCallStack.popFrame(); \
+            stack[_STK + 1].setEmptyString(); \
+            PUSH_STK(); \
+            DISPATCH(); \
+      } \
+      \
+      if (  nsEntry->mType != Namespace::Entry::ConsoleFunctionType && \
+            ((nsEntry->mMinArgs && S32(callArgc) < nsEntry->mMinArgs) || (nsEntry->mMaxArgs && S32(callArgc) > nsEntry->mMaxArgs))) \
+      { \
+            const char* nsName = nsEntry->mNamespace ? nsEntry->mNamespace->mName : ""; \
+            Con::warnf(ConsoleLogEntry::Script, "%s: %s::%s - wrong number of arguments. got %d, expected %d to %d", \
+            getFileLine(ip - 7), nsName, fnName, S32(callArgc) - 1 , nsEntry->mMinArgs - 1 , nsEntry->mMaxArgs - 1); \
+            \
+            Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s%s", \
+            getFileLine(ip - 7), nsEntry->mFunctionName, nsEntry->getArgumentsString().c_str()); \
+            \
+            if (strlen(nsEntry->mUsage) > 0) \
+            { \
+                  Con::warnf(ConsoleLogEntry::Script, "%s: docu: %s", getFileLine(ip - 7), nsEntry->mUsage); \
+            } \
+            \
+            gCallStack.popFrame(); \
+            stack[_STK + 1].setEmptyString(); \
+            PUSH_STK(); \
+            DISPATCH(); \
+      } \
+} while(0)
+
+
+#define PATCH_AND_DISPATCH_CALL(isMethod) \
+do { \
+      bool call_failed = false; \
+      if (nsEntry) \
+      { \
+            *(Namespace::Entry**)&code[ip - 2] = nsEntry; \
+            \
+            switch (nsEntry->mType) \
+            { \
+                  case Namespace::Entry::ConsoleFunctionType: \
+                        code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION; \
+                        break; \
+                  case Namespace::Entry::StringCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_STRING_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_STRING; \
+                                    break; \
+                  case Namespace::Entry::IntCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_INT_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_INT; \
+                                    break; \
+                  case Namespace::Entry::FloatCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_FLOAT_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_FLOAT; \
+                                    break; \
+                  case Namespace::Entry::VoidCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VOID_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_VOID; \
+                                    break; \
+                  case Namespace::Entry::BoolCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_BOOL_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_BOOL; \
+                                    break; \
+                  case Namespace::Entry::VectorCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VECTOR_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_VECTOR; \
+                                    break; \
+                  case Namespace::Entry::ConsoleValueCallbackType: \
+                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VALUE_METHOD; \
+                              else code[ip - 7] = OP_CALLFUNC_VALUE; \
+                                    break; \
+                  default: { \
+                        Con::errorf("Invalid return type on function call!!!"); \
+                        gCallStack.popFrame(); \
+                        stack[_STK + 1].setEmptyString(); \
+                        PUSH_STK(); \
+                        call_failed = true; \
+                        break; \
+                  } \
+            } \
+            \
+            if (call_failed) { \
+                  DISPATCH(); \
+            } else { \
+                  ip -= 6; \
+                  DISPATCH_OPCODE(code[ip - 1]); \
+            } \
+      } \
+} while(0)
+
+
+// ~~~~~~~~~~~~ FUNCTION CALL ~~~~~~~~~~~~~~~~
+
+handle_OP_CALL_FUNCTION_CALL: {
+      PREPARE_CALLFUNC();
+      // Note: This works even if the function was in a package. Reason being is when
+      // activatePackage() is called, it swaps the namespaceEntry into the global namespace
+      // (and reverts it when deactivatePackage is called). Method or Static related ones work
+      // as expected, as the namespace is resolved on the fly.
+      nsEntry = Namespace::global()->lookup(fnName);
+      if (!nsEntry)
+      {
+            Con::warnf(ConsoleLogEntry::General,
+                       "%s: Unable to find function %s",
+                       getFileLine(ip - 7), fnName);
+
+            gCallStack.popFrame();
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+            DISPATCH();
+      }
+
+      VALIDATE_CALL_AND_DISPATCH(false);
+      PATCH_AND_DISPATCH_CALL(false);
+}
+
+// ~~~~~~~~~~~~ STATIC CALL ~~~~~~~~~~~~~~~~
+handle_OP_CALL_STATIC_CALL: {
+
+      PREPARE_CALLFUNC();
+      // Try to look it up.
+      ns = Namespace::find(fnNamespace);
+      nsEntry = ns->lookup(fnName);
+      if (!nsEntry)
+      {
+            Con::warnf(ConsoleLogEntry::General,
+                       "%s: Unable to find function %s%s%s",
+                       getFileLine(ip - 7), fnNamespace ? fnNamespace : "",
+                       fnNamespace ? "::" : "", fnName);
+
+            gCallStack.popFrame();
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+            DISPATCH();
+      }
+
+      VALIDATE_CALL_AND_DISPATCH(false);
+      PATCH_AND_DISPATCH_CALL(false);
+}
+
+
+
+// ~~~~~~~~~~~~ METHOD CALL ~~~~~~~~~~~~~~~~
+handle_OP_CALL_METHOD_CALL: {
+      PREPARE_CALLFUNC();
+
+      // ConsoleValue& simObjectLookupValue = callArgv[1];
+      // thisObject = getThisObject(simObjectLookupValue);
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (thisObject == NULL)
+      {
+            Con::warnf(
+                  ConsoleLogEntry::General,
+                  "%s: Unable to find object: '%s' attempting to call function '%s'",
+                  getFileLine(ip - 7),
+                       simObjectLookupPtr->getString(),
+                       // simObjectLookupValue.getString(),
+                       fnName
+            );
+
+            gCallStack.popFrame();
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+            DISPATCH();
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else
+            nsEntry = NULL;
+
+      VALIDATE_CALL_AND_DISPATCH(true);
+      PATCH_AND_DISPATCH_CALL(true);
+
+}
+
+// ~~~~~~~~~~~~ PARENT CALL ~~~~~~~~~~~~~~~~
+handle_OP_CALL_PARENT_CALL: {
+
+      PREPARE_CALLFUNC();
+      // ConsoleValue& simObjectLookupValue = callArgv[1];
+      // thisObject = getThisObject(simObjectLookupValue);
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (thisObject == NULL)
+      {
+            Con::warnf(
+                  ConsoleLogEntry::General,
+                  "%s: Unable to find object: '%s' attempting to call function '%s'",
+                  getFileLine(ip - 7),
+                       simObjectLookupPtr->getString(),
+                       // simObjectLookupValue.getString(),
+                       fnName
+            );
+
+            gCallStack.popFrame();
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+            DISPATCH();
+      }
+
+      if (thisNamespace)
+      {
+            ns = thisNamespace->mParent;
+            if (ns)
+                  nsEntry = ns->lookup(fnName);
+            else
+                  nsEntry = NULL;
+      }
+      else
+      {
+            ns = NULL;
+            nsEntry = NULL;
+      }
+      VALIDATE_CALL_AND_DISPATCH(false);
+      PATCH_AND_DISPATCH_CALL(true);
+}
+
+// ~~~~~~~~~~~~ CONSOLEFUNCTION ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_CONSOLEFUNCTION: {
+   PREPARE_CALLFUNC();
+   if (nsEntry->mFunctionOffset)
+   {
+         ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+         stack[_STK + 1] = (returnFromFn);
+   }
+   else // no body
+         stack[_STK + 1].setEmptyString();
+      PUSH_STK();
+
+   gCallStack.popFrame();
+   FINIT_CALLFUNC();
+   DISPATCH();
+}
+
+// ~~~~~~~~~~~~ VECTOR ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VECTOR: {
+
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+
+#ifdef ENABLE_CONSOLE_VECTOR
+      ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setVector(result);
+            PUSH_STK();
+      }
+#endif
+
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+// ~~~~~~~~~~~~ VALUE ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VALUE: {
+
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            // written above ! stack[_STK + 1].copyFrom( result) ;
+            PUSH_STK();
+      }
+#endif
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+
+// ~~~~~~~~~~~~ STRING ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_STRING: {
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+      const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setString(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ INT ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_INT: {
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+      S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setInt(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ FLOAT ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_FLOAT: {
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+      F32 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setFloat((F64)result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+// ~~~~~~~~~~~~ BOOL ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_BOOL: {
+      PREPARE_CALLFUNC();
+      thisObject = nullptr;
+      bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setBool(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ VOID ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VOID: {
+      PREPARE_CALLFUNC();
+
+      thisObject = nullptr;
+      nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            #ifdef TORQUE_DEBUG //ElfScript on debug only but then always :P
+            Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 7), fnName, functionName);
+            #endif
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+
+      }
+
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~~~ METHODS ... ~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~ VECTOR METHOD~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VECTOR_METHOD: {
+
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      #ifdef ENABLE_CONSOLE_VECTOR
+      ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setVector(result);
+            PUSH_STK();
+      }
+      #endif
+
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+// ~~~~~~~~~~~~ VALUE METHOD ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VALUE_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            // written above ! stack[_STK + 1].copyFrom( result) ;
+            PUSH_STK();
+      }
+      #endif
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+
+// ~~~~~~~~~~~~ STRING METHOD ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_STRING_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setString(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ INT METHOD ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_INT_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setInt(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ FLOAT METHOD ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_FLOAT_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      F32 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setFloat((F64)result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+// ~~~~~~~~~~~~ BOOL METHOD ~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_BOOL_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            stack[_STK + 1].setBool(result);
+            PUSH_STK();
+      }
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+// ~~~~~~~~~~~~ VOID METHOD~~~~~~~~~~~~~~~~
+handle_OP_CALLFUNC_VOID_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
+      gCallStack.popFrame();
+
+      if (code[ip] == OP_POP_STK)
+      {
+            ip++;
+      } else {
+            #ifdef TORQUE_DEBUG //ElfScript on debug only but then always :P
+            Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip - 7), fnName, functionName);
+            #endif
+            stack[_STK + 1].setEmptyString();
+            PUSH_STK();
+
+      }
+
+      FINIT_CALLFUNC();
+      DISPATCH();
+
+}
+
+
+// ~~~~~~~~ END OF NEW FUNCCALL ~~~~~~~~~~~~~~
+
 handle_OP_CALLFUNC:
 {
 
@@ -3002,6 +3587,7 @@ handle_OP_CALLFUNC:
 
       ip += 5;
       gCallStack.argvc(fnName, callArgc, &callArgv);
+
 
       if (callType == FuncCallExprNode::FunctionCall)
       {
@@ -3156,6 +3742,11 @@ handle_OP_CALLFUNC:
                         {
                               ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
                               gCallStack.popFrame();
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
                               stack[_STK + 1].setVector(result);
                               PUSH_STK();
                               break;
@@ -3166,6 +3757,11 @@ handle_OP_CALLFUNC:
                         {
                               ConsoleValue result = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
                               gCallStack.popFrame();
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
                               stack[_STK + 1].copyFrom( result) ;
                               PUSH_STK();
                               break;
@@ -3176,6 +3772,11 @@ handle_OP_CALLFUNC:
                         {
                               const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
                               gCallStack.popFrame();
+                              if (code[ip] == OP_POP_STK)
+                              {
+                                    ip++;
+                                    break;
+                              }
                               stack[_STK + 1].setString(result);
                               PUSH_STK();
                               break;
@@ -3650,7 +4251,8 @@ handle_OP_ITER_ARRAY:
             DISPATCH(); // continue;
       }
 
-      iter.mConsoleValue->copyFrom( array->mValues[index] );
+      // iter.mConsoleValue->copyFrom( array->mValues[index] );
+      iter.mConsoleValue =  &array->mValues[index];
 
       iter.mData.mObj.mIndex = index + 1;
 

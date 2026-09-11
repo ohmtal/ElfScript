@@ -93,12 +93,8 @@ public:
          FloatCallbackType,
          VoidCallbackType,
          BoolCallbackType
-#ifdef ENABLE_CONSOLE_VECTOR
-        , VectorCallbackType
-#endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
-      , ConsoleValueCallbackType
-#endif
+        ,VectorCallbackType
+        ,ConsoleValueCallbackType
 
       };
 

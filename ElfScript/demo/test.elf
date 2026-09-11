@@ -1,5 +1,6 @@
 function rl() {
     // exec("ElfScript/demo/test.elf");
+    $Debug::DumpByteCode=0;
     if ($Con::File !$= "") exec($Con::File);
     else {
         error("RELOAD: fallback to hardcoded filename");
