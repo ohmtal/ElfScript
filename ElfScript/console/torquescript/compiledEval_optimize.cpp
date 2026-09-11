@@ -3418,6 +3418,20 @@ handle_OP_CALLFUNC_VECTOR_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
+
       #ifdef ENABLE_CONSOLE_VECTOR
       ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3439,6 +3453,20 @@ handle_OP_CALLFUNC_VALUE_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
 
       #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
@@ -3462,6 +3490,20 @@ handle_OP_CALLFUNC_STRING_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
+
       const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3481,6 +3523,20 @@ handle_OP_CALLFUNC_INT_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
 
       S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3503,6 +3559,20 @@ handle_OP_CALLFUNC_FLOAT_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
+
       F32 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
 
@@ -3522,6 +3592,21 @@ handle_OP_CALLFUNC_BOOL_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
+
 
       bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3543,6 +3628,22 @@ handle_OP_CALLFUNC_VOID_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
+
+      ///
+      if (!thisObject) {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+
+      }
+
+      ns = thisObject->getNamespace();
+      if (ns)
+            nsEntry = ns->lookup(fnName);
+      else {
+            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
+            DISPATCH();
+      }
+      ///
 
       nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();

@@ -1369,7 +1369,7 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       codeStream.emit(OP_PUSH);
    }
 
-
+// // #define ENABLE_EXPERIMENTAL_CALL_FUNC
 #ifdef ENABLE_EXPERIMENTAL_CALL_FUNC
    switch (callType) {
       case FuncCallExprNode::FunctionCall:  codeStream.emit(OP_CALL_FUNCTION_CALL);  break;

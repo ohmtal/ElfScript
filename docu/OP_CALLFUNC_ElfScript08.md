@@ -2,6 +2,8 @@
 
 ElfScript 0.8 : Targeting OP_CALLFUNC to optimize. 
 
+New  attempt after my first with cache did not work.
+
 ##  switch (nsEntry->mType)
 
 VM and switch is not the best idea:
@@ -56,7 +58,23 @@ kill this if.
 I got it running but after loading a other module (CrazyElf for example) it did
 not work anymore and the calls where broken. I guess the function pointer changes
 when a new script is loaded but the codestream is still filled with the old pointers.
-It did not crash but the functions where scrambled. 
+It did not crash but the functions where scrambled. But when reload the same script
+it works fine .. I now speed so many hours on it .. I should try to get it run :P
+I guess the func call cache was not a good idea. So i will maybe come back to my 
+first idea the OP_CODE monster with 32 + 1 OP Codes and doing every time the lookup 
+but removing if (...) switch() ... guess this will also not working ?! .. 
+Is it only the method or parent call which cause the problems :
+
+```
+            ns = thisObject->getNamespace();
+            if (ns)
+                  nsEntry = ns->lookup(fnName);
+            else
+                  nsEntry = NULL;
+```
+i added this to _METHODS ... Mhhh
+
+
 
 I kept all the OP codes but `#ifdef ENABLE_EXPERIMENTAL_CALL_FUNC` it in the 
 compiler (astNodes.cpp) 
