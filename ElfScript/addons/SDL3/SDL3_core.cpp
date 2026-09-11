@@ -12,6 +12,8 @@
 
 namespace ElfSDL3 {
 
+ConsoleValue _resultSetter;
+
 void RegisterCoreConstants() {
     using namespace Con;
 
@@ -39,24 +41,28 @@ DefineEngineFunction(SDL_Quit, void, (), , "Quit SDL") {
 
 // -------- Timer -------------
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetTicks(void);
-DefineEngineFunction(SDL_GetTicks, U64, (),,"Get the number of milliseconds that have elapsed since the SDL library") {
-    return SDL_GetTicks();
+DefineEngineFunction(SDL_GetTicks, ConsoleValue, (),,"Get the number of milliseconds that have elapsed since the SDL library") {
+    _resultSetter.setInt(SDL_GetTicks());
+    return _resultSetter;
 }
 
 
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetTicksNS(void);
-DefineEngineFunction(SDL_GetTicksNS, U64, (),,"Get the number of nanoseconds that have elapsed since the SDL library") {
-    return SDL_GetTicksNS();
+DefineEngineFunction(SDL_GetTicksNS, ConsoleValue, (),,"Get the number of nanoseconds that have elapsed since the SDL library") {
+    _resultSetter.setInt(SDL_GetTicksNS());
+    return _resultSetter;
 }
 
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetPerformanceCounter(void);
-DefineEngineFunction(SDL_GetPerformanceCounter, U64, (),,"Get the current value of the high resolution counter.") {
-    return SDL_GetPerformanceCounter();
+DefineEngineFunction(SDL_GetPerformanceCounter, ConsoleValue, (),,"Get the current value of the high resolution counter.") {
+    _resultSetter.setInt(SDL_GetPerformanceCounter());
+    return _resultSetter;
 }
 
 // extern SDL_DECLSPEC Uint64 SDLCALL SDL_GetPerformanceFrequency(void);
-DefineEngineFunction(SDL_GetPerformanceFrequency, U64, (),,"Get the count per second of the high resolution counter.") {
-    return SDL_GetPerformanceFrequency();
+DefineEngineFunction(SDL_GetPerformanceFrequency, ConsoleValue, (),,"Get the count per second of the high resolution counter.") {
+    _resultSetter.setInt(SDL_GetPerformanceFrequency());
+    return _resultSetter;
 }
 
 
@@ -66,13 +72,13 @@ DefineEngineFunction(SDL_Delay, void, (U32 ms),,"Wait a specified number of mill
 }
 
 // extern SDL_DECLSPEC void SDLCALL SDL_DelayNS(Uint64 ns);
-DefineEngineFunction(SDL_DelayNS, void, (U64 ns),,"Wait a specified number of nanoseconds before returning.") {
-    SDL_Delay(ns);
+DefineEngineFunction(SDL_DelayNS, void, (ConsoleValue ns),,"Wait a specified number of nanoseconds before returning.") {
+    SDL_Delay(ns.getInt());
 }
 
 // extern SDL_DECLSPEC void SDLCALL SDL_DelayPrecise(Uint64 ns);
-DefineEngineFunction(SDL_DelayPrecise, void, (U64 ns),,"Wait a specified number of nanoseconds before returning.") {
-    SDL_DelayPrecise(ns);
+DefineEngineFunction(SDL_DelayPrecise, void, (ConsoleValue ns),,"Wait a specified number of nanoseconds before returning.") {
+    SDL_DelayPrecise(ns.getInt());
 }
 
 

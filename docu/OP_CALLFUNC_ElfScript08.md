@@ -82,7 +82,7 @@ compiler (astNodes.cpp)
 
 Research:
 
-- nothing todo with it but `DefineEngineFunction(SDL_GetPerformanceCounter, U64, (),,"Get the current value of the high resolution counter.")` return string !!!!!!
+- fixed: nothing todo with it but `DefineEngineFunction(SDL_GetPerformanceCounter, U64, (),,"Get the current value of the high resolution counter.")` return string !!!!!!
 - `%this.module.render();` is handle_OP_CALLFUNC_CONSOLEFUNCTION !!!!!
       - 1th 
             - callArgc = 2
