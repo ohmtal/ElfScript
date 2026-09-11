@@ -78,3 +78,56 @@ i added this to _METHODS ... Mhhh
 
 I kept all the OP codes but `#ifdef ENABLE_EXPERIMENTAL_CALL_FUNC` it in the 
 compiler (astNodes.cpp) 
+
+
+Research:
+
+- nothing todo with it but `DefineEngineFunction(SDL_GetPerformanceCounter, U64, (),,"Get the current value of the high resolution counter.")` return string !!!!!!
+- `%this.module.render();` is handle_OP_CALLFUNC_CONSOLEFUNCTION !!!!!
+      - 1th 
+            - callArgc = 2
+            - argv[0] = render
+            - argv[1] = 16454
+            - namespace: sdlTests
+      - 2th
+            - callArgc = 2
+            - argv[0] = render
+            - argv[1] = 16453
+            - namespace: main
+      - --------- CHANGED --------
+      - 1th 
+            - callArgc = 2
+            - argv[0] = render
+            - argv[1] = 16532 !!!!!!!
+            - namespace: sdlTests !!!!!!!!
+      - 2th
+            - callArgc = 2
+            - argv[0] = render
+            - argv[1] = 16453
+            - namespace: main
+      - others    
+            - namespace: GuiTextWidgetVintage
+
+Added OP_CALLFUNC_CONSOLEFUNCTION_METHOD and lookup namespace
+on every call ... is this faster than before ? hope so ..
+My Speed test does not use function calles so this is not the way to test it. StarField seams not to be faster. 
+
+      with        without
+[IV]:  ~ 235FPS   240 FPS
+[III]: ~ 265FPS   255 FPS
+[II]:  ~ 280FPS   265 FPS
+*420 I   1220|1800     1180|1700max
+
+maybe a bit faster ... but not really for all this work. 
+
+
+i test it with ON but as i said .. no function calls
+| Script | time |
+| --- | --- |
+| test_localvar.elf     | 1.362u 0.002s 0:01.36 100.0%    0+0k 0+0io 0pf+0w |
+| test_global.elf       | 2.399u 0.002s 0:02.40 99.5%     0+0k 0+0io 0pf+0w |
+| test_static.elf       | 4.655u 0.002s 0:04.67 99.5%     0+0k 0+0io 0pf+0w |
+| test_dynamic.elf      | 3.823u 0.005s 0:03.84 99.4%     0+0k 0+0io 0pf+0w |
+| test_vector_components.elf    | 4.020u 0.004s 0:04.03 99.7%     0+0k 0+0io 0pf+0w
+ |
+            

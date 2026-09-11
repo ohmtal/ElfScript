@@ -8,6 +8,8 @@ add_compile_definitions(ELFSCRIPT_VERSION_0_5)
 add_compile_definitions(ELFSCRIPT_VERSION_0_6)
 add_compile_definitions(ELFSCRIPT_VERSION_0_7)
 
+option(ELF_ENABLE_FUNCCALLOP "ElfScript: Enable EXPERIMENTAL function call OP codes in compiler and VM" OFF)
+
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support - recommended" ON)
 
@@ -355,8 +357,10 @@ if (ELF_ENABLE_SLIMOBJECT)
      add_compile_definitions(ELFSCRIPT_SLIM_OBJECT)
 endif()
 
-# if (ELF_ENABLE_CV_CALLBACK)
-# endif()
+
+if (ELF_ENABLE_FUNCCALLOP)
+     add_compile_definitions(ENABLE_CALL_FUNC_OP)
+endif()
 
 add_compile_definitions(ENABLE_CONSOLE_VALUE_CALLBACK)
 add_compile_definitions(TORQUE_DISABLE_MEMORY_MANAGER)

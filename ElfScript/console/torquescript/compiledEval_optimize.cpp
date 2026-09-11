@@ -1421,6 +1421,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_CALLFUNC_BOOL,
          &&handle_OP_CALLFUNC_VOID,
 
+         &&handle_OP_CALLFUNC_CONSOLEFUNCTION_METHOD,
          &&handle_OP_CALLFUNC_VECTOR_METHOD,
          &&handle_OP_CALLFUNC_VALUE_METHOD,
          &&handle_OP_CALLFUNC_STRING_METHOD,
@@ -3066,66 +3067,126 @@ do { \
 } while(0)
 
 
-#define PATCH_AND_DISPATCH_CALL(isMethod) \
+// #define PATCH_AND_DISPATCH_CALL(isMethod) \
+// do { \
+//       bool call_failed = false; \
+//       if (nsEntry) \
+//       { \
+//             *(Namespace::Entry**)&code[ip - 2] = nsEntry; \
+//             \
+//             switch (nsEntry->mType) \
+//             { \
+//                   case Namespace::Entry::ConsoleFunctionType: \
+//                         code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION; \
+//                         break; \
+//                   case Namespace::Entry::StringCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_STRING_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_STRING; \
+//                                     break; \
+//                   case Namespace::Entry::IntCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_INT_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_INT; \
+//                                     break; \
+//                   case Namespace::Entry::FloatCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_FLOAT_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_FLOAT; \
+//                                     break; \
+//                   case Namespace::Entry::VoidCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VOID_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_VOID; \
+//                                     break; \
+//                   case Namespace::Entry::BoolCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_BOOL_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_BOOL; \
+//                                     break; \
+//                   case Namespace::Entry::VectorCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VECTOR_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_VECTOR; \
+//                                     break; \
+//                   case Namespace::Entry::ConsoleValueCallbackType: \
+//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VALUE_METHOD; \
+//                               else code[ip - 7] = OP_CALLFUNC_VALUE; \
+//                                     break; \
+//                   default: { \
+//                         Con::errorf("Invalid return type on function call!!!"); \
+//                         gCallStack.popFrame(); \
+//                         stack[_STK + 1].setEmptyString(); \
+//                         PUSH_STK(); \
+//                         call_failed = true; \
+//                         break; \
+//                   } \
+//             } \
+//             \
+//             if (call_failed) { \
+//                   DISPATCH(); \
+//             } else { \
+//                   ip -= 6; \
+//                   DISPATCH_OPCODE(code[ip - 1]); \
+//             } \
+//       } \
+// } while(0)
+
+#define PATCH_AND_DISPATCH_CALL() \
 do { \
-      bool call_failed = false; \
       if (nsEntry) \
       { \
             *(Namespace::Entry**)&code[ip - 2] = nsEntry; \
             \
             switch (nsEntry->mType) \
             { \
-                  case Namespace::Entry::ConsoleFunctionType: \
-                        code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION; \
-                        break; \
-                  case Namespace::Entry::StringCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_STRING_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_STRING; \
-                                    break; \
-                  case Namespace::Entry::IntCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_INT_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_INT; \
-                                    break; \
-                  case Namespace::Entry::FloatCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_FLOAT_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_FLOAT; \
-                                    break; \
-                  case Namespace::Entry::VoidCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VOID_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_VOID; \
-                                    break; \
-                  case Namespace::Entry::BoolCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_BOOL_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_BOOL; \
-                                    break; \
-                  case Namespace::Entry::VectorCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VECTOR_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_VECTOR; \
-                                    break; \
-                  case Namespace::Entry::ConsoleValueCallbackType: \
-                        if (isMethod) code[ip - 7] = OP_CALLFUNC_VALUE_METHOD; \
-                              else code[ip - 7] = OP_CALLFUNC_VALUE; \
-                                    break; \
+                  case Namespace::Entry::ConsoleFunctionType:  code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION; break; \
+                  case Namespace::Entry::StringCallbackType:   code[ip - 7] = OP_CALLFUNC_STRING;  break; \
+                  case Namespace::Entry::IntCallbackType:      code[ip - 7] = OP_CALLFUNC_INT;  break; \
+                  case Namespace::Entry::FloatCallbackType:    code[ip - 7] = OP_CALLFUNC_FLOAT;  break; \
+                  case Namespace::Entry::VoidCallbackType:     code[ip - 7] = OP_CALLFUNC_VOID; break; \
+                  case Namespace::Entry::BoolCallbackType:     code[ip - 7] = OP_CALLFUNC_BOOL;  break; \
+                  case Namespace::Entry::VectorCallbackType:   code[ip - 7] = OP_CALLFUNC_VECTOR;  break; \
+                  case Namespace::Entry::ConsoleValueCallbackType: code[ip - 7] = OP_CALLFUNC_VALUE;  break; \
                   default: { \
                         Con::errorf("Invalid return type on function call!!!"); \
                         gCallStack.popFrame(); \
                         stack[_STK + 1].setEmptyString(); \
                         PUSH_STK(); \
-                        call_failed = true; \
+                        DISPATCH(); \
                         break; \
                   } \
             } \
             \
-            if (call_failed) { \
-                  DISPATCH(); \
-            } else { \
-                  ip -= 6; \
-                  DISPATCH_OPCODE(code[ip - 1]); \
-            } \
+            ip -= 6; \
+            DISPATCH_OPCODE(code[ip - 1]); \
       } \
 } while(0)
 
-
+#define PATCH_AND_DISPATCH_METHOD_CALL() \
+do { \
+      if (nsEntry) \
+      { \
+            *(Namespace::Entry**)&code[ip - 2] = nsEntry; \
+            \
+            switch (nsEntry->mType) \
+            { \
+                  case Namespace::Entry::ConsoleFunctionType:  code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION_METHOD; break; \
+                  case Namespace::Entry::StringCallbackType:   code[ip - 7] = OP_CALLFUNC_STRING_METHOD;  break; \
+                  case Namespace::Entry::IntCallbackType:      code[ip - 7] = OP_CALLFUNC_INT_METHOD;  break; \
+                  case Namespace::Entry::FloatCallbackType:    code[ip - 7] = OP_CALLFUNC_FLOAT_METHOD;  break; \
+                  case Namespace::Entry::VoidCallbackType:     code[ip - 7] = OP_CALLFUNC_VOID_METHOD; break; \
+                  case Namespace::Entry::BoolCallbackType:     code[ip - 7] = OP_CALLFUNC_BOOL_METHOD;  break; \
+                  case Namespace::Entry::VectorCallbackType:   code[ip - 7] = OP_CALLFUNC_VECTOR_METHOD;  break; \
+                  case Namespace::Entry::ConsoleValueCallbackType: code[ip - 7] = OP_CALLFUNC_VALUE_METHOD;  break; \
+                  default: { \
+                        Con::errorf("Invalid return type on function call!!!"); \
+                        gCallStack.popFrame(); \
+                        stack[_STK + 1].setEmptyString(); \
+                        PUSH_STK(); \
+                        DISPATCH(); \
+                        break; \
+                  } \
+            } \
+            \
+            ip -= 6; \
+            DISPATCH_OPCODE(code[ip - 1]); \
+      } \
+} while(0)
 // ~~~~~~~~~~~~ FUNCTION CALL ~~~~~~~~~~~~~~~~
 
 handle_OP_CALL_FUNCTION_CALL: {
@@ -3148,7 +3209,7 @@ handle_OP_CALL_FUNCTION_CALL: {
       }
 
       VALIDATE_CALL_AND_DISPATCH(false);
-      PATCH_AND_DISPATCH_CALL(false);
+      PATCH_AND_DISPATCH_CALL();
 }
 
 // ~~~~~~~~~~~~ STATIC CALL ~~~~~~~~~~~~~~~~
@@ -3172,7 +3233,7 @@ handle_OP_CALL_STATIC_CALL: {
       }
 
       VALIDATE_CALL_AND_DISPATCH(false);
-      PATCH_AND_DISPATCH_CALL(false);
+      PATCH_AND_DISPATCH_CALL();
 }
 
 
@@ -3210,7 +3271,7 @@ handle_OP_CALL_METHOD_CALL: {
             nsEntry = NULL;
 
       VALIDATE_CALL_AND_DISPATCH(true);
-      PATCH_AND_DISPATCH_CALL(true);
+      PATCH_AND_DISPATCH_METHOD_CALL();
 
 }
 
@@ -3254,7 +3315,7 @@ handle_OP_CALL_PARENT_CALL: {
             nsEntry = NULL;
       }
       VALIDATE_CALL_AND_DISPATCH(false);
-      PATCH_AND_DISPATCH_CALL(true);
+      PATCH_AND_DISPATCH_METHOD_CALL();
 }
 
 // ~~~~~~~~~~~~ CONSOLEFUNCTION ~~~~~~~~~~~~~~~~
@@ -3410,6 +3471,34 @@ handle_OP_CALLFUNC_VOID: {
 
 }
 // ~~~~~~~~~~~~~~ METHODS ... ~~~~~~~~~~~~~~~
+
+// ~~~~~~~~~~~~ CONSOLEFUNCTION METHOD~~~~~~~~~~~~~~~~
+// This is special i need to lookup nsEntry else the
+// namespace is broken after loading a module
+handle_OP_CALLFUNC_CONSOLEFUNCTION_METHOD: {
+      PREPARE_CALLFUNC();
+
+      simObjectLookupPtr = &callArgv[1];
+      thisObject = getThisObject(*simObjectLookupPtr);
+
+      ns = thisObject->getNamespace();
+      nsEntry = ns->lookup(fnName);
+
+      if (nsEntry->mFunctionOffset)
+      {
+            ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+            stack[_STK + 1] = (returnFromFn);
+      }
+      else // no body
+            stack[_STK + 1].setEmptyString();
+      PUSH_STK();
+
+      gCallStack.popFrame();
+      FINIT_CALLFUNC();
+      DISPATCH();
+}
+
+
 // ~~~~~~~~~~~~ VECTOR METHOD~~~~~~~~~~~~~~~~
 handle_OP_CALLFUNC_VECTOR_METHOD: {
 
@@ -3417,20 +3506,6 @@ handle_OP_CALLFUNC_VECTOR_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
-
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
 
       #ifdef ENABLE_CONSOLE_VECTOR
       ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
@@ -3454,20 +3529,6 @@ handle_OP_CALLFUNC_VALUE_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
-
       #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3490,20 +3551,6 @@ handle_OP_CALLFUNC_STRING_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
-
       const char* result = nsEntry->cb.mStringCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3523,20 +3570,6 @@ handle_OP_CALLFUNC_INT_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
-
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
 
       S64 result = nsEntry->cb.mIntCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3559,20 +3592,6 @@ handle_OP_CALLFUNC_FLOAT_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
-
       F32 result = nsEntry->cb.mFloatCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
 
@@ -3592,21 +3611,6 @@ handle_OP_CALLFUNC_BOOL_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
-
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
-
 
       bool result = nsEntry->cb.mBoolCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
@@ -3628,22 +3632,6 @@ handle_OP_CALLFUNC_VOID_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
-
-      ///
-      if (!thisObject) {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-
-      }
-
-      ns = thisObject->getNamespace();
-      if (ns)
-            nsEntry = ns->lookup(fnName);
-      else {
-            Con::errorf("YOU METHOD SUCKS: %s %s", __FILE__, __LINE__);
-            DISPATCH();
-      }
-      ///
 
       nsEntry->cb.mVoidCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
