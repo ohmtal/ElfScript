@@ -37,14 +37,14 @@ function StarField::OnAdd(%this) {
 
     %this.updateSize();
 
-    %this.add( %starPoints = new PointStorageObject(starPoints) {
+    %this.add( %this.starPoints = new PointStorageObject() {
         storageSize = STAR_COUNT;
     });
 
 
     for(%i in range STAR_COUNT)
     {
-        %starPoints.setPoint(%i, math.randomf($minH , $maxH),math.randomf($minW , $maxW), 1.0 );
+        %this.starPoints.setPoint(%i, math.randomf($minH , $maxH),math.randomf($minW , $maxW), 1.0 );
     }
 
     return true;
@@ -68,7 +68,8 @@ function StarField::Render(%this) {
     %speed = %this.speed;
     SDL_SetRenderDrawColor(%renderer, 255,255,255);
 
-    %lStarPoints = starPoints.getId(); // slightly faster
+
+    %lStarPoints = %this.starPoints.getId(); // slightly faster
 
     %ranMinH = $minH;
     %ranMaxH = $maxH;
@@ -80,10 +81,16 @@ function StarField::Render(%this) {
     {
         // this fetch/ setPoint combination is the fastest way i found so far.
         // the local vars are fast anyway.
-        %lStarPoints.fetchPoint(%i);
-        %pointX = %lStarPoints.x;
-        %pointY = %lStarPoints.y;
-        %pointZ = %lStarPoints.z - %dt * %speed;
+
+
+        // %lStarPoints.fetchPoint(%i);
+        // %pointX = %lStarPoints.x;
+        // %pointY = %lStarPoints.y;
+        // %pointZ = %lStarPoints.z - %dt * %speed;
+
+
+        [ %pointX , %pointY, %pointZ] = %lStarPoints.getPointVec(%i);
+        %pointZ -= %dt * %this.speed;
 
         // Calculate the screen position
         %invZ = 1.0 /  %pointZ;
@@ -125,10 +132,15 @@ function StarField::Render(%this) {
 
 
     %fontScale = 0.7;
-    SDL_SetRenderDrawColor(%renderer, 128,20,255);
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("%d FPS",$Global::FPS));
+    %text =  sprintf("[I] PointStorage and Tupple assign %d FPS",$Global::FPS);
+    SDL_SetRenderDrawColor(%renderer, 40,40,40);
+    SDL_RenderDebugText(%renderer, %scale10 + 1  , 1 , %text);
+    SDL_SetRenderDrawColor(%renderer, 128,20,255);
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , %text);
+
+
     SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%speed));
     SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
         ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));

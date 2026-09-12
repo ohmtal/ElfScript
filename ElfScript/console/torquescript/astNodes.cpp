@@ -1938,7 +1938,7 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
       {
             if (walk->varName[0] != '%') {
-                  Con::errorf("Tupple unpacking only supports local variables.");
+                  Con::errorf("Parse Error: Tuple unpacking only supports local variables.");
                   return 0;
             }
             argc++;

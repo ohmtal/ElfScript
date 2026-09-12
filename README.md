@@ -81,6 +81,8 @@ Located in Folder [CrazyElf](./CrazyElf):
 
 Based on the Torque3D (4.x) source code this is my version of TorqueScript without Torque3D. 
 
+- **ElfScript 0.8:** Local variable tuple assignment like: `[%foo, %bar] = "foo bar";` works with ConsoleVector, Array Object and Strings. 
+- **ElfScript 0.8:** Experimental function call optimization
 - **ElfScript 0.7:** added an Array object which can be used in script with this constuctor: `%arr = [ 1 , 2 ,3 ];`. It's methods names are loosly follow the naming of std::vector methods.
 - **ElfScript 0.7:** lexer/vm direct implemented math.* (math.randomf/math.sin/...) and print/printf/sprintf commands 
 - **ElfScript 0.7:** lexer is not longer case sensitive so you can use: for (%i IN Range 10) instead of everthing must be lowercase - so everything except defined constants like SDL_SCANCODE_UP (usually  upper case), is case insensitve. 

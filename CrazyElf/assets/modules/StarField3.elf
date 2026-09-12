@@ -72,11 +72,13 @@ function StarField::Render(%this) {
      %dt = $Global::FrameTime;
     %renderer = $Main.renderer;
 
-     SDL_SetRenderDrawColor(%renderer, 60, 60, 20);
+     SDL_SetRenderDrawColor(%renderer, 40, 40, 0);
      SDL_RenderClear(%renderer);
 
 
     SDL_SetRenderDrawColor(%renderer, 255,255,255);
+
+    %starArray = %this.starArray;
 
     // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
@@ -89,8 +91,7 @@ function StarField::Render(%this) {
 //
 
         // new tupple assignment
-        [ %pointX , %pointY, %pointZ] = %this.starArray.at( %i );
-
+        [ %pointX , %pointY, %pointZ] = %starArray.at( %i );
         %pointZ -= %dt * %this.speed;
 
         // Calculate the screen position
@@ -115,7 +116,7 @@ function StarField::Render(%this) {
             if ( (%t - %pointZ) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = %this.halfW  + ( %pointY * %invT);
+                %startX = %this.halfW  + ( %pointX * %invT);
                 %startY = %this.halfH  + (  %pointY * %invT);
 
                 SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
@@ -174,12 +175,11 @@ function StarField::Render(%this) {
     //     %this.starArray.set(%i, %pointVec);
     // }
 
-    // vardump("%pointVec");
 
     %fontScale = 0.7;
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    %text =  sprintf("[III] Array and LocalVar Tupple assign- %d FPS",$Global::FPS);
+    %text =  sprintf("[III] Array and Tupple assign %d FPS",$Global::FPS);
     SDL_SetRenderDrawColor(%renderer, 40,40,40);
     SDL_RenderDebugText(%renderer, %scale10 + 1  , 1 , %text);
     SDL_SetRenderDrawColor(%renderer, 128,20,255);

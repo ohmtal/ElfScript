@@ -723,6 +723,7 @@ $o = new Object();
 
 // ----------------------------------------------------------------------------
 printSeparator();
+print("----------------- Tuple Assign Test ----------------- ");
 %vec = {1,2,3,4};
 print("ConsoleVector");
 [ %v1, %v2, %v3 , %v4, %v5 , %v6] = %vec;
@@ -739,7 +740,6 @@ print("---");
 
 print("Single float");
 [ %v1, %v2, %v3 , %v4, %v5 , %v6] = 47.11;
-echo("ASSSING......");
 for (%i in 1..6)varDump("%v" @ %i);
 print("");
 print("---");
@@ -747,7 +747,6 @@ print("---");
 print("Single float VAR");
 %f = 47.11;
 [ %v1, %v2, %v3 , %v4, %v5 , %v6] = %f;
-echo("ASSSING......");
 for (%i in 1..6)varDump("%v" @ %i);
 print("");
 print("---");
