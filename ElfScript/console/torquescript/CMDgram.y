@@ -177,15 +177,17 @@ struct Token
 %type <intslot>   intslot_acc
 %type <stmt>   expression_stmt
 %type <var>    param
-%type <var>    var_list
-%type <var>    var_list_decl
+%type <var>    func_var_list
+%type <var>    func_var_list_decl
 %type <asn>    assign_op_struct
 /* ==================== new PoD* ============== */
 %type <expr> func_arg_item
 %type <expr> func_arg_list
 %type <expr> func_arg_list_decl
 /* ============================================ */
-
+// ElfScript 0.8 tuple
+%type <var>    unpack_var_list
+%type <var>    unpack_param
 
 // Operator precedence — lowest to highest.
 // FIX: opMDASN, opNDASN, opNTASN were listed here but were never defined
@@ -285,30 +287,30 @@ stmt
       { $$ = StrConstNode::alloc( $1.lineNumber, $1.value, false, true ); }
 
   // ElfScript 0.8 tupple unpacking
-   |  '[' var_list ']' '='  expr ';'
-   {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
+   |  '[' unpack_var_list ']' '='  expr ';'
+      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
    ;
 
 fn_decl_stmt
    // Global function
-   : rwDEFINE IDENT '(' var_list_decl ')' '{' statement_list '}'
+   : rwDEFINE IDENT '(' func_var_list_decl ')' '{' statement_list '}'
       { $$ = FunctionDeclStmtNode::alloc( $1.lineNumber, $2.value, NULL, $4, $7 ); }
    // Namespaced method:  function Namespace::name(...) { }
-   | rwDEFINE IDENT opCOLONCOLON IDENT '(' var_list_decl ')' '{' statement_list '}'
+   | rwDEFINE IDENT opCOLONCOLON IDENT '(' func_var_list_decl ')' '{' statement_list '}'
       { $$ = FunctionDeclStmtNode::alloc( $1.lineNumber, $4.value, $2.value, $6, $9 ); }
    ;
 
-var_list_decl
+func_var_list_decl
    :
       { $$ = NULL; }
-   | var_list
+   | func_var_list
       { $$ = $1; }
    ;
 
-var_list
+func_var_list
    : param
       { $$ = $1; }
-   | var_list ',' param
+   | func_var_list ',' param
       { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3 ); }
    ;
 
@@ -333,6 +335,22 @@ param
       { $$ = VarNode::allocParam($1.lineNumber, $1.value, $3); }
    | VAR '?' '=' expr
       { $$ = VarNode::allocParam($1.lineNumber, $1.value, $4); }
+   ;
+
+
+// ElfScript 0.8
+unpack_var_list
+   : unpack_param
+      { $$ = $1; }
+   | unpack_var_list ',' unpack_param
+      { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3); }
+   ;
+
+unpack_param
+   : VAR
+      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
+   | VAR '?'
+      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
    ;
 
 datablock_decl
