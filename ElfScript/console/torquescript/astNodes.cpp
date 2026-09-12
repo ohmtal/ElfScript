@@ -1945,14 +1945,26 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       }
 
       // now the source
-      // NOTE: preferedType not working so well
-      // // // // TypeReq preferedType =  expr->getPreferredType();
-      // // // // Con::printf("PREFERED TYPE:%d", (S32)preferedType);
-      // // // // ip = expr->compile(codeStream, ip, preferedType);
-      ip = expr->compile(codeStream, ip, TypeReqString);
+      // // ip = expr->compile(codeStream, ip, TypeReqString);
+      U32 exprCount = 0;
+      const U32 MAX_ELEMENTS = 16;
+      for (ExprNode* curExpr = argsList;
+           curExpr && exprCount < MAX_ELEMENTS;
+           curExpr = (ExprNode*)argsList->getNext() )
+      {
+            if (curExpr->getExprNodeNameEnum() ==  NameFloatNode || curExpr->getExprNodeNameEnum() ==  NameIntNode) {
+                  ip = curExpr->compile(codeStream, ip, TypeReqFloat);
+            } else {
+                  ip = curExpr->compile(codeStream, ip, TypeReqString);
+            }
+
+            exprCount++;
+      }
+
 
       codeStream.emit(OP_TUPPLE_ASSIGNMENT);
-      codeStream.emit(argc); // Count
+      codeStream.emit(argc); // Variable Count
+      codeStream.emit(exprCount); //expr (parameter) count
 
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
       {
@@ -1960,8 +1972,6 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
             codeStream.emit(getFuncVars(dbgLineNumber)->assign(walk->varName, TypeReqString, dbgLineNumber));
       }
 
-      // // // // if (preferedType != TypeReqNone)
-      codeStream.emit(OP_POP_STK);
 
       return codeStream.tell();
 }

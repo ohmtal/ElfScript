@@ -177,7 +177,7 @@ struct Token
 %type <intslot>   intslot_acc
 %type <stmt>   expression_stmt
 %type <var>    param
-%type <var>    var_list
+%type <var>    func_var_list
 %type <var>    var_list_decl
 %type <asn>    assign_op_struct
 /* ==================== new PoD* ============== */
@@ -185,7 +185,8 @@ struct Token
 %type <expr> func_arg_list
 %type <expr> func_arg_list_decl
 /* ============================================ */
-
+%type <var>   unpack_var_list
+%type <var>   unpack_param
 
 // Operator precedence — lowest to highest.
 // FIX: opMDASN, opNDASN, opNTASN were listed here but were never defined
@@ -285,8 +286,12 @@ stmt
       { $$ = StrConstNode::alloc( $1.lineNumber, $1.value, false, true ); }
 
   // ElfScript 0.8 tupple unpacking
-   |  '[' var_list ']' '='  expr ';'
-   {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
+   |  '[' unpack_var_list ']' '='  expr ';'
+      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
+   | '[' unpack_var_list ']' '=' '[' expr_list ']' ';'
+      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $6);}
+   | '[' unpack_var_list ']' '=' '{' expr_list '}' ';'
+      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $6);}
    ;
 
 fn_decl_stmt
@@ -301,14 +306,14 @@ fn_decl_stmt
 var_list_decl
    :
       { $$ = NULL; }
-   | var_list
+   | func_var_list
       { $$ = $1; }
    ;
 
-var_list
+func_var_list
    : param
       { $$ = $1; }
-   | var_list ',' param
+   | func_var_list ',' param
       { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3 ); }
    ;
 
@@ -334,6 +339,23 @@ param
    | VAR '?' '=' expr
       { $$ = VarNode::allocParam($1.lineNumber, $1.value, $4); }
    ;
+
+// ElfScript 0.8
+unpack_var_list
+   : unpack_param
+      { $$ = $1; }
+   | unpack_var_list ',' unpack_param
+      { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3); }
+   ;
+
+unpack_param
+   : VAR
+      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
+   | VAR '?'
+      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
+
+
+
 
 datablock_decl
    : rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt '}' ';'

@@ -621,10 +621,10 @@ namespace Script
 // Elfscript 0.8 tuple unpacking
 struct TupleUnpackingStmtNode : StmtNode
 {
-   VarNode* vars;
-   ExprNode* expr;
+   VarNode* vars = nullptr;
+   ExprNode* argsList = nullptr;
 
-   static TupleUnpackingStmtNode* alloc(S32 lineNumber, VarNode* vars,  ExprNode* expr);
+   static TupleUnpackingStmtNode* alloc(S32 lineNumber, VarNode* vars,  ExprNode* argsList);
    U32 compileStmt(CodeStream& codeStream, U32 ip) override;
    DBG_STMT_TYPE(TupleUnpackingStmtNode);
 };

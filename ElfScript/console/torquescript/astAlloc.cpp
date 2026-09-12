@@ -469,13 +469,13 @@ FunctionDeclStmtNode* FunctionDeclStmtNode::alloc(S32 lineNumber, StringTableEnt
 }
 
 // Elfscript 0.8 Tuple assignment  (XXTH) --------------------------------------------
-TupleUnpackingStmtNode* TupleUnpackingStmtNode::alloc(S32 lineNumber, VarNode* vars, ExprNode* expr)
+TupleUnpackingStmtNode* TupleUnpackingStmtNode::alloc(S32 lineNumber, VarNode* vars, ExprNode* argsList)
 {
       TupleUnpackingStmtNode* ret = (TupleUnpackingStmtNode*)consoleAlloc(sizeof(TupleUnpackingStmtNode));
       constructInPlace(ret);
       ret->dbgLineNumber = lineNumber;
       ret->vars = vars;
-      ret->expr = expr;
+      ret->argsList = argsList;
       return ret;
 }
 

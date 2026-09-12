@@ -1584,10 +1584,11 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_CMPNE_UINT: Con::printf("%i: OP_CMPNE_UINT stk=-1 ", ip - 1); break;
 
       case OP_TUPPLE_ASSIGNMENT: {
-            U32 count = code[ip];
-            Con::printf("%i: OP_TUPPLE_ASSIGNMENT stk=-1 variable count:%d", ip - 1, count);
-            ip++; //Count
-            ip+=count; //vars
+            U32 varCount = code[ip];
+            U32 paramCount = code[ip+1];
+            Con::printf("%i: OP_TUPPLE_ASSIGNMENT stk=-1 variable vars:%d params:%d", ip - 1, varCount, paramCount);
+            ip+=2; //Counts
+            ip+=varCount; //vars
             break;
 
       }
