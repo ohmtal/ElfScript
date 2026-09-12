@@ -283,6 +283,10 @@ stmt
       { $$ = TTagSetStmtNode::alloc( $1.lineNumber, $1.value, $3, $5 ); }
    | DOCBLOCK
       { $$ = StrConstNode::alloc( $1.lineNumber, $1.value, false, true ); }
+
+  // ElfScript 0.8 tupple unpacking
+   |  '[' var_list ']' '='  expr ';'
+   {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
    ;
 
 fn_decl_stmt

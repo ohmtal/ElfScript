@@ -229,6 +229,7 @@ namespace Compiler
       OP_MATH_RANDOMF_1,
       OP_MATH_RANDOMF_2,
 
+      OP_TUPPLE_ASSIGNMENT,
 
       OP_INVALID,   //
 

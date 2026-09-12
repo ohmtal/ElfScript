@@ -19,12 +19,20 @@ class Array: public SimObject
 public:
     DECLARE_CONOBJECT(Array);
     Vector<ConsoleValue> mValues;
+    ConsoleValue emptyValue;
 
     bool onAdd() override;
     void onRemove() override;
     void write(Stream &stream, U32 tabStop, U32 flags) override;
     void toFields(); // save array to _p fields
     void fromFields(bool removeFields = true); // load array from _p fields
+
+
+    // ------------------------------------------------------------------------
+    inline ConsoleValue& at(S32 index) {
+        if (!isIndexValid(index)) return emptyValue;
+        return mValues[index];
+    }
     // ------------------------------------------------------------------------
     S32 fromString(const char* text, bool doAdd = true);
     // ------------------------------------------------------------------------

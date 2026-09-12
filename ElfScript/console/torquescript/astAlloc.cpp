@@ -468,6 +468,24 @@ FunctionDeclStmtNode* FunctionDeclStmtNode::alloc(S32 lineNumber, StringTableEnt
    return ret;
 }
 
+// Elfscript 0.8 Tuple assignment  (XXTH) --------------------------------------------
+TupleUnpackingStmtNode* TupleUnpackingStmtNode::alloc(S32 lineNumber, VarNode* vars, ExprNode* expr)
+{
+      TupleUnpackingStmtNode* ret = (TupleUnpackingStmtNode*)consoleAlloc(sizeof(TupleUnpackingStmtNode));
+      constructInPlace(ret);
+      ret->dbgLineNumber = lineNumber;
+      ret->vars = vars;
+      ret->expr = expr;
+      return ret;
+}
+
+
+// TypeReq TupleUnpackingStmtNode::getPreferredType()
+// {
+//       return TypeReqString;
+// }
+
+
 // Elfscript PoD (XXTH) --------------------------------------------
 VectorConstructorNode* VectorConstructorNode::alloc(S32 lineNumber,bool arrayConstuctor)
 {

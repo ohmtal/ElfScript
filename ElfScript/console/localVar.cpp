@@ -325,6 +325,13 @@ DefineEngineFunction(varDumpField, void, (const char* variableName), , "local/gl
     ElfScript::varDumpDynamicField(variableName);
 }
 
+DefineEngineFunction(value, const char * , (const char* variableName), , "local/global value")
+{
+    if ( !variableName || variableName[0] == '\0') return "";
+   return(ElfScript::getLocalString(variableName)); //does both local and global
+
+}
+
 DefineEngineFunction(varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
     ElfScript::varDump(variableName);

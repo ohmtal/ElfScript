@@ -82,54 +82,108 @@ function StarField::Render(%this) {
     for( %i in range STAR_COUNT )
     {
 
-        %pointVec = %this.starArray.at( %i );
-        %pointVec.z -= %dt * %this.speed;
+//         %pointVec = %this.starArray.at( %i );
+//         %pointX = %pointVec.x;
+//         %pointY = %pointVec.y;
+//         %pointZ = %pointVec.z - %dt * %this.speed;
+//
+
+        // new tupple assignment
+        [ %pointX , %pointY, %pointZ] = %this.starArray.at( %i );
+
+        %pointZ -= %dt * %this.speed;
 
         // Calculate the screen position
-        %invZ = 1.0 /  %pointVec.z;
-        %screenPos_X = %this.halfW + (%pointVec.x * %invZ);
-        %screenPos_Y = %this.halfH + (%pointVec.y * %invZ);
+        %invZ = 1.0 /  %pointZ;
+        %screenPos_X = %this.halfW + (%pointX * %invZ);
+        %screenPos_Y = %this.halfH + (%pointY * %invZ);
 
-        if ( %pointVec.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+        if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
             || %screenPos_X > %this.screenWidth || %screenPos_Y > %this.screenHeight)
         {
-            %pointVec.x = math.randomf(%this.minW , %this.maxW);
-            %pointVec.y =  math.randomf(%this.minH , %this.maxH);
-            %pointVec.z = 1.0;
-            %screenPos_X = %this.halfW + %pointVec.x;
-            %screenPos_Y = %this.halfH + %pointVec.y;
+            %pointX = math.randomf(%this.minW , %this.maxW);
+            %pointY =  math.randomf(%this.minH , %this.maxH);
+            %pointZ = 1.0;
+            %screenPos_X = %this.halfW + %pointX;
+            %screenPos_Y = %this.halfH + %pointY;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%this.drawLines)
         {
-            %t = math.ClampF(%pointVec.z + START_DIV , 0.0 , 1.0 );
+            %t = math.ClampF(%pointZ + START_DIV , 0.0 , 1.0 );
 
-            if ( (%t - %pointVec.z) > 1e-3)
+            if ( (%t - %pointZ) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = %this.halfW  + ( %pointVec.x * %invT);
-                %startY = %this.halfH  + (  %pointVec.y * %invT);
+                %startX = %this.halfW  + ( %pointY * %invT);
+                %startY = %this.halfH  + (  %pointY * %invT);
 
                 SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
             }
         }
         else
         {
-            %radius = math.Lerp(2.0, 0.3, %pointVec.z);
+            %radius = math.Lerp(2.0, 0.3, %pointZ);
             // SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
             SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
         }
 
-        %this.starArray.set(%i, %pointVec);
+        %this.starArray.set(%i, { %pointX, %pointY, %pointZ});
     }
+    // for( %i in range STAR_COUNT )
+    // {
+    //
+    //     %pointVec = %this.starArray.at( %i );
+    //     %pointVec.z -= %dt * %this.speed;
+    //
+    //     // Calculate the screen position
+    //     %invZ = 1.0 /  %pointVec.z;
+    //     %screenPos_X = %this.halfW + (%pointVec.x * %invZ);
+    //     %screenPos_Y = %this.halfH + (%pointVec.y * %invZ);
+    //
+    //     if ( %pointVec.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+    //         || %screenPos_X > %this.screenWidth || %screenPos_Y > %this.screenHeight)
+    //     {
+    //         %pointVec.x = math.randomf(%this.minW , %this.maxW);
+    //         %pointVec.y =  math.randomf(%this.minH , %this.maxH);
+    //         %pointVec.z = 1.0;
+    //         %screenPos_X = %this.halfW + %pointVec.x;
+    //         %screenPos_Y = %this.halfH + %pointVec.y;
+    //     }
+    //     // <<<<<<<<<<<<<<<<<<<<<
+    //     if (%this.drawLines)
+    //     {
+    //         %t = math.ClampF(%pointVec.z + START_DIV , 0.0 , 1.0 );
+    //
+    //         if ( (%t - %pointVec.z) > 1e-3)
+    //         {
+    //             %invT = 1.0 / %t;
+    //             %startX = %this.halfW  + ( %pointVec.x * %invT);
+    //             %startY = %this.halfH  + (  %pointVec.y * %invT);
+    //
+    //             SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
+    //         }
+    //     }
+    //     else
+    //     {
+    //         %radius = math.Lerp(2.0, 0.3, %pointVec.z);
+    //         // SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
+    //         SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
+    //     }
+    //
+    //     %this.starArray.set(%i, %pointVec);
+    // }
 
     // vardump("%pointVec");
 
     %fontScale = 0.7;
-    SDL_SetRenderDrawColor(%renderer, 128,20,255);
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("[III] Points in a Array - %d FPS",$Global::FPS));
+    %text =  sprintf("[III] Array and LocalVar Tupple assign- %d FPS",$Global::FPS);
+    SDL_SetRenderDrawColor(%renderer, 40,40,40);
+    SDL_RenderDebugText(%renderer, %scale10 + 1  , 1 , %text);
+    SDL_SetRenderDrawColor(%renderer, 128,20,255);
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , %text);
     SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%this.speed));
     SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
     ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));

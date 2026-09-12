@@ -15,6 +15,7 @@
 IMPLEMENT_CONOBJECT(Array);
 // ----------------------------------------------------------------------------
 bool Array::onAdd()  {
+    emptyValue.reset();
     fromFields(true); //check if we have fields to merge
     return Parent::onAdd();
 }
@@ -117,8 +118,9 @@ S32 Array::fromString(const char* text, bool doAdd )
 
 // ----------------------------------------------------------------------------
 DefineEngineMethod(Array, at, ConsoleValue, (S32 index), , "fetch a value at index") {
-    if (!object->isIndexValid(index)) return ConsoleValue();
-    return object->mValues[index];
+    return object->at(index);
+    // if (!object->isIndexValid(index)) return ConsoleValue();
+    // return object->mValues[index];
 }
 
 DefineEngineMethod(Array, first, ConsoleValue, (), , "fetch first ") {

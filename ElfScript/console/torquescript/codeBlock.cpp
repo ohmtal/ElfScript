@@ -1583,6 +1583,16 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       case OP_CMPEQ_UINT: Con::printf("%i: OP_CMPEQ_UINT stk=-1 ", ip - 1); break;
       case OP_CMPNE_UINT: Con::printf("%i: OP_CMPNE_UINT stk=-1 ", ip - 1); break;
 
+      case OP_TUPPLE_ASSIGNMENT: {
+            U32 count = code[ip];
+            Con::printf("%i: OP_TUPPLE_ASSIGNMENT stk=-1 variable count:%d", ip - 1, count);
+            ip++; //Count
+            ip+=count; //vars
+            break;
+
+      }
+
+
       default:
          U32 curCodeIP = code[ip];
          Con::printSeparator();
@@ -1591,6 +1601,8 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
          break;
       }
    }
+
+
 
    smInFunction = false;
 }

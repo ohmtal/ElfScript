@@ -1483,6 +1483,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_MATH_RANDOMF_1,
          &&handle_OP_MATH_RANDOMF_2,
 
+         &&handle_OP_TUPPLE_ASSIGNMENT,
+
          &&handle_OP_INVALID
    };
 
@@ -5106,6 +5108,94 @@ handle_OP_MATH_RANDOMF:
       DISPATCH();
 }
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< INLINE COMMANDS <<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// ------------------ TUPPLE ASSIGNMENT
+handle_OP_TUPPLE_ASSIGNMENT: {
+
+      U32 count = code[ip++];
+      ConsoleValue * dstPtr = nullptr;
+      ConsoleValue * srcPtr = &stack[_STK];
+
+      // Con::debugf("handle_OP_TUPPLE_ASSIGNMENT count: %d _STK is: %d TYPE:%d value: %s", count, _STK, stack[_STK].type, stack[_STK].getString());
+
+      bool dstPtrFail = false;
+      switch (srcPtr->type) {
+            case cvVector:{
+                  for (S32 i = 0; i < count; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if  (!dstPtr) { dstPtrFail = true; break;}
+                        if (i < 4) dstPtr->setFloat(srcPtr->v.points[i]);
+                        else dstPtr->reset();
+                  }
+                  break;
+            }
+            case cvFloat: {
+                  for (S32 i = 0; i < count; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if  (!dstPtr) { dstPtrFail = true; break;}
+                        if (i < 1) dstPtr->setFloat(srcPtr->f);
+                        else dstPtr->reset();
+                  }
+                  break;
+            }
+            case cvInteger: {
+
+                  // check we have a Array object
+                  Array *arrPtr = dynamic_cast<Array*>(Sim::findObject(*srcPtr));
+                   if (arrPtr) {
+                         for (S32 i = 0; i < count; i++) {
+                               dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                               if  (!dstPtr) { dstPtrFail = true; break;}
+                               *dstPtr = arrPtr->at(i);
+                         }
+                   } else {
+                         for (S32 i = 0; i < count; i++) {
+                               dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                               if  (!dstPtr) { dstPtrFail = true; break;}
+                               if (i < 1) dstPtr->setInt(srcPtr->i);
+                               else dstPtr->reset();
+                         }
+                  }
+                  break;
+            }
+            default: { //guess it's a string slomo explode but still usable ;)
+                  const char* text = stack[_STK].getString();
+                  U32 unitCount = 0;
+                  const char* set = "\t\n";
+                  if (text || text[0] != '\0') {
+                        // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+                        unitCount =  StringUnit::getUnitCount( text, "\t\n" );
+                        // we only got no or one token - switch to space / tab separated
+                        if (unitCount < 2) {
+                              unitCount =  StringUnit::getUnitCount( text, " \t\n" );
+                              set = " \t\n";
+                        }
+                  }
+                  for (U32 i = 0; i < count; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if  (!dstPtr) { dstPtrFail = true; break;}
+                        if (i < unitCount) {
+                              const char * token = StringUnit::getUnit( text, i, set );
+                              if (isInt(token)) dstPtr->setInt(dAtol(token));
+                              else if (isFloat(token)) dstPtr->setFloat(dAtod(token));
+                              else dstPtr->setString(token);
+                        } else  {
+                              dstPtr->reset();
+                        }
+                  }
+            }
+
+      } //switch
+
+
+      if (dstPtrFail) {
+            Con::errorf("Failed to get destination variable!");
+      }
+
+      ip += count;
+      DISPATCH();
+}
+
 
 
 // ~~~~~~~~~~~~~~~~~ INVALID

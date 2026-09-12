@@ -709,11 +709,83 @@ $arr.list();
 
 $arr.clear();
 $arr.push_back({1,47.22, 2, 3});
+$arr.push_back("Die Kuh lief ....");
+$arr.push_back(47.11);
+$arr.push_back(47);
 
+
+
+
+$o = new Object();
+// NOTE %var0 is NOT %var[0] !!!!!
+%i = 0; %var[%i]=1; print("var0 is: 1:", %var0,":: 2:", %var[0],":: 3:", %var[%i]);
+
+
+// ----------------------------------------------------------------------------
+printSeparator();
+%vec = {1,2,3,4};
+print("ConsoleVector");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = %vec;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("Array ");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = $arr;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+
+print("Single float");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = 47.11;
+echo("ASSSING......");
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("Single float VAR");
+%f = 47.11;
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = %f;
+echo("ASSSING......");
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("Single int");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = 45;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("Single int VAR");
+%f = 45;
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = %f;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("normal string");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = "Die Kuh lief um den Teich";
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("normal string VAR");
+%s = "Die Kuh lief um den Teich";
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = %s;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("string TAB separated from Vector assignment");
+%mixedVec = {"Die", "Kuh", 45.4, 10};
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = %mixedVec;
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+$Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");
 
 printSeparator();
 printf("script %s load completed..... no parse errors....", $Con::File);
-
-$o = new Object();
-
-$Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");

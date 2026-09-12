@@ -54,10 +54,16 @@ function StarField::OnAdd(%this) {
     for(%i in range STAR_COUNT)
     {
 
+
         %o = new Object() {
-          TypeF64 x =  math.randomf(%this.minW , %this.maxW);
-          TypeF64 y =  math.randomf(%this.minW , %this.maxW);
-          TypeF64 z =  1.0;
+        // Testing ElfScript 0.8 auto assign
+            x =  math.randomf(%this.minW , %this.maxW);
+            y =  math.randomf(%this.minW , %this.maxW);
+            z =  1.0;
+            color = {math.randomf(60,255), math.randomf(60,255), math.randomf(60,255)};
+          // TypeF64 x =  math.randomf(%this.minW , %this.maxW);
+          // TypeF64 y =  math.randomf(%this.minW , %this.maxW);
+          // TypeF64 z =  1.0;
         };
 
         %this.starGroup.push_back(%o);
@@ -78,11 +84,11 @@ function StarField::Render(%this) {
      %dt = $Global::FrameTime;
     %renderer = $Main.renderer;
 
-     SDL_SetRenderDrawColor(%renderer, 10, 60, 60);
+     SDL_SetRenderDrawColor(%renderer, 10, 10, 10);
      SDL_RenderClear(%renderer);
 
 
-    SDL_SetRenderDrawColor(%renderer, 255,255,255);
+    SDL_SetRenderDrawColor(%renderer, 120,120,120);
 
     // using objects with group iter:
     foreach ( %pointVec in %this.starGroup )
@@ -104,6 +110,7 @@ function StarField::Render(%this) {
             %screenPos_X = %this.halfW + %pointVec.x;
             %screenPos_Y = %this.halfH + %pointVec.y;
         }
+        // SDL_SetRenderDrawColorVec(%renderer, %pointVec.color);
         // <<<<<<<<<<<<<<<<<<<<<
         if (%this.drawLines)
         {
@@ -121,17 +128,22 @@ function StarField::Render(%this) {
         else
         {
             %radius = math.Lerp(2.0, 0.3, %pointVec.z);
-            //SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
+            // SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
             SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
+            // SDL_RenderPoint(%renderer,  %screenPos_X, %screenPos_Y);
         }
 
     }
 
     %fontScale = 0.7;
-    SDL_SetRenderDrawColor(%renderer, 128,20,255);
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
-    SDL_RenderDebugText(%renderer, %scale10 , 0 , sprintf("[IV] Points in Objects - %d FPS",$Global::FPS));
+    %text = sprintf("[IV] Points in Objects - %d FPS",$Global::FPS);
+    SDL_SetRenderDrawColor(%renderer, 40,40,40);
+    SDL_RenderDebugText(%renderer, %scale10 + 1  , 1 , %text);
+    SDL_SetRenderDrawColor(%renderer,120,255,255);
+    SDL_RenderDebugText(%renderer, %scale10 , 0 , %text);
+
     SDL_RenderDebugText(%renderer, %scale10 , %scale10,sprintf("[MOUSE WHEEL] Current Speed: %.2f",%this.speed));
     SDL_RenderDebugText(%renderer, %scale10 ,20 / %fontScale
     ,sprintf("[SPACE] Current draw mode: %s", %this.drawLines ? "Lines" : "Rectangle" ));

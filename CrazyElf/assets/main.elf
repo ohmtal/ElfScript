@@ -223,6 +223,11 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
 
         if (%scancode == SDL_SCANCODE_HOME && %ctrl) ToggleVSync();
 
+        if (%scancode == SDL_SCANCODE_S && %ctrl) {
+            echo("switch to starfields");
+            starfields();
+        }
+
         if (%scancode == SDL_SCANCODE_R && %ctrl) {
             echo("Shortcut detected! Reload");
             rl();

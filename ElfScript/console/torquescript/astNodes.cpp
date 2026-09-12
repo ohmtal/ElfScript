@@ -1920,4 +1920,48 @@ U32 FunctionDeclStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 }
 
 
+// Elfscript 0.8 Tuple assignment  (XXTH) --------------------------------------------
+// uis
+U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
+{
 
+      // * OP_TUPPLE_ASSIGNMENT
+      // * COUNT
+      // * for count: destination Variable
+      // * src expr
+
+
+      // only for local vars at the moment
+      // check if we are fine:
+
+      U32 argc = 0;
+      for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
+      {
+            if (walk->varName[0] != '%') {
+                  Con::errorf("Tupple unpacking only supports local variables.");
+                  return 0;
+            }
+            argc++;
+      }
+
+      // now the source
+      // NOTE: preferedType not working so well
+      // // // // TypeReq preferedType =  expr->getPreferredType();
+      // // // // Con::printf("PREFERED TYPE:%d", (S32)preferedType);
+      // // // // ip = expr->compile(codeStream, ip, preferedType);
+      ip = expr->compile(codeStream, ip, TypeReqString);
+
+      codeStream.emit(OP_TUPPLE_ASSIGNMENT);
+      codeStream.emit(argc); // Count
+
+      for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
+      {
+            // allways fallback to string!
+            codeStream.emit(getFuncVars(dbgLineNumber)->assign(walk->varName, TypeReqString, dbgLineNumber));
+      }
+
+      // // // // if (preferedType != TypeReqNone)
+      codeStream.emit(OP_POP_STK);
+
+      return codeStream.tell();
+}
