@@ -177,7 +177,7 @@ struct Token
 %type <intslot>   intslot_acc
 %type <stmt>   expression_stmt
 %type <var>    param
-%type <var>    func_var_list
+%type <var>    var_list
 %type <var>    var_list_decl
 %type <asn>    assign_op_struct
 /* ==================== new PoD* ============== */
@@ -185,8 +185,7 @@ struct Token
 %type <expr> func_arg_list
 %type <expr> func_arg_list_decl
 /* ============================================ */
-%type <var>   unpack_var_list
-%type <var>   unpack_param
+
 
 // Operator precedence — lowest to highest.
 // FIX: opMDASN, opNDASN, opNTASN were listed here but were never defined
@@ -268,14 +267,14 @@ stmt
       { $$ = ReturnStmtNode::alloc( $1.lineNumber, NULL ); }
    | rwRETURN expr ';'
       { $$ = ReturnStmtNode::alloc( $1.lineNumber, $2 ); }
-//     /* ==================== new PoD* ============== */
-//    | rwRETURN '{' expr_list '}' ';'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$3;
-//          $$ = ReturnStmtNode::alloc( $1.lineNumber, vecNode );
-//       }
-//     /* ============================================ */
+    /* ==================== new PoD* ============== */
+   | rwRETURN '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$3;
+         $$ = ReturnStmtNode::alloc( $1.lineNumber, vecNode );
+      }
+    /* ============================================ */
    | expression_stmt ';'
       { $$ = $1; }
    | TTAG '=' expr ';'
@@ -286,12 +285,8 @@ stmt
       { $$ = StrConstNode::alloc( $1.lineNumber, $1.value, false, true ); }
 
   // ElfScript 0.8 tupple unpacking
-   |  '[' unpack_var_list ']' '='  expr ';'
-      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
-   | '[' unpack_var_list ']' '=' '[' expr_list ']' ';'
-      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $6);}
-   | '[' unpack_var_list ']' '=' '{' expr_list '}' ';'
-      {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $6);}
+   |  '[' var_list ']' '='  expr ';'
+   {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
    ;
 
 fn_decl_stmt
@@ -306,14 +301,14 @@ fn_decl_stmt
 var_list_decl
    :
       { $$ = NULL; }
-   | func_var_list
+   | var_list
       { $$ = $1; }
    ;
 
-func_var_list
+var_list
    : param
       { $$ = $1; }
-   | func_var_list ',' param
+   | var_list ',' param
       { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3 ); }
    ;
 
@@ -339,23 +334,6 @@ param
    | VAR '?' '=' expr
       { $$ = VarNode::allocParam($1.lineNumber, $1.value, $4); }
    ;
-
-// ElfScript 0.8
-unpack_var_list
-   : unpack_param
-      { $$ = $1; }
-   | unpack_var_list ',' unpack_param
-      { $$ = $1; ((StmtNode*)($1))->append((StmtNode*)$3); }
-   ;
-
-unpack_param
-   : VAR
-      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
-   | VAR '?'
-      { $$ = VarNode::allocParam($1.lineNumber, $1.value, NULL); }
-
-
-
 
 datablock_decl
    : rwDATABLOCK class_name_expr '(' expr parent_block ')' '{' slot_assign_list_opt '}' ';'
@@ -570,20 +548,20 @@ expr
          falseNode->argList = (ExprNode*)$8;
          { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, trueNode, falseNode); }
    }
-//    | expr '?' expr ':' '{' expr_list '}'
-//    {
-// //     ElfScript 0.7g
-//          VectorConstructorNode* falseNode = VectorConstructorNode::alloc($1->dbgLineNumber);
-//          falseNode->argList = (ExprNode*)$6;
-//          { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, $3, falseNode); }
-//    }
-//    | expr '?' '{' expr_list '}' ':' expr
-//    {
-// //     ElfScript 0.7g
-//          VectorConstructorNode* trueNode = VectorConstructorNode::alloc($1->dbgLineNumber);
-//          trueNode->argList = (ExprNode*)$4;
-//          { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, trueNode, $7); }
-//    }
+   | expr '?' expr ':' '{' expr_list '}'
+   {
+//     ElfScript 0.7g
+         VectorConstructorNode* falseNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         falseNode->argList = (ExprNode*)$6;
+         { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, $3, falseNode); }
+   }
+   | expr '?' '{' expr_list '}' ':' expr
+   {
+//     ElfScript 0.7g
+         VectorConstructorNode* trueNode = VectorConstructorNode::alloc($1->dbgLineNumber);
+         trueNode->argList = (ExprNode*)$4;
+         { $$ = ConditionalExprNode::alloc( $1->dbgLineNumber, $1, trueNode, $7); }
+   }
    | expr '<' expr
       { $$ = IntBinaryExprNode::alloc( $1->dbgLineNumber, $2.value, $1, $3); }
    | expr '>' expr
@@ -640,23 +618,6 @@ expr
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, NULL); }
    | VAR '[' aidx_expr ']'
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, $3 ); }
-   /* ====================  PoD: ==================== */
-   | '{' expr_list '}'
-      {
-         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-         vecNode->argList = (ExprNode*)$4;
-         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
-      }
-   /* ==================== Array Constructor: ==================== */
-   | '[' expr_list ']'
-      {
-         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
-         vecNode->argList = (ExprNode*)$4;
-         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
-      }
-  /* ======================================================================= */
-
-
 
    ;
 
@@ -721,21 +682,21 @@ stmt_expr
    | VAR '=' expr
       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, $3); }
 
-//    /* ==================== new PoD* ==================== */
-//    | VAR '=' '{' expr_list '}'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$4;
-//          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
-//       }
-//
-//    /* ==================== new Array Constructor ==================== */
-//    | VAR '=' '[' expr_list ']'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
-//          vecNode->argList = (ExprNode*)$4;
-//          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
-//       }
+   /* ==================== new PoD* ==================== */
+   | VAR '=' '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
+      }
+
+   /* ==================== new Array Constructor ==================== */
+   | VAR '=' '[' expr_list ']'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, NULL, vecNode);
+      }
 
    /* ============================================================================== */
 
@@ -743,12 +704,12 @@ stmt_expr
       { $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, $6); }
 
    /* ==================== new PoD* ============== */
-//    | VAR '[' aidx_expr ']' '=' '{' expr_list '}'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//           vecNode->argList = (ExprNode*)$7;
-//          $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, vecNode);
-//       }
+   | VAR '[' aidx_expr ']' '=' '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+          vecNode->argList = (ExprNode*)$7;
+         $$ = AssignExprNode::alloc( $1.lineNumber, $1.value, $3, vecNode);
+      }
    /* ============================================================================== */
 
    | VAR assign_op_struct
@@ -820,14 +781,14 @@ funcall_expr
 func_arg_item
    : expr
       { $$ = $1; }
-//    | '{' expr_list '}'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$2;
-// //          for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
-// //             vecNode->elements.push_back(expr);
-// //          }
-//          $$ = vecNode;
+   | '{' expr_list '}'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$2;
+//          for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
+//             vecNode->elements.push_back(expr);
+//          }
+         $$ = vecNode;
       }
    ;
 
@@ -952,47 +913,47 @@ slot_assign
    : IDENT '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, $3); }
 
-//    /* ==================== new PoD: ==================== */
-//    | IDENT '=' '{' expr_list '}' ';'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$4;
-//          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
-//       }
-//    /* ==================== Array Constructor: ==================== */
-//    | IDENT '=' '[' expr_list ']' ';'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
-//          vecNode->argList = (ExprNode*)$4;
-//          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
-//       }
-//   /* ======================================================================= */
+   /* ==================== new PoD: ==================== */
+   | IDENT '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
+      }
+   /* ==================== Array Constructor: ==================== */
+   | IDENT '=' '[' expr_list ']' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber, true);
+         vecNode->argList = (ExprNode*)$4;
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $1.value, vecNode);
+      }
+  /* ======================================================================= */
 
    | TYPEIDENT IDENT '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, $4, $1.value); }
 
-//    /* ==================== new: PoD ================= */
-//    | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$5;
-//          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, vecNode, $1.value);
-//       }
-//    /* ======================================================================= */
+   /* ==================== new: PoD ================= */
+   | TYPEIDENT IDENT '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$5;
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, $2.value, vecNode, $1.value);
+      }
+   /* ======================================================================= */
 
    | rwDATABLOCK '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, NULL, StringTable->insert("datablock"), $3); }
    | IDENT '[' aidx_expr ']' '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, $6); }
 
-//    /* ==================== new PoD ======================= */
-//    | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
-//       {
-//          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
-//          vecNode->argList = (ExprNode*)$7;
-//          $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, vecNode);
-//       }
-//    /* ======================================================================= */
+   /* ==================== new PoD ======================= */
+   | IDENT '[' aidx_expr ']' '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
+         vecNode->argList = (ExprNode*)$7;
+         $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $3, $1.value, vecNode);
+      }
+   /* ======================================================================= */
    | TYPEIDENT IDENT '[' aidx_expr ']' '=' expr ';'
       { $$ = SlotAssignNode::alloc( $1.lineNumber, NULL, $4, $2.value, $7, $1.value); }
    ;
