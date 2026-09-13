@@ -4372,8 +4372,8 @@ handle_OP_ITER_ARRAY:
             DISPATCH(); // continue;
       }
 
-      // iter.mConsoleValue->copyFrom( array->mValues[index] );
-      iter.mConsoleValue =  &array->mValues[index];
+      iter.mConsoleValue->copyFrom( array->mValues[index] );
+      //sucks! iter.mConsoleValue =  &array->mValues[index];
 
       iter.mData.mObj.mIndex = index + 1;
 
@@ -5143,7 +5143,7 @@ handle_OP_MATH_RANDOMF:
 handle_OP_TUPLE_ASSIGNMENT: {
 
       U32 varCount = code[ip++];
-      Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d paramcount:%d", varCount);
+      Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d", varCount);
       // _STK is: %d TYPE:%d value: %s", count, _STK, stack[_STK].type, stack[_STK].getString());
 
       ConsoleValue * dstPtr = nullptr;

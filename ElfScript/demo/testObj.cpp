@@ -443,4 +443,8 @@ DefineEngineFunction(isTypeTest, void, (),,"") {
 
     for (S32 i = 0; i < 4; i++) Con::printf("%s => int:%d float:%d", a[i],  isInt(a[i]), isFloat(a[i]) );
 }
-
+// need to be s simObject!
+// /*
+// DefineEngineFunction(CrazyLambda, void, (Namespace::Entry* e),, "") {
+//
+// }*/
