@@ -3507,6 +3507,7 @@ handle_OP_CALLFUNC_VOID: {
 // ~~~~~~~~~~~~ CONSOLEFUNCTION METHOD~~~~~~~~~~~~~~~~
 // This is special i need to lookup nsEntry else the
 // namespace is broken after loading a module
+// so the cahed ptr is useless :/
 handle_OP_CALLFUNC_CONSOLEFUNCTION_METHOD: {
       PREPARE_CALLFUNC();
 

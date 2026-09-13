@@ -444,7 +444,33 @@ DefineEngineFunction(isTypeTest, void, (),,"") {
     for (S32 i = 0; i < 4; i++) Con::printf("%s => int:%d float:%d", a[i],  isInt(a[i]), isFloat(a[i]) );
 }
 // need to be s simObject!
-// /*
-// DefineEngineFunction(CrazyLambda, void, (Namespace::Entry* e),, "") {
-//
-// }*/
+
+// // // DefineEngineFunction(CallLambda, ConsoleValue, (ConsoleValue lambdaValue),, "") {
+// // //     ConsoleValue result;
+// // //     result.reset();
+// // //     if  (  lambdaValue.type != ConsoleValueType::cvLambda || !lambdaValue.dataPtr) {
+// // //         Con::errorf("LAMBDA Error: function not found!");
+// // //         return result;
+// // //
+// // //     }
+// // //     Namespace::Entry* nsEntry = reinterpret_cast<Namespace::Entry*>(lambdaValue.dataPtr);
+// // //
+// // //     if (!nsEntry || !nsEntry->mFunctionOffset) {
+// // //         Con::errorf("LAMBDA Error: function is invalid!");
+// // //         return result;
+// // //     }
+// // //     // i could use a vector and push the address for arguments:
+// // //     U32 callArgc = 2;
+// // //     ConsoleValue callArgv[2];
+// // //     callArgv[0].setString( nsEntry->mFunctionName);
+// // //     callArgv[1].setString("Babsack!");
+// // //     result = nsEntry->mModule->exec(nsEntry->mFunctionOffset,
+// // //                                     nsEntry->mFunctionName,
+// // //                                     nsEntry->mNamespace,
+// // //                                     callArgc, callArgv,
+// // //                                     false, nsEntry->mPackage).value;
+// // //
+// // //
+// // //     return result;
+// // //
+// // // }

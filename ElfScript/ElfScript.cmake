@@ -232,6 +232,10 @@ set ( OBJECTS_SRC
     ${CMAKE_CURRENT_LIST_DIR}/objects/KeyValueStringTable.h
     ${CMAKE_CURRENT_LIST_DIR}/objects/KeyValueStringTable.cpp
 
+    # Lambda helpers
+    ${CMAKE_CURRENT_LIST_DIR}/objects/LambdaMappings.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/objects/LambdaMappings.h
+
 
 )
 
