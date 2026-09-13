@@ -421,11 +421,9 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
                   }
 
                   if (isNegative) {
-                        // Con::errorf("NEGATIVE STEP!!!");
                         iterOPCode = OP_ITER_FOR_INT_RANGE_NEG;
                         mode = 4; //overwrite !!
                   } else {
-                        // Con::errorf("POSITIVE STEP!!!");
                         iterOPCode = OP_ITER_FOR_INT_RANGE;
                   }
             }
@@ -1376,7 +1374,7 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       case FuncCallExprNode::MethodCall:    codeStream.emit(OP_CALL_METHOD_CALL);    break;
       case FuncCallExprNode::ParentCall:    codeStream.emit(OP_CALL_PARENT_CALL);    break;
       default:
-            Con::errorf(" FuncCallExprNode::compile something is really wrong here unknown FuncCallExprNode : %d", callType);
+            Con::errorf(" FuncCallExprNode::compile something is really wrong here unknown FuncCallExprNode : %d (%s:%d)", callType, dbgFileName, dbgLineNumber);
             return 0;
             break;
    }
@@ -1938,7 +1936,7 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
       {
             if (walk->varName[0] != '%') {
-                  Con::errorf("Parse Error: Tuple unpacking only supports local variables.");
+                  Con::errorf("Parse Error: Tuple unpacking only supports local variables. %s:%d", dbgFileName, dbgLineNumber);
                   return 0;
             }
             argc++;
@@ -1952,7 +1950,7 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       }
 
 
-      codeStream.emit(OP_TUPPLE_ASSIGNMENT);
+      codeStream.emit(OP_TUPLE_ASSIGNMENT);
       codeStream.emit(argc); // Variable Count
 
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
@@ -1963,4 +1961,57 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
 
       return codeStream.tell();
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// ElfScript 0.8 Lamda
+U32 LambdaLoadExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
+      if (type == TypeReqNone) {
+            Con::errorf("Parse Error Lamba expression needs to be assigned! %s:%d", dbgFileName, dbgLineNumber);
+            return 0;
+      }
+
+      functionDeclStmtNode->compileStmt(codeStream, ip);
+      codeStream.emit(OP_LAMBDA_LOAD);
+      if (type == TypeReqNone) codeStream.emit(OP_POP_STK);
+      return codeStream.tell();
+}
+// .....
+U32 LambdaCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
+
+      S32 count = 0;
+      for (ExprNode* walk = args; walk; walk = static_cast<ExprNode*>(walk->getNext()))
+            count++;
+
+      codeStream.emit(OP_PUSH_FRAME);
+      codeStream.emit(count);
+
+      for (ExprNode* walk = args; walk; walk = static_cast<ExprNode*>(walk->getNext()))
+      {
+            TypeReq walkType = walk->getPreferredType();
+            if (walkType == TypeReqNone)
+                  walkType = TypeReqString;
+
+            ip = walk->compile(codeStream, ip, walkType);
+            codeStream.emit(OP_PUSH);
+      }
+
+      codeStream.emit(OP_LAMBDA_CALL);
+      bool isGlobal = varName[0] == '$';
+      codeStream.emit(isGlobal);
+      if (isGlobal)
+            codeStream.emitSTE(varName);
+      else {
+            codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName, TypeReqString, dbgLineNumber));
+            codeStream.emit(0); //fill up
+      }
+
+
+      if (type == TypeReqNone)
+            codeStream.emit(OP_POP_STK);
+
+      return codeStream.tell();
+
+
+
 }

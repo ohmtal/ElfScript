@@ -47,6 +47,9 @@ public:
    void setFloatVariable(F64 val);
    void setStringVariable(const char *str);
 
+   void* getPointerVariable();
+   void setPointerVariable(void* val);
+
    ConsoleValue* getConsoleValue(); //ElfScript
 
 #ifdef  ENABLE_CONSOLE_VECTOR
@@ -73,6 +76,11 @@ public:
       return currentRegisterArray->values[reg].getFloat();
    }
 
+   TORQUE_FORCEINLINE void* getLocalPointerVariable(S32 reg)
+   {
+      return currentRegisterArray->values[reg].getPointer();
+   }
+
    TORQUE_FORCEINLINE const char* getLocalStringVariable(S32 reg)
    {
       return currentRegisterArray->values[reg].getString();
@@ -86,6 +94,11 @@ public:
    TORQUE_FORCEINLINE void setLocalFloatVariable(S32 reg, F64 val)
    {
       currentRegisterArray->values[reg].setFloat(val);
+   }
+
+   TORQUE_FORCEINLINE void setLocalPointerVariable(S32 reg, void* val, U32 type = cvLambda)
+   {
+      currentRegisterArray->values[reg].setPointer(val, type);
    }
 
    TORQUE_FORCEINLINE void setLocalStringVariable(S32 reg, const char* val, S32 len)

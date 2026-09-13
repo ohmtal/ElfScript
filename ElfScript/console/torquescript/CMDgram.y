@@ -119,6 +119,8 @@ struct Token
 %token <i> rwFMOD rwMIN rwMAX rwATAN2 rwPOW
 %token <i> rwCLAMP rwCLAMPF rwLERP rwSMOOTHSTEP
 
+// ElfScript 0.8
+%token <i> rwFN
 
 %union {
    Token< char >           c;
@@ -650,7 +652,17 @@ expr
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, NULL); }
    | VAR '[' aidx_expr ']'
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, $3 ); }
+   // ElfScript 0.8 lamda
+   | rwFN '(' func_var_list_decl ')' '{' statement_list '}'
+      {
+         char lambdaName[64];
+         static unsigned int lambdaCounter = 0;
+         dSprintf(lambdaName, 64, "__lambda_%u", lambdaCounter++);
 
+         StmtNode* node =  FunctionDeclStmtNode::alloc($1.lineNumber, StringTable->insert(lambdaName), NULL, $3, $6);
+
+         $$ = LambdaLoadExprNode::alloc($1.lineNumber, node);
+      }
    ;
 
 slot_acc
@@ -807,6 +819,10 @@ funcall_expr
    // Method call:  object.method(args)
    | expr '.' IDENT '(' func_arg_list_decl ')'
       { $1->append($5); $$ = FuncCallExprNode::alloc( $1->dbgLineNumber, $3.value, NULL, $1, true); }
+   // ElfScript 0.8 lamda
+   | VAR '(' func_arg_list_decl ')'
+      { $$ = LambdaCallExprNode::alloc($1.lineNumber, $1.value, $3); }
+
    ;
 
 
@@ -817,9 +833,6 @@ func_arg_item
       {
          VectorConstructorNode* vecNode = VectorConstructorNode::alloc($1.lineNumber);
          vecNode->argList = (ExprNode*)$2;
-//          for (ExprNode* expr = (ExprNode*)$2; expr; expr = (ExprNode*)(expr->next)) {
-//             vecNode->elements.push_back(expr);
-//          }
          $$ = vecNode;
       }
    ;

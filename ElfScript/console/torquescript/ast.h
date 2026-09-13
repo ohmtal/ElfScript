@@ -686,5 +686,31 @@ struct CommandStmtNode : ExprNode
    DBG_STMT_TYPE(CommandStmtNode);
 };
 // ---------------------------------------------------------------
+// Elfscript 0.8 Lamda :D
+struct LambdaLoadExprNode : ExprNode
+{
+   StmtNode* functionDeclStmtNode; // not sure i need it
 
-#endif
+   static LambdaLoadExprNode* alloc(S32 lineNumber, StmtNode* functionDeclStmtNode);
+
+   U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
+   TypeReq getPreferredType() override;
+   DBG_STMT_TYPE(LambdaLoadExprNode);
+};
+//....
+struct LambdaCallExprNode : ExprNode
+{
+   StringTableEntry varName;
+   ExprNode* args;
+
+   static LambdaCallExprNode* alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args);
+
+   U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
+   TypeReq getPreferredType() override;
+   DBG_STMT_TYPE(LambdaCallExprNode);
+};
+
+
+
+
+#endif // _AST_H_

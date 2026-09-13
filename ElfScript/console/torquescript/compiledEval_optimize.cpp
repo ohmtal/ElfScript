@@ -155,6 +155,8 @@ do { \
 } while(0)
 
 
+// XXTH ElfScript 0.8 inline LAMBDA attepmt
+Namespace::Entry* gLastFuncDecl = nullptr;
 
 
 ConsoleValue stack[MaxStackSize];
@@ -795,6 +797,17 @@ void ExprEvalState::setStringVariable(const char *val)
    AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
 }
+
+void* ExprEvalState::getPointerVariable() {
+        return currentVariable ? currentVariable->getPointerValue() : nullptr;
+}
+
+void ExprEvalState::setPointerVariable(void* val)
+{
+      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      currentVariable->setPointerValue(val);
+}
+
 #ifdef  ENABLE_CONSOLE_VECTOR
 void ExprEvalState::setVectorVariable(ConsoleVector vec)
 {
@@ -1483,7 +1496,10 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_MATH_RANDOMF_1,
          &&handle_OP_MATH_RANDOMF_2,
 
-         &&handle_OP_TUPPLE_ASSIGNMENT,
+         &&handle_OP_TUPLE_ASSIGNMENT,
+
+         &&handle_OP_LAMBDA_LOAD,
+         &&handle_OP_LAMBDA_CALL,
 
          &&handle_OP_INVALID
    };
@@ -1529,9 +1545,11 @@ handle_OP_FUNC_DECL:
 
             const U32 fnArgc = code[ip + 8];
 
-            Namespace::Entry* temp = ns->lookup(fnName);
-            temp->mArgFlags.setSize(fnArgc);
-            temp->mDefaultOffsets.setSize(fnArgc);
+            // ElfScript 0.8 LAMBDA attempt
+            // Namespace::Entry* temp = ns->lookup(fnName);
+            gLastFuncDecl = ns->lookup(fnName);
+            gLastFuncDecl->mArgFlags.setSize(fnArgc);
+            gLastFuncDecl->mDefaultOffsets.setSize(fnArgc);
 
             // Arg flags: ip + 10 + fnArgc
             // Codelet IPs: ip + 10 + 2*fnArgc
@@ -1540,8 +1558,8 @@ handle_OP_FUNC_DECL:
 
             for (U32 fa = 0; fa < fnArgc; ++fa)
             {
-                  temp->mArgFlags[fa] = code[flagBase + fa];
-                  temp->mDefaultOffsets[fa] = code[offsetBase + fa];
+                  gLastFuncDecl->mArgFlags[fa] = code[flagBase + fa];
+                  gLastFuncDecl->mDefaultOffsets[fa] = code[offsetBase + fa];
             }
 
             // No stack pops: mDefaultValues is gone.
@@ -2264,7 +2282,8 @@ handle_OP_LOADVAR_STR:
 #ifdef ENABLE_CONSOLE_VECTOR
                               valueType == ConsoleValueType::cvVector ||
 #endif
-                              valueType == ConsoleValueType::cvInteger;
+                              valueType == ConsoleValueType::cvInteger ||
+                              valueType == ConsoleValueType::cvLambda;
             }
             if (fastPath)
             {
@@ -2295,6 +2314,11 @@ handle_OP_SAVEVAR_STR:
             DISPATCH();
       }
 
+      if (stack[_STK].type == cvLambda) {
+            Script::gEvalState.setPointerVariable(stack[_STK].getPointer());
+            DISPATCH();
+      }
+
       if (stack[_STK].type == cvFloat) {
             Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
             DISPATCH();
@@ -2305,6 +2329,7 @@ handle_OP_SAVEVAR_STR:
             DISPATCH();
       }
 #endif
+
 
       Script::gEvalState.setStringVariable(stack[_STK].getString());
       DISPATCH();
@@ -2352,7 +2377,8 @@ handle_OP_LOAD_LOCAL_VAR_STR:
 #ifdef ENABLE_CONSOLE_VECTOR
                   varType == ConsoleValueType::cvVector ||
 #endif
-                  varType == ConsoleValueType::cvInteger
+                  varType == ConsoleValueType::cvInteger ||
+                  varType == ConsoleValueType::cvLambda
             )
             {
                   //fast fetch
@@ -2429,6 +2455,11 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          if (stack[_STK].type == cvInteger) {
             Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
             DISPATCH();
+         }
+
+         if (stack[_STK].type == cvLambda) {
+               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvLambda);
+               DISPATCH();
          }
 
          if (stack[_STK].type == cvFloat) {
@@ -5109,7 +5140,7 @@ handle_OP_MATH_RANDOMF:
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< INLINE COMMANDS <<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // ------------------ TUPPLE ASSIGNMENT
-handle_OP_TUPPLE_ASSIGNMENT: {
+handle_OP_TUPLE_ASSIGNMENT: {
 
       U32 varCount = code[ip++];
       Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d paramcount:%d", varCount);
@@ -5187,7 +5218,61 @@ handle_OP_TUPPLE_ASSIGNMENT: {
       DISPATCH();
 }
 
+// ~~~~~~~~~~~~~~~~~ LAMBDA
+handle_OP_LAMBDA_LOAD: {
+      stack[_STK+1].setPointer(gLastFuncDecl, cvLambda);
+      PUSH_STK();
+      DISPATCH();
+}
+handle_OP_LAMBDA_CALL: {
+      bool isGlobal = code[ip++] == 1;
+      ConsoleValue* srcValuePtr = nullptr;
+      if (isGlobal)
+      {
+            StringTableEntry varName = CodeToSTE(code, ip);
+            srcValuePtr = Con::gGlobalVars.add(varName)->getValuePtr();
+      }
+      else
+      {
+            srcValuePtr =  Script::gEvalState.getLocalConsoleValuePtr(code[ip]);
+      }
+      ip += 2;
+      if (!srcValuePtr || srcValuePtr->type != ConsoleValueType::cvLambda || !srcValuePtr->dataPtr) {
+            Con::errorf("LAMBDA Error: function not found!");
+            DISPATCH();
+      }
+      Con::printf("Found LAMBDA function: %p", srcValuePtr->dataPtr);
 
+      nsEntry = reinterpret_cast<Namespace::Entry*>(srcValuePtr->dataPtr);
+
+      if (!nsEntry) {
+            Con::errorf("LAMBDA Error: function is invalid!");
+            DISPATCH();
+      }
+
+
+      if (!Script::gEvalState.stack.empty())
+      {
+            Script::gEvalState.getCurrentFrame().module = this;
+            Script::gEvalState.getCurrentFrame().ip = ip - 1;
+      }
+
+      gCallStack.argvc(fnName, callArgc, &callArgv);
+
+      if (nsEntry->mFunctionOffset)
+      {
+            ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+            stack[_STK + 1] = (returnFromFn);
+      }
+      else // no body
+            stack[_STK + 1].setEmptyString();
+
+      PUSH_STK();
+
+      gCallStack.popFrame();
+
+      DISPATCH();
+}
 
 // ~~~~~~~~~~~~~~~~~ INVALID
 handle_OP_INVALID:

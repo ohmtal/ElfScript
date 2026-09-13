@@ -378,6 +378,16 @@ public:
          return value.getString();
       }
 
+
+      inline void setPointerValue(void* ptr, U32 type = cvLambda) {
+            value.type = type;
+            value.dataPtr = ptr;
+      }
+
+      inline void* getPointerValue() {
+            return value.dataPtr;
+      }
+
       // ElfScript !
       // void setIntValue(U32 val)
       inline void setIntValue(S64 val)
@@ -404,6 +414,7 @@ public:
          if (notify)
             notify->trigger();
       }
+
 
       // ElfScript !
       // void setFloatValue(F32 val)

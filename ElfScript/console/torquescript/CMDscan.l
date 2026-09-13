@@ -296,6 +296,9 @@ HEXDIGIT [a-fA-F0-9]
 "math.clampf"       { CMDlval.i = MakeToken<int>(rwCLAMPF,         yylineno); return rwCLAMPF;          }
 "math.lerp"        { CMDlval.i = MakeToken<int>(rwLERP,           yylineno); return rwLERP;          }
 "math.smoothstep"  { CMDlval.i = MakeToken<int>(rwSMOOTHSTEP,     yylineno); return rwSMOOTHSTEP;          }
+
+"fn"  { CMDlval.i = MakeToken<int>(rwFN,     yylineno); return rwFN;          }
+
 %{
 // Boolean literals — return INTCONST so the parser treats them as integers.
 %}

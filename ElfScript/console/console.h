@@ -129,9 +129,8 @@ typedef const char *StringTableEntry;
 
 enum ConsoleValueType
 {
-#ifdef ENABLE_CONSOLE_VECTOR
+   cvLambda   =          -7,
    cvVector  =          -6,
-#endif
    cvNULL =             -5,
    cvInteger =          -4,
    cvFloat =            -3,
@@ -295,6 +294,7 @@ public:
             case ConsoleValueType::cvVector: v = {0}; break;
             case ConsoleValueType::cvFloat:  f = 0.0; break;
             case ConsoleValueType::cvInteger: i = 0; break;
+            case ConsoleValueType::cvLambda: dataPtr = nullptr; break;
             default: setEmptyString(); break;
       }
    }
@@ -314,6 +314,7 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
+      case ConsoleValueType::cvLambda: return 0.0;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
@@ -338,6 +339,8 @@ public:
          return static_cast<S64>(f);
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
+
+      case ConsoleValueType::cvLambda: return 0;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);
@@ -361,6 +364,7 @@ public:
       case ConsoleValueType::cvVector:
          return (v.points[0] != 0.0f);
 #endif
+      case ConsoleValueType::cvLambda: return dataPtr != nullptr;
       // case ConsoleValueType::cvInteger:
       //    return (i != 0);
       case ConsoleValueType::cvFloat:
@@ -390,6 +394,8 @@ public:
       case ConsoleValueType::cvVector:
             TORQUE_CASE_FALLTHROUGH;
 #endif
+      case ConsoleValueType::cvLambda:
+            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvFloat:
             TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvInteger:
@@ -475,6 +481,18 @@ public:
    {
          s = (val && len > 0) ? const_cast<char*>(StringTable->insert(val, len)) : const_cast<char*>(StringTable->EmptyString());
          type = ConsoleValueType::cvSTEntry;
+   }
+
+
+
+   TORQUE_FORCEINLINE void setPointer(void* ptr, const U32 assigntype = cvLambda) {
+         this->type = assigntype;
+         this->dataPtr = ptr;
+   }
+
+   TORQUE_FORCEINLINE void* getPointer() {
+         if (type == cvLambda) return this->dataPtr;
+         return nullptr;
    }
 
 

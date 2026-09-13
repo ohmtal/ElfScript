@@ -705,7 +705,7 @@ U32 CommandStmtNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
                         i++;
                   }
                   if (i!=elementCount) {
-                        Con::errorf("elementCount MISSMATCH !!!!");
+                        Con::errorf("elementCount MISSMATCH %s:%d!!!!", dbgFileName, dbgLineNumber);
 
                   }
 
@@ -729,3 +729,32 @@ TypeReq CommandStmtNode::getPreferredType()
 }
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// ElfScript 0.8 Lamda
+LambdaLoadExprNode* LambdaLoadExprNode::alloc(S32 lineNumber, StmtNode* functionDeclStmtNode)
+{
+      LambdaLoadExprNode* ret = (LambdaLoadExprNode*)consoleAlloc(sizeof(LambdaLoadExprNode));
+      constructInPlace(ret);
+      ret->dbgLineNumber = lineNumber;
+      ret->functionDeclStmtNode = functionDeclStmtNode;
+      return ret;
+}
+TypeReq LambdaLoadExprNode::getPreferredType()
+{
+      return TypeReqString; //hackfest
+}
+
+
+LambdaCallExprNode* LambdaCallExprNode::alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args)
+{
+      LambdaCallExprNode* ret = (LambdaCallExprNode*)consoleAlloc(sizeof(LambdaCallExprNode));
+      constructInPlace(ret);
+      ret->dbgLineNumber = lineNumber;
+      ret->varName = varName;
+      ret->args = args;
+      return ret;
+}
+TypeReq LambdaCallExprNode::getPreferredType()
+{
+      return TypeReqString; //hackfest
+}
