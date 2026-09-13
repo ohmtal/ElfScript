@@ -71,11 +71,22 @@ char* ConsoleValue::convertToBuffer() const
         return buffer;
    }
 #endif
+   if (type == ConsoleValueType::cvLambda) {
+
+        char* buffer = static_cast<char*>(sConversionAllocator.alloc(128));
+        Namespace::Entry* entry = nullptr;
+        if ( this->dataPtr && ( entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr))) {
+            dSprintf(buffer, 64, "%s", entry->mFunctionName);
+        } else {
+            dSprintf(buffer, 64, "%s", "INVALID!");
+        }
+        return buffer;
+   }
+
 
    char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
-   if (type == ConsoleValueType::cvLambda)
-      dSprintf(buffer, 32, "%p", (void*)dataPtr);
-   else if (type == ConsoleValueType::cvFloat)
+
+   if (type == ConsoleValueType::cvFloat)
       dSprintf(buffer, 32, "%#.9g", f);
    else
       dSprintf(buffer, 32, "%lld", i);

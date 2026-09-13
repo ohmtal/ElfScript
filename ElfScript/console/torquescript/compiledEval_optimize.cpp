@@ -1945,7 +1945,7 @@ handle_OP_JMPIF:
 handle_OP_JMPIFNOT_NP:
       if (stack[_STK].getInt())
       {
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
             ip++;
             DISPATCH(); //break;
       }
@@ -1955,7 +1955,7 @@ handle_OP_JMPIFNOT_NP:
 handle_OP_JMPIF_NP:
       if (!stack[_STK].getInt())
       {
-            POP_STK(); //XXTH memfix attempt orig: _STK--;
+            POP_STK();
             ip++;
             DISPATCH(); //break;
       }
@@ -5241,7 +5241,6 @@ handle_OP_LAMBDA_CALL: {
             Con::errorf("LAMBDA Error: function not found!");
             DISPATCH();
       }
-      Con::printf("Found LAMBDA function: %p", srcValuePtr->dataPtr);
 
       nsEntry = reinterpret_cast<Namespace::Entry*>(srcValuePtr->dataPtr);
 
@@ -5249,6 +5248,7 @@ handle_OP_LAMBDA_CALL: {
             Con::errorf("LAMBDA Error: function is invalid!");
             DISPATCH();
       }
+      Con::printf("Found LAMBDA function: %p function name: %s", srcValuePtr->dataPtr, nsEntry->mFunctionName);
 
 
       if (!Script::gEvalState.stack.empty())

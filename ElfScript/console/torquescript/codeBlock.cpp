@@ -772,9 +772,11 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
    U32 ip = startIp;
    smInFunction = false;
    U32 endFuncIp = 0;
+   S32 ignoreNextIfInvalid = false;
 
    while (ip < codeSize)
    {
+
       if (ip > endFuncIp)
       {
          smInFunction = false;
@@ -853,6 +855,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIFFNOT stk=-1 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -860,6 +863,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIFNOT stk=-1 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -867,6 +871,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIFF stk=-1 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -874,6 +879,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIF stk=-1 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -881,6 +887,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIFNOT_NP stk=-1 or 0 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -888,6 +895,7 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
       {
          Con::printf("%i: OP_JMPIF_NP stk=-1 or 0 ip=%i", ip - 1, code[ip]);
          ++ip;
+         ignoreNextIfInvalid = 2;
          break;
       }
 
@@ -1601,12 +1609,15 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             break;
 
       default:
-         U32 curCodeIP = code[ip];
-         Con::printSeparator();
-         Con::printf("%i: !!INVALID!! (curCodeIP: %u) ", ip - 1, curCodeIP);
-         Con::printSeparator();
+         if (ignoreNextIfInvalid > 0) {
+            U32 curCodeIP = code[ip];
+            Con::printSeparator();
+            Con::printf("%i: !!INVALID!! (curCodeIP: %u) ", ip - 1, curCodeIP);
+            Con::printSeparator();
+         }
          break;
       }
+      if (ignoreNextIfInvalid > 0) ignoreNextIfInvalid --;
    }
 
 

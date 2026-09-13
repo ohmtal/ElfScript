@@ -314,7 +314,7 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
-      case ConsoleValueType::cvLambda: return 0.0;
+      case ConsoleValueType::cvLambda: return (F64)(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
@@ -340,7 +340,7 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
 
-      case ConsoleValueType::cvLambda: return 0;
+      case ConsoleValueType::cvLambda: return dataPtr != nullptr;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);

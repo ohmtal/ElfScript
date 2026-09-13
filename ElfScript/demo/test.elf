@@ -813,8 +813,8 @@ print("---");
 
 
 
-printSeparator();
-$Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");
 
 printSeparator();
 printf("script %s load completed..... no parse errors....", $Con::File);
+
+$Debug::DumpByteCode=1; print("Enable $Debug::DumpByteCode");

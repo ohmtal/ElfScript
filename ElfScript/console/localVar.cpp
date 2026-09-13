@@ -26,6 +26,7 @@ namespace ElfScript {
             // case ConsoleValueType::cvString:  return "String";
             case ConsoleValueType::cvSTEntry: return "String";
             case ConsoleValueType::cvConsoleValueType: return "Console";
+            case ConsoleValueType::cvLambda: return "Lambda function";
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
             #endif
