@@ -722,16 +722,6 @@ $o = new Object();
 
 
 // ----------------------------------------------------------------------------
-// printSeparator();
-// print("----------------- Tuple Assign by ArgList ----------------- ");
-// print("Vecor {1,2,3,4,5,HUHU}");
-// [ %v1, %v2, %v3 , %v4, %v5 , %v6] = [1,2,3,4,5];
-// for (%i in 1..6)varDump("%v" @ %i);
-// print("");
-// print("---");
-//
-// return;
-
 printSeparator();
 print("----------------- Tuple Assign Test ----------------- ");
 %vec = {1,2,3,4};
@@ -795,6 +785,31 @@ print("");
 print("---");
 
 
+printSeparator();
+print("----------------- Tuple Assign by ArgList ----------------- ");
+print("Vecor {1,2,3,4,5,HUHU}");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = {1.01,2.01,3.00,4,5,"HUHU"};
+for (%i in 1..6)varDump("%v" @ %i);
+print("");
+print("---");
+
+print("tuple Swapping and less parameters");
+%a = 1.0; %b = 2.0; %c = 3.0;
+[ %a, %b, %c ] = [%b, %a];
+varDump("%a");
+varDump("%b");
+varDump("%c");
+print("");
+print("---");
+
+print("less variables");
+%a = 1.0; %b = 2.0; %c = 3.0;
+[ %a ] = [%c, %b, %a];
+varDump("%a");
+varDump("%b");
+varDump("%c");
+print("");
+print("---");
 
 
 

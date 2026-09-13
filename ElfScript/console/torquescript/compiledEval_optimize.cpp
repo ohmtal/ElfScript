@@ -1500,7 +1500,6 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 handle_OP_FUNC_DECL:
 {
       //NOTE XXTH we have noCalls but we want to load the functions!
-      // NOTE rolled back cause memory leak!!
       //orig: if (!noCalls)
       {
             fnName = CodeToSTE(code, ip);
@@ -5113,91 +5112,77 @@ handle_OP_MATH_RANDOMF:
 handle_OP_TUPPLE_ASSIGNMENT: {
 
       U32 varCount = code[ip++];
-      U32 paramCount = code[ip++];
-      Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d paramcount:%d", varCount, paramCount);
+      Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d paramcount:%d", varCount);
       // _STK is: %d TYPE:%d value: %s", count, _STK, stack[_STK].type, stack[_STK].getString());
 
       ConsoleValue * dstPtr = nullptr;
-      if (paramCount == 1)
-      {
-            ConsoleValue * srcPtr = &stack[_STK];
+      ConsoleValue * srcPtr = &stack[_STK];
 
 
-            switch (srcPtr->type) {
-                  case cvVector:{
-                        for (S32 i = 0; i < varCount; i++) {
-                              dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                              if (i < 4) dstPtr->setFloat(srcPtr->v.points[i]);
-                              else dstPtr->reset();
-                        }
-                        break;
+      switch (srcPtr->type) {
+            case cvVector:{
+                  for (S32 i = 0; i < varCount; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if (i < CONSOLE_VALUE_VECTOR_FIELD_COUNT) dstPtr->setFloat(srcPtr->v.points[i]);
+                        else dstPtr->reset();
                   }
-                  case cvFloat: {
-                        for (S32 i = 0; i < varCount; i++) {
-                              dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                              if (i < 1) dstPtr->setFloat(srcPtr->f);
-                              else dstPtr->reset();
-                        }
-                        break;
-                  }
-                  case cvInteger: {
-
-                        // check we have a Array object
-                        Array *arrPtr = dynamic_cast<Array*>(Sim::findObject(*srcPtr));
-                        if (arrPtr) {
-                              for (S32 i = 0; i < varCount; i++) {
-                                    dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                                    *dstPtr = arrPtr->at(i);
-                              }
-                        } else {
-                              for (S32 i = 0; i < varCount; i++) {
-                                    dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                                    if (i < 1) dstPtr->setInt(srcPtr->i);
-                                    else dstPtr->reset();
-                              }
-                        }
-                        break;
-                  }
-                  default: { //guess it's a string slomo explode but still usable ;)
-                        const char* text = stack[_STK].getString();
-                        U32 unitCount = 0;
-                        const char* set = "\t\n";
-                        if (text || text[0] != '\0') {
-                              // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
-                              unitCount =  StringUnit::getUnitCount( text, "\t\n" );
-                              // we only got no or one token - switch to space / tab separated
-                              if (unitCount < 2) {
-                                    unitCount =  StringUnit::getUnitCount( text, " \t\n" );
-                                    set = " \t\n";
-                              }
-                        }
-                        for (U32 i = 0; i < varCount; i++) {
-                              dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                              if (i < unitCount) {
-                                    const char * token = StringUnit::getUnit( text, i, set );
-                                    if (isInt(token)) dstPtr->setInt(dAtol(token));
-                                    else if (isFloat(token)) dstPtr->setFloat(dAtod(token));
-                                    else dstPtr->setString(token);
-                              } else  {
-                                    dstPtr->reset();
-                              }
-                        }
-                  }
-
-            } //switch
-            POP_STK();
-      } else {
-            for (S32 i = 0; i < paramCount; i++) {
-                  if (i < varCount) {
-                      dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
-                      *dstPtr = stack[_STK];
-                  }
-
-                 POP_STK();
+                  break;
             }
-      }
+            case cvFloat: {
+                  for (S32 i = 0; i < varCount; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if (i < 1) dstPtr->setFloat(srcPtr->f);
+                        else dstPtr->reset();
+                  }
+                  break;
+            }
+            case cvInteger: {
 
+                  // check we have a Array object
+                  Array *arrPtr = dynamic_cast<Array*>(Sim::findObject(*srcPtr));
+                  if (arrPtr) {
+                        for (S32 i = 0; i < varCount; i++) {
+                              dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                              *dstPtr = arrPtr->at(i);
+                        }
+                  } else {
+                        for (S32 i = 0; i < varCount; i++) {
+                              dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                              if (i < 1) dstPtr->setInt(srcPtr->i);
+                              else dstPtr->reset();
+                        }
+                  }
+                  break;
+            }
+            default: { //guess it's a string slomo explode but still usable ;)
+                  const char* text = stack[_STK].getString();
+                  U32 unitCount = 0;
+                  const char* set = "\t\n";
+                  if (text || text[0] != '\0') {
+                        // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
+                        unitCount =  StringUnit::getUnitCount( text, "\t\n" );
+                        // we only got no or one token - switch to space / tab separated
+                        if (unitCount < 2) {
+                              unitCount =  StringUnit::getUnitCount( text, " \t\n" );
+                              set = " \t\n";
+                        }
+                  }
+                  for (U32 i = 0; i < varCount; i++) {
+                        dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
+                        if (i < unitCount) {
+                              const char * token = StringUnit::getUnit( text, i, set );
+                              if (isInt(token)) dstPtr->setInt(dAtol(token));
+                              else if (isFloat(token)) dstPtr->setFloat(dAtod(token));
+                              else dstPtr->setString(token);
+                        } else  {
+                              dstPtr->reset();
+                        }
+                  }
+            }
 
+      } //switch
+
+      POP_STK();
       ip += varCount;
       DISPATCH();
 }

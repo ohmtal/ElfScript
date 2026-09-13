@@ -289,7 +289,21 @@ stmt
   // ElfScript 0.8 tupple unpacking
    |  '[' unpack_var_list ']' '='  expr ';'
       {  $$ = TupleUnpackingStmtNode::alloc( $2->dbgLineNumber , $2, $5);}
+   | '[' unpack_var_list ']' '=' '{' expr_list '}' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($2->dbgLineNumber);
+         vecNode->argList = (ExprNode*)$6;
+         $$ = TupleUnpackingStmtNode::alloc($2->dbgLineNumber, $2, vecNode);
+      }
+   | '[' unpack_var_list ']' '=' '[' expr_list ']' ';'
+      {
+         VectorConstructorNode* vecNode = VectorConstructorNode::alloc($2->dbgLineNumber);
+         vecNode->argList = (ExprNode*)$6;
+         $$ = TupleUnpackingStmtNode::alloc($2->dbgLineNumber, $2, vecNode);
+      }
+
    ;
+
 
 fn_decl_stmt
    // Global function

@@ -1945,26 +1945,15 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       }
 
       // now the source
-      // // ip = expr->compile(codeStream, ip, TypeReqString);
-      U32 exprCount = 0;
-      const U32 MAX_ELEMENTS = 16;
-      for (ExprNode* curExpr = argsList;
-           curExpr && exprCount < MAX_ELEMENTS;
-           curExpr = (ExprNode*)argsList->getNext() )
-      {
-            if (curExpr->getExprNodeNameEnum() ==  NameFloatNode || curExpr->getExprNodeNameEnum() ==  NameIntNode) {
-                  ip = curExpr->compile(codeStream, ip, TypeReqFloat);
-            } else {
-                  ip = curExpr->compile(codeStream, ip, TypeReqString);
-            }
-
-            exprCount++;
+      if (argsList->getExprNodeNameEnum() ==  NameFloatNode || argsList->getExprNodeNameEnum() ==  NameIntNode) {
+            ip = argsList->compile(codeStream, ip, TypeReqFloat);
+      } else {
+            ip = argsList->compile(codeStream, ip, TypeReqString);
       }
 
 
       codeStream.emit(OP_TUPPLE_ASSIGNMENT);
       codeStream.emit(argc); // Variable Count
-      codeStream.emit(exprCount); //expr (parameter) count
 
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
       {

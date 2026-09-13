@@ -1585,9 +1585,8 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
 
       case OP_TUPPLE_ASSIGNMENT: {
             U32 varCount = code[ip];
-            U32 paramCount = code[ip+1];
-            Con::printf("%i: OP_TUPPLE_ASSIGNMENT stk=-1 variable vars:%d params:%d", ip - 1, varCount, paramCount);
-            ip+=2; //Counts
+            Con::printf("%i: OP_TUPPLE_ASSIGNMENT stk=-1 variable vars:%d ", ip - 1, varCount);
+            ip+=1; //Count
             ip+=varCount; //vars
             break;
 

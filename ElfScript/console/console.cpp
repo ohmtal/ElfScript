@@ -75,7 +75,7 @@ char* ConsoleValue::convertToBuffer() const
    char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
    
    if (type == ConsoleValueType::cvFloat)
-      dSprintf(buffer, 32, "%.9g", f);
+      dSprintf(buffer, 32, "%#.9g", f);
    else
       dSprintf(buffer, 32, "%lld", i);
 
