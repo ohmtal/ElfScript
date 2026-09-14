@@ -42,13 +42,14 @@ testLocalGlobal("%uniqeB");
 %fun = fn() {
     print ("----------- LAMDA ---------");
     whereami();
-    #uniqeA = 5;
     testLocalGlobal("%uniqeA");
     testLocalGlobal("%uniqeB");
 };
 
 %fun();
 
+    :uniqeC = 5;
+    print("TEST C is",:uniqeC);
 return;
 
 // ============================================================================
