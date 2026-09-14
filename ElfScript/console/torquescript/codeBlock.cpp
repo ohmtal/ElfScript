@@ -1608,6 +1608,21 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
             ip+=3;
             break;
 
+      case OP_SAVE_PARENTSCOPE_VAR:
+      {
+            Con::printf("%i: OP_SAVE_PARENTSCOPE_VAR stk=0 reg=%i", ip - 1, code[ip]);
+            ++ip;
+            break;
+      }
+
+      case OP_LOAD_PARENTSCOPE_VAR:
+      {
+            Con::printf("%i: OP_LOAD_PARENTSCOPE_VAR stk=+1 reg=%i", ip - 1, code[ip]);
+            ++ip;
+            break;
+      }
+
+
       default:
          if (ignoreNextIfInvalid > 0) {
             U32 curCodeIP = code[ip];

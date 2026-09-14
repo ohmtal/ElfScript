@@ -201,6 +201,8 @@ void FuncVars::listExising() {
 
 S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
 {
+
+
    std::unordered_map<StringTableEntry, Var>::iterator found = vars.find(var);
 
    if (found == vars.end())
@@ -214,8 +216,11 @@ S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
       if (lineNumber > 0 && splitLines.size() > lineNumber)
          lineText = splitLines[lineNumber - 1].c_str();
 
-      const char* str = avar("Script Warning: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
-      scriptErrorHandler(str);
+      // Elfscript 0.8 Parent
+      if (var[0] != '#' ) {
+            const char* str = avar("Script Warning lookup: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
+            scriptErrorHandler(str);
+      }
 
       return assign(var, TypeReqString, lineNumber, false);
    }
@@ -226,6 +231,7 @@ S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
 
 TypeReq FuncVars::lookupType(StringTableEntry var, S32 lineNumber)
 {
+
    std::unordered_map<StringTableEntry, Var>::iterator found = vars.find(var);
 
    if (found == vars.end())
@@ -239,8 +245,11 @@ TypeReq FuncVars::lookupType(StringTableEntry var, S32 lineNumber)
       if (lineNumber > 0 && splitLines.size() > lineNumber)
          lineText = splitLines[lineNumber-1].c_str();
 
-      const char* str = avar("Script Warning: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
-      scriptErrorHandler(str);
+      // Elfscript 0.8 Parent
+      if (var[0] != '#' ) {
+            const char* str = avar("Script Warning lookupType: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
+            scriptErrorHandler(str);
+      }
 
       assign(var, TypeReqString, lineNumber, false);
       return vars.find(var)->second.currentType;

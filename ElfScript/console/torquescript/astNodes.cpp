@@ -859,14 +859,25 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    }
    else
    {
-      switch (type)
-      {
-      case TypeReqUInt:  codeStream.emit(OP_LOAD_LOCAL_VAR_UINT); break;
-      case TypeReqFloat: codeStream.emit(OP_LOAD_LOCAL_VAR_FLT); break;
-      default:           codeStream.emit(OP_LOAD_LOCAL_VAR_STR);
+      //ElfScript 0.8
+      if ( varName[0] == '#') {
+             codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
+             FuncVars* lFuncVars = &gGlobalScopeFuncVars;
+             codeStream.emit(lFuncVars->lookup(varName, dbgLineNumber));
+
+
+      } else {
+
+            switch (type)
+            {
+            case TypeReqUInt:  codeStream.emit(OP_LOAD_LOCAL_VAR_UINT); break;
+            case TypeReqFloat: codeStream.emit(OP_LOAD_LOCAL_VAR_FLT); break;
+            default:           codeStream.emit(OP_LOAD_LOCAL_VAR_STR);
+            }
+            codeStream.emit(getFuncVars(dbgLineNumber)->lookup(varName, dbgLineNumber));
       }
 
-      codeStream.emit(getFuncVars(dbgLineNumber)->lookup(varName, dbgLineNumber));
+
    }
 
    return codeStream.tell();
@@ -1100,21 +1111,34 @@ U32 AssignExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       }
       switch (subType)
       {
-      case TypeReqString: codeStream.emit(OP_SAVEVAR_STR);  break;
-      case TypeReqUInt:   codeStream.emit(OP_SAVEVAR_UINT); break;
-      case TypeReqFloat:  codeStream.emit(OP_SAVEVAR_FLT);  break;
-      default: break;
+            case TypeReqString: codeStream.emit(OP_SAVEVAR_STR);  break;
+            case TypeReqUInt:   codeStream.emit(OP_SAVEVAR_UINT); break;
+            case TypeReqFloat:  codeStream.emit(OP_SAVEVAR_FLT);  break;
+            default: break;
       }
    }
    else
    {
-      switch (subType)
-      {
-      case TypeReqUInt:  codeStream.emit(OP_SAVE_LOCAL_VAR_UINT); break;
-      case TypeReqFloat: codeStream.emit(OP_SAVE_LOCAL_VAR_FLT); break;
-      default:           codeStream.emit(OP_SAVE_LOCAL_VAR_STR);
+
+      //ElfScript 0.8 #
+      if ( varName[0] == '#') {
+            codeStream.emit(OP_SAVE_PARENTSCOPE_VAR);
+            // FIXME REWRITE varName[0] = '%';
+            FuncVars* lFuncVars = &gGlobalScopeFuncVars;
+            codeStream.emit(lFuncVars->assign(varName,
+                        subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
+      } else {
+
+            switch (subType)
+            {
+                  case TypeReqUInt:  codeStream.emit(OP_SAVE_LOCAL_VAR_UINT); break;
+                  case TypeReqFloat: codeStream.emit(OP_SAVE_LOCAL_VAR_FLT); break;
+                  default:           codeStream.emit(OP_SAVE_LOCAL_VAR_STR);
+            }
+            codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName,
+                        subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
       }
-      codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName, subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
+
    }
 
    if (type == TypeReqNone)
@@ -1208,14 +1232,15 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    getAssignOpTypeOp(op, subType, operand);
    precompileIdent(varName);
 
-   bool oldVariables = arrayIndex || varName[0] == '$';
+   // FIXME fastpath ElfScript 0.8 for '#'
+   bool oldVariables = arrayIndex || varName[0] == '$' || varName[0] == '#';
 
    if ((op == opPLUSPLUS || op == opMINUSMINUS) && !oldVariables && type == TypeReqNone)
    {
 
       if (op == opPLUSPLUS) {
             const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
-            codeStream.emit(OP_INC); //ElfScript orig
+            codeStream.emit(OP_INC);
             codeStream.emit(varIdx);
       } else {
             const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
@@ -1232,26 +1257,41 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
       if (oldVariables)
       {
-         if (!arrayIndex)
-         {
-            codeStream.emit(OP_SETCURVAR_CREATE);
-            codeStream.emitSTE(varName);
+         //ElfScript 0.8 slowmo path
+         if (varName[0] == '#') {
+               FuncVars* lFuncVars = &gGlobalScopeFuncVars;
+               const S32 varIdx =lFuncVars->lookup(varName, dbgLineNumber);
+               codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
+               codeStream.emit(varIdx);
+               codeStream.emit(operand);
+               codeStream.emit(OP_SAVE_PARENTSCOPE_VAR);
+               codeStream.emit(varIdx);
          }
          else
          {
-            codeStream.emit(OP_LOADIMMED_IDENT);
-            codeStream.emitSTE(varName);
+               if (!arrayIndex)
+               {
+                     codeStream.emit(OP_SETCURVAR_CREATE);
+                     codeStream.emitSTE(varName);
+               }
 
-            //codeStream.emit(OP_ADVANCE_STR);
-            ip = arrayIndex->compile(codeStream, ip, TypeReqString);
-            codeStream.emit(OP_REWIND_STR);
-            codeStream.emit(OP_SETCURVAR_ARRAY_CREATE);
-            if (type == TypeReqNone)
-               codeStream.emit(OP_POP_STK);
+               else
+               {
+                     codeStream.emit(OP_LOADIMMED_IDENT);
+                     codeStream.emitSTE(varName);
+
+                     //codeStream.emit(OP_ADVANCE_STR);
+                     ip = arrayIndex->compile(codeStream, ip, TypeReqString);
+                     codeStream.emit(OP_REWIND_STR);
+                     codeStream.emit(OP_SETCURVAR_ARRAY_CREATE);
+                     if (type == TypeReqNone)
+                           codeStream.emit(OP_POP_STK);
+               }
+               codeStream.emit((subType == TypeReqFloat) ? OP_LOADVAR_FLT : OP_LOADVAR_UINT);
+               codeStream.emit(operand);
+               codeStream.emit((subType == TypeReqFloat) ? OP_SAVEVAR_FLT : OP_SAVEVAR_UINT);
          }
-         codeStream.emit((subType == TypeReqFloat) ? OP_LOADVAR_FLT : OP_LOADVAR_UINT);
-         codeStream.emit(operand);
-         codeStream.emit((subType == TypeReqFloat) ? OP_SAVEVAR_FLT : OP_SAVEVAR_UINT);
+
       }
       else
       {
@@ -1286,6 +1326,7 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
                   codeStream.emit(operand);
                   codeStream.emit(isFloat ? OP_SAVE_LOCAL_VAR_FLT : OP_SAVE_LOCAL_VAR_UINT);
                   codeStream.emit(varIdx);
+                  break;
             }
          }
 

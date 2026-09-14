@@ -1512,6 +1512,9 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_LAMBDA_LOAD,
          &&handle_OP_LAMBDA_CALL,
 
+         &&handle_OP_LOAD_PARENTSCOPE_VAR,
+         &&handle_OP_SAVE_PARENTSCOPE_VAR,
+
          &&handle_OP_INVALID
    };
 
@@ -2280,37 +2283,45 @@ handle_OP_LOADVAR_FLT:
       PUSH_STK();
       DISPATCH();
 
-handle_OP_LOADVAR_STR:
+handle_OP_LOADVAR_STR: {
+
+
       currentRegister = -1;
-      {
-            // i check the type first!
-            const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
-            bool fastPath = false;
-            if (varEntry) {
-                  static S32 valueType = 0;
-                  valueType = varEntry->value.getType();
-                  fastPath =  valueType == ConsoleValueType::cvFloat ||
-#ifdef ENABLE_CONSOLE_VECTOR
-                              valueType == ConsoleValueType::cvVector ||
-#endif
-                              valueType == ConsoleValueType::cvInteger ||
-                              valueType == ConsoleValueType::cvPointer ||
-                              valueType == ConsoleValueType::cvLambda;
-            }
-            if (fastPath)
-            {
-                  // Fastpath
-                  stack[_STK + 1] = varEntry->value;
-            }
-            else
-            {
-                  // Slowpath: Fallback
-                  stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
-            }
+      // Rocket 0.8 ? ... not really
+      if(Script::gEvalState.currentVariable) {
+            stack[_STK + 1] = Script::gEvalState.currentVariable->value;
+      } else {
+            stack[_STK + 1].setEmptyString();
       }
+            // ElfScript 0.8 why this anymore
+// // //             // i check the type first!
+// // //             const Dictionary::Entry* varEntry = Script::gEvalState.currentVariable;
+// // //             bool fastPath = false;
+// // //             if (varEntry) {
+// // //                   static S32 valueType = 0;
+// // //                   valueType = varEntry->value.getType();
+// // //                   fastPath =  valueType == ConsoleValueType::cvFloat ||
+// // // #ifdef ENABLE_CONSOLE_VECTOR
+// // //                               valueType == ConsoleValueType::cvVector ||
+// // // #endif
+// // //                               valueType == ConsoleValueType::cvInteger ||
+// // //                               valueType == ConsoleValueType::cvPointer ||
+// // //                               valueType == ConsoleValueType::cvLambda;
+// // //             }
+// // //             if (fastPath)
+// // //             {
+// // //                   // Fastpath
+// // //                   stack[_STK + 1] = varEntry->value;
+// // //             }
+// // //             else
+// // //             {
+// // //                   // Slowpath: Fallback
+// // //                   stack[_STK + 1].setString(Script::gEvalState.getStringVariable());
+// // //             }
+
       PUSH_STK();
       DISPATCH();
-
+}
 // ~~~~~~~~~~~~~~~~~ SAVEVAR
 handle_OP_SAVEVAR_UINT:
       Script::gEvalState.setIntVariable(stack[_STK].getInt());
@@ -2320,37 +2331,50 @@ handle_OP_SAVEVAR_FLT:
       Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
       DISPATCH();
 
-handle_OP_SAVEVAR_STR:
-      if (stack[_STK].type == cvInteger) {
-            Script::gEvalState.setIntVariable(stack[_STK].getInt());
-            DISPATCH();
-      }
-      else
-      if (stack[_STK].type == cvLambda) {
-            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvLambda);
-            DISPATCH();
-      }
-      else
-      if (stack[_STK].type == cvPointer) {
-            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvPointer);
-            DISPATCH();
-      }
-      else
-      if (stack[_STK].type == cvFloat) {
-            Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
-            DISPATCH();
-      }
-      else
-#ifdef ENABLE_CONSOLE_VECTOR
-      if (stack[_STK].type == cvVector) {
-            Script::gEvalState.setVectorVariable(stack[_STK].getVector());
-            DISPATCH();
-      }
-#endif
+handle_OP_SAVEVAR_STR: {
 
 
-      Script::gEvalState.setStringVariable(stack[_STK].getString());
-      DISPATCH();
+      // Rocket 0.8 ? ... not really
+      if(Script::gEvalState.currentVariable) {
+            Script::gEvalState.currentVariable->value = stack[_STK];
+      } else {
+            Script::gEvalState.currentVariable->value.setEmptyString();
+      }
+       DISPATCH();
+
+      // ElfScript 0.8 why this anymore
+// // //       if (stack[_STK].type == cvInteger) {
+// // //             Script::gEvalState.setIntVariable(stack[_STK].getInt());
+// // //             DISPATCH();
+// // //       }
+// // //       else
+// // //       if (stack[_STK].type == cvLambda) {
+// // //             Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvLambda);
+// // //             DISPATCH();
+// // //       }
+// // //       else
+// // //       if (stack[_STK].type == cvPointer) {
+// // //             Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvPointer);
+// // //             DISPATCH();
+// // //       }
+// // //       else
+// // //       if (stack[_STK].type == cvFloat) {
+// // //             Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
+// // //             DISPATCH();
+// // //       }
+// // //       else
+// // // #ifdef ENABLE_CONSOLE_VECTOR
+// // //       if (stack[_STK].type == cvVector) {
+// // //             Script::gEvalState.setVectorVariable(stack[_STK].getVector());
+// // //             DISPATCH();
+// // //       }
+// // // #endif
+// // //
+// // //
+// // //       Script::gEvalState.setStringVariable(stack[_STK].getString());
+// // //       DISPATCH();
+
+}
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~ LOCAL_VAR
@@ -2380,39 +2404,46 @@ handle_OP_LOAD_LOCAL_VAR_FLT:
          PUSH_STK();
       DISPATCH();
 
-handle_OP_LOAD_LOCAL_VAR_STR:
+handle_OP_LOAD_LOCAL_VAR_STR: {
+
       reg = code[ip++];
       currentRegister = reg;
 
       prevField = NULL;
       prevObject = NULL;
       curObject = NULL;
-      {
-            const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-            S32 varType = localVal.getType();
-            if (
-                  varType == ConsoleValueType::cvFloat ||
-#ifdef ENABLE_CONSOLE_VECTOR
-                  varType == ConsoleValueType::cvVector ||
-#endif
-                  varType == ConsoleValueType::cvInteger ||
-                  varType == ConsoleValueType::cvPointer ||
-                  varType == ConsoleValueType::cvLambda
-            )
-            {
-                  //fast fetch
-                  stack[_STK + 1] = localVal;
-            }
-            else
-            {
-                  // fallback
-                  // val = Script::gEvalState.getLocalStringVariable(reg);
-                  stack[_STK + 1].setString(localVal.getString());
-            }
-      }
+
+
+      const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+
+      // Rocket 0.8 ? ... not really
+      stack[_STK + 1] = localVal;
+
+            // ElfScript 0.8 why this anymore
+// // //             S32 varType = localVal.getType();
+// // //             if (
+// // //                   varType == ConsoleValueType::cvFloat ||
+// // // #ifdef ENABLE_CONSOLE_VECTOR
+// // //                   varType == ConsoleValueType::cvVector ||
+// // // #endif
+// // //                   varType == ConsoleValueType::cvInteger ||
+// // //                   varType == ConsoleValueType::cvPointer ||
+// // //                   varType == ConsoleValueType::cvLambda
+// // //             )
+// // //             {
+// // //                   //fast fetch
+// // //                   stack[_STK + 1] = localVal;
+// // //             }
+// // //             else
+// // //             {
+// // //                   // fallback
+// // //                   // val = Script::gEvalState.getLocalStringVariable(reg);
+// // //                   stack[_STK + 1].setString(localVal.getString());
+// // //             }
+
       PUSH_STK();
       DISPATCH();
-
+}
 
 handle_OP_SAVE_LOCAL_VAR_UINT: {
          reg = code[ip++];
@@ -2462,7 +2493,7 @@ handle_OP_SAVE_LOCAL_VAR_FLT: {
          DISPATCH();
 }
 
-handle_OP_SAVE_LOCAL_VAR_STR:
+handle_OP_SAVE_LOCAL_VAR_STR: {
          reg = code[ip++];
          currentRegister = reg;
 
@@ -2470,36 +2501,42 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          prevObject = NULL;
          curObject = NULL;
 
-         // ElfScript 0.4c rocket change !
-         if (stack[_STK].type == cvInteger) {
-            Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
-            DISPATCH();
-         }
-         if (stack[_STK].type == cvPointer) {
-               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvPointer);
-               DISPATCH();
-         }
+         // Rocket 0.8 ? ... not really
+         *Script::gEvalState.getLocalConsoleValuePtr(reg) = stack[_STK];
+          DISPATCH();
 
-         if (stack[_STK].type == cvLambda) {
-               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvLambda);
-               DISPATCH();
-         }
-
-         if (stack[_STK].type == cvFloat) {
-               Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
-               DISPATCH();
-         }
-#ifdef ENABLE_CONSOLE_VECTOR
-         if (stack[_STK].type == cvVector) {
-             Script::gEvalState.setLocalVectorVariable(reg, stack[_STK].getVector());
-             DISPATCH();
-         }
-#endif
-         // orig slowmo =>
-         val = stack[_STK].getString();
-         Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
-         DISPATCH();
-
+         // ElfScript 0.8 why this anymore ?
+// // //
+// // //          // ElfScript 0.4c rocket change !
+// // //          if (stack[_STK].type == cvInteger) {
+// // //             Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
+// // //             DISPATCH();
+// // //          }
+// // //          if (stack[_STK].type == cvPointer) {
+// // //                Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvPointer);
+// // //                DISPATCH();
+// // //          }
+// // //
+// // //          if (stack[_STK].type == cvLambda) {
+// // //                Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvLambda);
+// // //                DISPATCH();
+// // //          }
+// // //
+// // //          if (stack[_STK].type == cvFloat) {
+// // //                Script::gEvalState.setLocalFloatVariable(reg, stack[_STK].getFloat());
+// // //                DISPATCH();
+// // //          }
+// // // #ifdef ENABLE_CONSOLE_VECTOR
+// // //          if (stack[_STK].type == cvVector) {
+// // //              Script::gEvalState.setLocalVectorVariable(reg, stack[_STK].getVector());
+// // //              DISPATCH();
+// // //          }
+// // // #endif
+// // //          // orig slowmo =>
+// // //          val = stack[_STK].getString();
+// // //          Script::gEvalState.setLocalStringVariable(reg, val, (S32)dStrlen(val));
+// // //          DISPATCH();
+}
 
 // ~~~~~~~~~~~~~~~~~ SETCUROBJECT
 handle_OP_SETCUROBJECT:
@@ -5262,6 +5299,57 @@ handle_OP_LAMBDA_CALL: {
 
       gCallStack.popFrame();
 
+      DISPATCH();
+}
+
+// ------------------------- PARENTSCOPE VAR
+handle_OP_LOAD_PARENTSCOPE_VAR: {
+
+
+      reg = code[ip++];
+      currentRegister = reg;
+
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+//FIXME
+
+      S32 stackNum = 0;
+      Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+      if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+            stackNum = Script::gEvalState.getTopOfStack() - 1;
+      } else {
+            stackNum = Script::gEvalState.getTopOfStack() - 2;
+      }
+      const ConsoleValue& localVal = Script::gEvalState.localStack[stackNum].values[reg];
+
+      // const ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
+
+      stack[_STK + 1] = localVal;
+
+      PUSH_STK();
+      DISPATCH();
+}
+// ---------------
+handle_OP_SAVE_PARENTSCOPE_VAR: {
+      reg = code[ip++];
+      currentRegister = reg;
+
+      prevField = NULL;
+      prevObject = NULL;
+      curObject = NULL;
+
+      S32 stackNum = 0;
+      Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+      if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+            stackNum = Script::gEvalState.getTopOfStack() - 1;
+      } else {
+            stackNum = Script::gEvalState.getTopOfStack() - 2;
+      }
+      ConsoleValue& localVal = Script::gEvalState.localStack[stackNum].values[reg];
+
+      localVal = stack[_STK];
       DISPATCH();
 }
 

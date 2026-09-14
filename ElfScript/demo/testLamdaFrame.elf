@@ -1,16 +1,46 @@
 // my beloved typo Lambda not Lamda !! ... file name stays now ..
-
+// ============================================================================
 
 function loader(%which) {
-        %testFile = "ElfScript/demo/test.elf";
-        %thisFile = "ElfScript/demo/testLamdaFrame.elf";
+    %testFile = "ElfScript/demo/test.elf";
+    %thisFile = "ElfScript/demo/testLamdaFrame.elf";
     $Debug::DumpByteCode=0;
     // if ($Con::File !$= "") exec($Con::File);
     if (%which == 1) exec(%testFile);
     else exec(%thisFile);
 }
+// ============================================================================
 
 
+
+#parent = 11.0;
+
+function pa() { print("PARENT VALUE INSIDE (11):",#parent); #parent = #parent + 2;}
+
+pa();
+print("PARENT VALUE OUTSIDE (13):",#parent);
+#parent++;
+print("PARENT VALUE OUTSIDE (14):",#parent);
+
+print(" ---------- FIXME vardump in localVar.cpp ---------- ");
+varDump("#parent");
+
+return;
+
+
+
+
+%foo = 11;
+%uniqeBar = 12;
+$ptr = getVarPtr("%foo");
+varDump("$ptr");
+varDump("%foo");
+printSeparator();
+%copyFoo = getValueByPtr($ptr);
+varDump("%copyFoo");
+
+
+printSeparator();
 
 %uniqeA = 11;
 %uniqeB = 12;
@@ -48,8 +78,8 @@ testLocalGlobal("%uniqeB");
 
 %fun();
 
-    :uniqeC = 5;
-    print("TEST C is",:uniqeC);
+    // :uniqeC = 5;
+    // print("TEST C is",:uniqeC);
 return;
 
 // ============================================================================
@@ -57,16 +87,7 @@ return;
 // ============================================================================
 // ============================================================================
 
-%foo = 11;
-%uniqeBar = 12;
-$ptr = getVarPtr("%foo");
-varDump("$ptr");
-varDump("%foo");
-printSeparator();
-%copyFoo = getValueByPtr($ptr);
-varDump("%copyFoo");
 
-printSeparator();
 
 function huhu() {
     print("-------------- INSIDE FUNCTION ------------------");
@@ -123,3 +144,8 @@ print("TODO A lambda batch with params" );
 print("- Array - with lamdas - must have all the same return value and setter!" );
 print("- ONE variable refrence for getter" );
 print("- Array variable refrences for getter" );
+
+
+
+
+

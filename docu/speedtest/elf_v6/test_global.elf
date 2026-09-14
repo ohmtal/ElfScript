@@ -13,7 +13,7 @@ for (%j in range JLOOPS) {
         $globalX --;
     }
     print("SUM (--) IS:" SPC $globalX);
-    $globalX = 66;
+    $globalX = 66.0;
     print("set Sum to 66 == " SPC $globalX);
     for (%i  in range ILOOPS) {
         $globalX *= %i + 1;

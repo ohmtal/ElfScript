@@ -233,6 +233,10 @@ namespace Compiler
       OP_LAMBDA_LOAD,
       OP_LAMBDA_CALL,
 
+      OP_LOAD_PARENTSCOPE_VAR,
+      OP_SAVE_PARENTSCOPE_VAR,
+
+
       OP_INVALID,   //
 
       MAX_OP_CODELEN ///< The amount of op codes.
