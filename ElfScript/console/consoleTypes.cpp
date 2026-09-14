@@ -1257,3 +1257,19 @@ ConsoleSetType( TypeValue )
       else
             Con::printf("failed to set Value!");
 }
+//-----------------------------------------------------------------------------
+// TypePointer
+//-----------------------------------------------------------------------------
+ConsoleType(float, TypePointer, void *, "")
+
+ConsoleGetType(TypePointer)
+{
+      static const U32 bufSize = 256;
+      char* returnBuffer = Con::getReturnBuffer(bufSize);
+      dSprintf(returnBuffer, bufSize, "%p", (void*)dptr);
+      return returnBuffer;
+}
+ConsoleSetType(TypePointer)
+{
+      Con::errorf("(TypePointer) Can not (want not) convert String to Pointer!");
+}

@@ -826,7 +826,12 @@ print("LAMDA RESULT IS:", %fn("huhu"));
 %p = ["Alder Babasack!", 1,2,3,4];
 print("LAMDA RESULT FROM C callLambda:", callLambdaTest(%fn, %p)); // test for later mappings
 
+
+LIST_LOCAL_STACKS();
 printSeparator();
+
+
+
 // else use ==> print($ScriptError );
 printf("script %s load completed..... no parse errors....", $Con::File);
 

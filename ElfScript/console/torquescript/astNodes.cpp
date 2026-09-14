@@ -1970,8 +1970,10 @@ U32 LambdaLoadExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
             Con::errorf("Parse Error Lamba expression needs to be assigned! %s:%d", dbgFileName, dbgLineNumber);
             return 0;
       }
-
+      // bool lastValue = gIsEvalCompile; //NOTE -569
+      // gIsEvalCompile = false;
       functionDeclStmtNode->compileStmt(codeStream, ip);
+      // gIsEvalCompile = lastValue;
       codeStream.emit(OP_LAMBDA_LOAD);
       if (type == TypeReqNone) codeStream.emit(OP_POP_STK);
       return codeStream.tell();
@@ -1986,6 +1988,7 @@ U32 LambdaCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
       codeStream.emit(OP_PUSH_FRAME);
       codeStream.emit(count);
 
+
       for (ExprNode* walk = args; walk; walk = static_cast<ExprNode*>(walk->getNext()))
       {
             TypeReq walkType = walk->getPreferredType();
@@ -1998,7 +2001,13 @@ U32 LambdaCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
 
       codeStream.emit(OP_LAMBDA_CALL);
       bool isGlobal = varName[0] == '$';
-      codeStream.emit(isGlobal);
+
+      U32 flags = 0; //can be used for more params if needed
+      if (isGlobal) flags |= 1u << 0;
+      if (mIsLamdaGlobalRef) flags |= 1u << 1;
+      codeStream.emit(flags);
+
+
       if (isGlobal)
             codeStream.emitSTE(varName);
       else {

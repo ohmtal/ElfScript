@@ -20,3 +20,13 @@ DefineEngineFunction(callLambdaTest, ConsoleValue, (ConsoleValue lambdaValue, Ar
     }
     return result;
 }
+
+
+DefineEngineFunction(callLambdaTest2, ConsoleValue, (ConsoleValue lambdaValue),,"") {
+    ConsoleValue result;
+
+    if (!ElfScript::Lambda::callValueWithOutArgs(lambdaValue, result)) {
+        Con::errorf("callLambdaTest2 Failed!!");
+    }
+    return result;
+}

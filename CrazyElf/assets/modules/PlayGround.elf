@@ -174,9 +174,9 @@ function PlayGround::Render(%this) {
     SDL_SetRenderDrawColor(%r, 55,55,55);
     %scale = 0.7;
     SDL_SetRenderScale(%r, %scale, %scale);
-    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 5) / %scale , 7, getFPS() SPC "FPS");
+    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 5) / %scale , 7, getFPSText());
     SDL_SetRenderDrawColor(%r, 255,255,255);
-    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 4) / %scale, 6, getFPS() SPC "FPS");
+    SDL_RenderDebugText(%r, (CANVAS_WIDTH + 4) / %scale, 6, getFPSText());
     SDL_SetRenderScale(%r);
 }
 //----------------------------------------------------------------------

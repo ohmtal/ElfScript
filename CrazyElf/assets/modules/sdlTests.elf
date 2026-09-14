@@ -50,9 +50,8 @@ function sdlTests::Render(%this) {
         case MODE_FILLRECT : SDL_RenderFillRects(%this.renderer, %this.pointsArray);
     }
 
-
     SDL_SetRenderDrawColor(%this.renderer, 55,155,155);
-    SDL_RenderDebugText(%this.renderer, 10, 10, " SDL Tests " SPC $Global::FPS);
+    SDL_RenderDebugText(%this.renderer, 10, 10, sprintf(" SDL Tests %d", $Global::FPS));
     SDL_RenderDebugText(%this.renderer, 10, 25, " F-Keys change mode " SPC %this.mode);
 }
 //----------------------------------------------------------------------

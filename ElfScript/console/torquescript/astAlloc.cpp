@@ -745,13 +745,14 @@ TypeReq LambdaLoadExprNode::getPreferredType()
 }
 
 
-LambdaCallExprNode* LambdaCallExprNode::alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args)
+LambdaCallExprNode* LambdaCallExprNode::alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args,bool isLamdaGlobalRef)
 {
       LambdaCallExprNode* ret = (LambdaCallExprNode*)consoleAlloc(sizeof(LambdaCallExprNode));
       constructInPlace(ret);
       ret->dbgLineNumber = lineNumber;
       ret->varName = varName;
       ret->args = args;
+      ret->mIsLamdaGlobalRef = isLamdaGlobalRef;
       return ret;
 }
 TypeReq LambdaCallExprNode::getPreferredType()

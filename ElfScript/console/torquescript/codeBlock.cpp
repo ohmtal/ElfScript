@@ -591,12 +591,12 @@ Con::EvalResult CodeBlock::compileExec(StringTableEntry fileName, const char *in
 // #ifdef ELFSCRIPT_PREPROCESSOR
 
    // --- PREPROCESSOR PREPARATION ---
-   // Store the preprocessed code safely on the C++ stack
+   // Store the preprocessed code
    std::string processedSource = Con::preprocessTorqueScript(string);
 
    STEtoCode = evalSTEtoCode;
 
-   // Wipes the temporary memory where the original inString might have lived
+   // Wipes the temporary memory
    consoleAllocReset();
 
    // --- PREPROCESSOR INSERTION START ---

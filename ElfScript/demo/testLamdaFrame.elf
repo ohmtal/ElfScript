@@ -1,0 +1,39 @@
+function rl() {
+    $Debug::DumpByteCode=0;
+    if ($Con::File !$= "") exec($Con::File);
+}
+
+
+%foo = 11;
+
+%p = [569];
+// %fn = fn() { %bar = 4711; print("FOO:", %foo, "BAR:", %bar); };
+%fn = fn(%param) { %bar = 4711; print("Param:", %param, "BAR:", %bar); };
+%fn2 = fn(%lolo) { %lala = 4711; print("Param:", %lolo, "BAR:", %lala); };
+function normal() { %norm = 0;}
+callLambdaTest(%fn,%p/*, true*/);
+// callLambdaTest2(%fn);
+print("FOO IS a global local:", %foo);
+
+// dumpLocals(1,0);
+// whereami();
+vardump("%foo");
+vardump("%p");
+vardump("%fn");
+vardump("%fn2");
+
+printSeparator();
+%o = new Object() {};
+%o.lam = %fn;
+print("FIELD:");
+vardumpField(%o.getId()@".lam");
+%back = %o.lam;
+vardump("%back");
+
+
+printSeparator();
+print ("FIRST THINK ABOUT IF THIS CAN BE USED FOR OTHER THINGS THAN MY SPEEDTEST!");
+print("TODO A lambda batch with params" );
+print("- Array - with lamdas - must have all the same return value and setter!" );
+print("- ONE variable refrence for getter" );
+print("- Array variable refrences for getter" );

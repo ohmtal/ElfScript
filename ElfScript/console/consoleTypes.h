@@ -87,6 +87,8 @@ DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, const char*)
 
+DefineConsoleType( TypePointer, void*)
+
 //ElfScript
 DefineConsoleType( TypeVector, ConsoleVector)
 DECLARE_STRUCT( ConsoleVector );

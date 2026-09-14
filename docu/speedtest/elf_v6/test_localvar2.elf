@@ -1,0 +1,48 @@
+// print and math::randomf are core commands
+ $JLOOPS = 25;
+ $ILOOPS = 1000000;
+ $HALF_ILOOPS = 500000;
+%localX = 0.0;
+
+%loop1 = fn(%localX) {
+    for(%i in range $ILOOPS)  {
+        %localX ++;
+    }
+    return %localX;
+};
+
+for(%j in range $JLOOPS)  {
+    %loop1();
+    // for(%i in range $ILOOPS)  {
+    //     %localX ++;
+    // }
+    print("SUM (++) IS:" SPC %localX);
+    vardump("%localX");
+    for(%i in range $ILOOPS)  {
+        %localX --;
+    }
+    print("SUM (--) IS:" SPC %localX);
+    vardump("%localX");
+    %localX = 66.0;
+    print("set Sum to 66 == " SPC %localX);
+    vardump("%localX");
+    for(%i in range $ILOOPS)  {
+        %localX *= %i + 1.0;
+        %localX /= %i + 1.0;
+    }
+    print("SUM (*/ %i+1) IS:" SPC %localX);
+    vardump("%localX");
+    for(%i in range $HALF_ILOOPS)  {
+        %ran = math.randomf(%i);
+        %localX -= %ran;
+        %localX += %ran;
+    }
+    vardump("%localX");
+    print("SUM (rand +-) IS:" SPC %localX);
+}
+%localX -= 66.0 ;
+print("---------------------");
+print("---------------------");
+print("Final sum should be 0 == ", %localX);
+print("---------------------");
+print("---------------------");

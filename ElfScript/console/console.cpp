@@ -857,10 +857,12 @@ void infof(const char* fmt,...)
 }
 void debugf(const char* fmt,...)
 {
+#ifdef TORQUE_DEBUG
       va_list argptr;
       va_start(argptr, fmt);
       _printf(ConsoleLogEntry::Debug, ConsoleLogEntry::General, fmt, argptr);
       va_end(argptr);
+#endif
 }
 
 //---------------------------------------------------------------------------

@@ -48,9 +48,27 @@ TORQUE_FORCEINLINE inline bool callValue(ConsoleValue& value, Array* params, Con
                     nsEntryPtr->mNamespace,
                     params->mValues.size(), params->mValues.address(),
                     false, nsEntryPtr->mPackage
+                    // , globalFrame ? -569 : -1
                     ).value;
     return true;
 }
 // ----------------------------------------------------------------------------
-
+// NOTE THIS SHOULD BE THE LOCAL VARS FROM GLOBAL:
+// Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[0];
+// i guess garbage collection kill this somewhere variables are there but scrambled.
+// ----------------------------------------------------------------------------
+TORQUE_FORCEINLINE inline bool callValueWithOutArgs(ConsoleValue& value,  ConsoleValue& result){
+    Namespace::Entry* nsEntryPtr = getEntry(value);
+    if (!nsEntryPtr) return false;
+    muleValue.setString(nsEntryPtr->mFunctionName);
+    result = nsEntryPtr->mModule->exec(
+        nsEntryPtr->mFunctionOffset,
+        nsEntryPtr->mFunctionName,
+        nsEntryPtr->mNamespace,
+        1, &muleValue,
+        false, nsEntryPtr->mPackage
+        // ,-569 //frame
+    ).value;
+    return true;
+}
 } // namespace

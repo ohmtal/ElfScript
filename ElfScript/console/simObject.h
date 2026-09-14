@@ -590,6 +590,7 @@ class SimObject: public ConsoleObject
                               #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
                               #endif
+                              case cvLambda: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
                   }
@@ -638,6 +639,9 @@ class SimObject: public ConsoleObject
                               stackP->setVector(entry->mValue.getVector());
                               break;
                         #endif
+                        case ConsoleValueType::cvLambda:
+                              stackP->setPointer(entry->mValue.getPointer());
+                              break;
                         default: {
                               const char* str = entry->mValue.getString();
                               if (str) stackP->setString(str);
@@ -741,6 +745,7 @@ class SimObject: public ConsoleObject
                               #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
                               #endif
+                              case cvLambda: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
                   }
@@ -762,6 +767,9 @@ class SimObject: public ConsoleObject
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
                   #endif
+                  case ConsoleValueType::cvLambda:
+                        stackP->setPointer(entry->mValue.getPointer());
+                        break;
                   default:
                         entry->mValue.setString(stackP->getString());
                         break;

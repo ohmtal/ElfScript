@@ -11,6 +11,7 @@
 #include <console/torquescript/ast.h>
 #include <console/torquescript/compiler.h>
 #include <core/strings/stringUnit.h>
+#include "localVar.h"
 
 
 extern  FuncVars gEvalFuncVars;
@@ -26,7 +27,7 @@ namespace ElfScript {
             // case ConsoleValueType::cvString:  return "String";
             case ConsoleValueType::cvSTEntry: return "String";
             case ConsoleValueType::cvConsoleValueType: return "Console";
-            case ConsoleValueType::cvLambda: return "Lambda function";
+            case ConsoleValueType::cvLambda: return "Lambda";
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
             #endif
@@ -62,7 +63,7 @@ namespace ElfScript {
     //  get a local or global variable ConsoleValue
     //  i also added global but keep the name getLocalVariable
     //
-    bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
+    bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg){
         if (!variableName) return false;
 
         if (variableName[0] == '%') {
@@ -287,11 +288,13 @@ namespace ElfScript {
         }
     }
     // -----------------------------------------------------------------------------
-    void dumpAllLocalVariables() {
+    void dumpAllLocalVariables(bool includingGlobalScope = true) {
         // 1. gEvalFuncVars
-        Con::printSeparator();
-        Con::printf("       ------------------- GlobalScope -------------------");
-        _getFuncVars()->listExising();
+        if (includingGlobalScope) {
+            Con::printSeparator();
+            Con::printf("       ------------------- GlobalScope -------------------");
+            _getFuncVars()->listExising();
+        }
 
         Con::printSeparator();
         Con::printf("       ------------------- LocalScope -------------------");
@@ -302,9 +305,11 @@ namespace ElfScript {
         }
 
         for (auto& [funcName, maptbl] : tbl->localVarToRegister) {
-            Con::printf("%s, count ", funcName, maptbl.varList.size());
-            for (S32 i = 0 ; i < maptbl.varList.size(); i++)
+            Con::printf("%s, count: %d ", funcName, maptbl.varList.size());
+            for (S32 i = 0 ; i < maptbl.varList.size(); i++) {
                 Con::printf("   - %s", maptbl.varList[i]);
+                varDump( maptbl.varList[i]);
+            }
             // Con::printf("%s: reg:%d currentType: %d", key, val.reg ,(S32)val.currentType);
         }
         Con::printSeparator();
@@ -343,9 +348,9 @@ DefineEngineFunction(varDump, void, (const char* variableName), , "local/global 
 
 }
 // -----------------------------------------------------------------------------
-DefineEngineFunction(dumpLocals, void, (),,"dump local and global  variables") {
-    ElfScript:: dumpAllLocalVariables();
-    ElfScript:: dumpAllGlobalVariables();
+DefineEngineFunction(dumpLocals, void, (bool allLocals, bool withGlobals),(true, true),"dump local and global  variables") {
+    ElfScript:: dumpAllLocalVariables(allLocals);
+    if (withGlobals) ElfScript:: dumpAllGlobalVariables();
 }
 // -----------------------------------------------------------------------------
 
@@ -420,53 +425,21 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 
     return count;
 }
-// ElfScript 0.7f - see also
-// FIXME can be removed and Array need a from string ?
-// Added to Array fromString
-// DefineEngineFunction(explodeToObject,S32, (const char* text),
-//                      ,"Convert an string to Object with v[] fields\n"
-//                      "tab separated (default) or space separated\n"
-//                      "WARNING you need to delete the object after it's not longer needed."
-// ) {
-//     if (!text || text[0] == '\0') {
-//         Con::errorf("Empty text cant be converted to object");
-//         return 0;
-//     }
-//
-//     const char* set = "\t\n";
-//     // we try to separate by tabs to keep stuff like "Hello World" TAB "tom"
-//     U32 count =  StringUnit::getUnitCount( text, "\t\n" );
-//     // we only got no or one token - switch to space / tab separated
-//     if (count < 2) {
-//         count =  StringUnit::getUnitCount( text, " \t\n" );
-//         set = " \t\n";
-//     }
-//
-//     // nothing - is empty ?
-//     if (count < 1) {
-//         Con::errorf("Empty text cant be converted to object");
-//         return 0;
-//     }
-//
-//     SimObject* obj = new SimObject();
-//     char buff[32];
-//     StringTableEntry fieldNameEntry = nullptr;
-//     for (U32 i = 0; i < count; i++) {
-//         const char * token = StringUnit::getUnit( text, i, set );
-//
-//         dSprintf(buff,32,"v%d", i); //mhh or as array ?
-//         fieldNameEntry = StringTable->insert( buff );
-//
-//         obj->setDataField(fieldNameEntry, nullptr, token);
-//         // try to typeCast:
-//         if (isInt(token)) obj->setDataFieldType(TypeS64, fieldNameEntry, nullptr );
-//         else if (isFloat(token)) obj->setDataFieldType(TypeF64, fieldNameEntry, nullptr );
-//     }
-//     obj->registerObject();
-//     return obj->getId();
-// }
+
 // =============================================================================
 #ifdef TORQUE_DEBUG
+DefineEngineFunction(LIST_LOCAL_STACKS, void, (),, "debug: list local stacks") {
+    Con::printSeparator();
+    Con::printf("STACK COUNT: %d", Script::gEvalState.localStack.size() );
+    for (S32 i =0; i < Script::gEvalState.localStack.size(); i++) {
+        S32 j = 0;
+        Script::gEvalState.localStack[i].values[j];
+        // while (dynamic_cast<ConsoleValue>();
+    }
+}
+
+
+
 DefineEngineFunction(TEST_VAR_CREATE,void,(),,"must be test inside and outside a function!") {
     ConsoleValue* stack = nullptr;
     Con::printSeparator();

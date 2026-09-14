@@ -1071,7 +1071,8 @@ TORQUE_FORCEINLINE inline void doIntOperation()
 //-----------------------------------------------------------------------------
 
 U32 gExecCount = 0;
-Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thisNamespace, U32 argc, ConsoleValue* argv, bool noCalls, StringTableEntry packageName, S32 setFrame)
+Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thisNamespace
+      , U32 argc, ConsoleValue* argv, bool noCalls, StringTableEntry packageName, S32 setFrame)
 {
 #ifdef TORQUE_DEBUG
    U32 stackStart = _STK;
@@ -1085,6 +1086,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    U32 iterDepth = 0;
    ConsoleValue returnValue;
    const bool isCodelet = (!argv && setFrame == -2);
+   // NOTE ElfScript 0.8 did not work .. wanted lambda in with global scope variable access ..but not
+   // // const bool isLambdaFullRef = setFrame == -569;
 
    incRefCount();
    F64* curFloatTable;
@@ -1093,6 +1096,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
    StringTableEntry thisFunctionName = NULL;
    bool popFrame = false;
+
    if (argv)
    {
       // assume this points into a function decl:
@@ -1129,8 +1133,15 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          dStrcat(traceBuffer, ")", TRACE_BUFFER_SIZE);
          Con::printf("%s", traceBuffer);
       }
-      Script::gEvalState.pushFrame(thisFunctionName, thisNamespace, regCount);
-      popFrame = true;
+      // // if (isLambdaFullRef) {
+      // //       Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[0];
+      // //       popFrame = false;
+      // //       setFrame = -1;
+      // // } else {
+            Script::gEvalState.pushFrame(thisFunctionName, thisNamespace, regCount);
+            popFrame = true;
+
+      // // }
       for (i = 0; i < wantedArgc; i++)
       {
          S32 reg = code[ip + (2 + 6 + 1 + 1) + i];
@@ -1211,7 +1222,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       curFloatTable = functionFloats;
       curStringTable = functionStrings;
       curStringTableLen = functionStringsMaxLen;
-   }
+   } // if argV
     else if (isCodelet)
     {
        // ---- Codelet path ----------------------------------------------------
@@ -2602,7 +2613,8 @@ handle_OP_LOADFIELD_FASTPATH:
                   DISPATCH();
             }
 
-            Con::errorf("I SHOULD NOT BE HERE !!!");
+            Con::errorf("I SHOULD NOT BE HERE %s[%d]!!! cachePtr:%p Type:%d", __FILE__, __LINE__
+                  ,(void*)cachePtr, cachePtr ?  cachePtr->type : -1);
             PUSH_STK();
             DISPATCH();
       }
@@ -2704,11 +2716,14 @@ handle_OP_LOADFIELD_FASTPATH:
                               case ConsoleValueType::cvFloat:
                                     stackPtr->setFloat(cachePtr->fieldValuePtr->getFloat());
                                     break;
-                                    #ifdef ENABLE_CONSOLE_VECTOR
+                              #ifdef ENABLE_CONSOLE_VECTOR
                               case ConsoleValueType::cvVector:
                                     stackPtr->setVector(cachePtr->fieldValuePtr->getVector());
                                     break;
-                                    #endif
+                              #endif
+                              case ConsoleValueType::cvLambda:
+                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer());
+                                    break;
                               default:
                                     const char* str = cachePtr->fieldValuePtr->getString();
                                     if (str) stackPtr->setString(str);
@@ -2806,7 +2821,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                   DISPATCH();
             }
 
-            Con::errorf("I SHOULD NOT BE HERE !!!");
+            Con::errorf("I SHOULD NOT BE HERE %s[%d]!!!", __FILE__, __LINE__);
             prevObject = NULL;
             DISPATCH();
       }
@@ -2901,14 +2916,19 @@ handle_OP_SAVEFIELD_FASTPATH:
                                     cachePtr->fieldValuePtr->setVector(stackP->getVector());
                                     break;
                               #endif
+                              case ConsoleValueType::cvLambda: //NOTE This will be never reached so far!!!
+                                    cachePtr->fieldValuePtr->setPointer(stackP->getPointer());
+                                    break;
                               default:
                                     if (desiredType == ConsoleValueType::cvFloat)
                                           cachePtr->fieldValuePtr->setFloat(stackP->getFloat());
                                     else
                                     if (desiredType == ConsoleValueType::cvInteger)
                                           cachePtr->fieldValuePtr->setInt(stackP->getInt());
-                                    else
-                                          cachePtr->fieldValuePtr->setString(stackP->getString());
+                                    else {
+                                          *cachePtr->fieldValuePtr = *stackP;
+                                          // cachePtr->fieldValuePtr->setString(stackP->getString());
+                                    }
                                     break;
                         }
                         break;
@@ -3097,66 +3117,6 @@ do { \
             DISPATCH(); \
       } \
 } while(0)
-
-
-// #define PATCH_AND_DISPATCH_CALL(isMethod) \
-// do { \
-//       bool call_failed = false; \
-//       if (nsEntry) \
-//       { \
-//             *(Namespace::Entry**)&code[ip - 2] = nsEntry; \
-//             \
-//             switch (nsEntry->mType) \
-//             { \
-//                   case Namespace::Entry::ConsoleFunctionType: \
-//                         code[ip - 7] = OP_CALLFUNC_CONSOLEFUNCTION; \
-//                         break; \
-//                   case Namespace::Entry::StringCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_STRING_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_STRING; \
-//                                     break; \
-//                   case Namespace::Entry::IntCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_INT_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_INT; \
-//                                     break; \
-//                   case Namespace::Entry::FloatCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_FLOAT_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_FLOAT; \
-//                                     break; \
-//                   case Namespace::Entry::VoidCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VOID_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_VOID; \
-//                                     break; \
-//                   case Namespace::Entry::BoolCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_BOOL_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_BOOL; \
-//                                     break; \
-//                   case Namespace::Entry::VectorCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VECTOR_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_VECTOR; \
-//                                     break; \
-//                   case Namespace::Entry::ConsoleValueCallbackType: \
-//                         if (isMethod) code[ip - 7] = OP_CALLFUNC_VALUE_METHOD; \
-//                               else code[ip - 7] = OP_CALLFUNC_VALUE; \
-//                                     break; \
-//                   default: { \
-//                         Con::errorf("Invalid return type on function call!!!"); \
-//                         gCallStack.popFrame(); \
-//                         stack[_STK + 1].setEmptyString(); \
-//                         PUSH_STK(); \
-//                         call_failed = true; \
-//                         break; \
-//                   } \
-//             } \
-//             \
-//             if (call_failed) { \
-//                   DISPATCH(); \
-//             } else { \
-//                   ip -= 6; \
-//                   DISPATCH_OPCODE(code[ip - 1]); \
-//             } \
-//       } \
-// } while(0)
 
 #define PATCH_AND_DISPATCH_CALL() \
 do { \
@@ -3360,7 +3320,8 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
    }
    else // no body
          stack[_STK + 1].setEmptyString();
-      PUSH_STK();
+
+   PUSH_STK();
 
    gCallStack.popFrame();
    FINIT_CALLFUNC();
@@ -3513,6 +3474,11 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION_METHOD: {
 
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
+
+      if (!thisObject) {
+              gCallStack.popFrame();
+              DISPATCH();
+      }
 
       ns = thisObject->getNamespace();
       nsEntry = ns->lookup(fnName);
@@ -5144,7 +5110,7 @@ handle_OP_MATH_RANDOMF:
 handle_OP_TUPLE_ASSIGNMENT: {
 
       U32 varCount = code[ip++];
-      Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d", varCount);
+      // Con::debugf("DEBUG: handle_OP_TUPPLE_ASSIGNMENT varcount: %d", varCount);
       // _STK is: %d TYPE:%d value: %s", count, _STK, stack[_STK].type, stack[_STK].getString());
 
       ConsoleValue * dstPtr = nullptr;
@@ -5226,7 +5192,13 @@ handle_OP_LAMBDA_LOAD: {
       DISPATCH();
 }
 handle_OP_LAMBDA_CALL: {
-      bool isGlobal = code[ip++] == 1;
+      U32 flags =  code[ip++];
+
+      bool isGlobal = (flags & 1u << 0);
+
+      // unused so far did not get it work
+      // // bool IsLamdaGlobalRef =  (flags & 1u << 1);
+
       ConsoleValue* srcValuePtr = nullptr;
       if (isGlobal)
       {
@@ -5239,7 +5211,7 @@ handle_OP_LAMBDA_CALL: {
       }
       ip += 2;
       if (!srcValuePtr || srcValuePtr->type != ConsoleValueType::cvLambda || !srcValuePtr->dataPtr) {
-            Con::errorf("LAMBDA Error: function not found!");
+            Con::errorf("LAMBDA Error: variable is not a lambda function or does not exists.");
             DISPATCH();
       }
 
@@ -5249,7 +5221,7 @@ handle_OP_LAMBDA_CALL: {
             Con::errorf("LAMBDA Error: function is invalid!");
             DISPATCH();
       }
-      Con::printf("Found LAMBDA function: %p function name: %s", srcValuePtr->dataPtr, nsEntry->mFunctionName);
+      Con::debugf("Found LAMBDA function: %p function name: %s", srcValuePtr->dataPtr, nsEntry->mFunctionName);
 
 
       if (!Script::gEvalState.stack.empty())
@@ -5262,7 +5234,10 @@ handle_OP_LAMBDA_CALL: {
 
       if (nsEntry->mFunctionOffset)
       {
-            ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+            ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset,
+                  fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage
+                  // , IsLamdaGlobalRef ? -569 : -1
+            ).value;
             stack[_STK + 1] = (returnFromFn);
       }
       else // no body

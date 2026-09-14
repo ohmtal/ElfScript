@@ -12,7 +12,7 @@ $Global::FullScreen = 0; //initial
 $Global::VSync = 1; //initial
 //------------------------------------------------------------------------------
 function GetFrameTime() { return $Global::FrameTime; }
-function GetFPS() { return $Global::FPS; }
+function GetFPSText() { return sprintf("%d FPS",$Global::FPS); }
 function SetFullScreen(%value) { $Global::FullScreen = %value; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
 function ToggleFullScreen() { $Global::FullScreen = !$Global::FullScreen; SDL_SetWindowFullscreen($Main.window, $Global::FullScreen); }
 function ToggleVSync() { $Global::VSync = !$Global::VSync; SDL_SetRenderVSync($Main.renderer, $Global::VSync); }
@@ -251,8 +251,9 @@ function onSDLKeyBoardEvent(%scancode, %modifiers, %isDown, %isRepeat) {
 // -----------------------------------------------------------------------------
 // reload helper
 function rl() {
-    Main.delete();
-    exec("assets/main.elf");
+    $Global::reloading = true;
+    $Global::running = false;
+    schedule(100, 0, exec, "assets/main.elf");
 }
 
 function updateDocu() {
@@ -278,6 +279,7 @@ function updateDocu() {
 $WindowSize = {640,400};
 
 $Global::running = onInit();
+$Global::reloading = false;
 
 %main = Main.getId();
 
@@ -296,8 +298,6 @@ echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 
 while ($Global::running) {
 
-    if (!%main) break;
-
     %tickCount = SDL_GetPerformanceCounter();
 
     $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
@@ -306,8 +306,7 @@ while ($Global::running) {
     %main.Render();
     // Main::Render(%main); //not really >>Fast call we are in a critical loop
     if (!SDL_MainLoop(%mainLoopParam)) {
-        echo("quit by SDL_MainLoop");
-        %main = 0;
+        print("quit by SDL_MainLoop");
         break;
     }
 
@@ -323,4 +322,18 @@ while ($Global::running) {
     // gGameTime += gFrameTime;
     %lastTick  = %tickCount;
 }
-Main.delete();
+%main.delete();
+print("main shutdown complete");
+if ($Global::reloading && $scriptError $= "") {
+    %startTicks = SDL_GetTicks();
+    %tickLimit = 1000;
+    print("Reload requested !!");
+    while($Global::reloading) {
+        SDL_Delay(10);
+        SDL_BasicLoop();
+        if (SDL_GetTicks() - %startTicks > %tickLimit) {
+            print("----------- Reloading Tick limit reached ------------ bye bye.");
+            break;
+        }
+    }
+}

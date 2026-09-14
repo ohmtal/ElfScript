@@ -702,8 +702,9 @@ struct LambdaCallExprNode : ExprNode
 {
    StringTableEntry varName;
    ExprNode* args;
+   bool mIsLamdaGlobalRef = false;
 
-   static LambdaCallExprNode* alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args);
+   static LambdaCallExprNode* alloc(S32 lineNumber, StringTableEntry varName,  ExprNode* args, bool isLamdaGlobalRef = false);
 
    U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override;
    TypeReq getPreferredType() override;

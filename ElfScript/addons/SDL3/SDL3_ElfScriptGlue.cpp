@@ -106,6 +106,20 @@ namespace ElfSDL3 {
     }
 
     // ----------------------------------------------------------------------------
+    DefineEngineFunction(SDL_BasicLoop, bool, (),
+                         ,"Loop to only keep the scheduler running\n"
+                         "This is usefull when reloading the complete scritpt\n"
+                         "Demo in CrazyElf/main.elf\n"
+    )
+    {
+        static U32 lastTicks = SDL_GetTicks();
+        U32 msEllapsed = SDL_GetTicks() - lastTicks;
+        FrameTime = msEllapsed / 1000.f;
+        engineGlue::process(msEllapsed );
+        lastTicks = SDL_GetTicks();
+        return true;
+    }
+    // ----------------------------------------------------------------------------
     DefineEngineFunction(SDL_MainLoop, bool, (S32 RendererID),(0),"Main Loop for events and more...\n"
     "optional RendererID parameter is required when you set SDL_SetRenderLogicalPresentation\n"
     "to match the mouse position to the scaled screen."
