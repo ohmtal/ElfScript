@@ -11,10 +11,42 @@
 
 
 ## Version 0.8a 
+-  about 100 ms slower speed tests ... not funny .. must be something in the VM but what. 
+Somewhere it breaks the CPU prediction or i added some cpu cycles.
+I think it's since the tuple assignment - but not sure. I changed the float format from 
+%.9g to %#.9g but i think this is not the reason. Maybe I should clean my cpu cooler *lol*
+StarField Test still good so i should forget about get closer to lua vanilla it's
+replaced by jit in most cases anyway. It's not the cpu cooler - I have a binary from 
+4 days ago (2026-09-10) where it's much faster than now. 
+
+must be after commit => 2026-09-11 "got expoerimental func call op codes running but not really faster in my tests."
+so it's not CALLFUNC. I guess it's lambda change ... but can't find out why. 
+
+Since then i added:
+
+- CALLFUNC stuff
+- Tuple asignment
+- lambda call
+- parent scope 
+
+|Script | run 1 | run 2 | run 3 |
+| --- | --- | --- | --- |
+|test_localvar.elf |1.42s |1.42s |1.42s |
+|test_global.elf |2.53s |2.53s |2.53s |
+|test_static.elf |4.50s |4.42s |4.42s |
+|test_dynamic.elf |3.85s |3.83s |3.85s |
+|test_vector_components.elf |3.92s |3.92s |3.92s |
+
+- Direct FastPath on SAVE/LOAD_VAR_STR an SAVE/LOAD_LOCAL_VAR_STR... but did not speed up anything
+- global scope local var .. more or less useless.
+- pointer type ConsoleValueType
+- lambda variables + ConsoleValueType
+- tuple assignment for local variables
+- New CallFunc OP Codes 
 - Cache last entry on Dictionary lookup .. this speed up global var test but 
 there is only one variable which is not the same as in a normal enviroment
 - Enabled inline cache as default ON again
-- Added Raylib bindings here as addon - will be merged with raylib-ElfScript later.
+- Added Raylib bindings here as addon - and merged it with raylib-ElfScript and elfFlux later.
 
 ## Version 0.7g - stability tests for first release - 
 

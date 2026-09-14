@@ -461,7 +461,6 @@ DefineEngineFunction( getValueByPtr, ConsoleValue, (ConsoleValue PtrValue),,"") 
     if (PtrValue.type != cvPointer ) return ElfScript::muleValue;
     void* rawPtr = PtrValue.getPointer();
     if ( !rawPtr ) return ElfScript::muleValue;
-    // // entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr)
     ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
     if ( !value ) return ElfScript::muleValue;
 
@@ -473,7 +472,6 @@ DefineEngineFunction( setValueByPtr, bool, (ConsoleValue PtrValue, ConsoleValue 
     if (PtrValue.type != cvPointer ) return false;
     void* rawPtr = PtrValue.getPointer();
     if ( !rawPtr ) return false;
-    // // entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr)
     ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
     if ( !value ) return false;
 

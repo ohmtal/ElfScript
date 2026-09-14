@@ -69,21 +69,19 @@ public:
 
    ~ConsoleValueStack()
    {
-      // NOTE ElfScript 0.8
-      // i changed it to original again
-      // since there is no memleak anymore ?!
 
-      // // memleak fix start >>>>
-      // while (stack.size() > 0)
-      // {
-      //    popFrame();
-      // }
-      //
-      // for (S32 i = 0; i < allocatorSize; i += sizeof(ConsoleValue))
-      // {
-      //    destructInPlace<ConsoleValue>(reinterpret_cast<ConsoleValue*>(memory + i));
-      // }
-      // // <<< memleak fix end
+
+      // memleak fix start >>>>
+      while (stack.size() > 0)
+      {
+         popFrame();
+      }
+
+      for (S32 i = 0; i < allocatorSize; i += sizeof(ConsoleValue))
+      {
+         destructInPlace<ConsoleValue>(reinterpret_cast<ConsoleValue*>(memory + i));
+      }
+      // <<< memleak fix end
 
       dFree(memory);
    }

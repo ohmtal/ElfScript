@@ -1,7 +1,7 @@
-// NOTE so ein dummfug ... all the work is useless ....
 // lambda test with parent variable type ... SLOW like global var ... lol!
 // because of missing ++/--/.. short cuts
 
+// NOTE so ein dummfug ... all the work is useless ....
 
 
 #define JLOOPS 25

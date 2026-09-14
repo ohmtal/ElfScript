@@ -258,7 +258,7 @@ public:
       transferFrom(other);
    }
 
-   ConsoleValue& operator=(const ConsoleValue& other)
+  TORQUE_FORCEINLINE ConsoleValue& operator=(const ConsoleValue& other)
    {
       if (this != &other)
       {
@@ -269,7 +269,7 @@ public:
       return *this;
    }
 
-   ConsoleValue& operator=(ConsoleValue&& other) noexcept
+   TORQUE_FORCEINLINE ConsoleValue& operator=(ConsoleValue&& other) noexcept
    {
       if (this != &other)
       {
@@ -292,7 +292,9 @@ public:
       // ElfScript 0.7 reset depending on type: orig setEmptyString();
       switch (type)
       {
+#ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector: v = {0}; break;
+#endif
             case ConsoleValueType::cvFloat:  f = 0.0; break;
             case ConsoleValueType::cvInteger: i = 0; break;
             case ConsoleValueType::cvLambda: dataPtr = nullptr; break;
@@ -619,7 +621,7 @@ public:
 //ElfScript need them  // private:
    /// Deep-copy from `other` into `this` (assumes `this` has already been
   /// cleaned up or is freshly constructed).
-   void copyFrom(const ConsoleValue& other)
+  inline void copyFrom(const ConsoleValue& other)
    {
       switch (other.type)
       {
@@ -643,7 +645,12 @@ public:
          setStringTableEntry(other.s);
          break;
 
-
+      case ConsoleValueType::cvPointer:
+            setPointer(other.dataPtr, cvPointer);
+      break;
+      case ConsoleValueType::cvLambda:
+            setPointer(other.dataPtr, cvLambda);
+      break;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
             dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
@@ -673,7 +680,7 @@ public:
    /// Steal the payload from `other` (which must already have its type and
    /// bufferLen copied into `this`), then leave `other` in a safe empty state.
    /// Called only from move constructor / move assignment after copying type.
-   TORQUE_FORCEINLINE void transferFrom(ConsoleValue& other) noexcept
+   inline void transferFrom(ConsoleValue& other) noexcept
    {
       // Copy the right union field based on the type we already copied.
       switch (type)
@@ -689,6 +696,12 @@ public:
           dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
           break;
 #endif
+      case ConsoleValueType::cvPointer:
+            setPointer(other.dataPtr, cvPointer);
+      break;
+      case ConsoleValueType::cvLambda:
+            setPointer(other.dataPtr, cvLambda);
+      break;
       // // case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:
       case ConsoleValueType::cvNULL:

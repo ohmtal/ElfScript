@@ -1,15 +1,9 @@
-// lambda test ... not slower and not faster ...
+// lambda test with pointers -  not slower and not faster ...
 // using pointer to localX ... still experimental .. will be better inside VM
 // and it's slower than with parameter and return, so far . but i finally got
 // a way to transfer the global scope variables
 
-// Plan:
-// 1. When i can get the pointer there must be a way to get the global scope stack!
-// 2. When i got the global scope stack [0] ?! i can add somthing like:
-// &localX << global scope %localX variable!
-// this would be a dream when i can work directly with the registers inside a
-// function and global variables will be completly useless :D
-// need a lot of search of if '%' or '$' / oldVariable ..........
+
 
 
 #define JLOOPS 25
