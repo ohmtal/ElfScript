@@ -862,9 +862,7 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       //ElfScript 0.8
       if ( varName[0] == '#') {
              codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
-             FuncVars* lFuncVars = &gGlobalScopeFuncVars;
-             codeStream.emit(lFuncVars->lookup(varName, dbgLineNumber));
-
+             codeStream.emit(getFuncVars(dbgLineNumber)->lookup(varName, dbgLineNumber));
 
       } else {
 
@@ -1124,9 +1122,8 @@ U32 AssignExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       if ( varName[0] == '#') {
             codeStream.emit(OP_SAVE_PARENTSCOPE_VAR);
             // FIXME REWRITE varName[0] = '%';
-            FuncVars* lFuncVars = &gGlobalScopeFuncVars;
-            codeStream.emit(lFuncVars->assign(varName,
-                        subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
+            codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName,
+                                                               subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
       } else {
 
             switch (subType)
@@ -1259,8 +1256,7 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       {
          //ElfScript 0.8 slowmo path
          if (varName[0] == '#') {
-               FuncVars* lFuncVars = &gGlobalScopeFuncVars;
-               const S32 varIdx =lFuncVars->lookup(varName, dbgLineNumber);
+              const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
                codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
                codeStream.emit(varIdx);
                codeStream.emit(operand);

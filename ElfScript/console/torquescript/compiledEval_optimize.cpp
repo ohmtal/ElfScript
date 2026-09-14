@@ -1325,7 +1325,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       Con::gCurrentFile = this->name;
       Con::gCurrentRoot = this->modPath;
    }
-   const char* val;
+
    S32 reg;
    S32 currentRegister = -1;
 
@@ -5273,7 +5273,7 @@ handle_OP_LAMBDA_CALL: {
             Con::errorf("LAMBDA Error: function is invalid!");
             DISPATCH();
       }
-      Con::debugf("Found LAMBDA function: %p function name: %s", srcValuePtr->dataPtr, nsEntry->mFunctionName);
+      // Con::debugf("Found LAMBDA function: %p function name: %s", srcValuePtr->dataPtr, nsEntry->mFunctionName);
 
 
       if (!Script::gEvalState.stack.empty())
@@ -5307,7 +5307,7 @@ handle_OP_LOAD_PARENTSCOPE_VAR: {
 
 
       reg = code[ip++];
-      currentRegister = reg;
+      // // // currentRegister = reg;
 
       prevField = NULL;
       prevObject = NULL;
@@ -5334,7 +5334,7 @@ handle_OP_LOAD_PARENTSCOPE_VAR: {
 // ---------------
 handle_OP_SAVE_PARENTSCOPE_VAR: {
       reg = code[ip++];
-      currentRegister = reg;
+      // // // currentRegister = reg;
 
       prevField = NULL;
       prevObject = NULL;

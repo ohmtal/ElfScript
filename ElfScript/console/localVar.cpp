@@ -19,6 +19,7 @@ extern  FuncVars gGlobalScopeFuncVars;
 
 //-----------------------------------------------------------------------------
 namespace ElfScript {
+    ConsoleValue muleValue;
 
     const char* getConsoleValueTypeName(S32 type) {
         switch (type) {
@@ -71,6 +72,24 @@ namespace ElfScript {
             reg = findLocalVarRegisterInCurrentScope(variableName);
             if (reg < 0) return false;
             stack = &Script::gEvalState.currentRegisterArray->values[reg];
+            if (!stack ) return false;
+            return true;
+        }
+        else if (variableName[0] == '#') {
+            reg = _getFuncVars()->lookupExising(StringTable->insert( variableName ));
+            if (reg < 0) return false;
+            S32 stackNum = 0;
+            Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+            if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+                stackNum = Script::gEvalState.getTopOfStack() - 1;
+            } else {
+                stackNum = Script::gEvalState.getTopOfStack() - 2;
+            }
+            if (stackNum < 0) {
+                Con::errorf("Gee stacknum lower than 0!");
+                return false;
+            }
+            stack =  &Script::gEvalState.localStack[stackNum].values[reg];
             if (!stack ) return false;
             return true;
         }
@@ -236,28 +255,26 @@ namespace ElfScript {
         , variableName, getConsoleValueTypeName(localVal.type), localVal.getString());
 
     }
-    // -----------------------------------------------------------------------------
+    // // -----------------------------------------------------------------------------
     void varDumpLocals(const char* variableName)
     {
         // sanity
         if (!variableName) return;
 
-        if (variableName[0] != '%') {
+        if (variableName[0] != '%' && variableName[0] != '#') {
             Con::errorf("Sorry [%s] in not a local variable %s", variableName);
             return;
         }
+        ConsoleValue* localVal = nullptr;
+        S32 reg = -1;
 
-        S32 reg = findLocalVarRegisterInCurrentScope(variableName);
-
-        if (reg < 0) {
+        if (!getLocalVariable(variableName, localVal, reg) || !localVal) {
             Con::printf("%s not found.", variableName);
             return ;
         }
 
-
-        ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
         Con::printf(" %10s [type:%8s] [value:%20s] [reg:%2d] "
-        , variableName, getConsoleValueTypeName(localVal.type), localVal.getString(), reg);
+        , variableName, getConsoleValueTypeName(localVal->type), localVal->getString(), reg);
     }
     // -----------------------------------------------------------------------------
     void varDumpDynamicField(const char* variableName) {
@@ -318,9 +335,18 @@ namespace ElfScript {
 
     // -----------------------------------------------------------------------------
     void varDump(const char* variableName) {
-        if ( !variableName || variableName[0] == '\0') return;
-        if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
-        else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
+
+        if (dStrstr(variableName, "."))  {
+             ElfScript::varDumpDynamicField(variableName);
+            return;
+        }
+
+        if (variableName[0] == '$') {
+            ElfScript::varDumpGobals(variableName);
+            return;
+        }
+
+        ElfScript::varDumpLocals(variableName);
     }
 
 } //namespace ElfScript
@@ -342,10 +368,6 @@ DefineEngineFunction( value, const char * , (const char* variableName), , "local
 DefineEngineFunction( varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
     ElfScript::varDump(variableName);
-    // if ( !variableName || variableName[0] == '\0') return;
-    // if ( variableName[0] == '%') ElfScript::varDumpLocals(variableName);
-    // else if ( variableName[0] == '$') ElfScript::varDumpGobals(variableName);
-
 
 }
 // -----------------------------------------------------------------------------
@@ -425,6 +447,38 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 
 
     return count;
+}
+
+// =============================================================================
+DefineEngineFunction( getVarPtr, ConsoleValue, (const char * variableName),,"") {
+    ConsoleValue* stack = ElfScript::getLocalVariable(variableName);
+    if (stack) ElfScript::muleValue.setPointer(stack, cvPointer);
+    else ElfScript::muleValue.setString("varPtr failed to get pointer!!");
+    return ElfScript::muleValue;
+}
+DefineEngineFunction( getValueByPtr, ConsoleValue, (ConsoleValue PtrValue),,"") {
+    ElfScript::muleValue.setString("valueByPtr: FAILED to get value!");
+    if (PtrValue.type != cvPointer ) return ElfScript::muleValue;
+    void* rawPtr = PtrValue.getPointer();
+    if ( !rawPtr ) return ElfScript::muleValue;
+    // // entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr)
+    ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
+    if ( !value ) return ElfScript::muleValue;
+
+    ElfScript::muleValue = *value;
+    return ElfScript::muleValue;
+
+}
+DefineEngineFunction( setValueByPtr, bool, (ConsoleValue PtrValue, ConsoleValue setterValue),,"") {
+    if (PtrValue.type != cvPointer ) return false;
+    void* rawPtr = PtrValue.getPointer();
+    if ( !rawPtr ) return false;
+    // // entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr)
+    ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
+    if ( !value ) return false;
+
+    *value = setterValue;
+    return true;
 }
 
 // =============================================================================

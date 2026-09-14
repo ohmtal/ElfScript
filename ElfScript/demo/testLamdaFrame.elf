@@ -10,10 +10,11 @@ function loader(%which) {
     else exec(%thisFile);
 }
 // ============================================================================
-
-
-
 #parent = 11.0;
+%lam = fn( )  { print("PARENT VALUE LAMDA (14):",#parent); #parent +=  2; };
+varDump("#parent");
+varDump("%lam");
+
 
 function pa() { print("PARENT VALUE INSIDE (11):",#parent); #parent = #parent + 2;}
 
@@ -22,10 +23,15 @@ print("PARENT VALUE OUTSIDE (13):",#parent);
 #parent++;
 print("PARENT VALUE OUTSIDE (14):",#parent);
 
+%lam();
+
 print(" ---------- FIXME vardump in localVar.cpp ---------- ");
 varDump("#parent");
 
-return;
+
+
+
+// return;
 
 
 

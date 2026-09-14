@@ -165,8 +165,8 @@ function Main::EndText(%this) {
     SDL_SetRenderScale(%this.renderer);
 }
 //------------------------------------------------------------------------------
-%mainRender = fn(%this) {
-
+%mainRender = fn() {
+    %this = $Main;
     if (isObject(%this.module)){
         %this.module.render();
     } else {
@@ -292,7 +292,7 @@ $WindowSize = {640,400};
 $Global::running = onInit();
 $Global::reloading = false;
 
-%main = Main.getId();
+
 
 echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 
@@ -307,6 +307,8 @@ echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 // we only need to push the renderer if we scaled the screen....
 %mainLoopParam = %main.scaledScreen ? %main.renderer : 0;
 
+#main = %main; //TEST for lamda
+
 while ($Global::running) {
 
     %tickCount = SDL_GetPerformanceCounter();
@@ -315,7 +317,7 @@ while ($Global::running) {
 
 
     // %main.Render();
-    %mainRender(%main); //as lambda
+    %mainRender(); //as lambda
 
 
     // Main::Render(%main); //not really >>Fast call we are in a critical loop
