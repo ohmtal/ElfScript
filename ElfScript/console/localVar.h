@@ -13,7 +13,7 @@ namespace ElfScript {
 
 
 
-    bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg);
+    bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg);
     ConsoleValue* getLocalVariable(const char* variableName );
 
     bool setLocalFloat(const char* variableName, F64 value);

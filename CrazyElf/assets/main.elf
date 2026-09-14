@@ -3,7 +3,6 @@ $MODULES_STARFIELDS = "StarField4 StarField3 StarField2 StarField";
 
 function StarFields() { $MODULES = $MODULES_STARFIELDS; $Main.loadModule(0); }
 
-
 //------------------------------------------------------------------------------
 $Global::ScreenSize = {320,200};
 $Global::FPS = 60; //initial - not a limit
@@ -166,6 +165,18 @@ function Main::EndText(%this) {
     SDL_SetRenderScale(%this.renderer);
 }
 //------------------------------------------------------------------------------
+%mainRender = fn(%this) {
+
+    if (isObject(%this.module)){
+        %this.module.render();
+    } else {
+        %this.DrawText(5, $ScreenSize.y - 20,"Failed to load module:" SPC %this.moduleName,  1.5, RED);
+    }
+
+    // draw the stuff ...
+    SDL_RenderPresent(%this.renderer);
+};
+//------------------------------------------------------------------------------
 function Main::Render(%this) {
 
 
@@ -303,7 +314,10 @@ while ($Global::running) {
     $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
 
 
-    %main.Render();
+    // %main.Render();
+    %mainRender(%main); //as lambda
+
+
     // Main::Render(%main); //not really >>Fast call we are in a critical loop
     if (!SDL_MainLoop(%mainLoopParam)) {
         print("quit by SDL_MainLoop");

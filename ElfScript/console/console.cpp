@@ -69,16 +69,26 @@ char* ConsoleValue::convertToBuffer() const
         //NOTE: hard coded 4
         dSprintf(buffer, 128, "%.9g %.9g %.9g %.9g", v.points[0], v.points[1],v.points[2],v.points[3]);
         return buffer;
-   }
+   } else
 #endif
    if (type == ConsoleValueType::cvLambda) {
 
-        char* buffer = static_cast<char*>(sConversionAllocator.alloc(128));
+        char* buffer = static_cast<char*>(sConversionAllocator.alloc(64));
         Namespace::Entry* entry = nullptr;
         if ( this->dataPtr && ( entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr))) {
             dSprintf(buffer, 64, "%s", entry->mFunctionName);
         } else {
             dSprintf(buffer, 64, "%s", "INVALID!");
+        }
+        return buffer;
+   } else
+   if (type == ConsoleValueType::cvPointer) {
+
+        char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
+        if ( this->dataPtr ) {
+            dSprintf(buffer, 32, "%p", this->dataPtr);
+        } else {
+            dSprintf(buffer, 32, "%s", "INVALID!");
         }
         return buffer;
    }

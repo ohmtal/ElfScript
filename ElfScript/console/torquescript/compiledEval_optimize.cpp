@@ -802,10 +802,10 @@ void* ExprEvalState::getPointerVariable() {
         return currentVariable ? currentVariable->getPointerValue() : nullptr;
 }
 
-void ExprEvalState::setPointerVariable(void* val)
+void ExprEvalState::setPointerVariable(void* val, ConsoleValueType type )
 {
       AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
-      currentVariable->setPointerValue(val);
+      currentVariable->setPointerValue(val, type);
 }
 
 #ifdef  ENABLE_CONSOLE_VECTOR
@@ -2294,6 +2294,7 @@ handle_OP_LOADVAR_STR:
                               valueType == ConsoleValueType::cvVector ||
 #endif
                               valueType == ConsoleValueType::cvInteger ||
+                              valueType == ConsoleValueType::cvPointer ||
                               valueType == ConsoleValueType::cvLambda;
             }
             if (fastPath)
@@ -2324,16 +2325,22 @@ handle_OP_SAVEVAR_STR:
             Script::gEvalState.setIntVariable(stack[_STK].getInt());
             DISPATCH();
       }
-
+      else
       if (stack[_STK].type == cvLambda) {
-            Script::gEvalState.setPointerVariable(stack[_STK].getPointer());
+            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvLambda);
             DISPATCH();
       }
-
+      else
+      if (stack[_STK].type == cvPointer) {
+            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvPointer);
+            DISPATCH();
+      }
+      else
       if (stack[_STK].type == cvFloat) {
             Script::gEvalState.setFloatVariable(stack[_STK].getFloat());
             DISPATCH();
       }
+      else
 #ifdef ENABLE_CONSOLE_VECTOR
       if (stack[_STK].type == cvVector) {
             Script::gEvalState.setVectorVariable(stack[_STK].getVector());
@@ -2389,6 +2396,7 @@ handle_OP_LOAD_LOCAL_VAR_STR:
                   varType == ConsoleValueType::cvVector ||
 #endif
                   varType == ConsoleValueType::cvInteger ||
+                  varType == ConsoleValueType::cvPointer ||
                   varType == ConsoleValueType::cvLambda
             )
             {
@@ -2466,6 +2474,10 @@ handle_OP_SAVE_LOCAL_VAR_STR:
          if (stack[_STK].type == cvInteger) {
             Script::gEvalState.setLocalIntVariable(reg, stack[_STK].getInt());
             DISPATCH();
+         }
+         if (stack[_STK].type == cvPointer) {
+               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvPointer);
+               DISPATCH();
          }
 
          if (stack[_STK].type == cvLambda) {
@@ -2721,8 +2733,11 @@ handle_OP_LOADFIELD_FASTPATH:
                                     stackPtr->setVector(cachePtr->fieldValuePtr->getVector());
                                     break;
                               #endif
+                              case ConsoleValueType::cvPointer:
+                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvPointer);
+                                    break;
                               case ConsoleValueType::cvLambda:
-                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer());
+                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvLambda);
                                     break;
                               default:
                                     const char* str = cachePtr->fieldValuePtr->getString();
@@ -2916,9 +2931,9 @@ handle_OP_SAVEFIELD_FASTPATH:
                                     cachePtr->fieldValuePtr->setVector(stackP->getVector());
                                     break;
                               #endif
-                              case ConsoleValueType::cvLambda: //NOTE This will be never reached so far!!!
-                                    cachePtr->fieldValuePtr->setPointer(stackP->getPointer());
-                                    break;
+                              // // case ConsoleValueType::cvLambda: //NOTE This will be never reached so far!!!
+                              // //       cachePtr->fieldValuePtr->setPointer(stackP->getPointer());
+                              // //       break;
                               default:
                                     if (desiredType == ConsoleValueType::cvFloat)
                                           cachePtr->fieldValuePtr->setFloat(stackP->getFloat());

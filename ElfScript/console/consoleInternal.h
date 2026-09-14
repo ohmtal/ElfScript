@@ -534,7 +534,7 @@ public:
    Dictionary();
    ~Dictionary();
 
-   Entry* mLastWalkCache = nullptr;
+   Entry* mLastWalkCache = nullptr; // ElfScript lookup cache last global
    Entry* lookup(StringTableEntry name);
    Entry* add(StringTableEntry name);
 

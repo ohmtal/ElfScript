@@ -28,6 +28,7 @@ namespace ElfScript {
             case ConsoleValueType::cvSTEntry: return "String";
             case ConsoleValueType::cvConsoleValueType: return "Console";
             case ConsoleValueType::cvLambda: return "Lambda";
+            case ConsoleValueType::cvPointer: return "Pointer";
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
             #endif
@@ -63,7 +64,7 @@ namespace ElfScript {
     //  get a local or global variable ConsoleValue
     //  i also added global but keep the name getLocalVariable
     //
-    bool getLocalVariable(const char* variableName, ConsoleValue* stack, S32& reg){
+    bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
         if (!variableName) return false;
 
         if (variableName[0] == '%') {
@@ -308,7 +309,7 @@ namespace ElfScript {
             Con::printf("%s, count: %d ", funcName, maptbl.varList.size());
             for (S32 i = 0 ; i < maptbl.varList.size(); i++) {
                 Con::printf("   - %s", maptbl.varList[i]);
-                varDump( maptbl.varList[i]);
+                // varDump( maptbl.varList[i]);
             }
             // Con::printf("%s: reg:%d currentType: %d", key, val.reg ,(S32)val.currentType);
         }
@@ -325,20 +326,20 @@ namespace ElfScript {
 } //namespace ElfScript
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-DefineEngineFunction(varDumpField, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
+DefineEngineFunction( varDumpField, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
     if ( !variableName || variableName[0] == '\0') return;
     ElfScript::varDumpDynamicField(variableName);
 }
 
-DefineEngineFunction(value, const char * , (const char* variableName), , "local/global value")
+DefineEngineFunction( value, const char * , (const char* variableName), , "local/global value")
 {
     if ( !variableName || variableName[0] == '\0') return "";
    return(ElfScript::getLocalString(variableName)); //does both local and global
 
 }
 
-DefineEngineFunction(varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
+DefineEngineFunction( varDump, void, (const char* variableName), , "local/global variable dump. local only valid in the variables scope")
 {
     ElfScript::varDump(variableName);
     // if ( !variableName || variableName[0] == '\0') return;
@@ -348,7 +349,7 @@ DefineEngineFunction(varDump, void, (const char* variableName), , "local/global 
 
 }
 // -----------------------------------------------------------------------------
-DefineEngineFunction(dumpLocals, void, (bool allLocals, bool withGlobals),(true, true),"dump local and global  variables") {
+DefineEngineFunction( dumpLocals, void, (bool allLocals, bool withGlobals),(true, true),"dump local and global  variables") {
     ElfScript:: dumpAllLocalVariables(allLocals);
     if (withGlobals) ElfScript:: dumpAllGlobalVariables();
 }
@@ -357,14 +358,14 @@ DefineEngineFunction(dumpLocals, void, (bool allLocals, bool withGlobals),(true,
 DefineEngineFunction(whereAmI, void,(),,"look up the function where i'am called from") {
     Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
     if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
-        Con::printf("Global scope i guess ...");
+        Con::printf("**WhereAmI** Global scope i guess ...");
         return;
     }
     StringTableEntry functionName = stackFrame.scopeName;
     StringTableEntry namespaceName = stackFrame.scopeNamespace->mName;
 
-    Con::printSeparator();
-    Con::printf("you are in function:  [%s::%s] ",
+    // Con::printSeparator();
+    Con::printf("**WhereAmI** you are in function:  [%s::%s] ",
                 namespaceName ? namespaceName : ""
                 , functionName ? functionName :"unknown");
 
@@ -428,15 +429,15 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 
 // =============================================================================
 #ifdef TORQUE_DEBUG
-DefineEngineFunction(LIST_LOCAL_STACKS, void, (),, "debug: list local stacks") {
-    Con::printSeparator();
-    Con::printf("STACK COUNT: %d", Script::gEvalState.localStack.size() );
-    for (S32 i =0; i < Script::gEvalState.localStack.size(); i++) {
-        S32 j = 0;
-        Script::gEvalState.localStack[i].values[j];
-        // while (dynamic_cast<ConsoleValue>();
-    }
-}
+// DefineEngineFunction(LIST_LOCAL_STACKS, void, (),, "debug: list local stacks") {
+//     Con::printSeparator();
+//     Con::printf("STACK COUNT: %d", Script::gEvalState.localStack.size() );
+//     for (S32 i =0; i < Script::gEvalState.localStack.size(); i++) {
+//         S32 j = 0;
+//         Script::gEvalState.localStack[i].values[j];
+//         // while (dynamic_cast<ConsoleValue>();
+//     }
+// }
 
 
 
@@ -455,6 +456,29 @@ DefineEngineFunction(TEST_VAR_CREATE,void,(),,"must be test inside and outside a
         Con::errorf("- FAILED TO CREATE LOCAL!");
     }
     Con::printSeparator();
+}
+
+
+DefineEngineFunction( testLocalGlobal, void, (const char * variableName),,"") {
+     S32 varRegister = ElfScript::_getFuncVars()->lookupExising(StringTable->insert( variableName ));
+     Con::printf("REGISTER FOR %s is %d - LOCALSTACK SIZE:%d STACKDEPTH: %d", variableName, varRegister,
+                 Script::gEvalState.localStack.size(), Script::gEvalState.getTopOfStack());
+     // hardcore validations later :P
+
+     S32 stackNum = 0;
+     Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
+     if (!stackFrame.scopeName || !stackFrame.scopeNamespace ){
+         stackNum = Script::gEvalState.getTopOfStack() - 1;
+     } else {
+         stackNum = Script::gEvalState.getTopOfStack() - 2;
+    }
+    if (stackNum < 0) {
+        Con::errorf("Gee stacknum lower than 0!");
+        stackNum = 0;
+    }
+    ConsoleValue* valuePtr =  &Script::gEvalState.localStack[stackNum].values[varRegister];
+     Con::printf("& %10s [type:%8s] [value:%20s] [reg:%2d] "
+       , variableName, ElfScript::getConsoleValueTypeName(valuePtr->type), valuePtr->getString(), varRegister);
 }
 
 #endif

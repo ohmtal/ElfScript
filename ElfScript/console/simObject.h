@@ -590,7 +590,9 @@ class SimObject: public ConsoleObject
                               #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
                               #endif
-                              case cvLambda: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
+                              case cvLambda: TORQUE_CASE_FALLTHROUGH;
+                              case cvPointer:
+                                    mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
                   }
@@ -639,6 +641,9 @@ class SimObject: public ConsoleObject
                               stackP->setVector(entry->mValue.getVector());
                               break;
                         #endif
+                        case ConsoleValueType::cvPointer:
+                              stackP->setPointer(entry->mValue.getPointer(), cvPointer);
+                              break;
                         case ConsoleValueType::cvLambda:
                               stackP->setPointer(entry->mValue.getPointer());
                               break;
@@ -745,6 +750,7 @@ class SimObject: public ConsoleObject
                               #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
                               #endif
+                              case cvPointer: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               case cvLambda: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
@@ -767,6 +773,9 @@ class SimObject: public ConsoleObject
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
                   #endif
+                  case ConsoleValueType::cvPointer:
+                        stackP->setPointer(entry->mValue.getPointer(), cvPointer);
+                        break;
                   case ConsoleValueType::cvLambda:
                         stackP->setPointer(entry->mValue.getPointer());
                         break;

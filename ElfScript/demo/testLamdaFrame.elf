@@ -1,14 +1,99 @@
-function rl() {
+// my beloved typo Lambda not Lamda !! ... file name stays now ..
+
+
+function loader(%which) {
+        %testFile = "ElfScript/demo/test.elf";
+        %thisFile = "ElfScript/demo/testLamdaFrame.elf";
     $Debug::DumpByteCode=0;
-    if ($Con::File !$= "") exec($Con::File);
+    // if ($Con::File !$= "") exec($Con::File);
+    if (%which == 1) exec(%testFile);
+    else exec(%thisFile);
 }
 
 
+
+%uniqeA = 11;
+%uniqeB = 12;
+
+function nuabber() {
+    print ("----------- ConsoleFunction ---------");
+    whereami();
+    testLocalGlobal("%uniqeA");
+    testLocalGlobal("%uniqeB");
+}
+
+nuabber();
+print("");
+%o = new Object();
+function Object::nubar() {
+    print ("----------- ConsoleFunction Method ---------");
+    whereami();
+    testLocalGlobal("%uniqeA");
+    testLocalGlobal("%uniqeB");
+}
+%o.nubar();
+print("");
+print ("----------- Outside in Global Scope ---------");
+whereami();
+testLocalGlobal("%uniqeA");
+testLocalGlobal("%uniqeB");
+
+
+%fun = fn() {
+    print ("----------- LAMDA ---------");
+    whereami();
+    #uniqeA = 5;
+    testLocalGlobal("%uniqeA");
+    testLocalGlobal("%uniqeB");
+};
+
+%fun();
+
+return;
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
 %foo = 11;
+%uniqeBar = 12;
+$ptr = getVarPtr("%foo");
+varDump("$ptr");
+varDump("%foo");
+printSeparator();
+%copyFoo = getValueByPtr($ptr);
+varDump("%copyFoo");
+
+printSeparator();
+
+function huhu() {
+    print("-------------- INSIDE FUNCTION ------------------");
+    //
+    %copyFoo = getValueByPtr($ptr);
+    varDump("%copyFoo");
+    setValueByPtr($ptr, 4711);
+}
+huhu();
+print("-------------- OUTSIDE FUNCTION ------------------");
+varDump("%foo");
+
+
+printSeparator();
+printSeparator();
+
+function lala() {
+    whereami();
+    dumpLocals(1,0);
+}
+lala();
+
+
+
 
 %p = [569];
-// %fn = fn() { %bar = 4711; print("FOO:", %foo, "BAR:", %bar); };
-%fn = fn(%param) { %bar = 4711; print("Param:", %param, "BAR:", %bar); };
+// %fn = fn() { %uniqeBar = 4711; print("FOO:", %foo, "BAR:", %uniqeBar); };
+%fn = fn(%param) { %uniqeBar = 4711; print("Param:", %param, "BAR:", %uniqeBar); };
 %fn2 = fn(%lolo) { %lala = 4711; print("Param:", %lolo, "BAR:", %lala); };
 function normal() { %norm = 0;}
 callLambdaTest(%fn,%p/*, true*/);
@@ -27,8 +112,8 @@ printSeparator();
 %o.lam = %fn;
 print("FIELD:");
 vardumpField(%o.getId()@".lam");
-%back = %o.lam;
-vardump("%back");
+%uniqeBack = %o.lam;
+vardump("%uniqeBack");
 
 
 printSeparator();

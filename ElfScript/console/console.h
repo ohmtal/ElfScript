@@ -129,6 +129,7 @@ typedef const char *StringTableEntry;
 
 enum ConsoleValueType
 {
+   cvPointer  =         -8,
    cvLambda   =          -7,
    cvVector  =          -6,
    cvNULL =             -5,
@@ -295,6 +296,7 @@ public:
             case ConsoleValueType::cvFloat:  f = 0.0; break;
             case ConsoleValueType::cvInteger: i = 0; break;
             case ConsoleValueType::cvLambda: dataPtr = nullptr; break;
+            case ConsoleValueType::cvPointer: dataPtr = nullptr; break;
             default: setEmptyString(); break;
       }
    }
@@ -315,6 +317,7 @@ public:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
       case ConsoleValueType::cvLambda: return (F64)(dataPtr != nullptr);
+      case ConsoleValueType::cvPointer: return (F64)(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
@@ -341,6 +344,7 @@ public:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
 
       case ConsoleValueType::cvLambda: return dataPtr != nullptr;
+      case ConsoleValueType::cvPointer: return dataPtr != nullptr;
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);
@@ -365,6 +369,7 @@ public:
          return (v.points[0] != 0.0f);
 #endif
       case ConsoleValueType::cvLambda: return dataPtr != nullptr;
+      case ConsoleValueType::cvPointer: return dataPtr != nullptr;
       // case ConsoleValueType::cvInteger:
       //    return (i != 0);
       case ConsoleValueType::cvFloat:
@@ -394,6 +399,8 @@ public:
       case ConsoleValueType::cvVector:
             TORQUE_CASE_FALLTHROUGH;
 #endif
+      case ConsoleValueType::cvPointer:
+            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvLambda:
             TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvFloat:
@@ -491,7 +498,8 @@ public:
    }
 
    TORQUE_FORCEINLINE void* getPointer() {
-         if (type == cvLambda) return this->dataPtr;
+         // if (type == cvLambda)
+         return this->dataPtr;
          return nullptr;
    }
 

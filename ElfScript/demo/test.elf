@@ -827,7 +827,8 @@ print("LAMDA RESULT IS:", %fn("huhu"));
 print("LAMDA RESULT FROM C callLambda:", callLambdaTest(%fn, %p)); // test for later mappings
 
 
-LIST_LOCAL_STACKS();
+
+
 printSeparator();
 
 

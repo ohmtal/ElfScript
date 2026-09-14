@@ -48,7 +48,7 @@ public:
    void setStringVariable(const char *str);
 
    void* getPointerVariable();
-   void setPointerVariable(void* val);
+   void setPointerVariable(void* val, ConsoleValueType type = cvLambda);
 
    ConsoleValue* getConsoleValue(); //ElfScript
 
