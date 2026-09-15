@@ -10,7 +10,17 @@
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
 
-## Version 0.8a 
+## Version 0.8
+
+- cleanup a bit no idea how to fix the cpu prediction again, so far:
+|Script | run 1 | run 2 | run 3 |
+| --- | --- | --- | --- |
+|test_localvar.elf |1.39s |1.43s |1.40s |
+|test_global.elf |2.45s |2.53s |2.43s |
+|test_static.elf |4.40s |4.51s |4.84s |
+|test_dynamic.elf |4.13s |4.01s |4.02s |
+|test_vector_components.elf |4.16s |4.22s |4.22s |
+
 -  about 100 ms slower speed tests ... not funny .. must be something in the VM but what. 
 Somewhere it breaks the CPU prediction or i added some cpu cycles.
 I think it's since the tuple assignment - but not sure. I changed the float format from 
