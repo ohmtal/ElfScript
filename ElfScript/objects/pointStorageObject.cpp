@@ -8,7 +8,7 @@
 // Store a VectorType with 4 Points inside a Vector
 // this can be used for a Vector2/3/4, Rectangle or UV
 //-----------------------------------------------------------------------------
-// applyMathOnPoints give special power to modify points in one call using tinyexpr.
+// REMOVED! applyMathOnPoints give special power to modify points in one call using tinyexpr.
 //-----------------------------------------------------------------------------
 // Examples:
 //  - store points for custom particles
@@ -45,7 +45,6 @@
 #include "console/simFieldDictionary.h"
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
-#include "ext/tinyexpr.h"
 
 #include "console/localVar.h"
 
@@ -71,20 +70,6 @@ void normalizeXY(F32& x, F32& y) {
 }
 
 
-// ------------ tinyexpr wrapped random: -------------------
-static double tinyexpr_randf_0() {
-    return (double)ElfMath::mRandF();
-}
-static double tinyexpr_randf_1(double min) {
-    return (double)ElfMath::mRandF((F32) min, 0.f);
-}
-static double tinyexpr_randf_2(double min, double max) {
-    return (double)ElfMath::mRandF((F32)min, (F32)max);
-}
-
-// For accessing current object from tinyexpr function
-class PointStorageObject;
-static PointStorageObject* sCurrentInstance = nullptr;
 
 class PointStorageObject: public SimObject
 {
@@ -104,14 +89,11 @@ public:
      */
     Vector<ConsoleVector> mPoints;
 
-    // math (tinyexpr) operation direct access:
-    F32 mtX, mtY, mtZ, mtW;
+
 
     // -------------------------------------------------------------------------
     PointStorageObject() {
-        // mVector.points[0] = mVector.points[1] = mVector.points[2] = mVector.points[3] = 0.f;
         mVector = {0};
-        mtX =  mtY = mtZ =  mtW = 0.f;
     }
 
     // -------------------------------------------------------------------------
@@ -192,108 +174,6 @@ public:
     void setPos(const ConsoleVector& vec4) {
         this->mVector = vec4;
     }
-
-
-    // -------------------------------------------------------------------------
-    /*
-     * applyMathOnPoints
-     * - Using tinyexpr
-     * - Format each statement separated by ";" => "x+5; y*2; z; w"
-     */
-    bool applyMathOnPoints(String Expr, U32 startIndex = 0, U32 endIndex = 0) {
-        if (endIndex == 0) endIndex = mPoints.size() -1;
-        if ( endIndex >= mPoints.size()
-            || startIndex >= mPoints.size()
-            || startIndex > endIndex
-        ) {
-            Con::errorf("Invalid Range parameter applyMathOnPoints ( %u .. %u )", startIndex, endIndex);
-            return false;
-        }
-
-
-
-        Vector<String> expressions;
-        Expr.split(";", expressions);
-
-        // special pathes !!
-        if (expressions.size() == 1) {
-            String trimmedExpr = Expr.trim();
-            if (trimmedExpr.equal("normalizeXY()", String::NoCase)) {
-                for (U32 i = startIndex; i <= endIndex; i++) {
-                    F32 x = static_cast<F32>(mPoints[i].points[0]);
-                    F32 y = static_cast<F32>(mPoints[i].points[1]);
-                    normalizeXY( x,y );
-                    mPoints[i].points[0] = static_cast<F32>(x);
-                    mPoints[i].points[1] = static_cast<F32>(y);
-                }
-                return true;
-            }
-        }
-
-        if (expressions.size() != 4) {
-
-            Con::errorf("applyMathOnPoints: Expected 4 expressions separated by ';' (e.g., 'x+1; y; z; w')");
-            return false;
-        }
-
-
-        sCurrentInstance = this;
-        const int paramCount = 7;
-        te_variable vars[paramCount] = {
-            {"x", &mtX, TE_VARIABLE},
-            {"y", &mtY, TE_VARIABLE},
-            {"z", &mtZ, TE_VARIABLE},
-            {"w", &mtW, TE_VARIABLE},
-            {"randf", (const void*)&tinyexpr_randf_0, TE_FUNCTION0},
-            {"randf1", (const void*)&tinyexpr_randf_1, TE_FUNCTION1},
-            {"randf2", (const void*)&tinyexpr_randf_2, TE_FUNCTION2}
-        };
-
-        int err;
-        te_expr* exprX = te_compile(expressions[0].c_str(), vars, paramCount, &err);
-        te_expr* exprY = te_compile(expressions[1].c_str(), vars, paramCount, &err);
-        te_expr* exprZ = te_compile(expressions[2].c_str(), vars, paramCount, &err);
-        te_expr* exprW = te_compile(expressions[3].c_str(), vars, paramCount, &err);
-
-        if (!exprX || !exprY || !exprZ || !exprW) {
-            Con::errorf("applyMathOnPoints: Formula compilation failed!");
-            if (exprX) te_free(exprX);
-            if (exprY) te_free(exprY);
-            if (exprZ) te_free(exprZ);
-            if (exprW) te_free(exprW);
-            return false;
-        }
-
-        for (U32 i = startIndex; i <= endIndex; i++) {
-            ConsoleVector& p = mPoints[i];
-
-            mtX = p.points[0];
-            mtY = p.points[1];
-            mtZ = p.points[2];
-            mtW = p.points[3];
-
-            mtX = (F32)te_eval(exprX);
-            mtY = (F32)te_eval(exprY);
-            mtZ = (F32)te_eval(exprZ);
-            mtW = (F32)te_eval(exprW);
-
-            p.points[0] = mtX;
-            p.points[1] = mtY;
-            p.points[2] = mtZ;
-            p.points[3] = mtW;
-        }
-
-        sCurrentInstance = nullptr;
-
-        te_free(exprX);
-        te_free(exprY);
-        te_free(exprZ);
-        te_free(exprW);
-
-        return true;
-    }
-
-
     // -------------------------------------------------------------------------
     // **** direct local var access !!!! - i ignore fails here ...***
     void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
@@ -353,7 +233,6 @@ public:
         writeFields(stream, tabStop + 1);
 
         // <<<<<<<<<<<<<<<<<<<<<<<< Parent::write
-// mhhhh
 
         S32 count = this->mPoints.size();
         dSprintf(buffer, sizeof(buffer), "TypeS32 _populate = %d;\r\n", count); //magic populate ^^
@@ -462,18 +341,10 @@ DefineEngineMethod(PointStorageObject, setPosVec, void, (ConsoleVector vector), 
        object->mVector = vector;
 }
 
-// DefineEngineMethod(PointStorageObject, getPosByReference, void,
-//                    (const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-//                    , "set the position by by Referency on up to 4 Variables\n"
-//                      "NOTE: the variables must exists before this is called it does NOT create them."
-// ) {
-//     object->getPosByReference(varX, varY, varZ, varW);
-// }
-
 
 // ---------- set Pos by float's ----------
 DefineEngineMethod(PointStorageObject, setPos, void, (F32 x, F32 y, F32 z, F32 w),(0.f,0.f) ,
-                   "Set position by method ") {
+                   "Set position by single values") {
     object->setPos(x,y,z,w);
 }
 DefineEngineMethod(PointStorageObject, normalizeXZ, void, (), ,
@@ -509,83 +380,6 @@ DefineEngineMethod(PointStorageObject, setPoint2, bool, (U32 index, F32 x, F32 y
 }
 
 
-DefineEngineMethod(PointStorageObject, getPointByReference, void,
-                   (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-                   , "get the point at index  by Reference from 2-4 Variables\n"
-                   "NOTE: the variables must exists before this is called it does NOT create them."
-) {
-    object->getPointByReference(index,varX, varY, varZ, varW);
-}
-DefineEngineMethod(PointStorageObject, setPointByReference, void,
-                   (U32 index,const char* varX, const char* varY, const char* varZ, const char* varW ),("","")
-                   , "set the point at index  by Reference to 2-4 Variables\n"
-                   "NOTE: the variables must exists before this is called it does NOT create them."
-) {
-    object->setPointByReference(index,varX, varY, varZ, varW);
-}
-
-#ifdef ENABLE_CONSOLE_VECTOR
-DefineEngineMethod(PointStorageObject, getPointVecByReference, void, (U32 index,const char* vecVar),
-                   , "get the point at index and push it into vecVar\n"
-                   "NOTE: the variables must exists before this is called it does NOT create them."
-) {
-    object->getPointVecByReference(index,vecVar);
-}
-DefineEngineMethod(PointStorageObject, setPointVecByReference, void,
-                   (U32 index,const char* vecVar ),
-                   , "use the data from vecVar to save a point at index\n"
-                   "NOTE: the variables must exists before this is called it does NOT create them."
-) {
-    object->setPointVecByReference(index,vecVar);
-}
-#endif
-
-
-DefineEngineMethod(PointStorageObject, getPointX, F32, (U32 index),
-                   , "get the point.points[0] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].points[0]);
-}
-DefineEngineMethod(PointStorageObject, getPointY, F32, (U32 index),
-                   , "get the point.points[0] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].points[1]);
-}
-DefineEngineMethod(PointStorageObject, getPointZ, F32, (U32 index),
-                   , "get the point.points[2] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].points[2]);
-}
-DefineEngineMethod(PointStorageObject, getPointW, F32, (U32 index),
-                   , "get the point.points[3] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return 0.f;
-    return (object->mPoints[index].points[3]);
-}
-DefineEngineMethod(PointStorageObject, setPointX, bool, (U32 index, F32 value),
-                   , "set the point.points[0] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].points[0] = value;
-    return true;
-}
-DefineEngineMethod(PointStorageObject, setPointY, bool, (U32 index, F32 value),
-                   , "set the point.points[1] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].points[1] = value;
-    return true;
-}
-DefineEngineMethod(PointStorageObject, setPointZ, bool, (U32 index, F32 value),
-                   , "set the point.points[2] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].points[2] = value;
-    return true;
-}
-DefineEngineMethod(PointStorageObject, setPointW, bool, (U32 index, F32 value),
-                   , "set the point.points[2] from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return false;
-    object->mPoints[index].points[3] = value;
-    return true;
-}
-
 DefineEngineMethod(PointStorageObject, getPointVec, ConsoleVector, (U32 index),
                    , "get the point from the point storage at index as Vector (String)") {
     if ( index >= object->mPoints.size()) return {0};
@@ -597,27 +391,8 @@ DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, ConsoleVe
 
     object->mPoints[index] = vec4;
     return true;
-
-
 }
 
-DefineEngineMethod(PointStorageObject, getPoint2Vec, String, (U32 index),
-                   , "get the point xy from the point storage at index as Vector (String)") {
-    if ( index >= object->mPoints.size()) return "";
-    ConsoleVector vec4 = object->mPoints[index];
-    StringBuilder str;
-    str.format("%g %g", vec4.points[0], vec4.points[1]);
-    return Con::getStringArg(str.end());
-}
-DefineEngineMethod(PointStorageObject, setPoint2Vec, bool, ( U32 index, String strVector), ,
-                   "set the point xy in the Point Storage at index by Vector (String)") {
-    if ( index >= object->mPoints.size()) return false;
-    F32 x,y;
-    dSscanf(strVector.c_str(), "%g %g",&x, &y);
-    object->mPoints[index].points[0] = x;
-    object->mPoints[index].points[1] = y;
-    return true;
-}
 // ---------- mPoints storage from/to objects position ----------
 DefineEngineMethod(PointStorageObject, storePoint, bool, (U32 index), ,
                    "store the current values x,y,z,w, to the point storage") {
@@ -635,27 +410,4 @@ DefineEngineMethod(PointStorageObject, fetchPoint, bool, (U32 index), ,
     object->setPos( object->mPoints[index] );
 
     return true;
-}
-
-// ---------- mPoints storage tinyexpr ----------
-// Test:
-//
-/*
-function PointMathTest() {
-if (!isObject(sto)) new PointStorageObject(sto) { storageSize = 1000; };
-sto.applyMathOnPoints("x+3.14; sin(x);randf1(1.0);w");
-for (%i = 0; %i < 1000; %i++) { echo(sto.getPointVec(%i));}
-}
-*/
-DefineEngineMethod(PointStorageObject, applyMathOnPoints, bool, (String Expr, U32 startIndex, U32 endIndex),(0,0)
-        ,"Apply a Math expression on point Storage.\n"
-        "expected format: \"x+5; y*2; z; w\" separated by ';'\n"
-        "this execute 4 statements. one for each field. "
-        "abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh\n"
-        "Random: randf(), randf1(5.0), randf2(1.0,2.0)\n"
-        "Example ranomize all: sto.applyMathOnPoints(\"mrandf(),mrandf(),mrandf(),mrandf()\");"
-        "Special one parameter expression: \n"
-        "  normalizeXY => applyMathOnPoints(\"normalizeXY()\");"
-        ) {
-    return object->applyMathOnPoints( Expr, startIndex, endIndex);
 }

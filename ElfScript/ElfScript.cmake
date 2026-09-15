@@ -287,7 +287,7 @@ set(MATH_SRC
 )
 
 set(EXT_SRC
-   ${CMAKE_CURRENT_LIST_DIR}/ext/tinyexpr.c
+   # # # ${CMAKE_CURRENT_LIST_DIR}/ext/tinyexpr.c
    ${CMAKE_CURRENT_LIST_DIR}/ext/genann.c
 )
 
