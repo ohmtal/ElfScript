@@ -130,7 +130,7 @@ typedef const char *StringTableEntry;
 enum ConsoleValueType
 {
    cvPointer  =         -8,
-   cvLambda   =          -7,
+   cvLambda   =         -7,
    cvVector  =          -6,
    cvNULL =             -5,
    cvInteger =          -4,
@@ -142,22 +142,10 @@ enum ConsoleValueType
 
 // #ifdef ENABLE_CONSOLE_VECTOR
 struct ConsoleVector {
-      F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT];/* = {0.f,0.f,0.f,0.f};*/ // 4!!
+      F32   points[CONSOLE_VALUE_VECTOR_FIELD_COUNT]; // 4!!
 };
 // #endif
 
-// TEST only - current is good, no need to rewrite everything
-// // // struct alignas(16) ConsoleValueTest {
-// // //       union {
-// // //             F64 f;
-// // //             S64 i;
-// // //             void* ptr;
-// // //       } val;                  // 8 Byte
-// // //
-// // //       S32 type;               // 4 byte
-// // //       unsigned char flags;    // 1 byte
-// // //       char padding[3];        // 4 byte
-// // // };
 
 
 class ConsoleValue
@@ -211,34 +199,10 @@ public:
    const char* getConsoleData() const;
 
 
-
-   // TORQUE_FORCEINLINE void cleanupData()
-   // {
-   //    // ElfScript 0.6e OBSOLETE!
-   //
-   //    // // Only cvString strings are heap-allocated and owned by this value.
-   //    // // cvSTEntry points into the StringTable (managed externally).
-   //    // // Numeric types use the f/i union fields — s is not valid for them.
-   //    //
-   //    // if (type == ConsoleValueType::cvString && bufferLen > 0)
-   //    // {
-   //    //    dFree(s);
-   //    //    bufferLen = 0;
-   //    // }
-   //    //
-   //    // s = const_cast<char*>(StringTable->EmptyString());
-   //    // type = ConsoleValueType::cvNULL;
-   // }
-
    ConsoleValue()
    {
       type = ConsoleValueType::cvSTEntry;
       s = const_cast<char*>(StringTable->EmptyString());
-      // bufferLen = 0;
-#ifdef ENABLE_CONSOLE_VECTOR
-      // for (S32 i = 0; i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) v.points[i] = 0.f;
-      //NO! i moved it into the union! // dMemset(v.points, 0, sizeof(ConsoleVector::points));
-#endif
    }
 
    ConsoleValue(const ConsoleValue& other)
@@ -296,9 +260,12 @@ public:
             case ConsoleValueType::cvVector: v = {0}; break;
 #endif
             case ConsoleValueType::cvFloat:  f = 0.0; break;
+
             case ConsoleValueType::cvInteger: i = 0; break;
-            case ConsoleValueType::cvLambda: dataPtr = nullptr; break;
+
+            case ConsoleValueType::cvLambda:
             case ConsoleValueType::cvPointer: dataPtr = nullptr; break;
+
             default: setEmptyString(); break;
       }
    }
@@ -318,8 +285,8 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
-      case ConsoleValueType::cvLambda: return (F64)(dataPtr != nullptr);
-      case ConsoleValueType::cvPointer: return (F64)(dataPtr != nullptr);
+      case ConsoleValueType::cvLambda:
+      case ConsoleValueType::cvPointer: return  static_cast<F64>(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
@@ -345,14 +312,12 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
 
-      case ConsoleValueType::cvLambda: return dataPtr != nullptr;
-      case ConsoleValueType::cvPointer: return dataPtr != nullptr;
+      case ConsoleValueType::cvLambda:
+      case ConsoleValueType::cvPointer: return  static_cast<S64>(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);
 #endif
-      // case ConsoleValueType::cvString:
-      //    return (s[0] == '\0') ? S64(0) : static_cast<S64>(dAtoi(s));
       case ConsoleValueType::cvNULL:
          return 0;
       default:
@@ -366,22 +331,24 @@ public:
       else
       switch (type)
       {
+
+      case ConsoleValueType::cvFloat:
+         return (f != 0.0);
+
+      case ConsoleValueType::cvSTEntry:
+         return (s != StringTable->EmptyString()) && dAtob(s);
+
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return (v.points[0] != 0.0f);
 #endif
-      case ConsoleValueType::cvLambda: return dataPtr != nullptr;
+
+      case ConsoleValueType::cvLambda:
       case ConsoleValueType::cvPointer: return dataPtr != nullptr;
-      // case ConsoleValueType::cvInteger:
-      //    return (i != 0);
-      case ConsoleValueType::cvFloat:
-         return (f != 0.0);
-      case ConsoleValueType::cvSTEntry:
-         return (s != StringTable->EmptyString()) && dAtob(s);
-      // case ConsoleValueType::cvString:
-      //    return (s[0] != '\0') && dAtob(s);
+
       case ConsoleValueType::cvNULL:
          return false;
+
       default:
          return dAtob(getConsoleData());
       }
@@ -392,22 +359,16 @@ public:
       switch (type)
       {
       case ConsoleValueType::cvSTEntry:
-      //       TORQUE_CASE_FALLTHROUGH;
-      // case ConsoleValueType::cvString:
          return s;
       case ConsoleValueType::cvNULL:
          return StringTable->EmptyString();
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-            TORQUE_CASE_FALLTHROUGH;
 #endif
-      case ConsoleValueType::cvPointer:
-            TORQUE_CASE_FALLTHROUGH;
-      case ConsoleValueType::cvLambda:
-            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvFloat:
-            TORQUE_CASE_FALLTHROUGH;
       case ConsoleValueType::cvInteger:
+      case ConsoleValueType::cvPointer:
+      case ConsoleValueType::cvLambda:
          return convertToBuffer();
       default:
          return getConsoleData(); //this usally crash ^^
@@ -438,17 +399,6 @@ public:
                            if (s == StringTable->EmptyString()) break;
                            dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
                            break;
-                     // case ConsoleValueType::cvVector: return v;
-                     // case ConsoleValueType::cvString: {
-                     //       if (s[0] == '\0') break;
-                     //       dSscanf(s, "%g %g %g %g", &result.points[0], &result.points[1], &result.points[2], &result.points[3]);
-                     //       break;
-                     // }
-
-                     // case ConsoleValueType::cvNULL:
-                     //       return 0.0;
-                     // default:
-                     //       return dAtof(getConsoleData());
                }
                return result;
          }
@@ -506,26 +456,7 @@ public:
    }
 
 
-//    // TORQUE_FORCEINLINE void setString(const char* val)
-//    // {
-//    //    setString(val, val ? static_cast<S32>(dStrlen(val)) : 0);
-//    // }
-//    TORQUE_FORCEINLINE void setString(const char* val, S32 len)
-//    {
-//       if (len == 0)
-//       {
-//          setEmptyString();
-//          return;
-//       }
-//
-//       cleanupData();
-//       type = ConsoleValueType::cvString;
-//
-//       bufferLen = static_cast<U32>(len) + 1u;   // allocation size, always > 0
-//       s = static_cast<char*>(dMalloc(bufferLen));
-//       s[len] = '\0';
-//       dMemcpy(s, val, static_cast<dsize_t>(len));
-//    }
+
 
    /// Transfer ownership of a dMalloc'd buffer to this value.
    ///
@@ -621,7 +552,7 @@ public:
 //ElfScript need them  // private:
    /// Deep-copy from `other` into `this` (assumes `this` has already been
   /// cleaned up or is freshly constructed).
-  inline void copyFrom(const ConsoleValue& other)
+  TORQUE_FORCEINLINE void copyFrom(const ConsoleValue& other)
    {
       switch (other.type)
       {
@@ -680,7 +611,7 @@ public:
    /// Steal the payload from `other` (which must already have its type and
    /// bufferLen copied into `this`), then leave `other` in a safe empty state.
    /// Called only from move constructor / move assignment after copying type.
-   inline void transferFrom(ConsoleValue& other) noexcept
+   TORQUE_FORCEINLINE void transferFrom(ConsoleValue& other) noexcept
    {
       // Copy the right union field based on the type we already copied.
       switch (type)

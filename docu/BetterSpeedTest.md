@@ -22,6 +22,10 @@ replaced by jit in most cases anyway. It's not the cpu cooler - I have a binary 
 must be after commit => 2026-09-11 "got expoerimental func call op codes running but not really faster in my tests."
 so it's not CALLFUNC. I guess it's lambda change ... but can't find out why. 
 
+It's the cvLambda and cvPointer ..., when i kick em out it's fast again... 
+Need to test this more on a faster PC since i have to change console.h all the 
+time and everything is recompiled - bad on my slow Notebook.
+
 Since then i added:
 
 - CALLFUNC stuff

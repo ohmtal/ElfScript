@@ -63,14 +63,14 @@ void ConsoleValue::resetConversionBuffer()
 char* ConsoleValue::convertToBuffer() const
 {
 
-#ifdef  ENABLE_CONSOLE_VECTOR
+   #ifdef  ENABLE_CONSOLE_VECTOR
    if (type == ConsoleValueType::cvVector) {
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(128));
         //NOTE: hard coded 4
         dSprintf(buffer, 128, "%.9g %.9g %.9g %.9g", v.points[0], v.points[1],v.points[2],v.points[3]);
         return buffer;
    } else
-#endif
+   #endif
    if (type == ConsoleValueType::cvLambda) {
 
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(64));
@@ -81,8 +81,7 @@ char* ConsoleValue::convertToBuffer() const
             dSprintf(buffer, 64, "%s", "INVALID!");
         }
         return buffer;
-   } else
-   if (type == ConsoleValueType::cvPointer) {
+   } else if (type == ConsoleValueType::cvPointer) {
 
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
         if ( this->dataPtr ) {
@@ -91,17 +90,18 @@ char* ConsoleValue::convertToBuffer() const
             dSprintf(buffer, 32, "%s", "INVALID!");
         }
         return buffer;
+   } else {
+
+      char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
+
+      if (type == ConsoleValueType::cvFloat)
+            dSprintf(buffer, 32, "%#.9g", f);
+      else
+            dSprintf(buffer, 32, "%lld", i);
+
+      return buffer;
    }
 
-
-   char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
-
-   if (type == ConsoleValueType::cvFloat)
-      dSprintf(buffer, 32, "%#.9g", f);
-   else
-      dSprintf(buffer, 32, "%lld", i);
-
-   return buffer;
 }
 
 const char* ConsoleValue::getConsoleData() const
