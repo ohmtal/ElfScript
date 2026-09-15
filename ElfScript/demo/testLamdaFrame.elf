@@ -10,6 +10,59 @@ function loader(%which) {
     else exec(%thisFile);
 }
 // ============================================================================
+%count = 5;
+%sto = new PointStorageObject() { storageSize = %count;};
+%fn = fn(%vec) {
+    %vec.x = math.randomf();
+    %vec.y = math.randomf();
+    %vec.z = math.randomf();
+    %vec.w = math.randomf();
+    return %vec;
+};
+
+%fn2 = fn(%vec) {
+    %vec = {0,0,0,0};
+    return %vec;
+};
+
+%sto.mapfn(%fn,0);
+%sto.runfn();
+
+for (%i in range %count) {
+    printf("#%d %s", %i, %sto.getPointVec(%i));
+}
+%sto.mapfn(%fn2,0);
+%sto.runfn();
+for (%i in range %count) {
+    printf("#%d %s", %i, %sto.getPointVec(%i));
+}
+
+%fn3 = fn(%vec, %space) {
+    print("custom param:", %space);
+    [%x,%y] = %vec;
+    for (%i in range 50000) {
+        %x += 10.0 * math.randomf();
+        %y -= 10.0 * math.randomf();
+    }
+    return {%x,%y};
+};
+%params = %sto.mapfn(%fn3, 1);
+%params.set(2,"space?!");
+
+%params.list();
+
+for (%i in range 20) {
+
+    %sto.stepFn();
+    %params.set(2,"custom" SPC %i);
+}
+for (%i in range %count) {
+    printf("#%d %s", %i, %sto.getPointVec(%i));
+}
+
+return;
+
+// ============================================================================
 #parent = 11.0;
 %lam = fn( )  { print("PARENT VALUE LAMDA (14):",#parent); #parent +=  2; };
 varDump("#parent");

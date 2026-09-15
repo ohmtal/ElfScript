@@ -16,9 +16,6 @@ namespace ElfScript::Lambda {
 
 
 
-
-
-
 DefineEngineFunction(callLambdaTest, ConsoleValue, (ConsoleValue lambdaValue, Array* params ),,"") {
     ConsoleValue result;
 

@@ -116,6 +116,14 @@ S32 Array::fromString(const char* text, bool doAdd )
     return count;
 }
 
+void Array::list() {
+    Con::printSeparator();
+    for (S32 i = 0; i < this->mValues.size(); i++) {
+        Con::printf("#%04d [type:%8s] [value:%20s]"
+        , i, ElfScript::getConsoleValueTypeName(this->mValues[i].type, this->mValues[i].subType)
+        , this->mValues[i].getString());
+    }
+}
 // ----------------------------------------------------------------------------
 DefineEngineMethod(Array, at, ConsoleValue, (S32 index), , "fetch a value at index") {
     return object->at(index);

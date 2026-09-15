@@ -45,6 +45,9 @@
 #include "console/simFieldDictionary.h"
 #include "math/mMathRand.h"
 #include "math/mMathFn.h"
+#include "console/consoleInternal.h" // for Lambda / mapFN
+#include "Array.h"
+#include "LambdaMappings.h"
 
 #include "console/localVar.h"
 
@@ -69,14 +72,21 @@ void normalizeXY(F32& x, F32& y) {
     }
 }
 
-
+// =============================================================================
 
 class PointStorageObject: public SimObject
 {
     typedef SimObject Parent;
+
+    Namespace::Entry* mFn = nullptr; //mapped function
+    ConsoleValue mMuleValue;
+
 public:
     DECLARE_CONOBJECT(PointStorageObject);
     ConsoleVector mVector;
+
+    Array* mFnParams = nullptr;
+    U32 mFnStep = 0;
 
     /*
      * Storing Point in a vector Vector implementation
@@ -96,10 +106,16 @@ public:
         mVector = {0};
     }
 
+
     // -------------------------------------------------------------------------
     bool onAdd() override {
         populate();
         return Parent::onAdd();
+    }
+    // -------------------------------------------------------------------------
+    void onRemove() override {
+        if (mFnParams) mFnParams->deleteObject();
+        Parent::onRemove();
     }
     // -------------------------------------------------------------------------
 
@@ -156,7 +172,8 @@ public:
         addField("b",     TypeF32,     Offset(mVector.points[2], PointStorageObject), "alias for z");
         addField("a",     TypeF32,     Offset(mVector.points[3], PointStorageObject), "alias for w");
 
-        //----
+        // ----
+
         addProtectedField("storageSize", TypeU32, 0, &_setStorageSize,&_getStorageSize, "Set the storage size (how many points we can work with) Max:1000000.");
 
 
@@ -326,7 +343,79 @@ public:
         }
     }
     // -------------------------------------------------------------------------
+    // Lambda Fn
+    // -------------------------------------------------------------------------
+    // "Map a Lambda function to PointStorage. This can be used by stepFn or runFn\n"
+    // "The function must except a Variable (TypeVector) and return a Variable TypeVector\n"
+    // "this will be used to modify the Point Storage"
+    bool mapFn(ConsoleValue funcValue, U32 customParamCount) {
 
+        mFn = ElfScript::Lambda::getFn(funcValue);
+        if (!mFn) return false;
+        mFnStep = 0;
+        initFnParams(customParamCount);
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // init the FnParams array
+    // Called:
+    //      1. every step ?
+    void initFnParams(U32 customParamCount) {
+        if (!mFn) return;
+        static Namespace::Entry* lastFN = nullptr;
+
+        if (!mFnParams) {
+            mFnParams = new Array();
+            mFnParams->registerObject();
+        };
+        if (lastFN != mFn || mFnParams->mValues.size() < 2) {
+            mFnParams->mValues.clear();
+            mMuleValue.setString(mFn->mFunctionName);
+            mFnParams->mValues.push_back(mMuleValue);
+            mMuleValue.setVector({0});
+            mFnParams->mValues.push_back(mMuleValue);
+            mMuleValue.reset();
+            for (S32 i = 0; i < customParamCount; i++) {
+                mFnParams->mValues.push_back(mMuleValue);
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    bool setFnValues() {
+        if ( mFnParams->mValues.size() < 2) return false;
+        mFnParams->at(1).setVector(mPoints[mFnStep]);
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    bool runFn() {
+        if (!mFn) return false;
+        for (mFnStep = 0; mFnStep< mPoints.size(); mFnStep++) {
+            if (!setFnValues()) return false;
+            if (ElfScript::Lambda::callFn(mFn,mFnParams,mMuleValue, true )) {
+                mPoints[mFnStep] = mMuleValue.getVector();
+            } else {
+                mFnStep = 0;
+                return false;
+            }
+        } //for
+
+        mFnStep = 0;
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    bool stepFn() {
+        if (!mFn) return false;
+        if (!setFnValues()) return false;
+        if (!ElfScript::Lambda::callFn(mFn,mFnParams,mMuleValue, true )) return 0;
+        mPoints[mFnStep] = mMuleValue.getVector();
+
+        mFnStep++;
+        if (mFnStep >= mPoints.size()) mFnStep = 0;
+        return true;
+    }
+    // -------------------------------------------------------------------------
 
 
 };
@@ -410,4 +499,45 @@ DefineEngineMethod(PointStorageObject, fetchPoint, bool, (U32 index), ,
     object->setPos( object->mPoints[index] );
 
     return true;
+}
+
+
+DefineEngineMethod(PointStorageObject, mapFn, SimObjectId, (ConsoleValue funcValue, U32 customParamCount),,
+    "Map a Lambda function to PointStorage. This can be used by stepFn or runFn\n"
+    "The function must except a Variable (TypeVector) and return a Variable TypeVector\n"
+    "this will be used to modify the Point Storage\n"
+    "Custom param count is the count of the parameter you want to set.\n"
+    "It will return the ID of the param Array if you set customParamCount\n"
+    "Your custom params start at 2..2+customParamCount\n"
+    "Max 16 custom params are allowed\n"
+) {
+    if (customParamCount > 16) {
+        Con::errorf("mapFn: Only up to 16 parameters allowed!");
+        return 0;
+    }
+    if (object->mapFn(funcValue, customParamCount) && object->mFnParams) {
+        Con::debugf("It will return the ID of the param Array if you set customParamCount.");
+        if (customParamCount > 0) {
+            Con::debugf("Your custom params start at 2  and end at %d", 2 + customParamCount);
+            Con::debugf("Do not push new fields or delete the first 2! Use .set(2,%value).", 2 + customParamCount);
+            return object->mFnParams->getId();
+        } else {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+// TODO extraParams
+DefineEngineMethod(PointStorageObject, runFn, bool, (),,
+                   "run the mapped function"
+) {
+    return object->runFn();
+}
+
+// TODO extraParams
+DefineEngineMethod(PointStorageObject, stepFn, bool, (),,
+                   "run the mapped function"
+) {
+    return object->stepFn();
 }

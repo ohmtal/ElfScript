@@ -36,6 +36,7 @@ public:
     }
     // ------------------------------------------------------------------------
     S32 fromString(const char* text, bool doAdd = true);
+    void list();
     // ------------------------------------------------------------------------
     inline bool isIndexValid(S32 index) {
         return index >= 0 && index < mValues.size();
