@@ -251,26 +251,30 @@ public:
       // cleanupData();
    }
 
-   TORQUE_FORCEINLINE void reset()
+   TORQUE_FORCEINLINE void reset( )
    {
-      // ElfScript 0.7 reset depending on type: orig setEmptyString();
-      switch (type)
-      {
-#ifdef ENABLE_CONSOLE_VECTOR
-            case ConsoleValueType::cvVector: v = {0}; break;
-#endif
-            case ConsoleValueType::cvFloat:  f = 0.0; break;
-
-            case ConsoleValueType::cvInteger: i = 0; break;
-
-            case ConsoleValueType::cvLambda:
-            case ConsoleValueType::cvPointer: dataPtr = nullptr; break;
-
-            default: setEmptyString(); break;
-      }
+      setEmptyString();
    }
 
+   TORQUE_FORCEINLINE void empty()
+   {
 
+         // ElfScript 0.7 reset depending on type: orig setEmptyString();
+         switch (type)
+         {
+               case ConsoleValueType::cvFloat:  f = 0.0; break;
+               #ifdef ENABLE_CONSOLE_VECTOR
+               case ConsoleValueType::cvInteger: i = 0; break;
+               case ConsoleValueType::cvVector: v = {0}; break;
+               #endif
+
+
+               case ConsoleValueType::cvLambda:
+               case ConsoleValueType::cvPointer: dataPtr = nullptr; break;
+
+               default: setEmptyString(); break;
+         }
+   }
 
    TORQUE_FORCEINLINE F64 getFloat() const
    {
@@ -356,17 +360,18 @@ public:
 
    TORQUE_FORCEINLINE const char* getString() const
    {
-      switch (type)
+      if (type == ConsoleValueType::cvSTEntry) {
+            return s;
+      } else   switch (type)
       {
-      case ConsoleValueType::cvSTEntry:
-         return s;
+      case ConsoleValueType::cvFloat: return convertToBuffer();
+      case ConsoleValueType::cvInteger: return convertToBuffer();
+
       case ConsoleValueType::cvNULL:
          return StringTable->EmptyString();
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
 #endif
-      case ConsoleValueType::cvFloat:
-      case ConsoleValueType::cvInteger:
       case ConsoleValueType::cvPointer:
       case ConsoleValueType::cvLambda:
          return convertToBuffer();
@@ -565,8 +570,9 @@ private:
 
                case ConsoleValueType::cvSTEntry: setStringTableEntry(other.s); break;
 
-               case ConsoleValueType::cvPointer:
-               case ConsoleValueType::cvLambda: this->dataPtr = other.dataPtr; break;
+               // handled by default
+               // case ConsoleValueType::cvPointer:
+               // case ConsoleValueType::cvLambda: this->dataPtr = other.dataPtr; break;
 
                #ifdef  ENABLE_CONSOLE_VECTOR
                case ConsoleValueType::cvVector:
@@ -576,8 +582,9 @@ private:
                case ConsoleValueType::cvNULL: setEmptyString(); break;
 
                default:
-                     setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
-                     break;
+                     this->dataPtr = other.dataPtr; break;
+                    // this set the pointer! setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
+               break;
          }
    }
 
@@ -643,10 +650,11 @@ private:
           dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
           break;
 #endif
-      case ConsoleValueType::cvPointer:
-      case ConsoleValueType::cvLambda:
-            this->dataPtr = other.dataPtr;
-      break;
+      // catched by default!
+      // case ConsoleValueType::cvPointer:
+      // case ConsoleValueType::cvLambda:
+      //       this->dataPtr = other.dataPtr;
+      // break;
       // // case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:
       case ConsoleValueType::cvNULL:

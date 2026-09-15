@@ -5180,7 +5180,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
                   for (S32 i = 0; i < varCount; i++) {
                         dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
                         if (i < CONSOLE_VALUE_VECTOR_FIELD_COUNT) dstPtr->setFloat(srcPtr->v.points[i]);
-                        else dstPtr->reset();
+                        else dstPtr->empty();
                   }
                   break;
             }
@@ -5189,7 +5189,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
                   for (S32 i = 0; i < varCount; i++) {
                         dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
                         if (i < 1) dstPtr->setFloat(srcPtr->f);
-                        else dstPtr->reset();
+                        else dstPtr->empty();
                   }
                   break;
             }
@@ -5206,7 +5206,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
                         for (S32 i = 0; i < varCount; i++) {
                               dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
                               if (i < 1) dstPtr->setInt(srcPtr->i);
-                              else dstPtr->reset();
+                              else dstPtr->empty();
                         }
                   }
                   break;
@@ -5232,7 +5232,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
                               else if (isFloat(token)) dstPtr->setFloat(dAtod(token));
                               else dstPtr->setString(token);
                         } else  {
-                              dstPtr->reset();
+                              dstPtr->empty();
                         }
                   }
             }
