@@ -21,15 +21,20 @@ extern  FuncVars gGlobalScopeFuncVars;
 namespace ElfScript {
     ConsoleValue muleValue;
 
-    const char* getConsoleValueTypeName(S32 type) {
+    const char* getConsoleValueTypeName(S32 type, U32 subType) {
         switch (type) {
             case ConsoleValueType::cvFloat:   return "Float";
             case ConsoleValueType::cvInteger: return "Integer";
             // case ConsoleValueType::cvString:  return "String";
             case ConsoleValueType::cvSTEntry: return "String";
             case ConsoleValueType::cvConsoleValueType: return "Console";
-            case ConsoleValueType::cvLambda: return "Lambda";
-            case ConsoleValueType::cvPointer: return "Pointer";
+            case ConsoleValueType::cvPointer:{
+                switch (subType) {
+                    case cvsLambda: return "Lambda";
+                    case cvsVariable: return "VarPtr";
+                    default: return "Pointer";
+                }
+            }
             #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
             #endif
@@ -252,7 +257,7 @@ namespace ElfScript {
 
         ConsoleValue& localVal = entry->getValue();
         Con::printf(" %10s [type:%8s] [value:%20s]"
-        , variableName, getConsoleValueTypeName(localVal.type), localVal.getString());
+        , variableName, getConsoleValueTypeName(localVal.type, localVal.subType), localVal.getString());
 
     }
     // // -----------------------------------------------------------------------------
@@ -274,7 +279,7 @@ namespace ElfScript {
         }
 
         Con::printf(" %10s [type:%8s] [value:%20s] [reg:%2d] "
-        , variableName, getConsoleValueTypeName(localVal->type), localVal->getString(), reg);
+        , variableName, getConsoleValueTypeName(localVal->type, localVal->subType), localVal->getString(), reg);
     }
     // -----------------------------------------------------------------------------
     void varDumpDynamicField(const char* variableName) {
@@ -282,7 +287,7 @@ namespace ElfScript {
         cval = Con::getObjectDynamicFieldConsoleValue(variableName);
         if (cval) {
             Con::printf(" %20s [type:%8s] [value:%20s]"
-            , variableName, getConsoleValueTypeName(cval->type), cval->getString());
+            , variableName, getConsoleValueTypeName(cval->type, cval->subType), cval->getString());
         }
 
     }
@@ -299,7 +304,7 @@ namespace ElfScript {
             {
                 ConsoleValue& localVal = walk->getValue();
                 Con::printf(" %30s [type:%8s] [value:%20s]"
-                , walk->name, getConsoleValueTypeName(localVal.type), localVal.getString());
+                , walk->name, getConsoleValueTypeName(localVal.type, localVal.subType), localVal.getString());
 
                 walk = walk->nextEntry;
             }
@@ -452,13 +457,13 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 // =============================================================================
 DefineEngineFunction( getVarPtr, ConsoleValue, (const char * variableName),,"") {
     ConsoleValue* stack = ElfScript::getLocalVariable(variableName);
-    if (stack) ElfScript::muleValue.setPointer(stack, cvPointer);
+    if (stack) ElfScript::muleValue.setPointer(stack, cvsVariable);
     else ElfScript::muleValue.setString("varPtr failed to get pointer!!");
     return ElfScript::muleValue;
 }
 DefineEngineFunction( getValueByPtr, ConsoleValue, (ConsoleValue PtrValue),,"") {
     ElfScript::muleValue.setString("valueByPtr: FAILED to get value!");
-    if (PtrValue.type != cvPointer ) return ElfScript::muleValue;
+    if (PtrValue.type != cvPointer || PtrValue.subType != cvsVariable) return ElfScript::muleValue;
     void* rawPtr = PtrValue.getPointer();
     if ( !rawPtr ) return ElfScript::muleValue;
     ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
@@ -530,7 +535,7 @@ DefineEngineFunction( testLocalGlobal, void, (const char * variableName),,"") {
     }
     ConsoleValue* valuePtr =  &Script::gEvalState.localStack[stackNum].values[varRegister];
      Con::printf("& %10s [type:%8s] [value:%20s] [reg:%2d] "
-       , variableName, ElfScript::getConsoleValueTypeName(valuePtr->type), valuePtr->getString(), varRegister);
+       , variableName, ElfScript::getConsoleValueTypeName(valuePtr->type, valuePtr->subType), valuePtr->getString(), varRegister);
 }
 
 #endif

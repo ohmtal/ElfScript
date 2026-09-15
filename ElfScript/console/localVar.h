@@ -8,7 +8,7 @@
 
 class ConsoleValue;
 namespace ElfScript {
-    const char* getConsoleValueTypeName(S32 type);
+    const char* getConsoleValueTypeName(S32 type, U32 subType);
     S32 findLocalVarRegisterInCurrentScope(const char* variableName);
 
 

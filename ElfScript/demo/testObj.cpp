@@ -233,9 +233,9 @@ DefineEngineFunction(setLocalFloatVariable, void, (const char* VariableName, F32
     // is 0 valid ??
     if (reg > 0 ) {
         ConsoleValue& localVal = Script::gEvalState.currentRegisterArray->values[reg];
-        Con::printf(" --- %s type is (%d) %s", VariableName, localVal.type, ElfScript::getConsoleValueTypeName(localVal.type));
+        Con::printf(" --- %s type is (%d) %s", VariableName, localVal.type, ElfScript::getConsoleValueTypeName(localVal.type,localVal.subType));
         localVal.setFloat(value);
-        Con::printf(" --- type after setFloat: (%d) %s", localVal.type, ElfScript::getConsoleValueTypeName(localVal.type));
+        Con::printf(" --- type after setFloat: (%d) %s", localVal.type, ElfScript::getConsoleValueTypeName(localVal.type,localVal.subType));
     }
 
 }

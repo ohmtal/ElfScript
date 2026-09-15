@@ -19,6 +19,8 @@ Testing crazyElf starfield with 4200 stars: ~320 fps, thats fine.
 Tuple assign with pointstorage rocks here, also if i lost 100ms against 4 days 
 ago, i dont want to roll back. 
 
+
+
 -  about 100 ms slower speed tests ... not funny .. must be something in the VM but what. 
 Somewhere it breaks the CPU prediction or i added some cpu cycles.
 I think it's since the tuple assignment - but not sure. I changed the float format from 

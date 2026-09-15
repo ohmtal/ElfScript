@@ -33,6 +33,8 @@ for script in "${scripts[@]}"; do
         printf "${exec_time}s |" >> "$summary_file"
         sleep 2
     done
+    echo "sleep...."
+    sleep 5
     echo "---------------------"
 done
 printf "\n" >> "$summary_file"

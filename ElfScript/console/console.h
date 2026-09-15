@@ -127,10 +127,17 @@ typedef const char *StringTableEntry;
 //NOTE: do not change the 4 (FOUR) or you need to change a lot of code (cvVector)!
 #define CONSOLE_VALUE_VECTOR_FIELD_COUNT 4
 
+enum ConsoleValueSubType
+{
+   // i start at 2 ^ 18
+   cvsLambda      =     262144,
+   cvsVariable    =     262145
+};
+
+
 enum ConsoleValueType
 {
-   cvPointer  =         -8,
-   cvLambda   =         -7,
+   cvPointer  =         -7,
    cvVector  =          -6,
    cvNULL =             -5,
    cvInteger =          -4,
@@ -151,9 +158,10 @@ struct ConsoleVector {
 class ConsoleValue
 {
 public:
-// NOTE for windoofs ignore the "unknown pragma warning" when using gcc/clang
+#if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
+#endif
       union
       {
             F64   f;
@@ -165,32 +173,13 @@ public:
             #endif
       };  // 8 or 16 byte
 
-// union
-   // {
-   //    struct
-   //    {
-   //       F64   f;
-   //       S64   i;
-   //       char* s;
-   //    };                // 8 Byte
-   //
-   //    struct
-   //    {
-   //       void* dataPtr;
-   //       EnumTable* enumTable;
-   //    };
-   // };
+#if defined(_MSC_VER)
 #pragma warning(pop)
+#endif
 
-
-// #ifdef ENABLE_CONSOLE_VECTOR
-//   // TODO move this to a pointer ... first attempt failed .. and it's not faster but less memory
-//   // 0.7: i would do this different now, but how can i change it and keep all the math and field fastpath i added for ?
-//   ConsoleVector v;      // 16 Byte
-// #endif
 
    S32 type;            // 4 Byte - used a 8 without padding
-   char padding[4];     // 4 Byte ... i  can use this for something else ;)
+   U32 subType;         // 4 Byte subType replaced the paddding[4] we stay at same bytes
 
    static DataChunker sConversionAllocator;
 
@@ -217,6 +206,7 @@ public:
    /// After the move, `other` is left as an empty-string value.
    ConsoleValue(ConsoleValue&& other) noexcept
       : type(other.type)
+      , subType(other.subType)
       // // , bufferLen(other.bufferLen)
    {
       transferFrom(other);
@@ -237,10 +227,8 @@ public:
    {
       if (this != &other)
       {
-         // cleanupData();
          type = other.type;
-
-         // // bufferLen = other.bufferLen;
+         subType = other.subType;
          transferFrom(other);
       }
       return *this;
@@ -269,7 +257,7 @@ public:
                #endif
 
 
-               case ConsoleValueType::cvLambda:
+
                case ConsoleValueType::cvPointer: dataPtr = nullptr; break;
 
                default: setEmptyString(); break;
@@ -289,7 +277,7 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? 0.0 : dAtod(s);//F64! dAtof(s);
 
-      case ConsoleValueType::cvLambda:
+
       case ConsoleValueType::cvPointer: return  static_cast<F64>(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
@@ -316,7 +304,7 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s == StringTable->EmptyString()) ? S64(0) : static_cast<S64>(dAtoi(s));
 
-      case ConsoleValueType::cvLambda:
+
       case ConsoleValueType::cvPointer: return  static_cast<S64>(dataPtr != nullptr);
 #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
@@ -347,7 +335,7 @@ public:
          return (v.points[0] != 0.0f);
 #endif
 
-      case ConsoleValueType::cvLambda:
+
       case ConsoleValueType::cvPointer: return dataPtr != nullptr;
 
       case ConsoleValueType::cvNULL:
@@ -373,7 +361,6 @@ public:
       case ConsoleValueType::cvVector:
 #endif
       case ConsoleValueType::cvPointer:
-      case ConsoleValueType::cvLambda:
          return convertToBuffer();
       default:
          return getConsoleData(); //this usally crash ^^
@@ -449,13 +436,14 @@ public:
 
 
 
-   TORQUE_FORCEINLINE void setPointer(void* ptr, const U32 assigntype = cvLambda) {
-         this->type = assigntype;
+   TORQUE_FORCEINLINE void setPointer(void* ptr, const U32 subType) {
+         this->type = cvPointer;
+         this->subType = subType;
          this->dataPtr = ptr;
    }
 
    TORQUE_FORCEINLINE void* getPointer() {
-         if (type == cvLambda || type == cvPointer)
+         if (type == cvPointer)
             return this->dataPtr;
          else
             return nullptr;
@@ -563,6 +551,7 @@ private:
   void copyFrom(const ConsoleValue& other)
    {
          this->type = other.type;
+         this->subType = other.subType;
          switch (other.type)
          {
                case ConsoleValueType::cvFloat: this->f = other.f; break;

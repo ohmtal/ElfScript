@@ -18,7 +18,9 @@ namespace {
 }
 // ----------------------------------------------------------------------------
 TORQUE_FORCEINLINE inline Namespace::Entry* getEntry(ConsoleValue& lambdaValue) {
-    if  (  lambdaValue.type != ConsoleValueType::cvLambda || !lambdaValue.dataPtr) {
+    if  (  !lambdaValue.dataPtr ||
+           lambdaValue.type != ConsoleValueType::cvPointer ||
+           lambdaValue.subType != ConsoleValueSubType::cvsLambda) {
         Con::debugf("LAMBDA Error: function not found!");
         return nullptr;
 

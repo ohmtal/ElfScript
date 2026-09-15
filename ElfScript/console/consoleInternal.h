@@ -379,8 +379,9 @@ public:
       }
 
 
-      inline void setPointerValue(void* ptr, U32 type = cvLambda) {
-            value.type = type;
+      inline void setPointerValue(void* ptr, U32 subType) {
+            value.type = cvPointer;
+            value.subType = subType;
             value.dataPtr = ptr;
       }
 

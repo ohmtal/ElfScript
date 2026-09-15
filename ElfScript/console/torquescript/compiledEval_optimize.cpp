@@ -804,10 +804,10 @@ void* ExprEvalState::getPointerVariable() {
         return currentVariable ? currentVariable->getPointerValue() : nullptr;
 }
 
-void ExprEvalState::setPointerVariable(void* val, ConsoleValueType type )
+void ExprEvalState::setPointerVariable(void* val, ConsoleValueSubType subType )
 {
       AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
-      currentVariable->setPointerValue(val, type);
+      currentVariable->setPointerValue(val, subType);
 }
 
 #ifdef  ENABLE_CONSOLE_VECTOR
@@ -2302,8 +2302,8 @@ handle_OP_LOADVAR_STR: {
                         valueType == ConsoleValueType::cvVector ||
 #endif
                         valueType == ConsoleValueType::cvInteger ||
-                        valueType == ConsoleValueType::cvPointer ||
-                        valueType == ConsoleValueType::cvLambda;
+                        valueType == ConsoleValueType::cvPointer
+                        ;
       }
       if (fastPath)
       {
@@ -2342,13 +2342,8 @@ handle_OP_SAVEVAR_STR: {
             DISPATCH();
       }
       else
-      if (stack[_STK].type == cvLambda) {
-            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvLambda);
-            DISPATCH();
-      }
-      else
       if (stack[_STK].type == cvPointer) {
-            Script::gEvalState.setPointerVariable(stack[_STK].getPointer(), cvPointer);
+            Script::gEvalState.currentVariable->value = stack[_STK];
             DISPATCH();
       }
       else
@@ -2422,8 +2417,7 @@ handle_OP_LOAD_LOCAL_VAR_STR: {
             varType == ConsoleValueType::cvVector ||
       #endif
             varType == ConsoleValueType::cvInteger ||
-            varType == ConsoleValueType::cvPointer ||
-            varType == ConsoleValueType::cvLambda
+            varType == ConsoleValueType::cvPointer
       )
       {
             //fast fetch
@@ -2510,12 +2504,7 @@ handle_OP_SAVE_LOCAL_VAR_STR: {
          }
          else
          if (stack[_STK].type == cvPointer) {
-               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvPointer);
-               DISPATCH();
-         }
-         else
-         if (stack[_STK].type == cvLambda) {
-               Script::gEvalState.setLocalPointerVariable(reg, stack[_STK].getPointer(), cvLambda);
+               *Script::gEvalState.getLocalConsoleValuePtr(reg) = stack[_STK];
                DISPATCH();
          }
          else
@@ -2772,10 +2761,8 @@ handle_OP_LOADFIELD_FASTPATH:
                                     break;
                               #endif
                               case ConsoleValueType::cvPointer:
-                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvPointer);
-                                    break;
-                              case ConsoleValueType::cvLambda:
-                                    stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvLambda);
+                                    *stackPtr  = *cachePtr->fieldValuePtr;
+                                    // stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvPointer);
                                     break;
                               default:
                                     const char* str = cachePtr->fieldValuePtr->getString();
@@ -5246,7 +5233,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
 
 // ~~~~~~~~~~~~~~~~~ LAMBDA
 handle_OP_LAMBDA_LOAD: {
-      stack[_STK+1].setPointer(gLastFuncDecl, cvLambda);
+      stack[_STK+1].setPointer(gLastFuncDecl, ConsoleValueSubType::cvsLambda);
       PUSH_STK();
       DISPATCH();
 }
@@ -5269,7 +5256,9 @@ handle_OP_LAMBDA_CALL: {
             srcValuePtr =  Script::gEvalState.getLocalConsoleValuePtr(code[ip]);
       }
       ip += 2;
-      if (!srcValuePtr || srcValuePtr->type != ConsoleValueType::cvLambda || !srcValuePtr->dataPtr) {
+      if (!srcValuePtr || !srcValuePtr->dataPtr
+          || srcValuePtr->type != ConsoleValueType::cvPointer
+          || srcValuePtr->subType != ConsoleValueSubType::cvsLambda) {
             Con::errorf("LAMBDA Error: variable is not a lambda function or does not exists.");
             DISPATCH();
       }

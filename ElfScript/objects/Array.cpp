@@ -231,6 +231,7 @@ DefineEngineMethod(Array, list, void, (), , "List the values") {
     Con::printSeparator();
     for (S32 i = 0; i < object->mValues.size(); i++) {
         Con::printf("#%04d [type:%8s] [value:%20s]"
-        , i, ElfScript::getConsoleValueTypeName(object->mValues[i].type), object->mValues[i].getString());
+        , i, ElfScript::getConsoleValueTypeName(object->mValues[i].type, object->mValues[i].subType)
+            , object->mValues[i].getString());
     }
 }

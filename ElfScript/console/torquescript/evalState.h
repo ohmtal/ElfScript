@@ -48,7 +48,7 @@ public:
    void setStringVariable(const char *str);
 
    void* getPointerVariable();
-   void setPointerVariable(void* val, ConsoleValueType type = cvLambda);
+   void setPointerVariable(void* val, ConsoleValueSubType subType);
 
    ConsoleValue* getConsoleValue(); //ElfScript
 
@@ -96,9 +96,9 @@ public:
       currentRegisterArray->values[reg].setFloat(val);
    }
 
-   TORQUE_FORCEINLINE void setLocalPointerVariable(S32 reg, void* val, U32 type = cvLambda)
+   TORQUE_FORCEINLINE void setLocalPointerVariable(S32 reg, void* val, U32 subType)
    {
-      currentRegisterArray->values[reg].setPointer(val, type);
+      currentRegisterArray->values[reg].setPointer(val, subType);
    }
 
    TORQUE_FORCEINLINE void setLocalStringVariable(S32 reg, const char* val, S32 len)

@@ -71,21 +71,14 @@ char* ConsoleValue::convertToBuffer() const
         return buffer;
    } else
    #endif
-   if (type == ConsoleValueType::cvLambda) {
-
+   if (type == ConsoleValueType::cvPointer) {
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(64));
-        Namespace::Entry* entry = nullptr;
-        if ( this->dataPtr && ( entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr))) {
-            dSprintf(buffer, 64, "%s", entry->mFunctionName);
-        } else {
-            dSprintf(buffer, 64, "%s", "INVALID!");
-        }
-        return buffer;
-   } else if (type == ConsoleValueType::cvPointer) {
-
-        char* buffer = static_cast<char*>(sConversionAllocator.alloc(32));
         if ( this->dataPtr ) {
-            dSprintf(buffer, 32, "%p", this->dataPtr);
+            if (this->subType == cvsLambda) {
+                  Namespace::Entry* entry = reinterpret_cast<Namespace::Entry*>(this->dataPtr);
+                  dSprintf(buffer, 64, "%s", entry->mFunctionName);
+            }
+            else dSprintf(buffer, 32, "%p", this->dataPtr);
         } else {
             dSprintf(buffer, 32, "%s", "INVALID!");
         }
