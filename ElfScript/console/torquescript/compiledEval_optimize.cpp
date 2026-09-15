@@ -3903,7 +3903,9 @@ handle_OP_CALLFUNC:
                                     ip++;
                                     break;
                               }
-                              stack[_STK + 1].copyFrom( result) ;
+
+                              // 0.8 100ms changes old:stack[_STK + 1].copyFrom( result) ;
+                              stack[_STK + 1] =  result ;
                               PUSH_STK();
                               break;
                         }

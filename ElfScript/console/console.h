@@ -222,7 +222,7 @@ public:
       transferFrom(other);
    }
 
-  TORQUE_FORCEINLINE ConsoleValue& operator=(const ConsoleValue& other)
+   ConsoleValue& operator=(const ConsoleValue& other)
    {
       if (this != &other)
       {
@@ -233,7 +233,7 @@ public:
       return *this;
    }
 
-   TORQUE_FORCEINLINE ConsoleValue& operator=(ConsoleValue&& other) noexcept
+   ConsoleValue& operator=(ConsoleValue&& other) noexcept
    {
       if (this != &other)
       {
@@ -450,9 +450,10 @@ public:
    }
 
    TORQUE_FORCEINLINE void* getPointer() {
-         // if (type == cvLambda)
-         return this->dataPtr;
-         return nullptr;
+         if (type == cvLambda || type == cvPointer)
+            return this->dataPtr;
+         else
+            return nullptr;
    }
 
 
@@ -549,69 +550,84 @@ public:
    static void init();
    static void resetConversionBuffer();
 
-//ElfScript need them  // private:
+
+private:
    /// Deep-copy from `other` into `this` (assumes `this` has already been
   /// cleaned up or is freshly constructed).
-  TORQUE_FORCEINLINE void copyFrom(const ConsoleValue& other)
+
+  void copyFrom(const ConsoleValue& other)
    {
-      switch (other.type)
-      {
-      case ConsoleValueType::cvNULL:
-         // Another value was already cleaned up.  Treat as empty string.
-         // Do NOT assert here — cvNULL is a valid transient state that can
-         // appear e.g. when an entry is moved out of.
-         setEmptyString();
-         break;
+         this->type = other.type;
+         switch (other.type)
+         {
+               case ConsoleValueType::cvFloat: this->f = other.f; break;
+               case ConsoleValueType::cvInteger: this->i = other.i; break;
 
-      case ConsoleValueType::cvInteger:
-         setInt(other.i);
-         break;
+               case ConsoleValueType::cvSTEntry: setStringTableEntry(other.s); break;
 
-      case ConsoleValueType::cvFloat:
-         setFloat(other.f);
-         break;
+               case ConsoleValueType::cvPointer:
+               case ConsoleValueType::cvLambda: this->dataPtr = other.dataPtr; break;
 
-      case ConsoleValueType::cvSTEntry:
-         // s already points into StringTable — just share the pointer.
-         setStringTableEntry(other.s);
-         break;
+               #ifdef  ENABLE_CONSOLE_VECTOR
+               case ConsoleValueType::cvVector:
+                     dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
+                     break;
+               #endif
+               case ConsoleValueType::cvNULL: setEmptyString(); break;
 
-      case ConsoleValueType::cvPointer:
-            setPointer(other.dataPtr, cvPointer);
-      break;
-      case ConsoleValueType::cvLambda:
-            setPointer(other.dataPtr, cvLambda);
-      break;
-#ifdef  ENABLE_CONSOLE_VECTOR
-      case ConsoleValueType::cvVector:
-            dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
-            type = ConsoleValueType::cvVector;
-            break;
-#endif
-
-      // // case ConsoleValueType::cvString:
-      // // {
-      // //    // bufferLen == allocation size (len+1), so string length == bufferLen-1.
-      // //    // Guard defensively: if somehow bufferLen is 0 (pre-fix bug state),
-      // //    // fall back to dStrlen.
-      // //    S32 strLen = (other.bufferLen > 0)
-      // //       ? static_cast<S32>(other.bufferLen) - 1
-      // //       : static_cast<S32>(dStrlen(other.s));
-      // //    setString(other.s, strLen);
-      // //
-      // //    break;
-      // // }
-
-      default:
-         setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
-         break;
-      }
+               default:
+                     setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
+                     break;
+         }
    }
+
+//   TORQUE_FORCEINLINE void copyFrom(const ConsoleValue& other)
+//    {
+//       switch (other.type)
+//       {
+//       case ConsoleValueType::cvNULL:
+//          // Another value was already cleaned up.  Treat as empty string.
+//          // Do NOT assert here — cvNULL is a valid transient state that can
+//          // appear e.g. when an entry is moved out of.
+//          setEmptyString();
+//          break;
+//
+//       case ConsoleValueType::cvInteger:
+//          setInt(other.i);
+//          break;
+//
+//       case ConsoleValueType::cvFloat:
+//          setFloat(other.f);
+//          break;
+//
+//       case ConsoleValueType::cvSTEntry:
+//          // s already points into StringTable — just share the pointer.
+//          setStringTableEntry(other.s);
+//          break;
+//
+//       case ConsoleValueType::cvPointer:
+//             setPointer(other.dataPtr, cvPointer);
+//       break;
+//       case ConsoleValueType::cvLambda:
+//             setPointer(other.dataPtr, cvLambda);
+//       break;
+// #ifdef  ENABLE_CONSOLE_VECTOR
+//       case ConsoleValueType::cvVector:
+//             dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
+//             type = ConsoleValueType::cvVector;
+//             break;
+// #endif
+//
+//       default:
+//          setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
+//          break;
+//       }
+//    }
 
    /// Steal the payload from `other` (which must already have its type and
    /// bufferLen copied into `this`), then leave `other` in a safe empty state.
    /// Called only from move constructor / move assignment after copying type.
-   TORQUE_FORCEINLINE void transferFrom(ConsoleValue& other) noexcept
+    void transferFrom(ConsoleValue& other) noexcept
    {
       // Copy the right union field based on the type we already copied.
       switch (type)
@@ -628,10 +644,8 @@ public:
           break;
 #endif
       case ConsoleValueType::cvPointer:
-            setPointer(other.dataPtr, cvPointer);
-      break;
       case ConsoleValueType::cvLambda:
-            setPointer(other.dataPtr, cvLambda);
+            this->dataPtr = other.dataPtr;
       break;
       // // case ConsoleValueType::cvString:
       case ConsoleValueType::cvSTEntry:
