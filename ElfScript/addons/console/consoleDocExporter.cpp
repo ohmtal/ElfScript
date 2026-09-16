@@ -81,6 +81,9 @@ bool ExportConsoleLines(const char* fileName, bool append = false) {
 
     return true;
 }
+
+} //namespace
+
 //-----------------------------------------------------------------------------
 DefineEngineFunction( ConsoleDocForStub, void, (bool value),,
         "@brief Set Con::ConsoleDocForStub - human readable output- exportConsoleDocu overwrites it."){
@@ -94,7 +97,7 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool humanread
                       "@ingroup Docu")
 {
     Con::ConsoleDocForStub = !humanreadable;
-    BeginConsoleLines();
+    ConsoleExporter::BeginConsoleLines();
     Con::printf("//------------------------------------------------------------------");
     Con::printf("//                    C L A S S E S  ");
     Con::printf("//------------------------------------------------------------------");
@@ -145,14 +148,13 @@ DefineEngineFunction( exportConsoleDocu, bool, ( String fileName, bool humanread
     Con::printf("*/");
 
 
-    bool ok = ExportConsoleLines(fileName,  append);
-    EndConsoleLines();
+    bool ok = ConsoleExporter::ExportConsoleLines(fileName,  append);
+    ConsoleExporter::EndConsoleLines();
     Con::ConsoleDocForStub = false;
     return ok;
 }
 
 
 
-} //namespace
 
 

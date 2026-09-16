@@ -1,6 +1,15 @@
 # NOTE: this only works with the default platform/stub/platformProcess.cpp which
 #       is not feature complete - depending on what you want to do.
 
+
+# NOTE: IMPORTANT when you link you project:
+
+#   "$<LINK_LIBRARY:WHOLE_ARCHIVE,ElfScript>"
+
+# else all DefineEngineFunction's get lost!!!!
+
+set(ELF_APP_NAME "elfscript library" CACHE STRING "ElfScript: App-Name used in scripts")
+
 include( ${CMAKE_CURRENT_LIST_DIR}/ElfScript.cmake)
 list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/platform/stub/platformProcess.cpp)
 
