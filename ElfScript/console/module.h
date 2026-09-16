@@ -14,8 +14,8 @@ namespace Con
       Module() = default;
       virtual ~Module() = default;
 
-      void incRefCount() { mRefCount++; }
-      void decRefCount() { mRefCount--; if (!mRefCount) delete this; }
+      inline void incRefCount() { mRefCount++; }
+      inline void decRefCount() { mRefCount--; if (!mRefCount) delete this; }
       virtual const char* getFunctionArgs(StringTableEntry functionName, U32 functionOffset) = 0;
       virtual const char* getPath() = 0;
       virtual const char* getName() = 0;

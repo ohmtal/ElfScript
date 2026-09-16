@@ -79,7 +79,7 @@ class PointStorageObject: public SimObject
     typedef SimObject Parent;
 
     Namespace::Entry* mFn = nullptr; //mapped function
-    ConsoleValue mMuleValue;
+    ConsoleValue mConsoleTempValue;
 
 public:
     DECLARE_CONOBJECT(PointStorageObject);
@@ -357,6 +357,8 @@ public:
         return true;
     }
 
+
+
     // -------------------------------------------------------------------------
     // init the FnParams array
     // Called:
@@ -371,13 +373,13 @@ public:
         };
         if (lastFN != mFn || mFnParams->mValues.size() < 2) {
             mFnParams->mValues.clear();
-            mMuleValue.setString(mFn->mFunctionName);
-            mFnParams->mValues.push_back(mMuleValue);
-            mMuleValue.setVector({0});
-            mFnParams->mValues.push_back(mMuleValue);
-            mMuleValue.reset();
+            mConsoleTempValue.setString(mFn->mFunctionName);
+            mFnParams->mValues.push_back(mConsoleTempValue);
+            mConsoleTempValue.setVector({0});
+            mFnParams->mValues.push_back(mConsoleTempValue);
+            mConsoleTempValue.reset();
             for (S32 i = 0; i < customParamCount; i++) {
-                mFnParams->mValues.push_back(mMuleValue);
+                mFnParams->mValues.push_back(mConsoleTempValue);
             }
         }
     }
@@ -389,12 +391,28 @@ public:
         return true;
     }
     // -------------------------------------------------------------------------
+    // much slower than the other in StarField test scripts :/
     bool runFn() {
         if (!mFn) return false;
-        for (mFnStep = 0; mFnStep< mPoints.size(); mFnStep++) {
+        S32 size = mPoints.size();
+
+        CodeBlock* funcModule = reinterpret_cast<CodeBlock*>(mFn->mModule);
+        const U32 funcOffSet = mFn->mFunctionOffset;
+        Namespace* funcNameSpace = mFn->mNamespace;
+        StringTableEntry funcName = mFn->mFunctionName;
+        StringTableEntry funcPackage = mFn->mPackage;
+        U32 argC = static_cast<U32>(mFnParams->mValues.size());
+        ConsoleValue* argV = mFnParams->mValues.address();
+
+        for (mFnStep = 0; mFnStep< size; mFnStep++) {
             if (!setFnValues()) return false;
-            if (ElfScript::Lambda::callFn(mFn,mFnParams,mMuleValue, true )) {
-                mPoints[mFnStep] = mMuleValue.getVector();
+
+
+            if (ElfScript::Lambda::callFnTight(
+                    funcModule, funcOffSet, funcNameSpace, funcName
+                    , funcPackage, argC, argV
+                    ,mConsoleTempValue)) {
+                mPoints[mFnStep] = mConsoleTempValue.getVector();
             } else {
                 mFnStep = 0;
                 return false;
@@ -408,14 +426,105 @@ public:
     bool stepFn() {
         if (!mFn) return false;
         if (!setFnValues()) return false;
-        if (!ElfScript::Lambda::callFn(mFn,mFnParams,mMuleValue, true )) return 0;
-        mPoints[mFnStep] = mMuleValue.getVector();
+        if (!ElfScript::Lambda::callFn(mFn,mFnParams,mConsoleTempValue, true )) return 0;
+        mPoints[mFnStep] = mConsoleTempValue.getVector();
 
         mFnStep++;
         if (mFnStep >= mPoints.size()) mFnStep = 0;
         return true;
     }
     // -------------------------------------------------------------------------
+    // ------------ EXPERIMENTAL ------------ EXPERIMENTAL ---------------------
+    // -------------------------------------------------------------------------
+
+
+    // -------------------------------------------------------------------------
+    // this is hardcore running on global scope with a exchange variable for out ConsoleVector
+    bool mapInjectFn(ConsoleValue funcValue) {
+
+        mFn = ElfScript::Lambda::getFn(funcValue);
+        if (!mFn) return false;
+        mFnStep = 0;
+        return true;
+    }
+
+
+    // -------------------------------------------------------------------------
+    // if we dont get a vector as result we write back direcly!
+    bool runInjectFn(U32 injectArgC, ConsoleValue* injectArgV) {
+        if (!mFn ) return false;
+        S32 size = mPoints.size();
+
+        CodeBlock* funcModule = reinterpret_cast<CodeBlock*>(mFn->mModule);
+        const U32 funcOffSet = mFn->mFunctionOffset;
+        Namespace* funcNameSpace = mFn->mNamespace;
+        StringTableEntry funcName = mFn->mFunctionName;
+        StringTableEntry funcPackage = mFn->mPackage;
+        U32 argC = 0;
+        ConsoleValue* argV = nullptr;
+
+        // hardcore inject !!!
+        U32* code = funcModule->code;
+        U32 regCount = code[funcOffSet + 2 + 7];
+        // count of parameters defined in lambda
+        U32 headerArgc = code[funcOffSet + 2 + 6];
+        if (headerArgc == 0) {
+              Con::errorf("We need at least one parameter for our vector!");
+              return false;
+        }
+        Script::gEvalState.pushFrame(NULL, NULL, regCount);
+        Script::gEvalState.currentRegisterArray->values[0].type = cvVector;
+
+
+
+        // loop the parameters from ConsoleMethod starting at 2
+        for (U32 i = 2; i < injectArgC; i++) {
+            U32 argIndexInLambda = i - 1; // first is reserved for a ConsoleVector
+
+            // overflow ?
+            if (argIndexInLambda >= headerArgc) break;
+
+            // fetch the register and go
+            U32 targetRegister = code[funcOffSet + 10 + argIndexInLambda];
+            Script::gEvalState.currentRegisterArray->values[targetRegister] = injectArgV[i];
+        }
+
+        U32 vecRegister = code[funcOffSet + 10 + 0]; // Index 0 for %vec
+        Script::gEvalState.currentRegisterArray->values[vecRegister].type = cvVector;
+
+        // 4. Der hocheffiziente Loop
+        for (mFnStep = 0; mFnStep < size; mFnStep++) {
+            // write our points
+            Script::gEvalState.currentRegisterArray->values[vecRegister].v = mPoints[mFnStep];
+
+            // // mFnVectorStackPrt->v = mPoints[mFnStep];
+            const Con::EvalResult evalRes = funcModule->exec(
+                funcOffSet,
+                funcName,
+                funcNameSpace,
+                argC, argV,
+                false, funcPackage,
+                Con::LamdaCallInjectedFrame_ID
+            );
+
+
+            if (evalRes.valid) {
+
+                if (evalRes.value.type == cvVector) mPoints[mFnStep] = evalRes.value.v;
+                else  mPoints[mFnStep] = Script::gEvalState.currentRegisterArray->values[vecRegister].v;
+                // // else mPoints[mFnStep] = mFnVectorStackPrt->v;
+            } else {
+                Script::gEvalState.popFrame();
+                return false;
+            }
+
+        } //for
+        Script::gEvalState.popFrame();
+        mFnStep = 0;
+        return true;
+    }
+
+
 
 
 };
@@ -482,6 +591,52 @@ DefineEngineMethod(PointStorageObject, setPointVec, bool, ( U32 index, ConsoleVe
     return true;
 }
 
+
+DefineEngineMethod(PointStorageObject, getPointX, F32, (U32 index),
+                   , "get the point.points[0] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return 0.f;
+    return (object->mPoints[index].points[0]);
+}
+DefineEngineMethod(PointStorageObject, getPointY, F32, (U32 index),
+                   , "get the point.points[0] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return 0.f;
+    return (object->mPoints[index].points[1]);
+}
+DefineEngineMethod(PointStorageObject, getPointZ, F32, (U32 index),
+                   , "get the point.points[2] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return 0.f;
+    return (object->mPoints[index].points[2]);
+}
+DefineEngineMethod(PointStorageObject, getPointW, F32, (U32 index),
+                   , "get the point.points[3] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return 0.f;
+    return (object->mPoints[index].points[3]);
+}
+DefineEngineMethod(PointStorageObject, setPointX, bool, (U32 index, F32 value),
+                   , "set the point.points[0] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[0] = value;
+    return true;
+}
+DefineEngineMethod(PointStorageObject, setPointY, bool, (U32 index, F32 value),
+                   , "set the point.points[1] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[1] = value;
+    return true;
+}
+DefineEngineMethod(PointStorageObject, setPointZ, bool, (U32 index, F32 value),
+                   , "set the point.points[2] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[2] = value;
+    return true;
+}
+DefineEngineMethod(PointStorageObject, setPointW, bool, (U32 index, F32 value),
+                   , "set the point.points[2] from the point storage at index as Vector (String)") {
+    if ( index >= object->mPoints.size()) return false;
+    object->mPoints[index].points[3] = value;
+    return true;
+}
+
 // ---------- mPoints storage from/to objects position ----------
 DefineEngineMethod(PointStorageObject, storePoint, bool, (U32 index), ,
                    "store the current values x,y,z,w, to the point storage") {
@@ -502,24 +657,26 @@ DefineEngineMethod(PointStorageObject, fetchPoint, bool, (U32 index), ,
 }
 
 
+
+
 DefineEngineMethod(PointStorageObject, mapFn, SimObjectId, (ConsoleValue funcValue, U32 customParamCount),,
     "Map a Lambda function to PointStorage. This can be used by stepFn or runFn\n"
     "The function must except a Variable (TypeVector) and return a Variable TypeVector\n"
     "this will be used to modify the Point Storage\n"
     "Custom param count is the count of the parameter you want to set.\n"
     "It will return the ID of the param Array if you set customParamCount\n"
-    "Your custom params start at 2..2+customParamCount\n"
-    "Max 16 custom params are allowed\n"
+    "Your custom params start at 2..1+customParamCount\n"
+    "Max 32 custom params are allowed\n"
 ) {
-    if (customParamCount > 16) {
-        Con::errorf("mapFn: Only up to 16 parameters allowed!");
+    if (customParamCount > 32) {
+        Con::errorf("mapFn: Only up to 32 parameters allowed!");
         return 0;
     }
     if (object->mapFn(funcValue, customParamCount) && object->mFnParams) {
         Con::debugf("It will return the ID of the param Array if you set customParamCount.");
         if (customParamCount > 0) {
-            Con::debugf("Your custom params start at 2  and end at %d", 2 + customParamCount);
-            Con::debugf("Do not push new fields or delete the first 2! Use .set(2,%value).", 2 + customParamCount);
+            Con::debugf("Your custom params start at 2  and end at %d", 1 + customParamCount);
+            Con::debugf("Do not push new fields or delete the first 2! Use .set(2,%value).", 1 + customParamCount);
             return object->mFnParams->getId();
         } else {
             return 0;
@@ -541,3 +698,26 @@ DefineEngineMethod(PointStorageObject, stepFn, bool, (),,
 ) {
     return object->stepFn();
 }
+
+
+
+DefineEngineMethod(PointStorageObject, mapInjectFn, bool, (ConsoleValue funcValue),,
+                   " ------------------------- VERY EXPERIMENTAL -------------------------------- \n"
+                   "Map a Lambda function to PointStorage. This can be used by runInjectFn\n"
+                   "Parameter 1 must be the %vec\n"
+                   "the vectorVariableName must be initialized and used for our ConsoleVector\n"
+                   "the lambda function does not need to return a value, then the vectorVariable will be used\n"
+                   "to update our data"
+) {
+    return object->mapInjectFn(funcValue);
+}
+
+
+
+ConsoleMethod(PointStorageObject, runInjectFn, bool, 2, 0, "Run injected Console function with parameters") {
+    // argv[0] ==> function name << runInjectFn
+    // argv[1] ==> object id of PointStorageObject
+    // argv[2] ==> here we go .....
+    return object->runInjectFn(argc, argv);
+}
+

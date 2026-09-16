@@ -1530,6 +1530,12 @@ void CodeBlock::dumpInstructions(U32 startIp, bool upToReturn)
           ++ip;
          break;
       }
+      case OP_BUILD_VECTOR_FAST: {
+            U32 count = code[ip+1];
+            Con::printf("%i: OP_BUILD_VECTOR_FAST , count:%d stk=-1", ip - 1, count);
+            ++ip;
+            break;
+      }
 
       case OP_ARRAY_CONSTUCTOR: {
             U32 count = code[ip+1];

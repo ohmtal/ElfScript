@@ -236,6 +236,7 @@ namespace Compiler
       OP_LOAD_PARENTSCOPE_VAR,
       OP_SAVE_PARENTSCOPE_VAR,
 
+      OP_BUILD_VECTOR_FAST,
 
       OP_INVALID,   //
 

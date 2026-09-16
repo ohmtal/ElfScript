@@ -217,7 +217,7 @@ S32 FuncVars::lookup(StringTableEntry var, S32 lineNumber)
          lineText = splitLines[lineNumber - 1].c_str();
 
       // Elfscript 0.8 Parent
-      if (var[0] != '#' ) {
+      if (var[0] != Con::ParentVarTag ) {
             const char* str = avar("Script Warning lookup: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
             scriptErrorHandler(str);
       }
@@ -246,7 +246,7 @@ TypeReq FuncVars::lookupType(StringTableEntry var, S32 lineNumber)
          lineText = splitLines[lineNumber-1].c_str();
 
       // Elfscript 0.8 Parent
-      if (var[0] != '#' ) {
+      if (var[0] != Con::ParentVarTag ) {
             const char* str = avar("Script Warning lookupType: Variable %s referenced before used when compiling script. File: %s\nLine Num: %d\nLine: \"%s\"", var, CodeBlock::smCurrentParser->getCurrentFile(), lineNumber, lineText);
             scriptErrorHandler(str);
       }

@@ -2888,7 +2888,7 @@ DefineEngineFunction( isDefined, bool, ( const char* varName, const char* varVal
          }
       }
    }
-   else if (name[0] == '%')
+   else if (name[0] == Con::LocalVarTag)
    {
       // Look up a local variable
       if( Con::getFrameStack().size() > 0 )
@@ -2905,7 +2905,7 @@ DefineEngineFunction( isDefined, bool, ( const char* varName, const char* varVal
       else
          Con::errorf("%s() - no local variable frame.", __FUNCTION__);
    }
-   else if (name[0] == '$')
+   else if (name[0] == Con::GlobalVarTag)
    {
       // Look up a global value
       Dictionary::Entry* ent = Con::gGlobalVars.lookup(name);

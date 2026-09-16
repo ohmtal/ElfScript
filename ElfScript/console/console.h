@@ -155,6 +155,7 @@ struct ConsoleVector {
 
 
 
+
 class ConsoleValue
 {
 public:
@@ -191,12 +192,13 @@ public:
    ConsoleValue()
    {
       type = ConsoleValueType::cvSTEntry;
+      subType = 0;
       s = const_cast<char*>(StringTable->EmptyString());
    }
 
    ConsoleValue(const ConsoleValue& other)
       : type(ConsoleValueType::cvSTEntry)
-      // , bufferLen(0)
+      , subType(0)
    {
       s = const_cast<char*>(StringTable->EmptyString());
       copyFrom(other);
@@ -241,6 +243,7 @@ public:
 
    TORQUE_FORCEINLINE void reset( )
    {
+      subType = 0;
       setEmptyString();
    }
 
@@ -754,6 +757,14 @@ typedef void(*SetDataFunction)(void *dptr, S32 argc, const char **argv, EnumTabl
 /// @nosubgrouping
 namespace Con
 {
+
+   // ElfScript 0.8
+   constexpr S32  LamdaCallInjectedFrame_ID = -569;
+   constexpr char GlobalVarTag = '$';
+   constexpr char LocalVarTag  = '%';
+   constexpr char ParentVarTag = '#';
+
+
    /// Various configuration constants.
    enum Constants
    {

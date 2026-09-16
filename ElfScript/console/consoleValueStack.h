@@ -113,8 +113,9 @@ public:
    TORQUE_FORCEINLINE void push(const ConsoleValue& val) // Per const-Referenz!
    {
       Frame& frame = stack.last();
-      frame.values[frame.internalCounter++] = val;
-      //orig ? why did i change this?...=>     frame.values[frame.internalCounter++] = (val);
+      // frame.values[frame.internalCounter++] = val;
+      //orig ? why did i change this?...=>
+      frame.values[frame.internalCounter++] = (val);
    }
 
    TORQUE_FORCEINLINE void argvc(StringTableEntry fn, S32& argc, ConsoleValue** argv)

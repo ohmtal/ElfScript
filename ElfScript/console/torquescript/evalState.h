@@ -139,17 +139,17 @@ TORQUE_FORCEINLINE ConsoleVector getLocalVectorVariable(S32 reg)
 
    void pushDebugFrame(S32 stackIndex);
 
-   U32 getStackDepth() const
+   inline U32 getStackDepth() const
    {
       return mStackDepth;
    }
 
-   Dictionary& getCurrentFrame()
+   inline Dictionary& getCurrentFrame()
    {
       return *(stack[mStackDepth - 1]);
    }
 
-   Dictionary& getFrameAt(S32 depth)
+   inline Dictionary& getFrameAt(S32 depth)
    {
       return *(stack[depth]);
    }

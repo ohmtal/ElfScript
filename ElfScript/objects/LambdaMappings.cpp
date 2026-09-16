@@ -24,7 +24,7 @@ DefineEngineFunction(callLambdaTest, ConsoleValue, (ConsoleValue lambdaValue, Ar
     }
     return result;
 }
-
+/*
 
 DefineEngineFunction(callLambdaTest2, ConsoleValue, (ConsoleValue lambdaValue),,"") {
     ConsoleValue result;
@@ -33,4 +33,4 @@ DefineEngineFunction(callLambdaTest2, ConsoleValue, (ConsoleValue lambdaValue),,
         Con::errorf("callLambdaTest2 Failed!!");
     }
     return result;
-}
+}*/

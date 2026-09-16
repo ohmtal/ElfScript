@@ -116,11 +116,11 @@ CON_DECLARE_PARSER(CMD);
 
 static const char * prependDollar ( const char * name )
 {
-   if(name[0] != '$')
+   if(name[0] != Con::GlobalVarTag)
    {
       U64   len = dStrlen(name);
       AssertFatal(len < sizeof(scratchBuffer)-2, "CONSOLE: name too long");
-      scratchBuffer[0] = '$';
+      scratchBuffer[0] = Con::GlobalVarTag;
       dMemcpy(scratchBuffer + 1, name, len + 1);
       name = scratchBuffer;
    }
@@ -129,11 +129,11 @@ static const char * prependDollar ( const char * name )
 
 static const char * prependPercent ( const char * name )
 {
-   if(name[0] != '%')
+   if(name[0] != Con::LocalVarTag)
    {
       U64   len = dStrlen(name);
       AssertFatal(len < sizeof(scratchBuffer)-2, "CONSOLE: name too long");
-      scratchBuffer[0] = '%';
+      scratchBuffer[0] = Con::LocalVarTag;
       dMemcpy(scratchBuffer + 1, name, len + 1);
       name = scratchBuffer;
    }
@@ -585,7 +585,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
 
          //XXTH autocomplete $ objects findObject need the id!
          char c = *completionBuffer;
-         if (c == '$') {
+         if (c == Con::GlobalVarTag) {
             // Con::errorf("[debug] we got a global variable at %s id:%s"
             // , completionBuffer
             // , Con::getVariable(completionBuffer)
@@ -624,7 +624,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    else 
    {
       // In the global namespace, we can complete on global vars as well as functions.
-      if (inputBuffer[completionBaseStart] == '$')
+      if (inputBuffer[completionBaseStart] == Con::GlobalVarTag)
       {
          newText = gGlobalVars.tabComplete(inputBuffer + completionBaseStart, completionBaseLen, forwardTab);
       }
@@ -1213,7 +1213,7 @@ const char *getObjectTokenField(const char *name)
    if (!name) NULL;
 
    const char *dot = dStrchr(name, '.');
-   if(name[0] != '$' && dot)
+   if(name[0] != Con::GlobalVarTag && dot)
    {
       U64 len = dStrlen(name);
       AssertFatal(len < sizeof(scratchBuffer)-1, "Sim::getVariable - object name too long");

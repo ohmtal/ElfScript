@@ -737,7 +737,7 @@ SimObject* getThisObject(ConsoleValue& simObjectLookupValue)
 
 void ExprEvalState::setCurVarName(StringTableEntry name)
 {
-   if (name[0] == '$')
+   if (name[0] == Con::GlobalVarTag)
       currentVariable = Con::gGlobalVars.lookup(name);
    else if (getStackDepth() > 0)
       currentVariable = getCurrentFrame().lookup(name);
@@ -747,7 +747,7 @@ void ExprEvalState::setCurVarName(StringTableEntry name)
 
 void ExprEvalState::setCurVarNameCreate(StringTableEntry name)
 {
-   if (name[0] == '$')
+   if (name[0] == Con::GlobalVarTag)
       currentVariable = Con::gGlobalVars.add(name);
    else if (getStackDepth() > 0)
       currentVariable = getCurrentFrame().add(name);
@@ -784,19 +784,19 @@ ConsoleValue* ExprEvalState::getConsoleValue()
 
 void ExprEvalState::setIntVariable(S32 val)
 {
-   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setIntValue(val);
 }
 
 void ExprEvalState::setFloatVariable(F64 val)
 {
-   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setFloatValue(val);
 }
 
 void ExprEvalState::setStringVariable(const char *val)
 {
-   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
 }
 
@@ -806,20 +806,20 @@ void* ExprEvalState::getPointerVariable() {
 
 void ExprEvalState::setPointerVariable(void* val, ConsoleValueSubType subType )
 {
-      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
       currentVariable->setPointerValue(val, subType);
 }
 
 #ifdef  ENABLE_CONSOLE_VECTOR
 void ExprEvalState::setVectorVariable(ConsoleVector vec)
 {
-      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
       currentVariable->setVectorVariable(vec);
 }
 
 ConsoleVector ExprEvalState::getVectorVariable()
 {
-      AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+      // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
       if (!currentVariable) return ConsoleVector();
       return currentVariable->getVectorVariable();
 }
@@ -1071,6 +1071,9 @@ TORQUE_FORCEINLINE inline void doIntOperation()
 }
 
 //-----------------------------------------------------------------------------
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~ CodeBlock::exec --------------------------------
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~ RUN THE BYTECODE -------------------------------
+//-----------------------------------------------------------------------------
 
 U32 gExecCount = 0;
 Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thisNamespace
@@ -1081,7 +1084,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    gExecCount++;
 #endif
 
-   const U32 TRACE_BUFFER_SIZE = 1024;
+   constexpr U32 TRACE_BUFFER_SIZE = 1024;
    static char traceBuffer[TRACE_BUFFER_SIZE];
    U32 i;
 
@@ -1095,8 +1098,27 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    S32 curStringTableLen = 0; //clint to ensure we dont overwrite it
 
    StringTableEntry thisFunctionName = NULL;
-   bool popFrame = false;
 
+   bool popFrame = false;
+   const bool isInjectedLambda = setFrame == Con::LamdaCallInjectedFrame_ID;
+
+   if (isInjectedLambda)
+   {
+         // we use the current frame!
+         popFrame = false;
+
+
+         // we use global scope so we should not use parameters
+         // setup a valid ip for no parmeters
+         U32 fnArgc = code[ip + 2 + 6];
+         ip = ip + 10 + 3 * fnArgc;
+
+         // setup IMMED tables
+         curFloatTable = functionFloats;
+         curStringTable = functionStrings;
+         curStringTableLen = functionStringsMaxLen;
+   }
+   else
    if (argv)
    {
       // assume this points into a function decl:
@@ -1295,14 +1317,14 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
       U32 failJump;
    } objectCreationStack[objectCreationStackSize] = {};
 
-   SimObject* currentNewObject = 0;
+   SimObject* currentNewObject = nullptr;
    StringTableEntry prevField = NULL;
    StringTableEntry curField = NULL;
    SimObject* prevObject = NULL;
    SimObject* curObject = NULL;
    SimObject* thisObject = NULL;
-   ConsoleValue* simObjectLookupPtr;
-   Namespace::Entry* nsEntry;
+   ConsoleValue* simObjectLookupPtr = nullptr;
+   Namespace::Entry* nsEntry = nullptr;
    Namespace* ns = NULL;
    const char* curFNDocBlock = NULL;
    const char* curNSDocBlock = NULL;
@@ -1326,18 +1348,19 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
    // The frame temp is used by the variable accessor ops (OP_SAVEFIELD_* and
    // OP_LOADFIELD_*) to store temporary values for the fields.
-   static S32 VAL_BUFFER_SIZE = 1024;
-   FrameTemp<char> valBuffer(VAL_BUFFER_SIZE);
+
+   // NOTE ElfScript 0.8.9.15  this is not used anywhere so do not init it
+   // static S32 VAL_BUFFER_SIZE = 1024;
+   // FrameTemp<char> valBuffer(VAL_BUFFER_SIZE);
 
 
    // ==========================================================================
    //  D i r e c t  T h r e a d i n g
+   //     .... ElfScript ....
    //  ----- XXTH: insane change started at 2026-08-05 ------
    // ==========================================================================
-
-
-   //XXTH ElfScript ( i guess i'am insane *haha* )
-   const void* dispatch_table[] = {
+   // NOTE ElfScript 0.8.9.15 : changed to constexpr
+   constexpr void* dispatch_table[] = {
          &&handle_OP_FUNC_DECL,
          &&handle_OP_DEFAULT_END,
          &&handle_OP_CREATE_OBJECT,
@@ -1510,6 +1533,8 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
          &&handle_OP_LOAD_PARENTSCOPE_VAR,
          &&handle_OP_SAVE_PARENTSCOPE_VAR,
 
+         &&handle_OP_BUILD_VECTOR_FAST,
+
          &&handle_OP_INVALID
    };
 
@@ -1622,7 +1647,7 @@ handle_OP_CREATE_OBJECT:
 
       // Get the constructor information off the stack.
       gCallStack.argvc(NULL, callArgc, &callArgv);
-      AssertFatal(callArgc - 3 >= 0, avar("Call Arg needs at least 3, only has %d", callArgc));
+      // // AssertFatal(callArgc - 3 >= 0, avar("Call Arg needs at least 3, only has %d", callArgc));
       const char* objectName = callArgv[2].getString();
 
       currentNewObject = NULL;
@@ -1892,7 +1917,7 @@ handle_OP_FINISH_OBJECT:
       if (currentNewObject)
             currentNewObject->onPostAdd();
 
-      AssertFatal( objectCreationStackIndex >= 0, "Object Stack is empty." );
+      // // AssertFatal( objectCreationStackIndex >= 0, "Object Stack is empty." );
       currentNewObject = objectCreationStack[--objectCreationStackIndex].newObject;
       failJump = objectCreationStack[objectCreationStackIndex].failJump;
       DISPATCH(); //break;
@@ -4127,7 +4152,7 @@ handle_OP_ASSERT:
 handle_OP_BREAK:
 {
       //append the ip and codeptr before managing the breakpoint!
-      AssertFatal(!Script::gEvalState.stack.empty(), "Empty eval stack on break!");
+      // // AssertFatal(!Script::gEvalState.stack.empty(), "Empty eval stack on break!");
       Script::gEvalState.getCurrentFrame().module = this;
       Script::gEvalState.getCurrentFrame().ip = ip - 1;
 
@@ -4819,7 +4844,22 @@ handle_OP_ARRAY_CONSTUCTOR: {
 }
 // ~~~~~~~~~~~~~~~~~ VECTOR_STRING
 #ifdef ENABLE_CONSOLE_VECTOR
-// PoD !! :D if count < 4 we get into vector mode :)
+
+handle_OP_BUILD_VECTOR_FAST: {
+      U32 count = code[ip++];
+      ConsoleVector cv = {0};
+      for (U32 i = 0; i < count; i++) {
+            cv.points[count - 1 - i] = static_cast<F32>(stack[_STK - i].getFloat());
+      }
+      _STK -= (count - 1);
+      stack[_STK].type = ConsoleValueType::cvVector;
+      stack[_STK].v = cv;
+
+      DISPATCH();
+}
+
+
+//TODO FIXME: this is mixed or too many parameters, so I can remove the matchVectorFields check
 handle_OP_BUILD_VECTOR_STRING: {
       // read the count
       U32 count = code[ip++];
@@ -4883,6 +4923,10 @@ handle_OP_BUILD_VECTOR_STRING: {
       DISPATCH();
 }
 #else // #ifdef ENABLE_CONSOLE_VECTOR
+
+handle_OP_BUILD_VECTOR_FAST: {
+      DISPATCH_OPCODE(OP_BUILD_VECTOR_STRING);
+}
 handle_OP_BUILD_VECTOR_STRING: {
       // read the count
       U32 count = code[ip++];
@@ -5299,6 +5343,7 @@ handle_OP_LAMBDA_CALL: {
 }
 
 // ------------------------- PARENTSCOPE VAR NOTE: useless as fast as global variables :P
+// NOTE removed from lexer - this make no sense! but i keep this here for maybe later use
 handle_OP_LOAD_PARENTSCOPE_VAR: {
 
 
@@ -5309,7 +5354,6 @@ handle_OP_LOAD_PARENTSCOPE_VAR: {
       prevObject = NULL;
       curObject = NULL;
 
-//FIXME
 
       S32 stackNum = 0;
       Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
@@ -5366,6 +5410,9 @@ execFinished:
       Script::gEvalState.popFrame();
    }
 
+   if (isInjectedLambda) {
+   }
+   else
    if (argv)
    {
       if (Con::gTraceOn)

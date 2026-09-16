@@ -349,7 +349,7 @@ U32 IterStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 
    codeStream.pushFixScope(true);
 
-   bool isGlobal = varName[0] == '$';
+   bool isGlobal = varName[0] == Con::GlobalVarTag;
    TypeReq varType = (mode==1) ? TypeReqString : TypeReqUInt;
 
    const U32 startIp = ip;
@@ -825,7 +825,7 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
    precompileIdent(varName); // <<< add varName to gGlobalStringTable
 
-   bool oldVariables = arrayIndex || varName[0] == '$';
+   bool oldVariables = arrayIndex || varName[0] == Con::GlobalVarTag;
 
    if (oldVariables)
    {
@@ -860,7 +860,7 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    else
    {
       //ElfScript 0.8
-      if ( varName[0] == '#') {
+      if ( varName[0] == Con::ParentVarTag) {
              codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
              codeStream.emit(getFuncVars(dbgLineNumber)->lookup(varName, dbgLineNumber));
 
@@ -883,7 +883,7 @@ U32 VarNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
 TypeReq VarNode::getPreferredType()
 {
-   bool oldVariables = arrayIndex || varName[0] == '$';
+   bool oldVariables = arrayIndex || varName[0] == Con::GlobalVarTag;
    return oldVariables ? TypeReqNone : getFuncVars(dbgLineNumber)->lookupType(varName, dbgLineNumber);
 }
 
@@ -1083,7 +1083,7 @@ U32 AssignExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 
    ip = expr->compile(codeStream, ip, subType);
 
-   bool oldVariables = arrayIndex || varName[0] == '$';
+   bool oldVariables = arrayIndex || varName[0] == Con::GlobalVarTag;
 
    if (oldVariables)
    {
@@ -1119,11 +1119,11 @@ U32 AssignExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    {
 
       //ElfScript 0.8 #
-      if ( varName[0] == '#') {
+      if ( varName[0] == Con::ParentVarTag) {
             codeStream.emit(OP_SAVE_PARENTSCOPE_VAR);
             // FIXME REWRITE varName[0] = '%';
             codeStream.emit(getFuncVars(dbgLineNumber)->assign(varName,
-                                                               subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
+                  subType == TypeReqNone ? TypeReqString : subType, dbgLineNumber));
       } else {
 
             switch (subType)
@@ -1229,8 +1229,8 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
    getAssignOpTypeOp(op, subType, operand);
    precompileIdent(varName);
 
-   // FIXME fastpath ElfScript 0.8 for '#'
-   bool oldVariables = arrayIndex || varName[0] == '$' || varName[0] == '#';
+   // FIXME fastpath ElfScript 0.8 for Con::ParentVarTag
+   bool oldVariables = arrayIndex || varName[0] == Con::GlobalVarTag || varName[0] == Con::ParentVarTag;
 
    if ((op == opPLUSPLUS || op == opMINUSMINUS) && !oldVariables && type == TypeReqNone)
    {
@@ -1255,7 +1255,7 @@ U32 AssignOpExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       if (oldVariables)
       {
          //ElfScript 0.8 slowmo path
-         if (varName[0] == '#') {
+         if (varName[0] == Con::ParentVarTag) {
               const S32 varIdx = getFuncVars(dbgLineNumber)->assign(varName, TypeReqFloat, dbgLineNumber);
                codeStream.emit(OP_LOAD_PARENTSCOPE_VAR);
                codeStream.emit(varIdx);
@@ -1972,7 +1972,7 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       U32 argc = 0;
       for (VarNode* walk = vars; walk; walk = (VarNode*)((StmtNode*)walk)->getNext())
       {
-            if (walk->varName[0] != '%') {
+            if (walk->varName[0] != Con::LocalVarTag) {
                   Con::errorf("Parse Error: Tuple unpacking only supports local variables. %s:%d", dbgFileName, dbgLineNumber);
                   return 0;
             }
@@ -2037,7 +2037,7 @@ U32 LambdaCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
       }
 
       codeStream.emit(OP_LAMBDA_CALL);
-      bool isGlobal = varName[0] == '$';
+      bool isGlobal = varName[0] == Con::GlobalVarTag;
 
       U32 flags = 0; //can be used for more params if needed
       if (isGlobal) flags |= 1u << 0;

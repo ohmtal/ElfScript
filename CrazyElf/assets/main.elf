@@ -1,5 +1,5 @@
-$MODULES = "sdlTests testWidget MelodyMaker Pixels NativSDL blank PlayGround StreetAI OnOffAI Squash";
-$MODULES_STARFIELDS = "StarField4 StarField3 StarField2 StarField";
+$MODULES = "StarField6 sdlTests testWidget MelodyMaker Pixels NativSDL blank PlayGround StreetAI OnOffAI Squash";
+$MODULES_STARFIELDS = "StarField4 StarField3 StarField2 StarField StarField5 StarField6";
 
 function StarFields() { $MODULES = $MODULES_STARFIELDS; $Main.loadModule(0); }
 
@@ -292,7 +292,7 @@ $WindowSize = {640,400};
 $Global::running = onInit();
 $Global::reloading = false;
 
-
+%main = $Main;
 
 echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 
@@ -307,7 +307,6 @@ echo("************** %main: ", %main, " RUNNUNG: ", $Global::running);
 // we only need to push the renderer if we scaled the screen....
 %mainLoopParam = %main.scaledScreen ? %main.renderer : 0;
 
-#main = %main; //TEST for lamda
 
 while ($Global::running) {
 
@@ -316,8 +315,8 @@ while ($Global::running) {
     $Global::FrameTime = (%tickCount - %lastTick) / %performanceFrequency;
 
 
-    // %main.Render();
-    %mainRender(); //as lambda
+    %main.Render();
+    // %mainRender(); //as lambda
 
 
     // Main::Render(%main); //not really >>Fast call we are in a critical loop

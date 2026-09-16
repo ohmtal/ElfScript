@@ -349,7 +349,7 @@ SimObject* findObject(const char* name)
    char c = *name;
 
    //ElfScript 0.5 why not looking for "$" ??? can't imagine a reason why not
-   if (c == '$') {
+   if (c == Con::GlobalVarTag) {
 
          Dictionary::Entry* ent = Con::gGlobalVars.lookup(StringTable->insert(name));
 
@@ -360,7 +360,7 @@ SimObject* findObject(const char* name)
 
    }
 
-   if (c == '%')
+   if (c == Con::LocalVarTag)
    {
 
       ConsoleValue* localVal = ElfScript::getLocalVariable(name);

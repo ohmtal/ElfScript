@@ -596,9 +596,9 @@ Dictionary::Entry* Dictionary::addVariable(const char *name,
 {
    AssertFatal(type >= 0, "Dictionary::addVariable - Got bad type!");
 
-   if (name[0] != '$')
+   if (name[0] != Con::GlobalVarTag)
    {
-      scratchBuffer[0] = '$';
+      scratchBuffer[0] = Con::GlobalVarTag;
       dStrcpy(scratchBuffer + 1, name, 1023);
       name = scratchBuffer;
    }

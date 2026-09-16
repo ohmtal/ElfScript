@@ -62,12 +62,8 @@ $ptr = getVarPtr("%localX");
 
 
 for(%j in range JLOOPS)  {
-        // printSeparator();
     foreach(%l in %loops) {
         %l();
-        // varDump("%l");
-        // %localX = %l(%localX);
-        // printSeparator();
 
     }
 }

@@ -19,7 +19,6 @@ extern  FuncVars gGlobalScopeFuncVars;
 
 //-----------------------------------------------------------------------------
 namespace ElfScript {
-    ConsoleValue muleValue;
 
     const char* getConsoleValueTypeName(S32 type, U32 subType) {
         switch (type) {
@@ -48,7 +47,7 @@ namespace ElfScript {
     // -----------------------------------------------------------------------------
     S32 findLocalVarRegisterInCurrentScope(const char* variableName)  {
         // sanity
-        if (!variableName || variableName[0] != '%') return -1;
+        if (!variableName || variableName[0] != Con::LocalVarTag) return -1;
 
         // check we are in a function
         Dictionary& stackFrame = Script::gEvalState.getCurrentFrame();
@@ -73,14 +72,14 @@ namespace ElfScript {
     bool getLocalVariable(const char* variableName, ConsoleValue*& stack, S32& reg){
         if (!variableName) return false;
 
-        if (variableName[0] == '%') {
+        if (variableName[0] == Con::LocalVarTag) {
             reg = findLocalVarRegisterInCurrentScope(variableName);
             if (reg < 0) return false;
             stack = &Script::gEvalState.currentRegisterArray->values[reg];
             if (!stack ) return false;
             return true;
         }
-        else if (variableName[0] == '#') {
+        else if (variableName[0] == Con::ParentVarTag) {
             reg = _getFuncVars()->lookupExising(StringTable->insert( variableName ));
             if (reg < 0) return false;
             S32 stackNum = 0;
@@ -98,7 +97,7 @@ namespace ElfScript {
             if (!stack ) return false;
             return true;
         }
-        else if (variableName[0] == '$') {
+        else if (variableName[0] == Con::GlobalVarTag) {
             Dictionary::Entry *entry =Con::gGlobalVars.lookup(StringTable->insert(variableName));
             if (!entry) return false;
             stack = &entry->getValue();
@@ -126,7 +125,7 @@ namespace ElfScript {
         if (!variableName ) return false;
 
 
-        if (variableName[0] == '%') {
+        if (variableName[0] == Con::LocalVarTag) {
 
             // !!!!!!!!!!!!!!!!!!!!!!!!
             Con::errorf("---- ElfScript::CreateVar: Local variables can only be created at compile time! ----");
@@ -169,7 +168,7 @@ namespace ElfScript {
             // This is tricky
             return false;
 
-        } else if (variableName[0] == '$') {
+        } else if (variableName[0] == Con::GlobalVarTag) {
             // This add does also check it exits !
             Dictionary::Entry *entry = Con::gGlobalVars.add(StringTable->insert(variableName));
             if (!entry) return false;
@@ -245,7 +244,7 @@ namespace ElfScript {
     {
         if (!variableName) return;
 
-        if (variableName[0] != '$') {
+        if (variableName[0] != Con::GlobalVarTag) {
             Con::errorf("Sorry [%s] in not a global variable %s", variableName);
             return;
         }
@@ -266,7 +265,7 @@ namespace ElfScript {
         // sanity
         if (!variableName) return;
 
-        if (variableName[0] != '%' && variableName[0] != '#') {
+        if (variableName[0] != Con::LocalVarTag && variableName[0] != Con::ParentVarTag) {
             Con::errorf("Sorry [%s] in not a local variable %s", variableName);
             return;
         }
@@ -346,7 +345,7 @@ namespace ElfScript {
             return;
         }
 
-        if (variableName[0] == '$') {
+        if (variableName[0] == Con::GlobalVarTag) {
             ElfScript::varDumpGobals(variableName);
             return;
         }
@@ -457,20 +456,22 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 // =============================================================================
 DefineEngineFunction( getVarPtr, ConsoleValue, (const char * variableName),,"") {
     ConsoleValue* stack = ElfScript::getLocalVariable(variableName);
-    if (stack) ElfScript::muleValue.setPointer(stack, cvsVariable);
-    else ElfScript::muleValue.setString("varPtr failed to get pointer!!");
-    return ElfScript::muleValue;
+    ConsoleValue myValue;
+    if (stack) myValue.setPointer(stack, cvsVariable);
+    else myValue.setString("varPtr failed to get pointer!!");
+    return myValue;
 }
 DefineEngineFunction( getValueByPtr, ConsoleValue, (ConsoleValue PtrValue),,"") {
-    ElfScript::muleValue.setString("valueByPtr: FAILED to get value!");
-    if (PtrValue.type != cvPointer || PtrValue.subType != cvsVariable) return ElfScript::muleValue;
+     ConsoleValue myValue;
+    myValue.setString("valueByPtr: FAILED to get value!");
+    if (PtrValue.type != cvPointer || PtrValue.subType != cvsVariable) return myValue;
     void* rawPtr = PtrValue.getPointer();
-    if ( !rawPtr ) return ElfScript::muleValue;
+    if ( !rawPtr ) return myValue;
     ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);
-    if ( !value ) return ElfScript::muleValue;
+    if ( !value ) return myValue;
 
-    ElfScript::muleValue = *value;
-    return ElfScript::muleValue;
+    myValue = *value;
+    return myValue;
 
 }
 DefineEngineFunction( setValueByPtr, bool, (ConsoleValue PtrValue, ConsoleValue setterValue),,"") {
