@@ -819,7 +819,7 @@ funcall_expr
    // Method call:  object.method(args)
    | expr '.' IDENT '(' func_arg_list_decl ')'
       { $1->append($5); $$ = FuncCallExprNode::alloc( $1->dbgLineNumber, $3.value, NULL, $1, true); }
-   // ElfScript 0.8 lamda
+   // ElfScript 0.8 lambda
    | VAR '(' func_arg_list_decl ')'
       { $$ = LambdaCallExprNode::alloc($1.lineNumber, $1.value, $3); }
 
