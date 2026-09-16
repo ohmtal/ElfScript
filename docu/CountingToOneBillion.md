@@ -1,7 +1,11 @@
-Note: I know this is not a real benchmark for a script language .. i do this just for fun.
+Note: I know this is not a real benchmark for a script language .. i do this just for fun. 
+And testing speed of Iterator. 
+
+Version 0.7a rocks the show ... any interpreted script language faster then ElfScript?
+If you know one, let me know. 
 
 My fastest Version 0.4g is a bit slower than 0.4a on this test, but does a 
-great job in my SpeedTest. I guess I'll never reach under 5sec at test I.
+great job in my SpeedTest. ~~I guess I'll never reach under 5sec at test I.~~
 
 # I. For loop test counting to one billion (1000000000)
 
@@ -45,7 +49,9 @@ time /opt/ElfScript/HelloElf --script counter.elf
 
 (*6) HalloElf (RelWithDeb)  optimized loop handling is slower Wtf. 
 
-# II. For loop test counting to one billion (1000000000) and output %
+# OBSOLETE OLD STUFF:
+
+## II. For loop test counting to one billion (1000000000) and output %
 
 - adding if/modulo/div/print
 
@@ -89,7 +95,7 @@ for ( $i = 0; $i < 1000000000; $i++) {
 - Python 3 (3.14.6): 89.470u 0.026s 1:29.74 99.7%    0+0k 0+0io 0pf+0w
 
 
-# III Float Test with While
+## III Float Test with While
 
 
 ```
@@ -119,7 +125,7 @@ echo(%i);
 - 📌 ElfScipt(0.4a (*3)): 28.889u 0.006s 0:28.94 99.7%    0+0k 0+0io 0pf+0w
 - Version 0.4g🚀 (RelWithDebug) : 31.617u 0.003s 0:31.64 99.9%    0+0k 0+0io 0pf+0w
 
-# IV Analysis
+## IV Analysis
 
 The ++ trigger OP_INV which typecast %i to float:
 
