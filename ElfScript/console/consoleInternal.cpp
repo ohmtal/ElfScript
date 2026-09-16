@@ -1172,7 +1172,7 @@ void Namespace::addCommand(StringTableEntry name, VectorCallback cb, const char 
 }
 #endif
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void Namespace::addCommand(StringTableEntry name, ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly , ConsoleFunctionHeader* header)
 {
       Entry *ent = createLocalEntry(name);
@@ -1187,7 +1187,7 @@ void Namespace::addCommand(StringTableEntry name, ConsoleValueCallback cb, const
       ent->mType = Entry::ConsoleValueCallbackType;
       ent->cb.mConsoleValueCallbackFunc = cb;
 }
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 
 void Namespace::addCommand(StringTableEntry name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header)
@@ -1302,12 +1302,12 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
             result.setVector(cb.mVectorCallbackFunc(thisObj, argc, argv));
         break;
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       case ConsoleValueCallbackType:
             // result.copyFrom(cb.mConsoleValueCallbackFunc(thisObj, argc, argv));
             result = cb.mConsoleValueCallbackFunc(thisObj, argc, argv);
         break;
-#endif
+// #endif
 
 
    }
@@ -1659,11 +1659,11 @@ String Namespace::Entry::getPrototypeString() const
             str.append("TypeVector ");
             break;
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
          case ConsoleValueCallbackType:
             str.append("TypeValue ");
             break;
-#endif
+// #endif
          case ScriptCallbackType:
             break;
       }

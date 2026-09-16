@@ -152,9 +152,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
          VectorCallback mVectorCallbackFunc;
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
          ConsoleValueCallback mConsoleValueCallbackFunc;
-#endif
+// #endif
          const char *mGroupName;
          const char *mCallbackName;
       } cb;
@@ -205,9 +205,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(StringTableEntry name, VectorCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
  void addCommand(StringTableEntry name, ConsoleValueCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-#endif
+// #endif
    void addScriptCallback(const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);
 
    void markGroup(const char* name, const char* usage);

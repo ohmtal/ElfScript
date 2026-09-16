@@ -474,13 +474,13 @@ inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
 // // // }
 
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 inline ConsoleValue _EngineConsoleThunkReturnValue( ConsoleValue value )
 {
       return value;
 }
 
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 // ElfScript 0.7
 inline U32 _EngineConsoleThunkReturnValue( U32 value )
@@ -557,14 +557,14 @@ struct _EngineConsoleThunkType< ConsoleVector >
       typedef VectorCallback CallbackType;
 };
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 template<>
 struct _EngineConsoleThunkType< ConsoleValue >
 {
       typedef ConsoleValue ReturnType;
       typedef ConsoleValueCallback CallbackType;
 };
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 template<>
 struct _EngineConsoleThunkType< void >
@@ -618,7 +618,7 @@ namespace engineAPI{
                return fixed_tuple_accessor<index + method_offset>::get(defaultArgs.mArgs);
             }
          }
-         
+
          template<size_t ...I>
          static R dispatchHelper(S32 argc, ConsoleValue *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs, Seq<I...>){
             return fn(SelfType::getRealArgValue<I>(argc, argv, defaultArgs) ...);
@@ -1382,6 +1382,27 @@ public:
 // NOTE: better use: DefineEngineFunction
 #define ConsoleFunction(name,returnType,minArgs,maxArgs,usage) \
        DefineEngineStringlyVariadicFunction(name,returnType,minArgs,maxArgs,usage)
+
+// ElfScript 0.8 THIS IS POWER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define ConsoleValueFunction(name, minArgs, maxArgs, usage) \
+static ConsoleValue _fn##name##impl(SimObject *, S32, ConsoleValue *); \
+static ConsoleValue _##name##caster(SimObject* obj, S32 argc, ConsoleValue *argv) \
+{ \
+      return _fn##name##impl(obj, argc, argv); \
+} \
+static ConsoleFunctionHeader _##name##header("ConsoleValue", "...", ""); \
+static ConsoleConstructor _##name##obj( \
+NULL, \
+#name, \
+(ConsoleValueCallback)_##name##caster, \
+usage, \
+minArgs, \
+maxArgs, \
+false, \
+&_##name##header \
+); \
+static ConsoleValue _fn##name##impl(SimObject *object, S32 argc, ConsoleValue *argv)
+
 
 //------------------------------------------------------------------------------
 

@@ -450,9 +450,32 @@ public:
 
 
     // -------------------------------------------------------------------------
-    // if we dont get a vector as result we write back direcly!
+    // This is very cool directly using TorqueScript CodeBock to inject
+    // params
+    //
+    // It's fast because we only push/pop the Frame once and have out own param setup :)
+    //
+    // What it does:
+    //
+    // 1. initalize params and loopup the
+    //    regCount == count of parameters of the Lambda function
+    //
+    // 2. push an Frame once
+    //
+    // 3. inject params which does not change in the loop reserve and
+    //    setup the first register for our Vector and set the
+    //
+    // 4. Loop:
+    //   - set ConsoleVector register
+    //   - call the function with Frame:  Con::LamdaCallInjectedFrame_ID
+    //   - use the function result to update the current ConsoleVector
+    //     If no valid result is returned it write back the data from the
+    //     first register.
+    //
+    // 5. Finished we now to pop the Frame.
+    //
     bool runInjectFn(U32 injectArgC, ConsoleValue* injectArgV) {
-        if (!mFn ) return false;
+        if (!mFn || !mFn->mModule) return false;
         S32 size = mPoints.size();
 
         CodeBlock* funcModule = reinterpret_cast<CodeBlock*>(mFn->mModule);
@@ -476,7 +499,8 @@ public:
         // pushframe every iteration is slow so I push it once
         Script::gEvalState.pushFrame(NULL, NULL, regCount);
         // setup argument
-        Script::gEvalState.currentRegisterArray->values[0].type = cvVector;
+        U32 vecRegister = code[funcOffSet + 10 + 0]; // Index 0 for %vec
+        Script::gEvalState.currentRegisterArray->values[vecRegister].type = cvVector;
 
 
 
@@ -492,10 +516,9 @@ public:
             Script::gEvalState.currentRegisterArray->values[targetRegister] = injectArgV[i];
         }
 
-        U32 vecRegister = code[funcOffSet + 10 + 0]; // Index 0 for %vec
         Script::gEvalState.currentRegisterArray->values[vecRegister].type = cvVector;
 
-        // 4. Der hocheffiziente Loop
+        // Loop
         for (mFnStep = 0; mFnStep < size; mFnStep++) {
             // write our points
             Script::gEvalState.currentRegisterArray->values[vecRegister].v = mPoints[mFnStep];

@@ -152,9 +152,9 @@ void ConsoleConstructor::init( const char *cName, const char *fName, const char 
 #ifdef ENABLE_CONSOLE_VECTOR
    mVecC = 0;
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    mValueC = 0;
-#endif
+// #endif
 
 
    mCallback = mGroup = false;
@@ -187,10 +187,10 @@ void ConsoleConstructor::setup()
       else if( walk->mVecC)
         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVecC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       else if( walk->mValueC)
         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mValueC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
-#endif
+// #endif
       else if( walk->mGroup )
          Con::markCommandGroup( walk->mClassName, walk->mFuncName, walk->mUsage);
       else if( walk->mClassName)
@@ -246,13 +246,13 @@ ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcNa
 }
 #endif
 // --------------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
       mValueC = bfunc;
 }
-#endif
+// #endif
 // --------------------------------------------------------------------------------
 
 ConsoleConstructor::ConsoleConstructor(const char* className, const char* groupName, const char* aUsage)
@@ -1386,13 +1386,13 @@ void addCommand( const char *nsName, const char *name,VectorCallback cb, const c
 }
 #endif
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void addCommand( const char *nsName, const char *name,ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       Namespace *ns = lookupNamespace(nsName);
       ns->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 
 void addCommand( const char *nsName, const char *name,BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
@@ -1455,12 +1455,12 @@ void addCommand( const char *name,VectorCallback cb,const char *usage, S32 minAr
 }
 #endif
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void addCommand( const char *name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
-#endif
+// #endif
 
 //------------------------------------------------------------------------------
 

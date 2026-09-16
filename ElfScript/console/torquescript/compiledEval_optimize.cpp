@@ -3420,7 +3420,7 @@ handle_OP_CALLFUNC_VALUE: {
 
       PREPARE_CALLFUNC();
       thisObject = nullptr;
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3430,7 +3430,7 @@ handle_OP_CALLFUNC_VALUE: {
             // written above ! stack[_STK + 1].copyFrom( result) ;
             PUSH_STK();
       }
-#endif
+// #endif
       FINIT_CALLFUNC();
       DISPATCH();
 }
@@ -3594,7 +3594,7 @@ handle_OP_CALLFUNC_VALUE_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
-      #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+      // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3604,7 +3604,7 @@ handle_OP_CALLFUNC_VALUE_METHOD: {
             // written above ! stack[_STK + 1].copyFrom( result) ;
             PUSH_STK();
       }
-      #endif
+      // #endif
       FINIT_CALLFUNC();
       DISPATCH();
 }
@@ -3906,7 +3906,7 @@ handle_OP_CALLFUNC:
                               break;
                         }
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
                         case Namespace::Entry::ConsoleValueCallbackType:
                         {
                               ConsoleValue result = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
@@ -3922,7 +3922,7 @@ handle_OP_CALLFUNC:
                               PUSH_STK();
                               break;
                         }
-#endif
+// #endif
 
                         case Namespace::Entry::StringCallbackType:
                         {

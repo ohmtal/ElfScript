@@ -732,9 +732,9 @@ typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef ConsoleVector(*VectorCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 #endif
 
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 typedef ConsoleValue(*ConsoleValueCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
-#endif
+// #endif
 
 typedef void(*ConsumerCallback)(U32 level, const char *consoleLine);
 /// @}
@@ -1104,9 +1104,9 @@ namespace Con
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand( const char* name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    void addCommand( const char* name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#endif
+// #endif
 
 /// @name Namespace Function Registration
 /// @{
@@ -1146,9 +1146,9 @@ namespace Con
 #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(const char *nameSpace, const char *name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
   void addCommand(const char *nameSpace, const char *name, ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#endif                                                                                                                                                                                        /// @}
+// #endif                                                                                                                                                                                        /// @}
 
                                                                                                                                                                                         /// @name Special Purpose Registration
                                                                                                                                                                                         ///
@@ -1426,9 +1426,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    VectorCallback mVecC;     ///< A function/method that returns a ConsoleVector.
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       ConsoleValueCallback mValueC;     ///< A function/method that returns a ConsoleVector.
-#endif
+// #endif
 
 
    bool mGroup;          ///< Indicates that this is a group marker.
@@ -1543,9 +1543,9 @@ public:
 #ifdef ENABLE_CONSOLE_VECTOR
    ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
 #endif
-#ifdef ENABLE_CONSOLE_VALUE_CALLBACK
+// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
-#endif
+// #endif
 
    /// @}
 

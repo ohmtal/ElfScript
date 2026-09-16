@@ -12,13 +12,21 @@ function loader(%which) {
 // ============================================================================
 %count = 5;
 %sto = new PointStorageObject() { storageSize = %count;};
-%fn = fn(%vec) {
+
+
+%fn = fn(%vec, %foo) {
+    print("foo is", %foo);
     %vec.x = math.randomf();
     %vec.y = math.randomf();
     %vec.z = math.randomf();
     %vec.w = math.randomf();
     return %vec;
 };
+
+echo(runInjectedLambda(%fn,{0}, 4711));
+
+return;
+// ============================================================================
 
 %fn2 = fn(%vec) {
     %vec = {0,0,0,0};
@@ -60,27 +68,28 @@ for (%i in range %count) {
     printf("#%d %s", %i, %sto.getPointVec(%i));
 }
 
-return;
+
 
 // ============================================================================
-#parent = 11.0;
-%lam = fn( )  { print("PARENT VALUE LAMDA (14):",#parent); #parent +=  2; };
-varDump("#parent");
-varDump("%lam");
-
-
-function pa() { print("PARENT VALUE INSIDE (11):",#parent); #parent = #parent + 2;}
-
-pa();
-print("PARENT VALUE OUTSIDE (13):",#parent);
-#parent++;
-print("PARENT VALUE OUTSIDE (14):",#parent);
-
-%lam();
-
-print(" ---------- FIXME vardump in localVar.cpp ---------- ");
-varDump("#parent");
-
+// # variables removed again!
+// // #parent = 11.0;
+// // %lam = fn( )  { print("PARENT VALUE LAMDA (14):",#parent); #parent +=  2; };
+// // varDump("#parent");
+// // varDump("%lam");
+// //
+// //
+// // function pa() { print("PARENT VALUE INSIDE (11):",#parent); #parent = #parent + 2;}
+// //
+// // pa();
+// // print("PARENT VALUE OUTSIDE (13):",#parent);
+// // #parent++;
+// // print("PARENT VALUE OUTSIDE (14):",#parent);
+// //
+// // %lam();
+// //
+// // print(" ---------- FIXME vardump in localVar.cpp ---------- ");
+// // varDump("#parent");
+// //
 
 
 
