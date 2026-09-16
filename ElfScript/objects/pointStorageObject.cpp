@@ -472,14 +472,17 @@ public:
               Con::errorf("We need at least one parameter for our vector!");
               return false;
         }
+
+        // pushframe every iteration is slow so I push it once
         Script::gEvalState.pushFrame(NULL, NULL, regCount);
+        // setup argument
         Script::gEvalState.currentRegisterArray->values[0].type = cvVector;
 
 
 
         // loop the parameters from ConsoleMethod starting at 2
-        for (U32 i = 2; i < injectArgC; i++) {
-            U32 argIndexInLambda = i - 1; // first is reserved for a ConsoleVector
+        for (U32 i = 0; i < injectArgC; i++) {
+            U32 argIndexInLambda = i + 1; // first is reserved for a ConsoleVector
 
             // overflow ?
             if (argIndexInLambda >= headerArgc) break;
@@ -702,11 +705,11 @@ DefineEngineMethod(PointStorageObject, stepFn, bool, (),,
 
 
 DefineEngineMethod(PointStorageObject, mapInjectFn, bool, (ConsoleValue funcValue),,
-                   " ------------------------- VERY EXPERIMENTAL -------------------------------- \n"
+                   " -------------------------  EXPERIMENTAL -------------------------------- \n"
                    "Map a Lambda function to PointStorage. This can be used by runInjectFn\n"
-                   "Parameter 1 must be the %vec\n"
+                   "Fist paramter must be the %vec variable like fn(%vec, ...) \n"
                    "the vectorVariableName must be initialized and used for our ConsoleVector\n"
-                   "the lambda function does not need to return a value, then the vectorVariable will be used\n"
+                   "the lambda function does not need to return a value - if we have none the vectorVariable will be written back\n"
                    "to update our data"
 ) {
     return object->mapInjectFn(funcValue);
@@ -718,6 +721,7 @@ ConsoleMethod(PointStorageObject, runInjectFn, bool, 2, 0, "Run injected Console
     // argv[0] ==> function name << runInjectFn
     // argv[1] ==> object id of PointStorageObject
     // argv[2] ==> here we go .....
-    return object->runInjectFn(argc, argv);
+    //                       less count, move pointer forward
+    return object->runInjectFn(argc - 2, argv + 2);
 }
 

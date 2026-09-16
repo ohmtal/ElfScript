@@ -1104,6 +1104,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
    if (isInjectedLambda)
    {
+         // NOTE *** IMPORTANT *** => you need to call push and popframe manually !!
          // we use the current frame!
          popFrame = false;
 

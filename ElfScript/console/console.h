@@ -574,8 +574,8 @@ private:
                case ConsoleValueType::cvNULL: setEmptyString(); break;
 
                default:
-                     this->dataPtr = other.dataPtr; break;
-                    // this set the pointer! setConsoleData(other.type, other.dataPtr, /* FIXME other.enumTable*/ nullptr);
+                     this->dataPtr = other.dataPtr;
+                     break;
                break;
          }
    }
