@@ -1412,7 +1412,6 @@ U32 FuncCallExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
       case FuncCallExprNode::ParentCall:    codeStream.emit(OP_CALL_PARENT_CALL);    break;
       default:
             Con::errorf(" FuncCallExprNode::compile something is really wrong here unknown FuncCallExprNode : %d (%s:%d)", callType, dbgFileName, dbgLineNumber);
-            return 0;
             break;
    }
 
@@ -1974,7 +1973,8 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
       {
             if (walk->varName[0] != Con::LocalVarTag) {
                   Con::errorf("Parse Error: Tuple unpacking only supports local variables. %s:%d", dbgFileName, dbgLineNumber);
-                  return 0;
+                  codeStream.emit(OP_RETURN_VOID);
+                  return codeStream.tell();
             }
             argc++;
       }
@@ -2002,15 +2002,21 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // ElfScript 0.8 Lamda
+// FIXME THIS BREAK THE CURRENT STACK IN A FUNCTION! ... look at ObjectDeclNode::compileSubObject ???
 U32 LambdaLoadExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
       if (type == TypeReqNone) {
-            Con::errorf("Parse Error Lamba expression needs to be assigned! %s:%d", dbgFileName, dbgLineNumber);
-            return 0;
+            Con::errorf("Parse Error Lamba: expression needs to be assigned! %s:%d", dbgFileName, dbgLineNumber);
+            codeStream.emit(OP_RETURN_VOID);
+            return codeStream.tell();
       }
-      // bool lastValue = gIsEvalCompile; //NOTE -569
-      // gIsEvalCompile = false;
+      if ( CodeBlock::smInFunction ) {
+            Con::errorf("Parse Error Lamba: Sorry, at the moment we cant add lamda inside a function! %s:%d", dbgFileName, dbgLineNumber);
+            codeStream.emit(OP_RETURN_VOID);
+            return codeStream.tell();
+
+      }
+
       functionDeclStmtNode->compileStmt(codeStream, ip);
-      // gIsEvalCompile = lastValue;
       codeStream.emit(OP_LAMBDA_LOAD);
       if (type == TypeReqNone) codeStream.emit(OP_POP_STK);
       return codeStream.tell();

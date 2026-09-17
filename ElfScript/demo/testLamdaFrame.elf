@@ -10,9 +10,33 @@ function loader(%which) {
     else exec(%thisFile);
 }
 // ============================================================================
+
+function huhu() { %foo = 2; $f = fn() {}; print("=>", %foo, "/", $f); }
+return;
+
+PARSE ERROR HERE !!!
+// ============================================================================
+
+%fn = fn(%foo) {
+    print("foo is", %foo);
+    %vec = {0};
+    %vec.x = math.randomf();
+    %vec.y = math.randomf();
+    %vec.z = math.randomf();
+    %vec.w = math.randomf();
+    return %vec;
+};
+
+$fn = %fn;
+echo(runInjectedLambda(%fn, 4711));
+
+
+return;
+
+
+// ============================================================================
 %count = 5;
 %sto = new PointStorageObject() { storageSize = %count;};
-
 
 %fn = fn(%vec, %foo) {
     print("foo is", %foo);
@@ -22,12 +46,6 @@ function loader(%which) {
     %vec.w = math.randomf();
     return %vec;
 };
-
-echo(runInjectedLambda(%fn,{0}, 4711));
-
-return;
-// ============================================================================
-
 %fn2 = fn(%vec) {
     %vec = {0,0,0,0};
     return %vec;
@@ -68,7 +86,7 @@ for (%i in range %count) {
     printf("#%d %s", %i, %sto.getPointVec(%i));
 }
 
-
+return;
 
 // ============================================================================
 // # variables removed again!

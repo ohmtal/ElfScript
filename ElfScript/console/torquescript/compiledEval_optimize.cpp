@@ -159,6 +159,7 @@ do { \
 
 // XXTH ElfScript 0.8 inline LAMBDA attepmt
 Namespace::Entry* gLastFuncDecl = nullptr;
+Namespace::Entry* gCurrentFuncDecl = nullptr;
 
 
 ConsoleValue stack[MaxStackSize];
