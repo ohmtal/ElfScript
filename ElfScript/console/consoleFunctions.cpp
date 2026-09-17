@@ -3128,11 +3128,11 @@ DefineEngineFunction ( listFeatures, void, (),,"List compiled features") {
       Con::printf("%20s:%s", "Build", "Release");
       #endif
 
-      #ifdef ENABLE_CONSOLE_VECTOR
+      // #ifdef ENABLE_CONSOLE_VECTOR
       Con::printf("%20s:%s", "Console Vector", "ON");
-      #else
-      Con::printf("%20s:%s", "Console Vector", "OFF");
-      #endif
+      // #else
+      // Con::printf("%20s:%s", "Console Vector", "OFF");
+      // #endif
 
       #ifdef ELFSCRIPT_ENABLE_FIELDCACHE
       Con::printf("%20s:%s", "FieldCache", "ON");

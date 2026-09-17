@@ -33,7 +33,7 @@ DECLARE_STRUCT(ImVec4);
 DefineConsoleType( TypeImVec4, ImVec4 )
 IMPLEMENT_ENGINE_TYPE_TRAITS(ImVec4)
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< ImVec2 >
 {
@@ -81,4 +81,4 @@ struct EngineUnmarshallData< ImVec4 >
         return result;
     }
 };
-#endif
+// #endif

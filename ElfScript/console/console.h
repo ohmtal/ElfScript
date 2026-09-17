@@ -169,9 +169,9 @@ public:
             S64   i;
             char* s;
             void* dataPtr;
-            #ifdef ENABLE_CONSOLE_VECTOR
+            // #ifdef ENABLE_CONSOLE_VECTOR
             ConsoleVector v;      // 16 Byte
-            #endif
+            // #endif
       };  // 8 or 16 byte
 
 #if defined(_MSC_VER)
@@ -254,10 +254,10 @@ public:
          switch (type)
          {
                case ConsoleValueType::cvFloat:  f = 0.0; break;
-               #ifdef ENABLE_CONSOLE_VECTOR
+               // #ifdef ENABLE_CONSOLE_VECTOR
                case ConsoleValueType::cvInteger: i = 0; break;
                case ConsoleValueType::cvVector: v = {0}; break;
-               #endif
+               // #endif
 
 
 
@@ -282,10 +282,10 @@ public:
 
 
       case ConsoleValueType::cvPointer: return  static_cast<F64>(dataPtr != nullptr);
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<F64>(v.points[0]);
-#endif
+// #endif
       // case ConsoleValueType::cvString:
       //    return (s[0] == '\0') ? 0.0 : dAtod(s);//F64! dAtof(s);
       case ConsoleValueType::cvNULL:
@@ -309,10 +309,10 @@ public:
 
 
       case ConsoleValueType::cvPointer: return  static_cast<S64>(dataPtr != nullptr);
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return  static_cast<S64>(v.points[0]);
-#endif
+// #endif
       case ConsoleValueType::cvNULL:
          return 0;
       default:
@@ -333,10 +333,10 @@ public:
       case ConsoleValueType::cvSTEntry:
          return (s != StringTable->EmptyString()) && dAtob(s);
 
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
          return (v.points[0] != 0.0f);
-#endif
+// #endif
 
 
       case ConsoleValueType::cvPointer: return dataPtr != nullptr;
@@ -360,9 +360,9 @@ public:
 
       case ConsoleValueType::cvNULL:
          return StringTable->EmptyString();
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
-#endif
+// #endif
       case ConsoleValueType::cvPointer:
          return convertToBuffer();
       default:
@@ -373,7 +373,7 @@ public:
    TORQUE_FORCEINLINE operator const char* () const { return getString(); }
    // ENABLE_CONSOLE_VALUE_CALLBACK ==> NOT ==> TORQUE_FORCEINLINE explicit operator const char* () const { return getString(); }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    TORQUE_FORCEINLINE void setVector(ConsoleVector vec)
    {
       // cleanupData();
@@ -399,7 +399,7 @@ public:
          }
 
    }
-#endif
+// #endif
    TORQUE_FORCEINLINE void setFloat(F64 val)
    {
       // cleanupData();
@@ -566,11 +566,11 @@ private:
                // case ConsoleValueType::cvPointer:
                // case ConsoleValueType::cvLambda: this->dataPtr = other.dataPtr; break;
 
-               #ifdef  ENABLE_CONSOLE_VECTOR
+               // #ifdef  ENABLE_CONSOLE_VECTOR
                case ConsoleValueType::cvVector:
                      dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
                      break;
-               #endif
+               // #endif
                case ConsoleValueType::cvNULL: setEmptyString(); break;
 
                default:
@@ -637,11 +637,11 @@ private:
       case ConsoleValueType::cvInteger:
          i = other.i;
          break;
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       case ConsoleValueType::cvVector:
           dMemcpy(v.points, other.v.points, sizeof(ConsoleVector::points));
           break;
-#endif
+// #endif
       // catched by default!
       // case ConsoleValueType::cvPointer:
       // case ConsoleValueType::cvLambda:
@@ -728,9 +728,9 @@ typedef F32(*FloatCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 typedef void(*VoidCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]); // We have it return a value so things don't break..
 typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 typedef ConsoleVector(*VectorCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
-#endif
+// #endif
 
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 typedef ConsoleValue(*ConsoleValueCallback)(SimObject *obj, S32 argc, ConsoleValue argv[]);
@@ -1101,9 +1101,9 @@ namespace Con
    void addCommand(const char* name, FloatCallback  cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, VoidCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char* name, BoolCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand( const char* name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    void addCommand( const char* name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly = false, ConsoleFunctionHeader* header = NULL );///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 // #endif
@@ -1143,9 +1143,9 @@ namespace Con
    void addCommand(const char *nameSpace, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
    void addCommand(const char *nameSpace, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    void addCommand(const char *nameSpace, const char *name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
   void addCommand(const char *nameSpace, const char *name, ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 // #endif                                                                                                                                                                                        /// @}
@@ -1423,9 +1423,9 @@ public:
    FloatCallback mFC;    ///< A function/method that returns a float.
    VoidCallback mVC;     ///< A function/method that returns nothing.
    BoolCallback mBC;     ///< A function/method that returns a bool.
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    VectorCallback mVecC;     ///< A function/method that returns a ConsoleVector.
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       ConsoleValueCallback mValueC;     ///< A function/method that returns a ConsoleVector.
 // #endif
@@ -1540,9 +1540,9 @@ public:
    ConsoleConstructor(const char* className, const char* funcName, FloatCallback  ffunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, VoidCallback   vfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
    ConsoleConstructor(const char* className, const char* funcName, BoolCallback   bfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header );
 // #endif

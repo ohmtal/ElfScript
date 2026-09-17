@@ -52,10 +52,10 @@ public:
 
    ConsoleValue* getConsoleValue(); //ElfScript
 
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
    void setVectorVariable(ConsoleVector vec);
    ConsoleVector getVectorVariable();
-#endif
+// #endif
 
    TORQUE_FORCEINLINE ConsoleValue* getLocalConsoleValuePtr(S32 reg) {
       return &currentRegisterArray->values[reg];
@@ -106,7 +106,7 @@ public:
       currentRegisterArray->values[reg].setString(val, len);
    }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 
 TORQUE_FORCEINLINE void setLocalVectorVariable(S32 reg, ConsoleVector val)
 {
@@ -118,7 +118,7 @@ TORQUE_FORCEINLINE ConsoleVector getLocalVectorVariable(S32 reg)
 }
 
 
-#endif
+// #endif
 
    TORQUE_FORCEINLINE void setLocalStringTableEntryVariable(S32 reg, StringTableEntry val)
    {

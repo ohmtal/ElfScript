@@ -539,9 +539,9 @@ class SimObject: public ConsoleObject
                                     || fld->type == TypeU32
                                     || fld->type == TypeS64
                                     || fld->type == TypeU64
-                                    #ifdef ENABLE_CONSOLE_VECTOR
+                                    // #ifdef ENABLE_CONSOLE_VECTOR
                                     || fld->type == TypeVector
-                                    #endif
+                                    // #endif
                               )) {
                               cacheP->type = staticField;
                               } else {
@@ -587,9 +587,9 @@ class SimObject: public ConsoleObject
                         switch (stackP->type) {
                               case cvFloat: mFieldDictionary->setFieldType(dynamicFieldName, TypeF64); break;
                               case cvInteger: mFieldDictionary->setFieldType(dynamicFieldName, TypeS64); break;
-                              #ifdef ENABLE_CONSOLE_VECTOR
+                              // #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
-                              #endif
+                              // #endif
                               case cvPointer: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
@@ -634,11 +634,11 @@ class SimObject: public ConsoleObject
                         case ConsoleValueType::cvFloat:
                               stackP->setFloat(entry->mValue.getFloat());
                               break;
-                        #ifdef ENABLE_CONSOLE_VECTOR
+                        // #ifdef ENABLE_CONSOLE_VECTOR
                         case ConsoleValueType::cvVector:
                               stackP->setVector(entry->mValue.getVector());
                               break;
-                        #endif
+                        // #endif
                         case ConsoleValueType::cvPointer:
                               *stackP = entry->mValue; //direct copy
                               break;
@@ -683,12 +683,12 @@ class SimObject: public ConsoleObject
                         entry->type = ConsoleBaseType::getType(TypeF64);
                         entry->mValue.setFloat( 0.0 );
                         break;
-                  #ifdef ENABLE_CONSOLE_VECTOR
+                  // #ifdef ENABLE_CONSOLE_VECTOR
                   case ConsoleValueType::cvVector:
                         entry->mValue.setVector({0});
                         entry->type = ConsoleBaseType::getType(TypeVector);
                         break;
-                  #endif
+                  // #endif
                   default:
                         entry->mValue.setEmptyString();
                         entry->type = ConsoleBaseType::getType(TypeString);
@@ -742,9 +742,9 @@ class SimObject: public ConsoleObject
                         switch (stackP->type) {
                               case cvFloat: mFieldDictionary->setFieldType(dynamicFieldName, TypeF64); break;
                               case cvInteger: mFieldDictionary->setFieldType(dynamicFieldName, TypeS64); break;
-                              #ifdef ENABLE_CONSOLE_VECTOR
+                              // #ifdef ENABLE_CONSOLE_VECTOR
                               case cvVector: mFieldDictionary->setFieldType(dynamicFieldName, TypeVector); break;
-                              #endif
+                              // #endif
                               case cvPointer: mFieldDictionary->setFieldType(dynamicFieldName, TypePointer); break;
                               default: mFieldDictionary->setFieldType(dynamicFieldName, TypeString); break;
                         }
@@ -761,12 +761,12 @@ class SimObject: public ConsoleObject
                         entry->mValue.setFloat(stackP->getFloat());
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
-                  #ifdef ENABLE_CONSOLE_VECTOR
+                  // #ifdef ENABLE_CONSOLE_VECTOR
                   case ConsoleValueType::cvVector:
                         entry->mValue.setVector(stackP->getVector());
                         // entry->mValue.setFastFloat(stackP->getFloat());
                         break;
-                  #endif
+                  // #endif
                   case ConsoleValueType::cvPointer:
                         *stackP = entry->mValue;
                         break;
@@ -940,9 +940,9 @@ class SimObject: public ConsoleObject
                   || fld->type == TypeS8
                   || fld->type == TypeU8
                   || fld->type == TypeS16
-                  #ifdef ENABLE_CONSOLE_VECTOR
+                  // // #ifdef ENABLE_CONSOLE_VECTOR
                   || fld->type == TypeVector
-                  #endif
+                  // // #endif
             ) {
 
                   #ifdef ENABLE_CONSOLE_VECTOR
@@ -965,7 +965,7 @@ class SimObject: public ConsoleObject
       // --------------------------------------------------------------------------------------
       virtual inline bool stackStaticFieldFastPath(const AbstractClassRep::Field *fld, ConsoleValue* stackP) {
             F64 floatValue = 0.f;
-            #ifdef ENABLE_CONSOLE_VECTOR
+            // #ifdef ENABLE_CONSOLE_VECTOR
 
             if (fld->type == TypeVector) {
                   ConsoleVector* source = (ConsoleVector*)(((const char*)this) + fld->offset);
@@ -973,7 +973,7 @@ class SimObject: public ConsoleObject
                   return true;
             }
             else
-            #endif
+            // #endif
             if (getDataField(fld, floatValue)) {
                   if (fld->type == TypeF64 || fld->type == TypeF32) {
                         stackP->setFastFloat(floatValue);

@@ -127,9 +127,9 @@ namespace ElfScriptDEBUG {
             case ConsoleValueType::cvInteger: return "Integer";
             // // // case ConsoleValueType::cvString:  return "String";
             case ConsoleValueType::cvSTEntry: return "String";
-    #ifdef ENABLE_CONSOLE_VECTOR
+    // #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
-    #endif
+    // #endif
             default: return "other";
         }
     }

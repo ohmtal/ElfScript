@@ -34,9 +34,9 @@ namespace ElfScript {
                     default: return "Pointer";
                 }
             }
-            #ifdef ENABLE_CONSOLE_VECTOR
+            // #ifdef ENABLE_CONSOLE_VECTOR
             case ConsoleValueType::cvVector:  return "Vector";
-            #endif
+            // #endif
             default: return avar("type:%d", type);
         }
     }
@@ -221,7 +221,7 @@ namespace ElfScript {
     }
 
     //-----------------------------------------------------------------------------
-    #ifdef ENABLE_CONSOLE_VECTOR
+    // #ifdef ENABLE_CONSOLE_VECTOR
     ConsoleVector getLocalVector(const char* variableName) {
         ConsoleValue* stack = getLocalVariable(variableName);
         if (stack == nullptr) return ConsoleVector{0};
@@ -235,7 +235,7 @@ namespace ElfScript {
         return true;
     }
 
-    #endif
+    // #endif
     // -------------------------------------------------------------------------
     //  ~~~~~~~~~ Dump and Debug .... ~~~~~~~~~~
     // -------------------------------------------------------------------------

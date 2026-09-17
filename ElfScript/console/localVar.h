@@ -25,10 +25,10 @@ namespace ElfScript {
     const char* getLocalString(const char* variableName);
 
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
     ConsoleVector getLocalVector(const char* variableName);
     bool setLocalVector(const char* variableName, ConsoleVector& value);
-#endif
+// #endif
     void varDumpGlobals(const char* variableName);
     void varDumpLocals(const char* variableName);
     void varDumpDynamicField(const char* variableName);

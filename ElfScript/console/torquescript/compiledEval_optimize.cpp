@@ -267,7 +267,7 @@ static ConsoleValue* fetchConsoleValue( S32 currentLocalRegister) {
 // -----------------------------------------------------------------------------
 static void fetchConsoleVectorVar(FieldCache* cachePtr, StringTableEntry subField, S32 currentLocalRegister)
 {
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 
       ConsoleValue* cv  = fetchConsoleValue(currentLocalRegister);
 
@@ -293,11 +293,11 @@ static void fetchConsoleVectorVar(FieldCache* cachePtr, StringTableEntry subFiel
       cachePtr->cacheIndex = Script::gEvalState.mFrameID;
       return;
 
-#else
-      cachePtr->type = component_NoVector;
-      cachePtr->cacheFailed = false;
-      return;
-#endif
+// #else
+//       cachePtr->type = component_NoVector;
+//       cachePtr->cacheFailed = false;
+//       return;
+// #endif
 }
 // -----------------------------------------------------------------------------
 static void stackFieldComponent(SimObject* object, StringTableEntry field, const char* array
@@ -333,11 +333,11 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
 
 
       if (object && field) {
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
             srcStoreValue.type = ConsoleValueType::cvVector;
-#else
-            srcStoreValue.type = ConsoleValueType::cvSTEntry;
-#endif
+// #else
+//             srcStoreValue.type = ConsoleValueType::cvSTEntry;
+// #endif
             srcValue = &srcStoreValue;
             object->stackDataField(field, array, srcValue); //get the current
             // Con::debugf("srcStoreValue.type is: %d value: %s", srcStoreValue.type, srcStoreValue.getString());
@@ -364,11 +364,11 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       }
 
       F64 targetValue = 0.0;
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
        if (srcValue->type == cvVector) {
              targetValue = (F64)srcValue->v.points[componentIndex];
        } else
-#endif
+// #endif
       {
             const char* srcStr = srcValue->getString();
             const char* pStr = srcStr;
@@ -518,7 +518,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
       if (componentIndex < 0) return;
 
 
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
       // Con::debugf("dstValue->type == %d",  dstValue->type );
       if (/*dstValue->type < cvConsoleValueType && */ dstValue->type != ConsoleValueType::cvVector ) //TEST typecasting by component
       {
@@ -531,7 +531,7 @@ static void pushFieldComponent(SimObject* object, StringTableEntry field, const 
             dstValue->v.points[componentIndex] = (F32)pSrcStack->getFloat();
       }
       else  //slow string ....
-#endif
+// #endif
       {
             String currentStr = dstValue->getString();
 
@@ -811,7 +811,7 @@ void ExprEvalState::setPointerVariable(void* val, ConsoleValueSubType subType )
       currentVariable->setPointerValue(val, subType);
 }
 
-#ifdef  ENABLE_CONSOLE_VECTOR
+// #ifdef  ENABLE_CONSOLE_VECTOR
 void ExprEvalState::setVectorVariable(ConsoleVector vec)
 {
       // // AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
@@ -824,7 +824,7 @@ ConsoleVector ExprEvalState::getVectorVariable()
       if (!currentVariable) return ConsoleVector();
       return currentVariable->getVectorVariable();
 }
-#endif
+// #endif
 
 //-----------------------------------------------------------------------------
 
@@ -2325,9 +2325,9 @@ handle_OP_LOADVAR_STR: {
             static S32 valueType = 0;
             valueType = varEntry->value.getType();
             fastPath =  valueType == ConsoleValueType::cvFloat ||
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
                         valueType == ConsoleValueType::cvVector ||
-#endif
+// #endif
                         valueType == ConsoleValueType::cvInteger ||
                         valueType == ConsoleValueType::cvPointer
                         ;
@@ -2379,12 +2379,12 @@ handle_OP_SAVEVAR_STR: {
             DISPATCH();
       }
       else
-      #ifdef ENABLE_CONSOLE_VECTOR
+      // #ifdef ENABLE_CONSOLE_VECTOR
       if (stack[_STK].type == cvVector) {
             Script::gEvalState.setVectorVariable(stack[_STK].getVector());
             DISPATCH();
       }
-      #endif
+      // #endif
 
 
       Script::gEvalState.setStringVariable(stack[_STK].getString());
@@ -2440,9 +2440,9 @@ handle_OP_LOAD_LOCAL_VAR_STR: {
       S32 varType = localVal.getType();
       if (
             varType == ConsoleValueType::cvFloat ||
-      #ifdef ENABLE_CONSOLE_VECTOR
+      // #ifdef ENABLE_CONSOLE_VECTOR
             varType == ConsoleValueType::cvVector ||
-      #endif
+      // #endif
             varType == ConsoleValueType::cvInteger ||
             varType == ConsoleValueType::cvPointer
       )
@@ -2540,13 +2540,13 @@ handle_OP_SAVE_LOCAL_VAR_STR: {
                DISPATCH();
          }
 
-      #ifdef ENABLE_CONSOLE_VECTOR
+      // #ifdef ENABLE_CONSOLE_VECTOR
          else
          if (stack[_STK].type == cvVector) {
              Script::gEvalState.setLocalVectorVariable(reg, stack[_STK].getVector());
              DISPATCH();
          }
-      #endif
+      // #endif
 
          // orig slowmo =>
          const char* val = stack[_STK].getString();
@@ -2782,11 +2782,11 @@ handle_OP_LOADFIELD_FASTPATH:
                               case ConsoleValueType::cvFloat:
                                     stackPtr->setFloat(cachePtr->fieldValuePtr->getFloat());
                                     break;
-                              #ifdef ENABLE_CONSOLE_VECTOR
+                              // #ifdef ENABLE_CONSOLE_VECTOR
                               case ConsoleValueType::cvVector:
                                     stackPtr->setVector(cachePtr->fieldValuePtr->getVector());
                                     break;
-                              #endif
+                              // #endif
                               case ConsoleValueType::cvPointer:
                                     *stackPtr  = *cachePtr->fieldValuePtr;
                                     // stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvPointer);
@@ -2978,11 +2978,11 @@ handle_OP_SAVEFIELD_FASTPATH:
                               case ConsoleValueType::cvFloat:
                                     cachePtr->fieldValuePtr->setFloat(stackP->getFloat());
                                     break;
-                              #ifdef ENABLE_CONSOLE_VECTOR
+                              // #ifdef ENABLE_CONSOLE_VECTOR
                               case ConsoleValueType::cvVector:
                                     cachePtr->fieldValuePtr->setVector(stackP->getVector());
                                     break;
-                              #endif
+                              // #endif
                               // // case ConsoleValueType::cvLambda: //NOTE This will be never reached so far!!!
                               // //       cachePtr->fieldValuePtr->setPointer(stackP->getPointer());
                               // //       break;
@@ -3401,7 +3401,7 @@ handle_OP_CALLFUNC_VECTOR: {
       PREPARE_CALLFUNC();
       thisObject = nullptr;
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
       ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3411,7 +3411,7 @@ handle_OP_CALLFUNC_VECTOR: {
             stack[_STK + 1].setVector(result);
             PUSH_STK();
       }
-#endif
+// #endif
 
       FINIT_CALLFUNC();
       DISPATCH();
@@ -3573,7 +3573,7 @@ handle_OP_CALLFUNC_VECTOR_METHOD: {
       simObjectLookupPtr = &callArgv[1];
       thisObject = getThisObject(*simObjectLookupPtr);
 
-      #ifdef ENABLE_CONSOLE_VECTOR
+      // #ifdef ENABLE_CONSOLE_VECTOR
       ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3583,7 +3583,7 @@ handle_OP_CALLFUNC_VECTOR_METHOD: {
             stack[_STK + 1].setVector(result);
             PUSH_STK();
       }
-      #endif
+      // #endif
 
       FINIT_CALLFUNC();
       DISPATCH();
@@ -3892,7 +3892,7 @@ handle_OP_CALLFUNC:
                   switch (nsEntry->mType)
                   {
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
                         case Namespace::Entry::VectorCallbackType:
                         {
                               ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
@@ -3906,7 +3906,7 @@ handle_OP_CALLFUNC:
                               PUSH_STK();
                               break;
                         }
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
                         case Namespace::Entry::ConsoleValueCallbackType:
                         {
@@ -4845,7 +4845,7 @@ handle_OP_ARRAY_CONSTUCTOR: {
       DISPATCH();
 }
 // ~~~~~~~~~~~~~~~~~ VECTOR_STRING
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 
 handle_OP_BUILD_VECTOR_FAST: {
       U32 count = code[ip++];
@@ -4924,8 +4924,8 @@ handle_OP_BUILD_VECTOR_STRING: {
 
       DISPATCH();
 }
-#else // #ifdef ENABLE_CONSOLE_VECTOR
-
+// #else // #ifdef ENABLE_CONSOLE_VECTOR
+#ifdef _OBSOLETE_OLD_
 handle_OP_BUILD_VECTOR_FAST: {
       DISPATCH_OPCODE(OP_BUILD_VECTOR_STRING);
 }
@@ -5208,7 +5208,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
 
 
       switch (srcPtr->type) {
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
             case cvVector:{
                   for (S32 i = 0; i < varCount; i++) {
                         dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);
@@ -5217,7 +5217,7 @@ handle_OP_TUPLE_ASSIGNMENT: {
                   }
                   break;
             }
-#endif
+// #endif
             case cvFloat: {
                   for (S32 i = 0; i < varCount; i++) {
                         dstPtr = Script::gEvalState.getLocalConsoleValuePtr(code[ip + i]);

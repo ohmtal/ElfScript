@@ -37,7 +37,7 @@ DefineConsoleType( TypeColor, Color )
 inline ConsoleVector toConsoleVector(const Color& value) { return { (F32)value.r,(F32)value.g,(F32)value.b,(F32)value.a}; }
 inline Color toColor(const ConsoleVector& value) { return { (U8)value.points[0],(U8)value.points[1],(U8)value.points[2],(U8)value.points[3]}; }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Color >
 {
@@ -64,7 +64,7 @@ struct EngineUnmarshallData< Color >
         return result;
     }
 };
-#endif
+// #endif
 
 
 // ----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ DefineConsoleType( TypeVector2, Vector2 )
 inline ConsoleVector toConsoleVector(const Vector2& value) { return { value.x,value.y,0.f,0.f}; }
 inline Vector2 toVector2(const ConsoleVector& value) { return { value.points[0],value.points[1]}; }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Vector2 >
 {
@@ -96,7 +96,7 @@ struct EngineUnmarshallData< Vector2 >
         return result;
     }
 };
-#endif
+// #endif
 
 // ----------------------------------------------------------------------------
 DECLARE_STRUCT( Vector3 );
@@ -105,7 +105,7 @@ DefineConsoleType( TypeVector3, Vector3 )
 inline ConsoleVector toConsoleVector(const Vector3& value) { return { value.x,value.y,value.z, 0.f}; }
 inline Vector3 toVector3(const ConsoleVector& value) { return { value.points[0],value.points[1],value.points[2]}; }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Vector3 >
 {
@@ -128,7 +128,7 @@ struct EngineUnmarshallData< Vector3 >
         return result;
     }
 };
-#endif
+// #endif
 
 // ----------------------------------------------------------------------------
 DECLARE_STRUCT( Vector4 );
@@ -138,7 +138,7 @@ DefineConsoleType( TypeVector4, Vector4 )
 inline ConsoleVector toConsoleVector(const Vector4& value) { return { value.x,value.y,value.z,value.w}; }
 inline Vector4 toVector4(const ConsoleVector& value) { return { value.points[0],value.points[1],value.points[2],value.points[3]}; }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Vector4 >
 {
@@ -162,7 +162,7 @@ struct EngineUnmarshallData< Vector4 >
         return result;
     }
 };
-#endif
+// #endif
 
 
 // ----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ DefineConsoleType( TypeRectangle, Rectangle )
 inline ConsoleVector toConsoleVector(const Rectangle& value) { return { value.x,value.y,value.width,value.height}; }
 inline Rectangle toRectangle(const ConsoleVector& value) { return { value.points[0],value.points[1],value.points[2],value.points[3]}; }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Rectangle >
 {
@@ -196,7 +196,7 @@ struct EngineUnmarshallData< Rectangle >
         return result;
     }
 };
-#endif
+// #endif
 
 // ----------------------------------------------------------------------------
 DECLARE_STRUCT( Ray );

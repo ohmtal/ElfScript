@@ -47,7 +47,7 @@ inline Point2F toPoint2F(const ConsoleVector& value) { return { value.points[0],
 inline Point2I toPoint2I(const ConsoleVector& value) { return { (S32)value.points[0],(S32)value.points[1]}; }
 
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< Color >
 {
@@ -142,7 +142,7 @@ struct EngineUnmarshallData< RectF >
         return result;
     }
 };
-#endif
+// #endif
 
 
 

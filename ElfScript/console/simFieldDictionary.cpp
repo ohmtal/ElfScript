@@ -153,11 +153,11 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
             ) {
             walk->mValue.setInt(walk->mValue.getInt());
             walk->mValue.type = ConsoleValueType::cvInteger;
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
          } else if (typeID == TypeVector) {
             walk->mValue.setVector(walk->mValue.getVector());
             walk->mValue.type = ConsoleValueType::cvVector;
-#endif
+// #endif
          } else {
             // ElfScript 0.6e walk->mValue.type = ConsoleValueType::cvString;
                walk->mValue.type = ConsoleValueType::cvSTEntry;

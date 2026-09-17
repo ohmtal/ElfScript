@@ -218,7 +218,7 @@ public:
         return true;
     }
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
     // fast fetch !!
     // **** direct local var access for ConsoleVector!!!! - i ignore fails here ...***
     bool getPointVecByReference(U32 index, const char* vecVar) {
@@ -232,7 +232,7 @@ public:
         this->mPoints[index] = ElfScript::getLocalVector(vecVar);
         return true;
     }
-#endif
+// #endif
     // -------------------------------------------------------------------------
     void write(Stream &stream, U32 tabStop, U32 flags) override {
         // Parent::write >>>>>>>>>>>>>>>>>>>>>>>>>>

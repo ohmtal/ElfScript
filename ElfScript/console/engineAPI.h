@@ -204,7 +204,7 @@ struct EngineUnmarshallData
    }
 };
 
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct EngineUnmarshallData< ConsoleVector >
 {
@@ -227,7 +227,7 @@ struct EngineUnmarshallData< ConsoleVector >
             return result;
       }
 };
-#endif
+// #endif
 
 
 template<>
@@ -463,7 +463,7 @@ inline bool _EngineConsoleThunkReturnValue( bool value )
    return value;
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
 {
       return value;
@@ -473,7 +473,7 @@ inline ConsoleVector _EngineConsoleThunkReturnValue( ConsoleVector value )
 // // //       //FIXME IF THIS IS MISSING
 // // // }
 
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 inline ConsoleValue _EngineConsoleThunkReturnValue( ConsoleValue value )
 {
@@ -549,14 +549,14 @@ struct _EngineConsoleThunkType< bool >
    typedef BoolCallback CallbackType;
 };
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 template<>
 struct _EngineConsoleThunkType< ConsoleVector >
 {
       typedef ConsoleVector ReturnType;
       typedef VectorCallback CallbackType;
 };
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 template<>
 struct _EngineConsoleThunkType< ConsoleValue >

@@ -7,11 +7,12 @@ add_compile_definitions(ELFSCRIPT_VERSION_0_4)
 add_compile_definitions(ELFSCRIPT_VERSION_0_5)
 add_compile_definitions(ELFSCRIPT_VERSION_0_6)
 add_compile_definitions(ELFSCRIPT_VERSION_0_7)
+add_compile_definitions(ELFSCRIPT_VERSION_0_8)
 
 option(ELF_ENABLE_FUNCCALLOP "ElfScript: Enable EXPERIMENTAL function call OP codes in compiler and VM" OFF)
 
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
-option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support - recommended" ON)
+# option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support - recommended" ON)
 
 option(ELF_ENABLE_SLIMOBJECT "ElfScript: Disable Torque3D Editor methods." ON)
 
@@ -236,7 +237,8 @@ set ( OBJECTS_SRC
     ${CMAKE_CURRENT_LIST_DIR}/objects/LambdaMappings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/objects/LambdaMappings.h
 
-
+    # Console Vector now default and removed ifdef
+    ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp
 )
 
 set(ZIP_SRC
@@ -313,10 +315,10 @@ set(ELFSCRIPT_SRC
     ${ANN_ELFSCRIPT_SRC}
 )
 
-if (ELF_ENABLE_CONSOLE_VECTOR)
-     add_compile_definitions(ENABLE_CONSOLE_VECTOR)
-     list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp)
-endif()
+# if (ELF_ENABLE_CONSOLE_VECTOR)
+#      add_compile_definitions(ENABLE_CONSOLE_VECTOR)
+#      list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp)
+# endif()
 
 if (ELF_ENABLE_ZIP)
      add_compile_definitions(ENABLE_ZIP_SUPPORT)
@@ -366,5 +368,5 @@ if (ELF_ENABLE_FUNCCALLOP)
      add_compile_definitions(ENABLE_CALL_FUNC_OP)
 endif()
 
-add_compile_definitions(ENABLE_CONSOLE_VALUE_CALLBACK)
+# add_compile_definitions(ENABLE_CONSOLE_VALUE_CALLBACK)
 add_compile_definitions(TORQUE_DISABLE_MEMORY_MANAGER)

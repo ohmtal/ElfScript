@@ -1155,7 +1155,7 @@ void Namespace::addCommand(StringTableEntry name, FloatCallback cb, const char *
    ent->cb.mFloatCallbackFunc = cb;
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 void Namespace::addCommand(StringTableEntry name, VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly , ConsoleFunctionHeader* header)
 {
       Entry *ent = createLocalEntry(name);
@@ -1170,7 +1170,7 @@ void Namespace::addCommand(StringTableEntry name, VectorCallback cb, const char 
       ent->mType = Entry::VectorCallbackType;
       ent->cb.mVectorCallbackFunc = cb;
 }
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void Namespace::addCommand(StringTableEntry name, ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly , ConsoleFunctionHeader* header)
@@ -1297,11 +1297,11 @@ ConsoleValue Namespace::Entry::execute(S32 argc, ConsoleValue *argv, SimObject *
       case BoolCallbackType:
          result.setBool(cb.mBoolCallbackFunc(thisObj, argc, argv));
          break;
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
       case VectorCallbackType:
             result.setVector(cb.mVectorCallbackFunc(thisObj, argc, argv));
         break;
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       case ConsoleValueCallbackType:
             // result.copyFrom(cb.mConsoleValueCallbackFunc(thisObj, argc, argv));
@@ -1654,11 +1654,11 @@ String Namespace::Entry::getPrototypeString() const
          case BoolCallbackType:
             str.append("bool ");
             break;
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
          case VectorCallbackType:
             str.append("TypeVector ");
             break;
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
          case ConsoleValueCallbackType:
             str.append("TypeValue ");

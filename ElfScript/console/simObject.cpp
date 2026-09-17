@@ -3385,7 +3385,7 @@ namespace {
                   mPadding[ 3 ] = ' ';
                   mPadding[ 4 ] = 0;
                   break;
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
                case Namespace::Entry::VectorCallbackType:
                      mReturnType = "TypeVector";
                      // NOTE no idea what to set here ...
@@ -3395,7 +3395,7 @@ namespace {
                      mPadding[ 3 ] = ' ';
                      mPadding[ 4 ] = 0;
                      break;
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
                case Namespace::Entry::ConsoleValueCallbackType:
                      mReturnType = "ConsoleValue";

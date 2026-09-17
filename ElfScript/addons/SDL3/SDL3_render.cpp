@@ -909,7 +909,7 @@ DefineEngineFunction(SDL_RenderPoint, bool , (S32 rendererID, F32 x, F32 y),
 }
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderPoints(SDL_Renderer *renderer, const SDL_FPoint *points, int count);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 DefineEngineFunction(SDL_RenderPoints, bool , (S32 rendererID, Array* pointsArray),
         ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
          "no that fast, since we need to fill the points every call."
@@ -929,7 +929,7 @@ DefineEngineFunction(SDL_RenderPoints, bool , (S32 rendererID, Array* pointsArra
 
     return SDL_RenderPoints(renderer,points.address(), realCount);
 }
-#endif
+// #endif
 
 
 
@@ -951,7 +951,7 @@ DefineEngineFunction(SDL_RenderLineRect, bool , (S32 rendererID, RectF pointsRec
     return SDL_RenderLine(renderer, pointsRect.x, pointsRect.y, pointsRect.w, pointsRect.h);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderLines(SDL_Renderer *renderer, const SDL_FPoint *points, int count);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 DefineEngineFunction(SDL_RenderLines, bool , (S32 rendererID, Array* pointsArray),
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
@@ -971,7 +971,7 @@ DefineEngineFunction(SDL_RenderLines, bool , (S32 rendererID, Array* pointsArray
 
     return SDL_RenderLines(renderer,points.address(), realCount);
 }
-#endif
+// #endif
 
 
 
@@ -985,7 +985,7 @@ DefineEngineFunction(SDL_RenderRect, bool , (S32 rendererID, RectF rect),
 }
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderRects(SDL_Renderer *renderer, const SDL_FRect *rects, int count);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 DefineEngineFunction(SDL_RenderRects, bool , (S32 rendererID, Array* pointsArray),
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
@@ -1005,7 +1005,7 @@ DefineEngineFunction(SDL_RenderRects, bool , (S32 rendererID, Array* pointsArray
 
     return SDL_RenderRects(renderer,points.address(), realCount);
 }
-#endif
+// #endif
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderFillRect(SDL_Renderer *renderer, const SDL_FRect *rect);
 DefineEngineFunction(SDL_RenderFillRect, bool , (S32 rendererID, RectF rect),
@@ -1027,7 +1027,7 @@ DefineEngineFunction(SDL_RenderRectF, bool , (S32 rendererID, F32 x, F32 y, F32 
      return SDL_RenderRect(renderer, &rect);
 }
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderFillRects(SDL_Renderer *renderer, const SDL_FRect *rects, int count);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 DefineEngineFunction(SDL_RenderFillRects, bool , (S32 rendererID, Array* pointsArray),
                      ,"render points from an Array of TypeVector (non TypeVector will be skipped!)\n"
                      "no that fast, since we need to fill the points every call."
@@ -1047,7 +1047,7 @@ DefineEngineFunction(SDL_RenderFillRects, bool , (S32 rendererID, Array* pointsA
 
     return SDL_RenderFillRects(renderer,points.address(), realCount);
 }
-#endif
+// #endif
 
 
 // extern SDL_DECLSPEC bool SDLCALL SDL_RenderTexture(SDL_Renderer *renderer, SDL_Texture *texture,

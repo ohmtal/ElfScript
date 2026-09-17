@@ -63,14 +63,14 @@ void ConsoleValue::resetConversionBuffer()
 char* ConsoleValue::convertToBuffer() const
 {
 
-   #ifdef  ENABLE_CONSOLE_VECTOR
+   // #ifdef  ENABLE_CONSOLE_VECTOR
    if (type == ConsoleValueType::cvVector) {
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(128));
         //NOTE: hard coded 4
         dSprintf(buffer, 128, "%.9g %.9g %.9g %.9g", v.points[0], v.points[1],v.points[2],v.points[3]);
         return buffer;
    } else
-   #endif
+   // #endif
    if (type == ConsoleValueType::cvPointer) {
         char* buffer = static_cast<char*>(sConversionAllocator.alloc(64));
         if ( this->dataPtr ) {
@@ -149,9 +149,9 @@ void ConsoleConstructor::init( const char *cName, const char *fName, const char 
    mUsage = usg;
    mClassName = cName;
    mSC = 0; mFC = 0; mVC = 0; mBC = 0; mIC = 0;
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
    mVecC = 0;
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
    mValueC = 0;
 // #endif
@@ -183,10 +183,10 @@ void ConsoleConstructor::setup()
          Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
       else if( walk->mBC )
          Con::addCommand( walk->mClassName, walk->mFuncName, walk->mBC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
       else if( walk->mVecC)
         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVecC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
-#endif
+// #endif
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       else if( walk->mValueC)
         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mValueC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
@@ -238,13 +238,13 @@ ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcNa
    mBC = bfunc;
 }
 // --------------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, VectorCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
       mVecC = bfunc;
 }
-#endif
+// #endif
 // --------------------------------------------------------------------------------
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, ConsoleValueCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
@@ -1378,13 +1378,13 @@ void addCommand( const char *nsName, const char *name,FloatCallback cb, const ch
    ns->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 void addCommand( const char *nsName, const char *name,VectorCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
       Namespace *ns = lookupNamespace(nsName);
       ns->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void addCommand( const char *nsName, const char *name,ConsoleValueCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
@@ -1448,12 +1448,12 @@ void addCommand( const char *name,BoolCallback cb,const char *usage, S32 minArgs
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
 // -----------------------------------------------------------------------------
-#ifdef ENABLE_CONSOLE_VECTOR
+// #ifdef ENABLE_CONSOLE_VECTOR
 void addCommand( const char *name,VectorCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
-#endif
+// #endif
 // -----------------------------------------------------------------------------
 // #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
 void addCommand( const char *name,ConsoleValueCallback cb,const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
