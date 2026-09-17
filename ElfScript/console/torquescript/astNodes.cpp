@@ -2001,7 +2001,7 @@ U32 TupleUnpackingStmtNode::compileStmt(CodeStream& codeStream, U32 ip)
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
-// ElfScript 0.8 Lamda
+// ElfScript 0.8 Lambda
 // FIXME THIS BREAK THE CURRENT STACK IN A FUNCTION! ... look at ObjectDeclNode::compileSubObject ???
 U32 LambdaLoadExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
       if (type == TypeReqNone) {
@@ -2009,6 +2009,10 @@ U32 LambdaLoadExprNode::compile(CodeStream& codeStream, U32 ip, TypeReq type) {
             codeStream.emit(OP_RETURN_VOID);
             return codeStream.tell();
       }
+
+      // The current solution is to ignore a Lambda definition inside a function
+      // and tell on console as error.
+      // I'am sure there is a other soltion but for now i have to do this:
       if ( CodeBlock::smInFunction ) {
             Con::errorf("Parse Error Lamba: Sorry, at the moment we cant add lamda inside a function! %s:%d", dbgFileName, dbgLineNumber);
             codeStream.emit(OP_RETURN_VOID);
