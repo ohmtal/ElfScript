@@ -4216,3 +4216,11 @@ DefineEngineMethod( SimObject, dumpMethods, void, ( bool detailed ), ( false ),
             }
       }
 }
+// -----------------------------------------------------------------------------
+DefineEngineMethod(SimObject, getPtr, ConsoleValue, (),, "return a Console Value with the object pointer") {
+      ConsoleValue result;
+      result.dataPtr = object;
+      result.type    = ConsoleValueType::cvPointer;
+      result.subType = ConsoleValueSubType::cvsSimObject;
+      return result;
+}

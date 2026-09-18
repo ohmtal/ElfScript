@@ -129,9 +129,13 @@ typedef const char *StringTableEntry;
 
 enum ConsoleValueSubType
 {
+   // ~~~~ SPACE for custom Types ~~~~
+
    // i start at 2 ^ 18
    cvsLambda      =     262144,
-   cvsVariable    =     262145
+   cvsVariable    =     262145,
+   cvsSimObject   =     262146, // for future use
+
 };
 
 

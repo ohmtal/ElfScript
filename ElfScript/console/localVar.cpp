@@ -29,8 +29,9 @@ namespace ElfScript {
             case ConsoleValueType::cvConsoleValueType: return "Console";
             case ConsoleValueType::cvPointer:{
                 switch (subType) {
-                    case cvsLambda: return "Lambda";
+                    case cvsLambda: return "LambdaPtr";
                     case cvsVariable: return "VarPtr";
+                    case cvsSimObject: return "SimObjectPtr";
                     default: return "Pointer";
                 }
             }
@@ -255,8 +256,8 @@ namespace ElfScript {
         }
 
         ConsoleValue& localVal = entry->getValue();
-        Con::printf(" %10s [type:%8s] [value:%20s]"
-        , variableName, getConsoleValueTypeName(localVal.type, localVal.subType), localVal.getString());
+        Con::printf(" %10s [type:%8s (sub:%d)] [value:%20s]"
+        , variableName, getConsoleValueTypeName(localVal.type, localVal.subType),localVal.subType, localVal.getString());
 
     }
     // // -----------------------------------------------------------------------------
@@ -454,7 +455,7 @@ DefineEngineFunction(explodeGlobal,S32, (const char* varName, bool debugOut),(fa
 }
 
 // =============================================================================
-DefineEngineFunction( getVarPtr, ConsoleValue, (const char * variableName),,"") {
+DefineEngineFunction( getVarPtr, ConsoleValue, (const char * variableName),,"Get the pointer of a variable, param must be string variable name!") {
     ConsoleValue* stack = ElfScript::getLocalVariable(variableName);
     ConsoleValue myValue;
     if (stack) myValue.setPointer(stack, cvsVariable);

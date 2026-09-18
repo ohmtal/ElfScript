@@ -717,6 +717,11 @@ SimObject* getThisObject(ConsoleValue& simObjectLookupValue)
    SimObject* thisObject = NULL;
 
    // Optimization: If we're an integer, we can lookup the value by SimObjectId
+   // ElfScript 0.8 check it's a pointer skip lookup
+   if (  simObjectLookupValue.type == ConsoleValueType::cvPointer
+         && simObjectLookupValue.subType == ConsoleValueSubType::cvsSimObject) {
+         if (simObjectLookupValue.dataPtr) thisObject =  reinterpret_cast<SimObject*>(simObjectLookupValue.dataPtr);
+   } else
    if (simObjectLookupValue.getType() == ConsoleValueType::cvInteger)
       thisObject = Sim::findObject(static_cast<SimObjectId>(simObjectLookupValue.getFastInt()));
    else
@@ -2329,6 +2334,7 @@ handle_OP_LOADVAR_STR: {
                         valueType == ConsoleValueType::cvVector ||
 // #endif
                         valueType == ConsoleValueType::cvInteger ||
+                        valueType == ConsoleValueType::cvValue ||
                         valueType == ConsoleValueType::cvPointer
                         ;
       }
@@ -2558,7 +2564,16 @@ handle_OP_SAVE_LOCAL_VAR_STR: {
 // ~~~~~~~~~~~~~~~~~ SETCUROBJECT
 handle_OP_SETCUROBJECT:
       prevObject = curObject;
-      curObject = Sim::findObject(stack[_STK]);
+      curObject  = nullptr;
+
+      //ElfScript 0.8 check it's a pointer, skip lookup
+      if (  stack[_STK].type == ConsoleValueType::cvPointer
+            && stack[_STK].subType == ConsoleValueSubType::cvsSimObject) {
+            if (stack[_STK].dataPtr) curObject =  reinterpret_cast<SimObject*>(stack[_STK].dataPtr);
+      } else {
+            curObject = Sim::findObject(stack[_STK]);
+      }
+
       DISPATCH();
 
 handle_OP_SETCUROBJECT_NEW:

@@ -1,9 +1,10 @@
 #define JLOOPS 25
 #define ILOOPS 1000000
 
+// ElfSctipt 0.8 using Ptr!
 %sto = new PointStorageObject(){
     TypeF32 DynX = 0;
-};
+}.getPtr(); //<<< THIS
 
 // %sto.DynX = 0;
 for (%j in range  JLOOPS) {
