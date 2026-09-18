@@ -1,6 +1,5 @@
 # ElfScript Simple Speed Test:
 
-
 ## Goal: get the (close to or better) speed as lua (vanilla - without jit) on "localvar test"
 - Lua 5.5.1: 1.243u 0.002s 0:01.25 99.2%     0+0k 0+0io 0pf+0w
 - Elfscript 0.7c very close : **1.354u** 0.002s 0:01.36 99.2%     0+0k 0+0io 0pf+0w
@@ -11,6 +10,21 @@
 
 
 ## Version 0.8
+
+- added Pointer subType cvsSimObject for lookup skipping but risking dangling pointers when used wrong.
+
+after speed test:
+
+|Script | run 1 | run 2 | run 3 |
+| --- | --- | --- | --- |
+|test_localvar.elf |1.30s |1.30s |1.31s |
+|test_global.elf |2.45s |2.44s |2.44s |
+|test_static.elf |3.88s |3.81s |3.84s |
+|test_dynamic.elf |3.49s |3.44s |3.39s |
+|test_vector_components.elf |3.63s |3.63s |3.66s |
+
+*again lucky binary ?*
+
 
 - added class ElfScript::Lambda::InjectCaller and error handling when lamba is defined inside a function
 
