@@ -134,7 +134,8 @@ enum ConsoleValueSubType
    // i start at 2 ^ 18
    cvsLambda      =     262144,
    cvsVariable    =     262145,
-   cvsSimObject   =     262146, // for future use
+   cvsSimObject   =     262146,
+   cvsComponent   =     262147, // like %vec.x
 
 };
 

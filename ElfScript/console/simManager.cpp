@@ -420,30 +420,32 @@ SimObject* findObject(const char* name)
    return obj->findObject(name + len + 1);
 }
 
-SimObject* findObject(const ConsoleValue &val)
-{
-   if (val.getType() == ConsoleValueType::cvInteger)
-      return findObject((SimObjectId)val.getFastInt());
-
-// #ifdef ENABLE_CONSOLE_VECTOR
-   // haha another handbreak found this is for field Components
-   // it's not an object it's an Vector
-   if (val.getType() == ConsoleValueType::cvVector)
-         return nullptr;
-// #endif
-   return findObject(val.getString());
-}
+// SimObject* findObject(const ConsoleValue &val)
+// {
+//    if (val.type == ConsoleValueType::cvInteger) {
+//       return findObject((SimObjectId)val.getFastInt());
+//    } else if (val.type == ConsoleValueType::cvVector){
+//       return nullptr;
+//    }else if (val.type == ConsoleValueType::cvPointer) {
+//       if (val.subType != ConsoleValueSubType::cvsSimObject) return nullptr;
+//       else return reinterpret_cast<SimObject*>(val.dataPtr);
+//    } else {
+//       return findObject(val.getString());
+//    }
+// }
 
 SimObject* findObject(ConsoleValue* val)
 {
-   if (val->getType() == ConsoleValueType::cvInteger)
-      return findObject((SimObjectId)val->getFastInt());
-// #ifdef ENABLE_CONSOLE_VECTOR
-      // it's not an object it's an Vector
-      if (val->getType() == ConsoleValueType::cvVector)
+      if (val->getType() == ConsoleValueType::cvInteger) {
+            return findObject((SimObjectId)val->getFastInt());
+      } else if (val->getType() == ConsoleValueType::cvVector) {
             return nullptr;
-// #endif
-   return findObject(val->getString());
+      }else if (val->getType() == ConsoleValueType::cvPointer) {
+            if (val->subType != ConsoleValueSubType::cvsSimObject) return nullptr;
+            else return reinterpret_cast<SimObject*>(val->dataPtr);
+      } else {
+            return findObject(val->getString());
+      }
 }
 
 SimObject* findObject(SimObjectId id)

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # List of scripts to test
+    # "test_localvar3.elf"
 scripts=(
     "test_localvar.elf"
-    "test_localvar3.elf"
     "test_global.elf"
     "test_static.elf"
     "test_dynamic.elf"

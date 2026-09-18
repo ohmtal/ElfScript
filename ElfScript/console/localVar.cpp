@@ -19,7 +19,6 @@ extern  FuncVars gGlobalScopeFuncVars;
 
 //-----------------------------------------------------------------------------
 namespace ElfScript {
-
     const char* getConsoleValueTypeName(S32 type, U32 subType) {
         switch (type) {
             case ConsoleValueType::cvFloat:   return "Float";
@@ -32,6 +31,7 @@ namespace ElfScript {
                     case cvsLambda: return "LambdaPtr";
                     case cvsVariable: return "VarPtr";
                     case cvsSimObject: return "SimObjectPtr";
+                    case cvsComponent: return "ComponentField";
                     default: return "Pointer";
                 }
             }
@@ -484,6 +484,51 @@ DefineEngineFunction( setValueByPtr, bool, (ConsoleValue PtrValue, ConsoleValue 
 
     *value = setterValue;
     return true;
+}
+// =============================================================================
+extern S32 getComponentIndex(StringTableEntry subField);
+
+DefineEngineFunction( getComponentPrt , ConsoleValue, (const char * variableStatement),,"Get the pointer of a Console Vector Component") {
+    ConsoleValue myValue;
+    myValue.setString("Failed to get component pointer");
+    StringTableEntry variableName  = StringTable->insert( StringUnit::getUnit( variableStatement, 0, "."));
+    if (!variableName || variableName[0] == '\0') return myValue;
+
+
+    StringTableEntry fieldName  =  StringTable->insert(StringUnit::getUnit( variableStatement, 1, "."));
+    if (!fieldName || fieldName[0] == '\0') return myValue;
+
+   // Con::printf("variableName: %p, fieldName: %p", (void*)variableName, (void*)fieldName);
+
+    ConsoleValue* stack = ElfScript::getLocalVariable(variableName);
+    if (!stack || stack->type != cvVector) return myValue;
+
+    S32 index = getComponentIndex(fieldName);
+    if (index < 0 ) return myValue;
+
+    myValue.type = cvPointer;
+    myValue.subType = cvsComponent;
+    myValue.dataPtr = &stack->v.points[index];
+
+    return myValue;
+}
+DefineEngineFunction( getFloatByComponentPtr, F32, (ConsoleValue PtrValue),,"") {
+    if (PtrValue.type != cvPointer || PtrValue.subType != cvsComponent) return 0.0f;
+    void* rawPtr = PtrValue.getPointer();
+    if ( !rawPtr ) return 0.0f;
+    F32* floatPtr = reinterpret_cast<F32*>(rawPtr);
+    if ( !floatPtr ) return 0.0f;
+
+    return *floatPtr;
+}
+DefineEngineFunction( setFloatByComponentPtr, void, (ConsoleValue PtrValue, F32 value),,"") {
+    if (PtrValue.type != cvPointer || PtrValue.subType != cvsComponent) return;
+    void* rawPtr = PtrValue.getPointer();
+    if ( !rawPtr ) return /*false*/;
+    F32* floatPtr = reinterpret_cast<F32*>(rawPtr);
+    if ( !floatPtr ) return /*false*/;
+    *floatPtr = value;
+    // return true;
 }
 
 // =============================================================================

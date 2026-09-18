@@ -130,7 +130,7 @@ namespace Sim
    SimGroup *getGarbageCollectionGroup(); //ElfScript 0.7 used for auto created Arrays at the moment
 
    SimObject* findObject(SimObjectId);
-   SimObject* findObject(const ConsoleValue&);
+
    SimObject* findObject(ConsoleValue*);
    SimObject* findObject(const char* name);
    SimObject* findObject(const char* fileName, S32 declarationLine);
@@ -139,6 +139,22 @@ namespace Sim
    {
       return findObject(name.c_str());
    }
+
+   // SimObject* findObject(const ConsoleValue&);
+   inline SimObject* findObject(const ConsoleValue &val)
+   {
+      if (val.type == ConsoleValueType::cvInteger) {
+         return findObject((SimObjectId)val.getFastInt());
+      } else if (val.type == ConsoleValueType::cvVector){
+         return nullptr;
+      }else if (val.type == ConsoleValueType::cvPointer) {
+         if (val.subType != ConsoleValueSubType::cvsSimObject) return nullptr;
+         else return reinterpret_cast<SimObject*>(val.dataPtr);
+      } else {
+         return findObject(val.getString());
+      }
+   }
+
 
    template<class T> inline bool findObject(SimObjectId iD,T*&t)
    {

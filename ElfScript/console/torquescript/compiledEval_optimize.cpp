@@ -220,7 +220,7 @@ namespace Con
 } //Con
 
 // -----------------------------------------------------------------------------
-static S32 getComponentIndex(StringTableEntry subField) {
+S32 getComponentIndex(StringTableEntry subField) {
       // -----
       static const StringTableEntry xyzw[] =
       {
@@ -414,17 +414,6 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       }
 
        pStack->setFloat(targetValue);
-
-      // 2.8 setFloat only because we have no cleanup anymore
-//       switch ( targetType ) {
-//             // case cvInteger: pStack->setFastInt(static_cast<S64>(targetValue)); break;
-// #ifdef  ENABLE_CONSOLE_VECTOR
-//             case cvVector: TORQUE_CASE_FALLTHROUGH;
-// #endif
-//             case cvInteger: TORQUE_CASE_FALLTHROUGH;
-//             case cvFloat: pStack->setFastFloat(targetValue); break;
-//             default: pStack->setFloat(targetValue); break;
-//       }
 
 }
 // -----------------------------------------------------------------------------
@@ -718,13 +707,14 @@ SimObject* getThisObject(ConsoleValue& simObjectLookupValue)
 
    // Optimization: If we're an integer, we can lookup the value by SimObjectId
    // ElfScript 0.8 check it's a pointer skip lookup
-   if (  simObjectLookupValue.type == ConsoleValueType::cvPointer
+   if (simObjectLookupValue.getType() == ConsoleValueType::cvInteger)
+      thisObject = Sim::findObject(static_cast<SimObjectId>(simObjectLookupValue.getFastInt()));
+
+   else if (  simObjectLookupValue.type == ConsoleValueType::cvPointer
          && simObjectLookupValue.subType == ConsoleValueSubType::cvsSimObject) {
          if (simObjectLookupValue.dataPtr) thisObject =  reinterpret_cast<SimObject*>(simObjectLookupValue.dataPtr);
    } else
-   if (simObjectLookupValue.getType() == ConsoleValueType::cvInteger)
-      thisObject = Sim::findObject(static_cast<SimObjectId>(simObjectLookupValue.getFastInt()));
-   else
+
    {
       SimObject *foundObject = Sim::findObject(simObjectLookupValue.getString());
 
@@ -2566,14 +2556,7 @@ handle_OP_SETCUROBJECT:
       prevObject = curObject;
       curObject  = nullptr;
 
-      //ElfScript 0.8 check it's a pointer, skip lookup
-      if (  stack[_STK].type == ConsoleValueType::cvPointer
-            && stack[_STK].subType == ConsoleValueSubType::cvsSimObject) {
-            if (stack[_STK].dataPtr) curObject =  reinterpret_cast<SimObject*>(stack[_STK].dataPtr);
-      } else {
-            curObject = Sim::findObject(stack[_STK]);
-      }
-
+      curObject = Sim::findObject(stack[_STK]);
       DISPATCH();
 
 handle_OP_SETCUROBJECT_NEW:
@@ -2683,7 +2666,7 @@ handle_OP_LOADFIELD_FASTPATH:
             }
 
             if (cachePtr->type == componentVectorField) {
-                  stackPtr->setFastFloat( (F64)*cachePtr->VectorComponentFloat);
+                  stackPtr->setFastFloat( static_cast<F64>(*cachePtr->VectorComponentFloat));
                   PUSH_STK();
                   DISPATCH();
             }
@@ -2801,7 +2784,8 @@ handle_OP_LOADFIELD_FASTPATH:
                               case ConsoleValueType::cvVector:
                                     stackPtr->setVector(cachePtr->fieldValuePtr->getVector());
                                     break;
-                              // #endif
+
+                              case ConsoleValueType::cvConsoleValueType:
                               case ConsoleValueType::cvPointer:
                                     *stackPtr  = *cachePtr->fieldValuePtr;
                                     // stackPtr->setPointer(cachePtr->fieldValuePtr->getPointer(), cvPointer);
@@ -2892,7 +2876,7 @@ handle_OP_SAVEFIELD_FASTPATH:
                         fetchConsoleVectorVar(cachePtr,  curField, currentRegister);
             }
             if (cachePtr->type == componentVectorField) {
-                  *cachePtr->VectorComponentFloat = (F32)stack[_STK].getFloat();
+                  *cachePtr->VectorComponentFloat = static_cast<F32>(stack[_STK].getFloat());
                   prevObject = NULL;
                   DISPATCH();
             }

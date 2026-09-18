@@ -4217,7 +4217,10 @@ DefineEngineMethod( SimObject, dumpMethods, void, ( bool detailed ), ( false ),
       }
 }
 // -----------------------------------------------------------------------------
-DefineEngineMethod(SimObject, getPtr, ConsoleValue, (),, "return a Console Value with the object pointer") {
+DefineEngineMethod(SimObject, getPtr, ConsoleValue, (),,
+      "return a Console Value with the object pointer\n"
+      "Warning: Handle with care, when object is deleted it becomes a dangling pointer!"
+) {
       ConsoleValue result;
       result.dataPtr = object;
       result.type    = ConsoleValueType::cvPointer;

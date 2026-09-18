@@ -507,10 +507,10 @@ U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
             expr && elementCount < MAX_ELEMENTS;
             expr = (ExprNode*)expr->next )
            {
-                 if (!this->isArrayConstuctor) {
+/*                 if (!this->isArrayConstuctor) {
                        ip = expr->compile(codeStream, ip, TypeReqFloat);
                  }
-                 else if (expr->getExprNodeNameEnum() == NameFloatNode || expr->getExprNodeNameEnum() == NameIntNode) {
+                 else*/ if (expr->getExprNodeNameEnum() == NameFloatNode || expr->getExprNodeNameEnum() == NameIntNode) {
                        ip = expr->compile(codeStream, ip, TypeReqFloat);
                  } else {
                        ip = expr->compile(codeStream, ip, TypeReqString);
