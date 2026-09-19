@@ -41,7 +41,8 @@ enum TypeReq
    TypeReqNone,
    TypeReqUInt,
    TypeReqFloat,
-   TypeReqString
+   TypeReqString,
+   //TODO: TypeReqPointer //ElfScript 0.8
 };
 
 enum ExprNodeName
@@ -712,6 +713,22 @@ struct LambdaCallExprNode : ExprNode
 };
 
 
+// --- ElfScript 0.8 Pointer VAR ---
+// TODO:
+// struct PointerVarNode : ExprNode
+// {
+//    StringTableEntry varName;
+//
+//    static PointerVarNode* alloc(S32 lineNumber, StringTableEntry varName){ return NULL; } //TODO
+//
+//    // function params initialization.
+//    static PointerVarNode* allocParam(S32 lineNumber, StringTableEntry varName) { return NULL; } //TODO
+//
+//    U32 compile(CodeStream& codeStream, U32 ip, TypeReq type) override { return ip;} //TODO
+//    TypeReq getPreferredType() override { return TypeReqPointer;}
+//    //FIXME ? ExprNodeName getExprNodeNameEnum() const override { return NameVarNode; }
+//    DBG_STMT_TYPE(PointerVarNode);
+// };
 
 
 #endif // _AST_H_

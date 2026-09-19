@@ -154,6 +154,10 @@ set(CONSOLE_SRC
     # new monster with direct threading:
     ${CMAKE_CURRENT_LIST_DIR}/console/torquescript/compiledEval_optimize.cpp
 
+    # console Vector functions
+    ${CMAKE_CURRENT_LIST_DIR}/console/consoleVectorFunc.h
+    ${CMAKE_CURRENT_LIST_DIR}/console/consoleVectorFunc.cpp
+
 )
 
 set(CORE_SRC

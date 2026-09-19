@@ -56,7 +56,7 @@
 // #include "console/telnetDebugger.h"
 
 #include "objects/Array.h"
-
+#include "console/consoleVectorFunc.h"
 
 using namespace Compiler;
 
@@ -364,11 +364,9 @@ static void stackFieldComponent(SimObject* object, StringTableEntry field, const
       }
 
       F64 targetValue = 0.0;
-// #ifdef  ENABLE_CONSOLE_VECTOR
-       if (srcValue->type == cvVector) {
+       if (srcValue->isConsoleVector()) {
              targetValue = (F64)srcValue->v.points[componentIndex];
        } else
-// #endif
       {
             const char* srcStr = srcValue->getString();
             const char* pStr = srcStr;
@@ -3298,11 +3296,28 @@ handle_OP_CALL_STATIC_CALL: {
 
 // ~~~~~~~~~~~~ METHOD CALL ~~~~~~~~~~~~~~~~
 handle_OP_CALL_METHOD_CALL: {
+
+
       PREPARE_CALLFUNC();
 
-      // ConsoleValue& simObjectLookupValue = callArgv[1];
-      // thisObject = getThisObject(simObjectLookupValue);
       simObjectLookupPtr = &callArgv[1];
+
+      if (simObjectLookupPtr->isConsoleVector()) {
+            gCallStack.popFrame();
+            if (!ElfScript::ConsoleVector::funcCaller(callArgc, callArgv, stack[_STK + 1])) {
+                  stack[_STK + 1].setEmptyString();
+            }
+
+             if (code[ip] == OP_POP_STK){
+                   ip++;
+            } else  {
+                  PUSH_STK();
+            }
+
+            FINIT_CALLFUNC();
+            DISPATCH();
+      }
+
       thisObject = getThisObject(*simObjectLookupPtr);
 
       if (thisObject == NULL)
@@ -4849,7 +4864,7 @@ handle_OP_ARRAY_CONSTUCTOR: {
 handle_OP_BUILD_VECTOR_FAST: {
       U32 count = code[ip++];
       ConsoleVector cv = {0};
-      for (U32 i = 0; i < count; i++) {
+      for (U32 i = 0; i < count && i < CONSOLE_VALUE_VECTOR_FIELD_COUNT; i++) {
             cv.points[count - 1 - i] = static_cast<F32>(stack[_STK - i].getFloat());
       }
       _STK -= (count - 1);
@@ -4860,7 +4875,7 @@ handle_OP_BUILD_VECTOR_FAST: {
 }
 
 
-//TODO FIXME: this is mixed or too many parameters, so I can remove the matchVectorFields check
+//NOTE : T H I S  I S  OBSOLETE !!!!
 handle_OP_BUILD_VECTOR_STRING: {
       // read the count
       U32 count = code[ip++];

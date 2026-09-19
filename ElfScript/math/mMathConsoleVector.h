@@ -70,23 +70,23 @@ inline ConsoleVector Vec4Div(const ConsoleVector& v1, F32 f){
 
 inline bool Vec4Equal(const ConsoleVector& v1, const ConsoleVector& v2){
     return
-        v1.points[0]  ==  v2.points[0]
-        && v1.points[1]  ==  v2.points[1]
-        && v1.points[2]  ==  v2.points[2]
-        && v1.points[3]  ==  v2.points[3]
+        mAbs (v1.points[0]  -  v2.points[0]) <= POINT_EPSILON
+        && mAbs (v1.points[1]  -  v2.points[1]) <= POINT_EPSILON
+        && mAbs (v1.points[2]  -  v2.points[2]) <= POINT_EPSILON
+        && mAbs (v1.points[3]  -  v2.points[3]) <= POINT_EPSILON
         ;
 }
 inline bool Vec3Equal(const ConsoleVector& v1, const ConsoleVector& v2){
     return
-    v1.points[0]  ==  v2.points[0]
-    && v1.points[1]  ==  v2.points[1]
-    && v1.points[2]  ==  v2.points[2]
+    mAbs (v1.points[0]  -  v2.points[0]) <= POINT_EPSILON
+    && mAbs (v1.points[1]  -  v2.points[1]) <= POINT_EPSILON
+    && mAbs (v1.points[2]  -  v2.points[2]) <= POINT_EPSILON
     ;
 }
 inline bool Vec2Equal(const ConsoleVector& v1, const ConsoleVector& v2){
     return
-    v1.points[0]  ==  v2.points[0]
-    && v1.points[1]  ==  v2.points[1]
+    mAbs (v1.points[0]  -  v2.points[0]) <= POINT_EPSILON
+    && mAbs (v1.points[1]  -  v2.points[1]) <= POINT_EPSILON
     ;
 }
 

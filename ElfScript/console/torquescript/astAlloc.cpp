@@ -497,39 +497,75 @@ VectorConstructorNode* VectorConstructorNode::alloc(S32 lineNumber,bool arrayCon
       return ret;
 }
 
+// NOTE  ElfScript 0.8 we ONLY do 4 floats  when using {} !!!
 U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
 {
       U32 elementCount = 0;
-      bool allElementsAreNumeric = true;
 
       const U32 MAX_ELEMENTS = 16;
       for (ExprNode* expr = argList;
             expr && elementCount < MAX_ELEMENTS;
             expr = (ExprNode*)expr->next )
-           {
-/*                 if (!this->isArrayConstuctor) {
-                       ip = expr->compile(codeStream, ip, TypeReqFloat);
-                 }
-                 else*/ if (expr->getExprNodeNameEnum() == NameFloatNode || expr->getExprNodeNameEnum() == NameIntNode) {
-                       ip = expr->compile(codeStream, ip, TypeReqFloat);
-                 } else {
-                       ip = expr->compile(codeStream, ip, TypeReqString);
-                       allElementsAreNumeric = false;
-                 }
-                 elementCount++;
-           }
+      {
+            if (!this->isArrayConstuctor) {
+                  // ElfScript 0.8 we ONLY do 4 floats  when using {} !!!
+                  if (elementCount >= CONSOLE_VALUE_VECTOR_FIELD_COUNT){
+                        break;
+                  }
+                  ip = expr->compile(codeStream, ip, TypeReqFloat);
+            } else if (expr->getExprNodeNameEnum() == NameFloatNode || expr->getExprNodeNameEnum() == NameIntNode) {
+                  ip = expr->compile(codeStream, ip, TypeReqFloat);
+            }else {
+                  ip = expr->compile(codeStream, ip, TypeReqString);
+            }
+            elementCount++;
+      }
 
-           if (this->isArrayConstuctor) {
-                 codeStream.emit(OP_ARRAY_CONSTUCTOR);
-           } else if (allElementsAreNumeric && elementCount <= 4) {
-                 codeStream.emit(OP_BUILD_VECTOR_FAST);
-           } else {
-                 codeStream.emit(OP_BUILD_VECTOR_STRING);
-           }
-           codeStream.emit(elementCount);
+      if (this->isArrayConstuctor) {
+            codeStream.emit(OP_ARRAY_CONSTUCTOR);
+      } else  {
+            codeStream.emit(OP_BUILD_VECTOR_FAST);
+      }
+      codeStream.emit(elementCount);
 
-           return codeStream.tell();
+      return codeStream.tell();
 }
+
+
+
+// // U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)
+// // {
+// //       U32 elementCount = 0;
+// //       bool allElementsAreNumeric = true;
+// //
+// //       const U32 MAX_ELEMENTS = 16;
+// //       for (ExprNode* expr = argList;
+// //             expr && elementCount < MAX_ELEMENTS;
+// //             expr = (ExprNode*)expr->next )
+// //            {
+// // /*                 if (!this->isArrayConstuctor) {
+// //                        ip = expr->compile(codeStream, ip, TypeReqFloat);
+// //                  }
+// //                  else*/ if (expr->getExprNodeNameEnum() == NameFloatNode || expr->getExprNodeNameEnum() == NameIntNode) {
+// //                        ip = expr->compile(codeStream, ip, TypeReqFloat);
+// //                  } else {
+// //                        ip = expr->compile(codeStream, ip, TypeReqString);
+// //                        allElementsAreNumeric = false;
+// //                  }
+// //                  elementCount++;
+// //            }
+// //
+// //            if (this->isArrayConstuctor) {
+// //                  codeStream.emit(OP_ARRAY_CONSTUCTOR);
+// //            } else if (allElementsAreNumeric && elementCount <= 4) {
+// //                  codeStream.emit(OP_BUILD_VECTOR_FAST);
+// //            } else {
+// //                  codeStream.emit(OP_BUILD_VECTOR_STRING);
+// //            }
+// //            codeStream.emit(elementCount);
+// //
+// //            return codeStream.tell();
+// // }
 
 // PRE FAST
 // // U32 VectorConstructorNode::compile(CodeStream& codeStream, U32 ip, TypeReq type)

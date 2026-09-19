@@ -19,10 +19,42 @@ DefineEngineFunction(getRectCentered, ConsoleVector, (ConsoleVector vec),,"retur
 }
 
 
+// i dont have this in the lexer so far so you have to use : getVarPtr("VAR");
+// Example:
+// I : %v = {10,20,30,40}; PrtVec4Scale(getVarPtr("%v"),2.0); echo(%v);
+// II: %v = {10,20,30,40}; %ptr = getVarPtr("%v");  PrtVec4Scale(%ptr,2.0); echo(%v);
+
+// Why not simple return a Console Value => direct assign is faster with less opcodes!
+// I could also add all this stuff directly into the VM like the math. functions vec.xxx
+
+// or even better do a special path when a vector is on the stack this can than skip
+// set object and the component system should only work with this!
+
+// i also should think about {} this should be for ConsoleVector only !
+
+// ---
+// TODO PrtVec4Scale(ptr(%v), 2.0);
+// i first thought about a &$v but very complicated ;)
+// So it's properly easier to call a inline ptr function which take the
+// variable name an push it into the runtime.
+// so i also can get a cvCompomentPointer  or a field Pointer ... maybe better
+// as string ... let's test it later
+// ---
+
+
+DefineEngineFunction(PrtVec4Scale, void , (ConsoleValue PtrValue1, F32 scale),
+                     ,"Testing by reference") {
+    if (!PtrValue1.isVariablePointer()) return;
+    ConsoleValue* vec1 = reinterpret_cast<ConsoleValue*>(PtrValue1.dataPtr);
+    if (!vec1->isConsoleVector()) return;
+
+    vec1->v = ElfMath::Vec4Mul(vec1->v,scale);
+}
 //-----------------------------------------------------------------------------
 // Set be Reference functions  directly into the local/global variable
 //-----------------------------------------------------------------------------
-
+// LOL i did not test it and it's all wrong! ElfMath::Vec4Add(v1,v2); return the result Vector!
+/*
 DefineEngineFunction(Vec4Add, void , (const char* varVec1, const char* varVec2),
                      ,"v1 = v1 + v2") {
 
@@ -167,4 +199,4 @@ DefineEngineFunction(Vec4Contains, bool , (const char* varRect1, const char* var
     ConsoleVector v1 =  ElfScript::getLocalVector(varRect1);
     ConsoleVector v2 =  ElfScript::getLocalVector(varRect2);
     return ElfMath::contains(v1,v2);
-}
+}*/

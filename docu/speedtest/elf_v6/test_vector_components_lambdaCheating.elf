@@ -7,7 +7,6 @@
 
 %myVec = { 0.0, 0.0 };
 
-vardump("%myVecXPrt");
 
 
 %loop1 = fn(%x) {

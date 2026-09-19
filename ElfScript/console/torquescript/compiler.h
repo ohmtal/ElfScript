@@ -198,7 +198,7 @@ namespace Compiler
       OP_ITER_END,         ///< End foreach loop.
 
 
-      OP_BUILD_VECTOR_STRING, // XXTH we build a PoD vector
+      OP_BUILD_VECTOR_STRING, // XXTH OBSOLETE {} only support 4 floats and OP_BUILD_VECTOR_FAST is used!
       OP_ARRAY_CONSTUCTOR,    // ElfScript 0.7
       OP_SAVEFIELD_FASTPATH,
       OP_LOADFIELD_FASTPATH,

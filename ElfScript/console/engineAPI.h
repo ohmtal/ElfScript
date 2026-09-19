@@ -325,6 +325,15 @@ struct EngineUnmarshallData< ConsoleValue >
    }
 };
 
+// ElfScript 0.8 did not get it work like i wanted it
+// // template<>
+// // struct EngineUnmarshallData< ConsoleValue* >
+// // {
+// //       ConsoleValue* operator()( ConsoleValue& ref ) const
+// //       {
+// //             return &ref;
+// //       }
+// // };
 /// @}
 
 

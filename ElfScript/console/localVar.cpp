@@ -29,7 +29,7 @@ namespace ElfScript {
             case ConsoleValueType::cvPointer:{
                 switch (subType) {
                     case cvsLambda: return "LambdaPtr";
-                    case cvsVariable: return "VarPtr";
+                    case cvsVariable: return "VariablePtr";
                     case cvsSimObject: return "SimObjectPtr";
                     case cvsComponent: return "ComponentField";
                     default: return "Pointer";
@@ -476,7 +476,7 @@ DefineEngineFunction( getValueByPtr, ConsoleValue, (ConsoleValue PtrValue),,"") 
 
 }
 DefineEngineFunction( setValueByPtr, bool, (ConsoleValue PtrValue, ConsoleValue setterValue),,"") {
-    if (PtrValue.type != cvPointer ) return false;
+    if (PtrValue.type != cvPointer || PtrValue.subType != cvsVariable) return false;
     void* rawPtr = PtrValue.getPointer();
     if ( !rawPtr ) return false;
     ConsoleValue* value = reinterpret_cast<ConsoleValue*>(rawPtr);

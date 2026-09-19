@@ -532,6 +532,16 @@ public:
       //    || type == ConsoleValueType::cvSTEntry;
    }
 
+   TORQUE_FORCEINLINE bool isFloat()    const { return type == ConsoleValueType::cvFloat; }
+   TORQUE_FORCEINLINE bool isInteger()    const { return type == ConsoleValueType::cvInteger; }
+   TORQUE_FORCEINLINE bool isConsoleVector()    const { return type == ConsoleValueType::cvVector; }
+   TORQUE_FORCEINLINE bool isConsoleValue()     const { return type == ConsoleValueType::cvConsoleValueType; }
+   TORQUE_FORCEINLINE bool isVariablePointer()  const { return type == ConsoleValueType::cvPointer && subType == ConsoleValueSubType::cvsVariable; }
+   TORQUE_FORCEINLINE bool isLambdaPointer()    const { return type == ConsoleValueType::cvPointer && subType == ConsoleValueSubType::cvsLambda; }
+   TORQUE_FORCEINLINE bool isSimObjectPointer() const { return type == ConsoleValueType::cvPointer && subType == ConsoleValueSubType::cvsSimObject; }
+   TORQUE_FORCEINLINE bool isComponentPointer() const { return type == ConsoleValueType::cvPointer && subType == ConsoleValueSubType::cvsComponent; }
+
+
    TORQUE_FORCEINLINE bool isNumberType()  const
    {
       return type == ConsoleValueType::cvFloat

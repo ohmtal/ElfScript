@@ -7,7 +7,6 @@
 %myVec = { 0.0, 0.0 };
 %ptr = getComponentPrt("%myVec.x");
 
-vardump("%myVecXPrt");
 
 
 %loop1 = fn(%ptr) {
@@ -55,7 +54,9 @@ vardump("%myVecXPrt");
     setFloatByComponentPtr(%ptr , %x);
 };
 
+
 %loops = [%loop1,%loop2,%loopReset, %loop3,%loop4];
+foreach(%l in %loops) { echo(%l); }
 
 
 for(%j in range JLOOPS)  {

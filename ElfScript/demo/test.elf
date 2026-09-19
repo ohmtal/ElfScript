@@ -534,19 +534,20 @@ sto.setPointVec(0, {1,2,3,4});
 sto.fetchPoint(0); printf("Cur point: %f %f %f", sto.x,sto.y,sto.z);
 %copyVec = sto.getPointVec(0); varDump("%copyVec");
 
-print("Test tinyEpr on pointVec:");
-%sto = sto.getId();
-%sto.applyMathOnPoints("randf();randf();randf();randf()", 0,%sto.storageSize - 1);
-// now we have a random lut for something
-%sto.addField("lutIndex","TypeS32", 0);
-function FooBar::getRand(%this) {
-    %result = %this.getPointX(%this.lutIndex);
-    %this.lutIndex = (%this.lutIndex + 1) % (%this.storageSize);
-
-    return %result;
-}
-printf("index:%d value:%f", sto.lutIndex, sto.getRand());
-
+// replaced by lambda!!!
+// // print("Test tinyEpr on pointVec:");
+// // %sto = sto.getId();
+// // %sto.applyMathOnPoints("randf();randf();randf();randf()", 0,%sto.storageSize - 1);
+// // // now we have a random lut for something
+// // %sto.addField("lutIndex","TypeS32", 0);
+// // function FooBar::getRand(%this) {
+// //     %result = %this.getPointX(%this.lutIndex);
+// //     %this.lutIndex = (%this.lutIndex + 1) % (%this.storageSize);
+// //
+// //     return %result;
+// // }
+// // printf("index:%d value:%f", sto.lutIndex, sto.getRand());
+// //
 // function TestAI(%loops = 10000, %filename = "myAITest.elfdata") {
 //
 //     %ann = ANN_Load(%filename, {2, 1, 3, 1});
@@ -625,7 +626,7 @@ function testInside() {
     TEST_VAR_CREATE();
 }
 
-$bla = {"Hello", "world"};
+$bla = "Hello do\tworld";
 printf("explodeGlobal $bla count is: %d",explodeGlobal("$bla", true));
 
 printSeparator();
@@ -777,8 +778,11 @@ for (%i in 1..6)varDump("%v" @ %i);
 print("");
 print("---");
 
+
 print("string TAB separated from Vector assignment");
-%mixedVec = {"Die", "Kuh", 45.4, 10};
+// not longer supported ... i want maximum speed for console vectorS
+// %mixedVec = {"Die", "Kuh", 45.4, 10};
+%mixedVec = "Die" TAB "Kuh" TAB 45.4 TAB 10;
 [ %v1, %v2, %v3 , %v4, %v5 , %v6] = %mixedVec;
 for (%i in 1..6)varDump("%v" @ %i);
 print("");
@@ -787,11 +791,12 @@ print("---");
 
 printSeparator();
 print("----------------- Tuple Assign by ArgList ----------------- ");
-print("Vecor {1,2,3,4,5,HUHU}");
-[ %v1, %v2, %v3 , %v4, %v5 , %v6] = {1.01,2.01,3.00,4,5,"HUHU"};
+print("NOT LONGER SUPPORTED !!!  {1,2,3,4,5,HUHU} use string! like: 1.01 TAB 2.01 TAB 3.00 TAB 4 TAB 5 TAB \"HUHU\"; ");
+[ %v1, %v2, %v3 , %v4, %v5 , %v6] = 1.01 TAB 2.01 TAB 3.00 TAB 4 TAB 5 TAB "HUHU";
 for (%i in 1..6)varDump("%v" @ %i);
 print("");
 print("---");
+
 
 print("tuple Swapping and less parameters");
 %a = 1.0; %b = 2.0; %c = 3.0;
@@ -823,8 +828,39 @@ print("----------------- Lambda TESTS ----------------- ");
 };
 
 print("LAMDA RESULT IS:", %fn("huhu"));
-%p = ["Alder Babasack!", 1,2,3,4];
-print("LAMDA RESULT FROM C callLambda:", callLambdaTest(%fn, %p)); // test for later mappings
+
+
+printSeparator();
+
+print("----------------- Console Vector Functions  ----------------- ");
+
+$failCount = 0;
+%vAssert = fn(%name, %got, %expected) {
+    if (%got.equal( %expected))
+    {
+        print("[PASS] " @ %name @ " -> Got: " @ %got);
+    }
+    else
+    {
+        error("[FAIL] " @ %name @ " -> expected: " @ %expected @ ", but got: " @ %got);
+        $failCount++;
+    }
+};
+
+%vec = {1,1,1,1};
+%vAssert("add", %vec.add({1,2,3,4}), {2,3,4,5});
+%vAssert("sub", %vec.sub({1,2,3,4}), {0,-1,-2,-3});
+
+
+var_dump(%vec.randomize(0,10));
+
+printSeparator();
+if ($failCount > 0 ) {
+    error(" some ConsoleVector functions (",$failCount,") failed !!!!!!!!!!!!!!!!!!!!!!!!!");
+} else {
+    print(" ConsoleVector Functions seams to work perfect :)");
+}
+
 
 
 
