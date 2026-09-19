@@ -60,7 +60,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ------------- SDL3
 # lazy add
-if (EMSCRIPTEN)
+# if (EMSCRIPTEN)
     include(FetchContent)
     FetchContent_Declare(
         SDL3
@@ -84,10 +84,10 @@ if (EMSCRIPTEN)
     endif()
 
     FetchContent_MakeAvailable(SDL3)
-else()
-find_package(SDL3 REQUIRED)
+# else()
+# find_package(SDL3 REQUIRED)
 
-endif()
+# endif()
 
 # =============== ElfScript >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 set(ELFSCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../" CACHE PATH "Path to ElfScript")
