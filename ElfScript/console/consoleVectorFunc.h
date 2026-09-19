@@ -31,6 +31,7 @@ bool div(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 
 bool getRectCentered(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool pointInRect(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
+bool isValidRect(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool contains(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool intersects(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 
@@ -45,8 +46,8 @@ bool len2Sq(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool len3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool len3Sq(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 
-bool normalize2(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
-bool normalize3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
+bool normalized2(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
+bool normalized3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 
 bool dot2(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
 bool dot3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue);
@@ -69,6 +70,7 @@ static void Init() {
 
     mLookup[StringTable->insert("getRectCentered")] = getRectCentered;
     mLookup[StringTable->insert("pointInRect")] = pointInRect;
+    mLookup[StringTable->insert("isValidRect")] = isValidRect;
     mLookup[StringTable->insert("contains")] = contains;
     mLookup[StringTable->insert("intersects")] = intersects;
 
@@ -83,8 +85,8 @@ static void Init() {
     mLookup[StringTable->insert("len3")]    = len3;
     mLookup[StringTable->insert("len3Sq")]  = len3Sq;
 
-    mLookup[StringTable->insert("normalize2")] = normalize2;
-    mLookup[StringTable->insert("normalize3")] = normalize3;
+    mLookup[StringTable->insert("normalized2")] = normalized2;
+    mLookup[StringTable->insert("normalized3")] = normalized3;
 
     mLookup[StringTable->insert("dot2")]    = dot2;
     mLookup[StringTable->insert("dot3")]    = dot3;

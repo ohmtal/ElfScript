@@ -82,6 +82,17 @@ namespace ElfScript::ConsoleVector {
 
         return true;
     }
+
+
+    bool isValidRect(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue) {
+        if (argC < 2 ) return false;
+
+        resultValue.setBool( ElfMath::isValidRect(argV[1].v));
+
+        return true;
+    }
+
+
     bool contains(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue){
         if (argC < 3 ) return false;
 
@@ -168,12 +179,12 @@ namespace ElfScript::ConsoleVector {
     }
 
     // ------------------------------------------------------------------------
-    bool normalize2(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue){
+    bool normalized2(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue){
         if (argC < 2 ) return false;
         resultValue.setVector( ElfMath::Vec2Normalized(argV[1].v));
         return true;
     }
-    bool normalize3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue){
+    bool normalized3(S32 argC, ConsoleValue* argV, ConsoleValue& resultValue){
         if (argC < 2 ) return false;
         resultValue.setVector( ElfMath::Vec3Normalized(argV[1].v));
         return true;

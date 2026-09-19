@@ -11,6 +11,14 @@
 
 namespace ElfMath {
 
+
+
+inline F32 VecX(const ConsoleVector& v1){ return v1.points[0];}
+inline F32 VecY(const ConsoleVector& v1){ return v1.points[1];}
+inline F32 VecZ(const ConsoleVector& v1){ return v1.points[2];}
+inline F32 VecW(const ConsoleVector& v1){ return v1.points[3];}
+
+
 inline ConsoleVector Vec4Add(const ConsoleVector& v1, const ConsoleVector& v2){
     return {
           v1.points[0] + v2.points[0]
@@ -103,6 +111,12 @@ inline ConsoleVector operator /  (const ConsoleVector& v1, const ConsoleVector& 
 inline ConsoleVector operator /= ( ConsoleVector& v1, const ConsoleVector& v2)  { v1 = Vec4Div(v1,v2); return v1;}
 
 inline bool operator == ( ConsoleVector& v1, const ConsoleVector& v2)  { return Vec4Equal(v1,v2); }
+
+
+inline bool isValidRect(const ConsoleVector& v)  {
+    return v.points[2] > 0.f && v.points[3] > 0.f;
+}
+
 
 inline ConsoleVector getRectCentered(const ConsoleVector& v)  {
 

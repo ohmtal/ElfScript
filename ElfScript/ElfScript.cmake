@@ -243,6 +243,16 @@ set ( OBJECTS_SRC
 
     # Console Vector now default and removed ifdef
     ${CMAKE_CURRENT_LIST_DIR}/objects/ConsoleVectorScript.cpp
+
+
+    # Now put it here i have it also in ElfFlux and OhmFlux/ElfTest..
+    # my beloved BasicGrid ;)
+    ${CMAKE_CURRENT_LIST_DIR}/objects/BasicGrid.h
+    ${CMAKE_CURRENT_LIST_DIR}/objects/BasicGrid.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/objects/GridObject.h
+    ${CMAKE_CURRENT_LIST_DIR}/objects/GridObject.cpp
+
 )
 
 set(ZIP_SRC

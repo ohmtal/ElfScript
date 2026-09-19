@@ -18,7 +18,9 @@ class Array: public SimObject
     typedef SimObject Parent;
 public:
     DECLARE_CONOBJECT(Array);
+
     Vector<ConsoleValue> mValues;
+
     ConsoleValue emptyValue;
 
     bool onAdd() override;
