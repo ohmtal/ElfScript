@@ -4938,43 +4938,43 @@ handle_OP_BUILD_VECTOR_STRING: {
 
       DISPATCH();
 }
-// #else // #ifdef ENABLE_CONSOLE_VECTOR
-#ifdef _OBSOLETE_OLD_
-handle_OP_BUILD_VECTOR_FAST: {
-      DISPATCH_OPCODE(OP_BUILD_VECTOR_STRING);
-}
-handle_OP_BUILD_VECTOR_STRING: {
-      // read the count
-      U32 count = code[ip++];
-
-      const U32 MAX_ELEMENTS = 16;
-      const char* stringValues[MAX_ELEMENTS];
-
-      if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
-
-      // get values from stack
-      for (S32 i = count - 1; i >= 0; i--) {
-            stringValues[i] = stack[_STK].getString();
-            POP_STK();
-      }
-
-      // i have to translate it to a string again :(
-      char buffer[256];
-      S32 offset = 0;
-      buffer[0] = '\0';
-
-      for (U32 i = 0; i < count; i++) {
-            offset += dSprintf(buffer + offset
-            , sizeof(buffer) - offset
-            , (i == 0) ? "%s" : "\t%s", stringValues[i]);
-      }
-
-      PUSH_STK();
-      stack[_STK].setString(buffer);
-
-      DISPATCH();
-}
-#endif // #ifdef ENABLE_CONSOLE_VECTOR
+// // // // #else // #ifdef ENABLE_CONSOLE_VECTOR
+// // // #ifdef _OBSOLETE_OLD_
+// // // handle_OP_BUILD_VECTOR_FAST: {
+// // //       DISPATCH_OPCODE(OP_BUILD_VECTOR_STRING);
+// // // }
+// // // handle_OP_BUILD_VECTOR_STRING: {
+// // //       // read the count
+// // //       U32 count = code[ip++];
+// // //
+// // //       const U32 MAX_ELEMENTS = 16;
+// // //       const char* stringValues[MAX_ELEMENTS];
+// // //
+// // //       if (count > MAX_ELEMENTS) count = MAX_ELEMENTS;
+// // //
+// // //       // get values from stack
+// // //       for (S32 i = count - 1; i >= 0; i--) {
+// // //             stringValues[i] = stack[_STK].getString();
+// // //             POP_STK();
+// // //       }
+// // //
+// // //       // i have to translate it to a string again :(
+// // //       char buffer[256];
+// // //       S32 offset = 0;
+// // //       buffer[0] = '\0';
+// // //
+// // //       for (U32 i = 0; i < count; i++) {
+// // //             offset += dSprintf(buffer + offset
+// // //             , sizeof(buffer) - offset
+// // //             , (i == 0) ? "%s" : "\t%s", stringValues[i]);
+// // //       }
+// // //
+// // //       PUSH_STK();
+// // //       stack[_STK].setString(buffer);
+// // //
+// // //       DISPATCH();
+// // // }
+// // // #endif
 // ~~~~~~~~~~~~~~~~~ SAVEFIELD_FASTPATH
 // NOTE placed under handle_OP_SAVEFIELD_FLT:
 

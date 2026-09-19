@@ -7,12 +7,6 @@
  */
 class  SimObject {
   public:
-      /*! Generic callback for when an object is edited */
-      void onInspectPostApply( SimObject obj );
-      /*! Generic callback for when an object is selected */
-      void onSelected( SimObject obj );
-      /*! Generic callback for when an object is un-selected */
-      void onUnselected( SimObject obj );
       /*! Called when this SimObject is added to the system.
 @param ID Unique object ID assigned when created (%this in script).
  */
@@ -61,28 +55,6 @@ class  SimObject {
     * @param name The name of the 'superClass' namespace for this object.
     */
       function setSuperClassNamespace( string name );
-   /** --- bool isSelected ---
-    * Get whether the object has been marked as selected. (in editor)
-    * @return True if the object is currently selected.
-    * @return bool
-    */
-      function isSelected();
-   /** --- void setIsSelected ---
-    * Set whether the object has been marked as selected. (in editor)
-    * @param state True if object is to be marked selected; false if not.
-    */
-      function setIsSelected( bool state=true );
-   /** --- bool isExpanded ---
-    * Get whether the object has been marked as expanded. (in editor)
-    * @return True if the object is marked expanded.
-    * @return bool
-    */
-      function isExpanded();
-   /** --- void setIsExpanded ---
-    * Set whether the object has been marked as expanded. (in editor)
-    * @param state True if the object is to be marked expanded; false if not.
-    */
-      function setIsExpanded( bool state=true );
    /** --- const char* getFilename ---
     * Returns the filename the object is attached to.
     * @return The name of the file the object is associated with; usually the file the object was loaded from.
@@ -121,17 +93,6 @@ class  SimObject {
     * @param value If true, the object will be included in saves; if false, it will be excluded.
     */
       function setCanSave( bool value=true );
-   /** --- bool isEditorOnly ---
-    * Return true if the object is only used by the editor.
-    * @return True if this object exists only for the sake of editing.
-    * @return bool
-    */
-      function isEditorOnly();
-   /** --- void setEditorOnly ---
-    * Set/clear the editor-only flag on this object.
-    * @param value If true, the object is marked as existing only for the editor.
-    */
-      function setEditorOnly( bool value=true );
    /** --- bool isNameChangeAllowed ---
     * Get whether this object may be renamed.
     * @return True if this object can be renamed; false otherwise.
@@ -155,17 +116,7 @@ class  SimObject {
     * @return SimObject*
     */
       function deepClone();
-   /** --- void setLocked ---
-    * Lock/unlock the object in the editor.
-    * @param value If true, the object will be locked; if false, the object will be unlocked.
-    */
-      function setLocked( bool value=true );
-   /** --- void setHidden ---
-    * Hide/unhide the object.
-    * @param value If true, the object will be hidden; if false, the object will be unhidden.
-    */
-      function setHidden( bool value=true );
-   /** --- ArrayObject* getMethods ---
+   /** --- KeyValueStringTable* getMethods ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - Minimum number of arguments.
@@ -174,17 +125,17 @@ class  SimObject {
     * - Full script file path (if script method).
     * - Line number of method definition in script (if script method).
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
       function getMethods();
-   /** --- ArrayObject* getMethodSigs ---
+   /** --- KeyValueStringTable* getMethodSigs ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - method prototype string.
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
       function getMethodSigs( bool commands=false );
    /** --- void dump ---
@@ -192,14 +143,14 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dump( bool detailed=false );
-   /** --- bool save ---
+   /** --- bool Save ---
     * Save out the object to the given file.
     * @param fileName The name of the file to save to.@param selectedOnly If true, only objects marked as selected will be saved out.
     * @param preAppendString Text which will be preprended directly to the object serialization.
     * @param True on success, false on failure.
     * @return bool
     */
-      function save( string fileName, bool selectedOnly=false, string preAppendString="" );
+      function Save( string fileName, bool selectedOnly=false, string preAppendString="" );
    /** --- void setName ---
     * Set the global name of the object.
     * @param newName The new global name to assign to the object.
@@ -242,7 +193,7 @@ class  SimObject {
     * @return bool
     */
       function setFieldValue( string fieldName, string value, int index=-1 );
-   /** --- bool addTypeField ---
+   /** --- bool addField ---
     * Set the value and console type of the given field on this object.
     * NOTE: this cant be used with arrays like setFieldValue@param fieldName The name of the field to assign to.  If it includes an array index, the index will be parsed out.
     * @param type The name of the console type.
@@ -250,7 +201,7 @@ class  SimObject {
     * @return True.
     * @return bool
     */
-      function addTypeField( string fieldName, string type, string value );
+      function addField( string fieldName, string type, string value );
    /** --- const char* getFieldType ---
     * Get the console type code of the given field.
     * @return The numeric type code for the underlying console type of the given field.
@@ -359,10 +310,10 @@ class  SimObject {
     * @return const char*
     */
       function getField( int index );
-   /** --- ArrayObject* getDebugInfo ---
+   /** --- KeyValueStringTable* getDebugInfo ---
     * Return some behind-the-scenes information on the object.
-    * @return An ArrayObject filled with internal information about the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable filled with internal information about the object.
+    * @return KeyValueStringTable*
     */
       function getDebugInfo();
    /** --- void dumpFields ---
@@ -375,22 +326,18 @@ class  SimObject {
     * @param detailed Whether to print detailed information about members.
     */
       function dumpMethods( bool detailed=false );
+   /** --- ConsoleValue getPtr ---
+    * return a Console Value with the object pointer
+    * Warning: Handle with care, when object is deleted it becomes a dangling pointer!
+    * @return ConsoleValue
+    */
+      function getPtr();
    // --- Group: Ungrouped ---
    /*!
    Optional global name of this object.
    
     */
    string name;
-   /*!
-   Optional Name of object to inherit from as a parent.
-   
-    */
-   string inheritFrom;
-   /*!
-   Prototype Methods
-   
-    */
-   bool Prototype;
    // --- Group: Object ---
    /*!
    Optional name that may be used to lookup this object within a SimSet.
@@ -412,22 +359,6 @@ class  SimObject {
    
     */
    string superClass;
-   /*!
-   Script class of object.
-   
-    */
-   string className;
-   // --- Group: Editing ---
-   /*!
-   Whether the object is visible.
-   
-    */
-   bool hidden;
-   /*!
-   Whether the object can be edited.
-   
-    */
-   bool locked;
    // --- Group: Persistence ---
    /*!
    Whether the object can be saved out. If false, the object is purely transient in nature.
@@ -445,176 +376,59 @@ class  SimObject {
     */
    pid persistentId;
 };
-class  SpriteBaseObject : public SimObject {
+class  FileDialogObject : public SimObject {
   public:
-   /** --- void CenterCenterPoint ---
-    * center the centerPoint inside the dstRect
+   /** --- void init ---
+    * set path and filter of FileDialog filer are TAB separated extension
     */
-      function CenterCenterPoint();
-   /** --- void colorFromHSV ---
-    * Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
+      function init( string path, string filterTabSep );
+   /** --- void setLoadMode ---
+    * set save mode fileName, fileExt, caption  and filter of FileDialog filer are TAB separated extension like .wav TAB .ogg
     */
-      function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-   Rect on Texture.
-   
+      function setLoadMode( string fileName, string caption, string filterTabSep );
+   /** --- void setSaveMode ---
+    * set save mode fileName, fileExt, caption  and filter of FileDialog filer are TAB separated extension like .wav TAB .ogg
     */
-   RectF srcRect;
-   /*!
+      function setSaveMode( string fileName, string fileExt, string caption, string filterTabSep );
+   /** --- void Reset ---
+    * reset current settings - when set to save for example
     */
-   float srcX;
-   /*!
-    */
-   float srcY;
-   /*!
-    */
-   float srcWidth;
-   /*!
-    */
-   float srcHeight;
-   /*!
-   Rect on Render Target.
-   
-    */
-   RectF dstRect;
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float width;
-   /*!
-    */
-   float height;
-   /*!
-   Rotation Angle on Render Target (degree)
-   
-    */
-   float angle;
-   /*!
-   The Centerpoit of the Rotation - when angle is set.
-   
-    */
-   Point2F centerPoint;
-   /*!
-   Flip mode on Render Target 0..3, see also SDL_FlipMode
-   
-    */
-   int flip;
-   /*!
-   Color in Byte representation default WHITE = 255 255 255 255
-   
-    */
-   Color color;
-   /*!
-    */
-   char r;
-   /*!
-    */
-   char g;
-   /*!
-    */
-   char b;
-   /*!
-    */
-   char a;
-   /*!
-   Flag for Rendering with SpriteGroup or manually checked.
-   
-    */
-   bool visible;
-   /*!
-   Translated rect when using camera translate
-   
-    */
-   RectF ScreenRect;
-   /*!
-   Translated point when using camera translate
-   
-    */
-   Point2F ScreenCenterPoint;
-};
-class  SpriteObject : public SpriteBaseObject {
-  public:
-   /** --- Point2F getCenter2F ---
-    * get the center point
-    * @return Point2F
-    */
-      function getCenter2F();
+      function Reset();
    /** --- bool Draw ---
-    * Draw the Texture
+    * Draw the Filedialog, return true on action
+    * You can check saveMode is set and save the selectedFileName
+    * if selectedExt is empty you can append it.
     * @return bool
     */
-      function Draw( uint camera2DObjectId=0 );
-   /** --- void moveLinear ---
-    * Move Linear by velocity
+      function Draw();
+   /** --- const char * getSelectedFile ---
+    * get the selected file
+    * @return const char *
     */
-      function moveLinear( float dt=-1.f );
-   /** --- void moveGravity ---
-    * Move with gravity acceleration default: 0,9.81
+      function getSelectedFile();
+   /** --- const char * getSelectedExt ---
+    * get the selected file extension
+    * @return const char *
     */
-      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float dt=-1.f );
-   /** --- void moveOrbital ---
-    * Orbital Movement around ankerPoint
-    */
-      function moveOrbital( Point2F ankerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f, float dt=-1.f );
-   /** --- bool solveCollideLine ---
-    * check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)
+      function getSelectedExt();
+   /** --- bool getCancelPressed ---
+    * the user pressed cancel?
     * @return bool
     */
-      function solveCollideLine( RectF linePoints, float bounceStrength=0.2f );
-   /** --- bool solveCollideRect ---
-    * Check collide and move out
+      function getCancelPressed();
+   /** --- bool IsSaveMode ---
+    * save mode or open mode
     * @return bool
     */
-      function solveCollideRect( RectF otherRect, bool stopMovement=false );
+      function IsSaveMode();
+   /** --- const char * getSaveExt ---
+    * get the save mode file extension
+    * @return const char *
+    */
+      function getSaveExt();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
-   /*!
-   velocity as point see also veloX veloY
-   
-    */
-   Point2F velocity;
-   /*!
-   X velocity
-   
-    */
-   float veloX;
-   /*!
-   Y velocity
-   
-    */
-   float veloY;
-   /*!
-   Layer of the Sprite. 
-   
-    */
-   uint layer;
-   /*!
-   SDL_BLENDMODE_ overwrite the Texture blendmode
-default SDL_BLENDMODE_INVALID => not overwritten
-   
-    */
-   uint blendMode;
-   /*!
-   Id of the Texture Object. Must be set after loading from file. The id is not persistent!
-   
-    */
-   uint textureObjectId;
-   /*!
-   optional Texturename
-   
-    */
-   string textureName;
 };
 /*!
 @brief A collection of SimObjects.
@@ -750,9 +564,46 @@ class  SimSet : public SimObject {
     * @return bool
     */
       function acceptsAsChild( SimObject obj );
+   /** --- S32 size ---
+    * Get the number of objects contained in the set.
+    * @return The number of objects contained in the set.
+    * @return S32
+    */
+      function size();
+   /** --- S32 last ---
+    * Get the last object in the set.
+    * @return S32
+    */
+      function last();
+   /** --- S32 first ---
+    * Get the first object in the set.
+    * @return S32
+    */
+      function first();
+   /** --- S32 at ---
+    * Get the object ID at the specified index.
+    * @return The object ID, or 0 if index is out of bounds.
+    * @return S32
+    */
+      function at( int index );
+   /** --- void erase ---
+    * Remove the object at the specified index from the set.
+    */
+      function erase( int index );
+   /** --- void push_back ---
+    * push a object (ID!)to the end of the list
+    */
+      function push_back( int SimObjectId );
+   /** --- void insert ---
+    * insert a object (ID!)to the index of the list
+    */
+      function insert( int position, int SimObjectId );
+   /** --- void pop_front ---
+    * pop the first object
+    */
+      function pop_front();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -792,24 +643,23 @@ class  SimGroup : public SimSet {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 class  TextureObject : public SimGroup {
   public:
-   /** --- bool load ---
+   /** --- bool Load ---
     * Load a Texture
     * @return bool
     */
-      function load( string fileName );
-   /** --- Point2I getSize ---
+      function Load( string fileName );
+   /** --- ConsoleVector getSize ---
     * get the width and height of the loaded texture
-    * @return Point2I
+    * @return ConsoleVector
     */
       function getSize();
-   /** --- RectF getAtlasRect ---
+   /** --- ConsoleVector getAtlasRect ---
     * get the rectangle on a atlas texture for a given index
-    * @return RectF
+    * @return ConsoleVector
     */
       function getAtlasRect( int colCount, int rowCount, int index );
    /** --- bool DrawRotatedSrcDstRect ---
@@ -844,7 +694,6 @@ class  TextureObject : public SimGroup {
       function SaveImage( string fileName, bool asPNG=true );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
     */
@@ -852,62 +701,6 @@ class  TextureObject : public SimGroup {
    /*!
     */
    uint blendMode;
-};
-class  Camera2DObject : public SimObject {
-  public:
-   /** --- void Begin ---
-    * Refresh the Center position. Must be called on init and when screensize is changed
-    * This is called on add. If you do not changes the screen size you do not need to call it at all.
-    */
-      function Begin();
-   /** --- void Reset ---
-    * Refresh the position and Reset the cam to center postion and zoom 1
-    */
-      function Reset();
-   /** --- Point2F GetMousePosition ---
-    * Get the Mouse position in world Coordinates
-    * @return Point2F
-    */
-      function GetMousePosition();
-   /** --- Point2F ScreenToWorld ---
-    * get the world position by a screen position
-    * @return Point2F
-    */
-      function ScreenToWorld( Point2F position );
-   /** --- bool GetInsideSceen ---
-    * Check is a rect is inside the screen (frustum culling)
-    * @return bool
-    */
-      function GetInsideSceen( RectF rect );
-   /** --- RectF TranslateWorldRect ---
-    * Translate a world rect to screen / render rect 
-    * @return RectF
-    */
-      function TranslateWorldRect( RectF rect );
-   /** --- Point2F TranslateCenterPoint ---
-    * Translate a world rect to screen / render rect 
-    * @return Point2F
-    */
-      function TranslateCenterPoint( Point2F point );
-   /** --- bool TranslateSpriteBaseObject ---
-    * Translate to screenRect and screenCenterPoint of a SpriteBaseObject
-    * return false if out of view.
-    * @return bool
-    */
-      function TranslateSpriteBaseObject( int spriteBaseObjectId );
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-   /*!
-    */
-   float x;
-   /*!
-    */
-   float y;
-   /*!
-    */
-   float zoom;
 };
 class  SpriteGroup : public SimGroup {
   public:
@@ -927,8 +720,176 @@ class  SpriteGroup : public SimGroup {
       function drawAtlasBatch( int texObjectID, int camera2DObjectId=0 );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
+};
+class  SpriteBaseObject : public SimObject {
+  public:
+   /** --- void CenterCenterPoint ---
+    * center the centerPoint inside the dstRect
+    */
+      function CenterCenterPoint();
+   /** --- void colorFromHSV ---
+    * Set the color from hue(0..359), sat (0..1), value(0..1). The Rainbow function ;)
+    */
+      function colorFromHSV( int hue, float saturation, float value, U8 alpha=255 );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+   Rect on Texture.
+   
+    */
+   TypeVector srcRect;
+   /*!
+    */
+   float srcX;
+   /*!
+    */
+   float srcY;
+   /*!
+    */
+   float srcWidth;
+   /*!
+    */
+   float srcHeight;
+   /*!
+   Rect on Render Target.
+   
+    */
+   TypeVector dstRect;
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float width;
+   /*!
+    */
+   float height;
+   /*!
+   Rotation Angle on Render Target (degree)
+   
+    */
+   float angle;
+   /*!
+   The Centerpoit of the Rotation - when angle is set.
+   
+    */
+   TypeVector centerPoint;
+   /*!
+   Flip mode on Render Target 0..3, see also SDL_FlipMode
+   
+    */
+   int flip;
+   /*!
+   Color in Byte representation default WHITE = 255 255 255 255
+   
+    */
+   TypeColor color;
+   /*!
+    */
+   char r;
+   /*!
+    */
+   char g;
+   /*!
+    */
+   char b;
+   /*!
+    */
+   char a;
+   /*!
+   Flag for Rendering with SpriteGroup or manually checked.
+   
+    */
+   bool visible;
+   /*!
+   Translated rect when using camera translate
+   
+    */
+   TypeVector ScreenRect;
+   /*!
+   Translated point when using camera translate
+   
+    */
+   TypeVector ScreenCenterPoint;
+};
+class  SpriteObject : public SpriteBaseObject {
+  public:
+   /** --- ConsoleVector getCenter2F ---
+    * get the center point
+    * @return ConsoleVector
+    */
+      function getCenter2F();
+   /** --- bool Draw ---
+    * Draw the Texture
+    * @return bool
+    */
+      function Draw( uint camera2DObjectId=0 );
+   /** --- void moveLinear ---
+    * Move Linear by velocity
+    */
+      function moveLinear( float dt=-1.f );
+   /** --- void moveGravity ---
+    * Move with gravity acceleration default: 0,9.81
+    */
+      function moveGravity( float gravityX=0.f, float gravityY=9.81f, float dt=-1.f );
+   /** --- void moveOrbital ---
+    * Orbital Movement around ankerPoint
+    */
+      function moveOrbital( Point2F ankerPoint, float gravity=10.f, float softening=150.f, float maxSpeed=350.f, float dt=-1.f );
+   /** --- bool solveCollideLine ---
+    * check collision agains a line .. using Points as parameter x1,x2,y1,y2 (packed in a RectF)
+    * @return bool
+    */
+      function solveCollideLine( RectF linePoints, float bounceStrength=0.2f );
+   /** --- bool solveCollideRect ---
+    * Check collide and move out
+    * @return bool
+    */
+      function solveCollideRect( RectF otherRect, bool stopMovement=false );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+   velocity as point see also veloX veloY
+   
+    */
+   TypePoint2F velocity;
+   /*!
+   X velocity
+   
+    */
+   float veloX;
+   /*!
+   Y velocity
+   
+    */
+   float veloY;
+   /*!
+   Layer of the Sprite. 
+   
+    */
+   uint layer;
+   /*!
+   SDL_BLENDMODE_ overwrite the Texture blendmode
+default SDL_BLENDMODE_INVALID => not overwritten
+   
+    */
+   uint blendMode;
+   /*!
+   Id of the Texture Object. Must be set after loading from file. The id is not persistent!
+   
+    */
+   uint textureObjectId;
+   /*!
+   optional Texturename
+   
+    */
+   string textureName;
 };
 /*!
 @brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.
@@ -963,7 +924,6 @@ class  ScriptGroup : public SimGroup {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -985,18 +945,16 @@ class  ScriptObject : public SimObject {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 class  AtlasEntryObject : public SimObject {
   public:
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
     */
-   RectF rect;
+   TypeRectF rect;
    /*!
     */
    float x;
@@ -1010,6 +968,24 @@ class  AtlasEntryObject : public SimObject {
     */
    float height;
 };
+class  Object : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  Group : public SimGroup {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  SDLEventData : public SimObject {
+  public:
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
 class  SettingsObject : public SimObject {
   public:
    /** --- void sync ---
@@ -1018,11 +994,10 @@ class  SettingsObject : public SimObject {
       function sync();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
     */
-   Point2I ScreenSize;
+   TypePoint2I ScreenSize;
    /*!
     */
    int FpsLimit;
@@ -1067,7 +1042,62 @@ class  SettingsObject : public SimObject {
    int sdlWindowFlagsOverwrite;
    /*!
     */
-   Color clearColor;
+   TypeColor clearColor;
+};
+class  Camera2DObject : public SimObject {
+  public:
+   /** --- void Begin ---
+    * Refresh the Center position. Must be called on init and when screensize is changed
+    * This is called on add. If you do not changes the screen size you do not need to call it at all.
+    */
+      function Begin();
+   /** --- void Reset ---
+    * Refresh the position and Reset the cam to center postion and zoom 1
+    */
+      function Reset();
+   /** --- Point2F GetMousePosition ---
+    * Get the Mouse position in world Coordinates
+    * @return Point2F
+    */
+      function GetMousePosition();
+   /** --- Point2F ScreenToWorld ---
+    * get the world position by a screen position
+    * @return Point2F
+    */
+      function ScreenToWorld( Point2F position );
+   /** --- bool GetInsideSceen ---
+    * Check is a rect is inside the screen (frustum culling)
+    * @return bool
+    */
+      function GetInsideSceen( RectF rect );
+   /** --- ConsoleVector TranslateWorldRect ---
+    * Translate a world rect to screen / render rect 
+    * @return ConsoleVector
+    */
+      function TranslateWorldRect( RectF rect );
+   /** --- ConsoleVector TranslateCenterPoint ---
+    * Translate a world rect to screen / render rect 
+    * @return ConsoleVector
+    */
+      function TranslateCenterPoint( Point2F point );
+   /** --- bool TranslateSpriteBaseObject ---
+    * Translate to screenRect and screenCenterPoint of a SpriteBaseObject
+    * return false if out of view.
+    * @return bool
+    */
+      function TranslateSpriteBaseObject( SpriteBaseObject spriteObj );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+   /*!
+    */
+   float x;
+   /*!
+    */
+   float y;
+   /*!
+    */
+   float zoom;
 };
 class  SoundObject : public SimObject {
   public:
@@ -1083,7 +1113,6 @@ class  SoundObject : public SimObject {
       function stop();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
    /*!
     */
@@ -1094,349 +1123,6 @@ class  SoundObject : public SimObject {
    /*!
     */
    bool loop;
-};
-class  FileDialogObject : public SimObject {
-  public:
-   /** --- void Init ---
-    * set path and filter of FileDialog filer are TAB separated extension
-    */
-      function Init( string path, string filterTabSep );
-   /** --- void setLoadMode ---
-    * set save mode fileName, fileExt, caption  and filter of FileDialog filer are TAB separated extension like .wav TAB .ogg
-    */
-      function setLoadMode( string fileName, string caption, string filterTabSep );
-   /** --- void setSaveMode ---
-    * set save mode fileName, fileExt, caption  and filter of FileDialog filer are TAB separated extension like .wav TAB .ogg
-    */
-      function setSaveMode( string fileName, string fileExt, string caption, string filterTabSep );
-   /** --- void Reset ---
-    * reset current settings - when set to save for example
-    */
-      function Reset();
-   /** --- bool Draw ---
-    * Draw the Filedialog, return true on action
-    * You can check saveMode is set and save the selectedFileName
-    * if selectedExt is empty you can append it.
-    * @return bool
-    */
-      function Draw();
-   /** --- const char * getSelectedFile ---
-    * get the selected file
-    * @return const char *
-    */
-      function getSelectedFile();
-   /** --- const char * getSelectedExt ---
-    * get the selected file extension
-    * @return const char *
-    */
-      function getSelectedExt();
-   /** --- bool getCancelPressed ---
-    * the user pressed cancel?
-    * @return bool
-    */
-      function getCancelPressed();
-   /** --- bool IsSaveMode ---
-    * save mode or open mode
-    * @return bool
-    */
-      function IsSaveMode();
-   /** --- const char * getSaveExt ---
-    * get the save mode file extension
-    * @return const char *
-    */
-      function getSaveExt();
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
-};
-/*!
-@brief Data structure for storing indexed sequences of key/value pairs.
-This is a powerful array class providing PHP style arrays in TorqueScript.
-The following features are supported:<ul>
-<li>array pointers: this allows you to move forwards or backwards through the array as if it was a list, including jumping to the start or end.</li>
-<li>sorting: the array can be sorted in either alphabetic or numeric mode, on the key or the value, and in ascending or descending order</li>
-<li>add/remove elements: elements can be pushed/popped from the start or end of the array, or can be inserted/erased from anywhere in the middle</li>
-<li>removal of duplicates: remove duplicate keys or duplicate values</li>
-<li>searching: search the array and return the index of a particular key or value</li>
-<li>counting: count the number of instaces of a particular value or key in the array, as well as the total number of elements</li>
-<li>advanced features: array append, array crop and array duplicate</li>
-</ul>
-Array element keys and values can be strings or numbers
- */
-class  ArrayObject : public SimObject {
-  public:
-   /** --- S32 getIndexFromValue ---
-    * Search the array from the current position for the element @param value Array value to search for
-    * @return Index of the first element found, or -1 if none
-    * @return S32
-    */
-      function getIndexFromValue( string value );
-   /** --- S32 getIndexFromKey ---
-    * Search the array from the current position for the key @param value Array key to search for
-    * @return Index of the first element found, or -1 if none
-    * @return S32
-    */
-      function getIndexFromKey( string key );
-   /** --- const char* getValueFromKey ---
-    * Search the array from the current position for the Key @param value Array key to search for
-    * @return Value of the first element found, or -1 if none
-    * @return const char*
-    */
-      function getValueFromKey( string key );
-   /** --- const char* getKeyFromValue ---
-    * Search the array from the current position for the Value @param value Array key to search for
-    * @return Key of the first element found, or -1 if none
-    * @return const char*
-    */
-      function getKeyFromValue( string key );
-   /** --- const char* getValue ---
-    * Get the value of the array element at the submitted index.
-    * @param index 0-based index of the array element to get
-    * @return The value of the array element at the specified index, or "" if the index is out of range
-    * @return const char*
-    */
-      function getValue( int index );
-   /** --- const char* getKey ---
-    * Get the key of the array element at the submitted index.
-    * @param index 0-based index of the array element to get
-    * @return The key associated with the array element at the specified index, or "" if the index is out of range
-    * @return const char*
-    */
-      function getKey( int index );
-   /** --- void setKey ---
-    * Set the key at the given index.
-    * @param key New key value
-    * @param index 0-based index of the array element to update
-    */
-      function setKey( string key, int index );
-   /** --- void setValue ---
-    * Set the value at the given index.
-    * @param value New array element value
-    * @param index 0-based index of the array element to update
-    */
-      function setValue( string value, int index );
-   /** --- S32 count ---
-    * Get the number of elements in the array.
-    * @return S32
-    */
-      function count();
-   /** --- S32 countValue ---
-    * Get the number of times a particular value is found in the array.
-    * @param value Array element value to count
-    * @return S32
-    */
-      function countValue( string value );
-   /** --- S32 countKey ---
-    * Get the number of times a particular key is found in the array.
-    * @param key Key value to count
-    * @return S32
-    */
-      function countKey( string key );
-   /** --- void add ---
-    * Adds a new element to the end of an array (same as push_back()).
-    * @param key Key for the new element
-    * @param value Value for the new element
-    */
-      function add( string key, string value="" );
-   /** --- void push_back ---
-    * Adds a new element to the end of an array.
-    * @param key Key for the new element
-    * @param value Value for the new element
-    */
-      function push_back( string key, string value="" );
-   /** --- void push_front ---
-    * Adds a new element to the front of an array
-    */
-      function push_front( string key, string value="" );
-   /** --- void insert ---
-    * Adds a new element to a specified position in the array.
-    * - @a index = 0 will insert an element at the start of the array (same as push_front())
-    * - @a index = %array.count() will insert an element at the end of the array (same as push_back())
-    * @param key Key for the new element
-    * @param value Value for the new element
-    * @param index 0-based index at which to insert the new element
-    */
-      function insert( string key, string value, int index );
-   /** --- void pop_back ---
-    * Removes the last element from the array
-    */
-      function pop_back();
-   /** --- void pop_front ---
-    * Removes the first element from the array
-    */
-      function pop_front();
-   /** --- void erase ---
-    * Removes an element at a specific position from the array.
-    * @param index 0-based index of the element to remove
-    */
-      function erase( int index );
-   /** --- void empty ---
-    * Emptys all elements from an array
-    */
-      function empty();
-   /** --- void uniqueValue ---
-    * Removes any elements that have duplicated values (leaving the first instance)
-    */
-      function uniqueValue();
-   /** --- void uniqueKey ---
-    * Removes any elements that have duplicated keys (leaving the first instance)
-    */
-      function uniqueKey();
-   /** --- void uniquePair ---
-    * Removes any elements that have duplicated key and value pairs (leaving the first instance)
-    */
-      function uniquePair();
-   /** --- bool duplicate ---
-    * Alters array into an exact duplicate of the target array.
-    * @param target ArrayObject to duplicate
-    * @return bool
-    */
-      function duplicate( ArrayObject target );
-   /** --- bool crop ---
-    * Removes elements with matching keys from array.
-    * @param target ArrayObject containing keys to remove from this array
-    * @return bool
-    */
-      function crop( ArrayObject target );
-   /** --- bool append ---
-    * Appends the target array to the array object.
-    * @param target ArrayObject to append to the end of this array
-    * @return bool
-    */
-      function append( ArrayObject target );
-   /** --- void sort ---
-    * Alpha sorts the array by value
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sort( bool ascending=false );
-   /** --- void sorta ---
-    * Alpha sorts the array by value in ascending order
-    */
-      function sorta();
-   /** --- void sortd ---
-    * Alpha sorts the array by value in descending order
-    */
-      function sortd();
-   /** --- void sortk ---
-    * Alpha sorts the array by key
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortk( bool ascending=false );
-   /** --- void sortka ---
-    * Alpha sorts the array by key in ascending order
-    */
-      function sortka();
-   /** --- void sortkd ---
-    * Alpha sorts the array by key in descending order
-    */
-      function sortkd();
-   /** --- void sortn ---
-    * Numerically sorts the array by value
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortn( bool ascending=false );
-   /** --- void sortna ---
-    * Numerically sorts the array by value in ascending order
-    */
-      function sortna();
-   /** --- void sortnd ---
-    * Numerically sorts the array by value in descending order
-    */
-      function sortnd();
-   /** --- void sortnk ---
-    * Numerically sorts the array by key
-    * @param ascending [optional] True for ascending sort, false for descending sort
-    */
-      function sortnk( bool ascending=false );
-   /** --- void sortnka ---
-    * Numerical sorts the array by key in ascending order
-    */
-      function sortnka();
-   /** --- void sortnkd ---
-    * Numerical sorts the array by key in descending order
-    */
-      function sortnkd();
-   /** --- void sortf ---
-    * Sorts the array by value in ascending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.
-    * @tsexample
-    * function mySortCallback(%a, %b)
-    * {
-    *    return strcmp( %a.name, %b.name );
-    * }
-    * %array.sortf( "mySortCallback" );
-    * @endtsexample
-    */
-      function sortf( string functionName );
-   /** --- void sortfk ---
-    * Sorts the array by key in ascending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfk( string functionName );
-   /** --- void sortfd ---
-    * Sorts the array by value in descending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfd( string functionName );
-   /** --- void sortfkd ---
-    * Sorts the array by key in descending order using the given callback function.
-    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
-    */
-      function sortfkd( string functionName );
-   /** --- S32 moveFirst ---
-    * Moves array pointer to start of array
-    * @return Returns the new array pointer
-    * @return S32
-    */
-      function moveFirst();
-   /** --- S32 moveLast ---
-    * Moves array pointer to end of array
-    * @return Returns the new array pointer
-    * @return S32
-    */
-      function moveLast();
-   /** --- S32 moveNext ---
-    * Moves array pointer to next position
-    * @return Returns the new array pointer, or -1 if already at the end
-    * @return S32
-    */
-      function moveNext();
-   /** --- S32 movePrev ---
-    * Moves array pointer to prev position
-    * @return Returns the new array pointer, or -1 if already at the start
-    * @return S32
-    */
-      function movePrev();
-   /** --- S32 getCurrent ---
-    * Gets the current pointer index
-    * @return S32
-    */
-      function getCurrent();
-   /** --- void setCurrent ---
-    * Sets the current pointer index.
-    * @param index New 0-based pointer index
-    */
-      function setCurrent( int index );
-   /** --- void echo ---
-    * Echos the array contents to the console
-    */
-      function echo();
-   /*!
-   Makes the keys and values case-sensitive.
-By default, comparison of key and value strings will be case-insensitive.
-   
-    */
-   bool caseSensitive;
-   /*!
-   Helper field which allows you to add new key['keyname'] = value pairs.
-   
-    */
-   caseString key;
-   // --- Group: Ungrouped ---
-   // --- Group: Object ---
-   // --- Group: Editing ---
-   // --- Group: Persistence ---
 };
 /*!
 @brief A ScriptObject that responds to tick and frame events.
@@ -1477,7 +1163,6 @@ class  ScriptTickObject : public ScriptObject {
    bool callOnAdvanceTime;
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1493,7 +1178,6 @@ class  SimPersistSet : public SimSet {
       function resolvePersistentIds();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1678,7 +1362,6 @@ class  FileObject : public SimObject {
       function writeObject( string simName, string objName="" );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1926,7 +1609,6 @@ class  StreamObject : public SimObject {
       function copyFrom( SimObject other );
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -1985,7 +1667,6 @@ class  FileStreamObject : public StreamObject {
       function close();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 /*!
@@ -2036,22 +1717,21 @@ function Message::onRemove(%this)
       function freeReference();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
 };
 class  PointStorageObject : public SimObject {
   public:
-   /** --- String getPosVec ---
-    * get the position as Vector (String)
-    * @return String
+   /** --- ConsoleVector getPosVec ---
+    * get the position as Vector 
+    * @return ConsoleVector
     */
       function getPosVec();
    /** --- void setPosVec ---
     * set the position by Vector (String)
     */
-      function setPosVec( String strVector );
+      function setPosVec( ConsoleVector vector );
    /** --- void setPos ---
-    * Set position by method 
+    * Set position by single values
     */
       function setPos( float x, float y, float z=0.f, float w=0.f );
    /** --- void normalizeXZ ---
@@ -2068,66 +1748,66 @@ class  PointStorageObject : public SimObject {
     * @return bool
     */
       function setPoint( uint index, float x, float y, float z=0.f, float w=0.f );
-   /** --- F32 getPointX ---
-    * get the point.x from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointX( uint index );
-   /** --- F32 getPointY ---
-    * get the point.x from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointY( uint index );
-   /** --- F32 getPointZ ---
-    * get the point.z from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointZ( uint index );
-   /** --- F32 getPointW ---
-    * get the point.w from the point storage at index as Vector (String)
-    * @return F32
-    */
-      function getPointW( uint index );
-   /** --- bool setPointX ---
-    * set the point.x from the point storage at index as Vector (String)
+   /** --- bool setPoint3 ---
+    * Set a  point at index in the point storage.
     * @return bool
     */
-      function setPointX( uint index, float value );
-   /** --- bool setPointY ---
-    * set the point.y from the point storage at index as Vector (String)
+      function setPoint3( uint index, float x, float y, float z );
+   /** --- bool setPoint2 ---
+    * Set a  point at index in the point storage.
     * @return bool
     */
-      function setPointY( uint index, float value );
-   /** --- bool setPointZ ---
-    * set the point.z from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointZ( uint index, float value );
-   /** --- bool setPointW ---
-    * set the point.z from the point storage at index as Vector (String)
-    * @return bool
-    */
-      function setPointW( uint index, float value );
-   /** --- String getPointVec ---
+      function setPoint2( uint index, float x, float y );
+   /** --- ConsoleVector getPointVec ---
     * get the point from the point storage at index as Vector (String)
-    * @return String
+    * @return ConsoleVector
     */
       function getPointVec( uint index );
    /** --- bool setPointVec ---
     * set the point in the Point Storage at index by Vector (String)
     * @return bool
     */
-      function setPointVec( uint index, String strVector );
-   /** --- String getPoint2Vec ---
-    * get the point xy from the point storage at index as Vector (String)
-    * @return String
+      function setPointVec( uint index, ConsoleVector vec4 );
+   /** --- F32 getPointX ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
     */
-      function getPoint2Vec( uint index );
-   /** --- bool setPoint2Vec ---
-    * set the point xy in the Point Storage at index by Vector (String)
+      function getPointX( uint index );
+   /** --- F32 getPointY ---
+    * get the point.points[0] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointY( uint index );
+   /** --- F32 getPointZ ---
+    * get the point.points[2] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointZ( uint index );
+   /** --- F32 getPointW ---
+    * get the point.points[3] from the point storage at index as Vector (String)
+    * @return F32
+    */
+      function getPointW( uint index );
+   /** --- bool setPointX ---
+    * set the point.points[0] from the point storage at index as Vector (String)
     * @return bool
     */
-      function setPoint2Vec( uint index, String strVector );
+      function setPointX( uint index, float value );
+   /** --- bool setPointY ---
+    * set the point.points[1] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointY( uint index, float value );
+   /** --- bool setPointZ ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointZ( uint index, float value );
+   /** --- bool setPointW ---
+    * set the point.points[2] from the point storage at index as Vector (String)
+    * @return bool
+    */
+      function setPointW( uint index, float value );
    /** --- bool storePoint ---
     * store the current values x,y,z,w, to the point storage
     * @return bool
@@ -2138,20 +1818,48 @@ class  PointStorageObject : public SimObject {
     * @return bool
     */
       function fetchPoint( uint index );
-   /** --- bool applyMathOnPoints ---
-    * Apply a Math expression on point Storage.
-    * expected format: "x+5; y*2; z; w" separated by ';'
-    * this execute 4 statements. one for each field. abs (calls to fabs), acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, ln (calls to log), log (calls to log10 by default, see below), log10, pow, sin, sinh, sqrt, tan, tanh
-    * Random: randf(), randf1(5.0), randf2(1.0,2.0)
-    * Example ranomize all: sto.applyMathOnPoints("mrandf(),mrandf(),mrandf(),mrandf()");Special one parameter expression: 
-    *   normalizeXY => applyMathOnPoints("normalizeXY()");
+   /** --- SimObjectId mapFn ---
+    * Map a Lambda function to PointStorage. This can be used by stepFn or runFn
+    * The function must except a Variable (TypeVector) and return a Variable TypeVector
+    * this will be used to modify the Point Storage
+    * Custom param count is the count of the parameter you want to set.
+    * It will return the ID of the param Array if you set customParamCount
+    * Your custom params start at 2..1+customParamCount
+    * Max 32 custom params are allowed
+    * @return SimObjectId
+    */
+      function mapFn( ConsoleValue funcValue, uint customParamCount );
+   /** --- bool runFn ---
+    * run the mapped function
     * @return bool
     */
-      function applyMathOnPoints( String Expr, uint startIndex=0, uint endIndex=0 );
+      function runFn();
+   /** --- bool stepFn ---
+    * run the mapped function
+    * @return bool
+    */
+      function stepFn();
+   /** --- bool mapInjectFn ---
+    *  -------------------------  EXPERIMENTAL -------------------------------- 
+    * Map a Lambda function to PointStorage. This can be used by runInjectFn
+    * Fist paramter must be the %vec variable like fn(%vec, ...) 
+    * the vectorVariableName must be initialized and used for our ConsoleVector
+    * the lambda function does not need to return a value - if we have none the vectorVariable will be written back
+    * to update our data
+    * @return bool
+    */
+      function mapInjectFn( ConsoleValue funcValue );
+   /** --- bool runInjectFn ---
+    * Run injected Console function with parameters
+    * @return bool
+    */
+      function runInjectFn();
    // --- Group: Ungrouped ---
    // --- Group: Object ---
-   // --- Group: Editing ---
    // --- Group: Persistence ---
+   /*!
+    */
+   TypeVector point;
    /*!
     */
    float x;
@@ -2175,10 +1883,501 @@ class  PointStorageObject : public SimObject {
     */
    float height;
    /*!
+   alias for x
+   
+    */
+   float r;
+   /*!
+   alias for y
+   
+    */
+   float g;
+   /*!
+   alias for z
+   
+    */
+   float b;
+   /*!
+   alias for w
+   
+    */
+   float a;
+   /*!
    Set the storage size (how many points we can work with) Max:1000000.
    
     */
    uint storageSize;
+};
+class  NeuralNetObject : public SimObject {
+  public:
+   /** --- bool init ---
+    * initialize network
+    * @return bool
+    */
+      function init( int inputs, int hidden_layers, int hidden_neuros, int outputs );
+   /** --- bool Copy ---
+    * deep copy the of a other network
+    * @return bool
+    */
+      function Copy( uint parentObjID );
+   /** --- bool Load ---
+    * load network and check parameter to match the loaded data.
+    * @return bool
+    */
+      function Load( string filename, int inputs=0, int hidden_layers=0, int hidden_neuros=0, int outputs=0 );
+   /** --- bool Save ---
+    * Save a network to file
+    * @return bool
+    */
+      function Save( string filename );
+   /** --- bool WarmUP ---
+    * Run with empty input to warmup the network
+    * @return bool
+    */
+      function WarmUP();
+   /** --- bool Run ---
+    * Run with your input data and set output data
+    * @return bool
+    */
+      function Run();
+   /** --- bool Train ---
+    * Tain (Backpropagation) your network with your input data and output data
+    * @return bool
+    */
+      function Train( F64 learningRate );
+   /** --- bool Mutate ---
+    * Mutate (Evolutuion) modify the weight of your network
+    * @return bool
+    */
+      function Mutate( F64 mutationRate, F64 mutationAmount );
+   /** --- bool Crossover ---
+    * Crossover (Evolutuion) from 2 parents
+    * @return bool
+    */
+      function Crossover( uint parentAObjID, uint parentBObjID );
+   /** --- F64 getIn ---
+    * Get the input value at index
+    * @return F64
+    */
+      function getIn( int index );
+   /** --- bool setIn ---
+    * Set the input value at index
+    * @return bool
+    */
+      function setIn( int index, F64 value );
+   /** --- F64 getOut ---
+    * Get the output value at index
+    * @return F64
+    */
+      function getOut( int index );
+   /** --- bool setOut ---
+    * Set the output value at index
+    * @return bool
+    */
+      function setOut( int index, F64 value );
+   /** --- void setActivationHidden ---
+    * Sets the hidden layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationHidden( int type );
+   /** --- void setActivationOutput ---
+    * Sets the output layer activation type.
+    *  default/0: genann_act_sigmoid_cached, 1: genann_act_tanh, 2:genann_act_relu, 3: genann_act_linear
+    */
+      function setActivationOutput( int type );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  ConsoleLogObject : public SimObject {
+  public:
+      /*! Called when a log line is pushed
+Level: Normal=0, Warning=1, Error=2; Info=3; Debug=4 */
+      void onLog( string text, uint level );
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+class  Array : public SimObject {
+  public:
+   /** --- ConsoleValue at ---
+    * fetch a value at index
+    * @return ConsoleValue
+    */
+      function at( int index );
+   /** --- ConsoleValue first ---
+    * fetch first 
+    * @return ConsoleValue
+    */
+      function first();
+   /** --- ConsoleValue last ---
+    * fetch last 
+    * @return ConsoleValue
+    */
+      function last();
+   /** --- S32 size ---
+    * get the size
+    * @return S32
+    */
+      function size();
+   /** --- void clear ---
+    * clear the Vector
+    */
+      function clear();
+   /** --- void reserve ---
+    * reserve elements in the array
+    */
+      function reserve( uint size );
+   /** --- void fill ---
+    * fill the array with value
+    */
+      function fill( ConsoleValue value );
+   /** --- void push_back ---
+    * push back a value
+    */
+      function push_back( ConsoleValue value );
+   /** --- S32 fromString ---
+    * add values from a TAB or SPC speparated String
+    * @param doAdd true = add values, false = fill with this and clean before@return count of the added values
+    * @return S32
+    */
+      function fromString( string text, bool doAdd=true );
+   /** --- bool set ---
+    * set a value at index
+    * @return bool
+    */
+      function set( int index, ConsoleValue value );
+   /** --- bool insert ---
+    * insert a value at index
+    * @return bool
+    */
+      function insert( int position, ConsoleValue value );
+   /** --- bool erase ---
+    * @return bool
+    */
+      function erase( int position );
+   /** --- ConsoleValue pop_front ---
+    * pop the first and return the removed value
+    * @return ConsoleValue
+    */
+      function pop_front();
+   /** --- ConsoleValue pop_back ---
+    * pop the last and return the remove value
+    * @return ConsoleValue
+    */
+      function pop_back();
+   /** --- void toFields ---
+    * Copy Array to dynamic fields fieldnames start with _p
+    */
+      function toFields();
+   /** --- void fromFields ---
+    * fill Array from dynamic fields
+    * fieldnames start with _p and count is in _populate
+    * this is used by save automaticly
+    */
+      function fromFields( bool deleteFieldAfterAdd=false );
+   /** --- bool concat ---
+    * Concat (append) a other array to this one
+    * @param Array* other the other array
+    * @param bool deleteOther delete other object after merge
+    * @return bool !failed
+    * @return bool
+    */
+      function concat( Array other, bool deleteOther=false );
+   /** --- void list ---
+    * List the values
+    */
+      function list();
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
+};
+/*!
+@brief Data structure for storing indexed sequences of key/value pairs.
+This is a powerful array class providing PHP style arrays in TorqueScript.
+The following features are supported:<ul>
+<li>array pointers: this allows you to move forwards or backwards through the array as if it was a list, including jumping to the start or end.</li>
+<li>sorting: the array can be sorted in either alphabetic or numeric mode, on the key or the value, and in ascending or descending order</li>
+<li>add/remove elements: elements can be pushed/popped from the start or end of the array, or can be inserted/erased from anywhere in the middle</li>
+<li>removal of duplicates: remove duplicate keys or duplicate values</li>
+<li>searching: search the array and return the index of a particular key or value</li>
+<li>counting: count the number of instaces of a particular value or key in the array, as well as the total number of elements</li>
+<li>advanced features: array append, array crop and array duplicate</li>
+</ul>
+Array element keys and values can be strings or numbers
+ */
+class  KeyValueStringTable : public SimObject {
+  public:
+   /** --- S32 getIndexFromValue ---
+    * Search the array from the current position for the element @param value Array value to search for
+    * @return Index of the first element found, or -1 if none
+    * @return S32
+    */
+      function getIndexFromValue( string value );
+   /** --- S32 getIndexFromKey ---
+    * Search the array from the current position for the key @param value Array key to search for
+    * @return Index of the first element found, or -1 if none
+    * @return S32
+    */
+      function getIndexFromKey( string key );
+   /** --- const char* getValueFromKey ---
+    * Search the array from the current position for the Key @param value Array key to search for
+    * @return Value of the first element found, or -1 if none
+    * @return const char*
+    */
+      function getValueFromKey( string key );
+   /** --- const char* getKeyFromValue ---
+    * Search the array from the current position for the Value @param value Array key to search for
+    * @return Key of the first element found, or -1 if none
+    * @return const char*
+    */
+      function getKeyFromValue( string key );
+   /** --- const char* getValue ---
+    * Get the value of the array element at the submitted index.
+    * @param index 0-based index of the array element to get
+    * @return The value of the array element at the specified index, or "" if the index is out of range
+    * @return const char*
+    */
+      function getValue( int index );
+   /** --- const char* getKey ---
+    * Get the key of the array element at the submitted index.
+    * @param index 0-based index of the array element to get
+    * @return The key associated with the array element at the specified index, or "" if the index is out of range
+    * @return const char*
+    */
+      function getKey( int index );
+   /** --- void setKey ---
+    * Set the key at the given index.
+    * @param key New key value
+    * @param index 0-based index of the array element to update
+    */
+      function setKey( string key, int index );
+   /** --- void setValue ---
+    * Set the value at the given index.
+    * @param value New array element value
+    * @param index 0-based index of the array element to update
+    */
+      function setValue( string value, int index );
+   /** --- S32 count ---
+    * Get the number of elements in the array.
+    * @return S32
+    */
+      function count();
+   /** --- S32 countValue ---
+    * Get the number of times a particular value is found in the array.
+    * @param value Array element value to count
+    * @return S32
+    */
+      function countValue( string value );
+   /** --- S32 countKey ---
+    * Get the number of times a particular key is found in the array.
+    * @param key Key value to count
+    * @return S32
+    */
+      function countKey( string key );
+   /** --- void add ---
+    * Adds a new element to the end of an array (same as push_back()).
+    * @param key Key for the new element
+    * @param value Value for the new element
+    */
+      function add( string key, string value="" );
+   /** --- void push_back ---
+    * Adds a new element to the end of an array.
+    * @param key Key for the new element
+    * @param value Value for the new element
+    */
+      function push_back( string key, string value="" );
+   /** --- void push_front ---
+    * Adds a new element to the front of an array
+    */
+      function push_front( string key, string value="" );
+   /** --- void insert ---
+    * Adds a new element to a specified position in the array.
+    * - @a index = 0 will insert an element at the start of the array (same as push_front())
+    * - @a index = %array.count() will insert an element at the end of the array (same as push_back())
+    * @param key Key for the new element
+    * @param value Value for the new element
+    * @param index 0-based index at which to insert the new element
+    */
+      function insert( string key, string value, int index );
+   /** --- void pop_back ---
+    * Removes the last element from the array
+    */
+      function pop_back();
+   /** --- void pop_front ---
+    * Removes the first element from the array
+    */
+      function pop_front();
+   /** --- void erase ---
+    * Removes an element at a specific position from the array.
+    * @param index 0-based index of the element to remove
+    */
+      function erase( int index );
+   /** --- void empty ---
+    * Emptys all elements from an array
+    */
+      function empty();
+   /** --- void uniqueValue ---
+    * Removes any elements that have duplicated values (leaving the first instance)
+    */
+      function uniqueValue();
+   /** --- void uniqueKey ---
+    * Removes any elements that have duplicated keys (leaving the first instance)
+    */
+      function uniqueKey();
+   /** --- void uniquePair ---
+    * Removes any elements that have duplicated key and value pairs (leaving the first instance)
+    */
+      function uniquePair();
+   /** --- bool duplicate ---
+    * Alters array into an exact duplicate of the target array.
+    * @param target KeyValueStringTable to duplicate
+    * @return bool
+    */
+      function duplicate( KeyValueStringTable target );
+   /** --- bool crop ---
+    * Removes elements with matching keys from array.
+    * @param target KeyValueStringTable containing keys to remove from this array
+    * @return bool
+    */
+      function crop( KeyValueStringTable target );
+   /** --- bool append ---
+    * Appends the target array to the array object.
+    * @param target KeyValueStringTable to append to the end of this array
+    * @return bool
+    */
+      function append( KeyValueStringTable target );
+   /** --- void sort ---
+    * Alpha sorts the array by value
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sort( bool ascending=false );
+   /** --- void sorta ---
+    * Alpha sorts the array by value in ascending order
+    */
+      function sorta();
+   /** --- void sortd ---
+    * Alpha sorts the array by value in descending order
+    */
+      function sortd();
+   /** --- void sortk ---
+    * Alpha sorts the array by key
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortk( bool ascending=false );
+   /** --- void sortka ---
+    * Alpha sorts the array by key in ascending order
+    */
+      function sortka();
+   /** --- void sortkd ---
+    * Alpha sorts the array by key in descending order
+    */
+      function sortkd();
+   /** --- void sortn ---
+    * Numerically sorts the array by value
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortn( bool ascending=false );
+   /** --- void sortna ---
+    * Numerically sorts the array by value in ascending order
+    */
+      function sortna();
+   /** --- void sortnd ---
+    * Numerically sorts the array by value in descending order
+    */
+      function sortnd();
+   /** --- void sortnk ---
+    * Numerically sorts the array by key
+    * @param ascending [optional] True for ascending sort, false for descending sort
+    */
+      function sortnk( bool ascending=false );
+   /** --- void sortnka ---
+    * Numerical sorts the array by key in ascending order
+    */
+      function sortnka();
+   /** --- void sortnkd ---
+    * Numerical sorts the array by key in descending order
+    */
+      function sortnkd();
+   /** --- void sortf ---
+    * Sorts the array by value in ascending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.
+    * @tsexample
+    * function mySortCallback(%a, %b)
+    * {
+    *    return strcmp( %a.name, %b.name );
+    * }
+    * %array.sortf( "mySortCallback" );
+    * @endtsexample
+    */
+      function sortf( string functionName );
+   /** --- void sortfk ---
+    * Sorts the array by key in ascending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfk( string functionName );
+   /** --- void sortfd ---
+    * Sorts the array by value in descending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfd( string functionName );
+   /** --- void sortfkd ---
+    * Sorts the array by key in descending order using the given callback function.
+    * @param functionName Name of a function that takes two arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal.@see sortf
+    */
+      function sortfkd( string functionName );
+   /** --- S32 moveFirst ---
+    * Moves array pointer to start of array
+    * @return Returns the new array pointer
+    * @return S32
+    */
+      function moveFirst();
+   /** --- S32 moveLast ---
+    * Moves array pointer to end of array
+    * @return Returns the new array pointer
+    * @return S32
+    */
+      function moveLast();
+   /** --- S32 moveNext ---
+    * Moves array pointer to next position
+    * @return Returns the new array pointer, or -1 if already at the end
+    * @return S32
+    */
+      function moveNext();
+   /** --- S32 movePrev ---
+    * Moves array pointer to prev position
+    * @return Returns the new array pointer, or -1 if already at the start
+    * @return S32
+    */
+      function movePrev();
+   /** --- S32 getCurrent ---
+    * Gets the current pointer index
+    * @return S32
+    */
+      function getCurrent();
+   /** --- void setCurrent ---
+    * Sets the current pointer index.
+    * @param index New 0-based pointer index
+    */
+      function setCurrent( int index );
+   /** --- void echo ---
+    * Echos the array contents to the console
+    */
+      function echo();
+   /*!
+   Makes the keys and values case-sensitive.
+By default, comparison of key and value strings will be case-insensitive.
+   
+    */
+   bool caseSensitive;
+   /*!
+   Helper field which allows you to add new key['keyname'] = value pairs.
+   
+    */
+   caseString key;
+   // --- Group: Ungrouped ---
+   // --- Group: Object ---
+   // --- Group: Persistence ---
 };
 //------------------------------------------------------------------
 //                  F U N C T I O N S 
@@ -2266,14 +2465,14 @@ namespace Global {
     * @return bool
     */
       function HasRectIntersection( RectF rectA, RectF rectB );
-   /** --- RectF GetRectIntersection ---
+   /** --- ConsoleVector GetRectIntersection ---
     * get rect intersection (overlap)
-    * @return RectF
+    * @return ConsoleVector
     */
       function GetRectIntersection( RectF rectA, RectF rectB );
-   /** --- RectF GetRectUnion ---
+   /** --- ConsoleVector GetRectUnion ---
     * get rect unio both rects combined to one big.
-    * @return RectF
+    * @return ConsoleVector
     */
       function GetRectUnion( RectF rectA, RectF rectB );
    /** --- bool HasRectLineIntersection ---
@@ -2289,9 +2488,9 @@ namespace Global {
     * Draw a Text with optional shadow
     */
       function DrawText( float x, float y, String text, float scale=1.0, Color color=BLACK, bool doShadow=false, Color shadowColor=DARKGRAY );
-   /** --- Point2F MeasureText ---
+   /** --- ConsoleVector MeasureText ---
     * Calculate Text Width and Heigth and return Point2F
-    * @return Point2F
+    * @return ConsoleVector
     */
       function MeasureText( String text, float scale=1.0 );
    /** --- void DrawLine ---
@@ -2370,16 +2569,6 @@ namespace Global {
     * @return F32
     */
       function getGameTime();
-   /** --- F32 getFrameTime ---
-    * get the current frame time in seconds
-    * @return F32
-    */
-      function getFrameTime();
-   /** --- U64 SDL_GetTicks ---
-    * Ticks from SDL
-    * @return U64
-    */
-      function SDL_GetTicks();
    /** --- S32 getRealTime ---
     * get current time from script engine
     * @return S32
@@ -2390,8 +2579,8 @@ namespace Global {
     * @return S32
     */
       function getFPS();
-   /** --- Point2I GetMousePosition ---
-    * @return Point2I
+   /** --- ConsoleVector GetMousePosition ---
+    * @return ConsoleVector
     */
       function GetMousePosition();
    /** --- bool setWindowSize ---
@@ -2410,13 +2599,13 @@ namespace Global {
     * @return bool
     */
       function unSetScreenSize();
-   /** --- Point2I GetScreenSize ---
+   /** --- ConsoleVector GetScreenSize ---
     * Get the current scaled screen size (SDL_GetRenderLogicalPresentation)
-    * @return Point2I
+    * @return ConsoleVector
     */
       function GetScreenSize();
-   /** --- Point2I getWindowSize ---
-    * @return Point2I
+   /** --- ConsoleVector getWindowSize ---
+    * @return ConsoleVector
     */
       function getWindowSize();
    /** --- void setVSync ---
@@ -3429,13 +3618,17 @@ namespace Global {
     * @ingroup Logging
     */
       function echo( string message... );
-   /** --- void print ---
-    * @brief Logs a message to the console see also echo 
+   /** --- void printSeparator ---
+    * Print a separator line
+    */
+      function printSeparator();
+   /** --- void sysprint ---
+    * @brief Logs a message to std out only 
     * Concatenates all given arguments to a single string and prints the string to the console.
     * A newline is added automatically after the text.
     * @param message Any number of string arguments.
     */
-      function print( string message... );
+      function sysprint( string message... );
    /** --- void warn ---
     * @brief Logs a warning message to the console.
     * Concatenates all given arguments to a single string and prints the string to the console as a warning message (in the in-game console, these will show up using a turquoise font by default). A newline is added automatically after the text.
@@ -3450,6 +3643,13 @@ namespace Global {
     * @ingroup Logging
     */
       function error( string message... );
+   /** --- void info ---
+    * @brief Logs an info message to the console.
+    * Concatenates all given arguments to a single string and prints the string to the console as an error message (in the in-game console, these will show up using a red font by default). A newline is added automatically after the text.
+    * @param message Any number of string arguments.
+    * @ingroup Logging
+    */
+      function info( string message... );
    /** --- void debugv ---
     * @brief Logs the value of the given variable to the console.
     * Prints a string of the form "<variableName> = <variable value>" to the console.
@@ -3668,20 +3868,6 @@ namespace Global {
     * @return const char *
     */
       function getModNameFromPath( string path );
-   /** --- void pushInstantGroup ---
-    * @brief Pushes the current $instantGroup on a stack and sets it to the given value (or clears it).
-    * @note Currently only used for editors
-    * @ingroup Editors
-    * @internal
-    */
-      function pushInstantGroup( String group="" );
-   /** --- void popInstantGroup ---
-    * @brief Pop and restore the last setting of $instantGroup off the stack.
-    * @note Currently only used for editors
-    * @ingroup Editors
-    * @internal
-    */
-      function popInstantGroup();
    /** --- const char * getPrefsPath ---
     * @note Appears to be useless in Torque 3D, should be deprecated
     * @internal
@@ -3733,26 +3919,10 @@ namespace Global {
     * @ingroup Debugging
     */
       function trace( bool enable=true );
-   /** --- void debug ---
-    * Drops the engine into the native C++ debugger.
-    * This function triggers a debug break and drops the process into the IDE's debugger.  If the process is not running with a debugger attached it will generate a runtime error on most platforms.
-    * @note This function is not available in shipping builds.@ingroup Debugging
+   /** --- void listFeatures ---
+    * List compiled features
     */
-      function debug();
-   /** --- bool isPlayerBuild ---
-    * Test whether the engine has been compiled with TORQUE_PLAYER.
-    * @return True if this is a playback only build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isPlayerBuild();
-   /** --- bool isShippingBuild ---
-    * Test whether the engine has been compiled with TORQUE_SHIPPING, i.e. in a form meant for final release.
-    * @return True if this is a shipping build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isShippingBuild();
+      function listFeatures();
    /** --- bool isDebugBuild ---
     * Test whether the engine has been compiled with TORQUE_DEBUG, i.e. if it includes debugging functionality.
     * @return True if this is a debug build; false otherwise.
@@ -3760,13 +3930,6 @@ namespace Global {
     * @return bool
     */
       function isDebugBuild();
-   /** --- bool isToolBuild ---
-    * Test whether the engine has been compiled with TORQUE_TOOLS, i.e. if it includes tool-related functionality.
-    * @return True if this is a tool build; false otherwise.
-    * @ingroup Platform
-    * @return bool
-    */
-      function isToolBuild();
    /** --- S32 getStringHash ---
     * generate a hash from a string. foramt is (string, casesensitive). defaults to true
     * @return S32
@@ -4000,13 +4163,13 @@ namespace Global {
     * @note This function is only available in debug builds and primarily meant as an aid in debugging.@ingroup Console
     */
       function debugEnumInstances( string className, string functionName );
-   /** --- ArrayObject* getMethodSigsNS ---
+   /** --- KeyValueStringTable* getMethodSigsNS ---
     * List the methods defined on this object.
     * Each description is a newline-separated vector with the following elements:
     * - method prototype string.
     * - Documentation string (not including prototype).  This takes up the remainder of the vector.
-    * @return An ArrayObject populated with (name,description) pairs of all methods defined on the object.
-    * @return ArrayObject*
+    * @return An KeyValueStringTable populated with (name,description) pairs of all methods defined on the object.
+    * @return KeyValueStringTable*
     */
       function getMethodSigsNS( StringTableEntry className, bool commands=false );
    /** --- S32 getFieldCountNS ---
@@ -4046,36 +4209,72 @@ namespace Global {
     * Dumps the script constants table to the console. Using filter for keys if not empty.
     */
       function dumpScriptConstants( String filter="" );
+   /** --- void varDumpField ---
+    * local/global variable dump. local only valid in the variables scope
+    */
+      function varDumpField( string variableName );
+   /** --- const char * value ---
+    * local/global value
+    * @return const char *
+    */
+      function value( string variableName );
+   /** --- void varDump ---
+    * local/global variable dump. local only valid in the variables scope
+    */
+      function varDump( string variableName );
+   /** --- void dumpLocals ---
+    * dump local and global  variables
+    */
+      function dumpLocals( bool allLocals=true, bool withGlobals=true );
+   /** --- void whereAmI ---
+    * look up the function where i'am called from
+    */
+      function whereAmI();
+   /** --- S32 explodeGlobal ---
+    * WARNING works only with Global Variable '$' !!!!!!
+    * Convert an string content of varname to an set typed of variables with varName[0..count] fields
+    * tab separated (default) or space separated@return the count of variables
+    * @return S32
+    */
+      function explodeGlobal( string varName, bool debugOut=false );
+   /** --- ConsoleValue getVarPtr ---
+    * Get the pointer of a variable, param must be string variable name!
+    * @return ConsoleValue
+    */
+      function getVarPtr( string variableName );
+   /** --- ConsoleValue getValueByPtr ---
+    * @return ConsoleValue
+    */
+      function getValueByPtr( ConsoleValue PtrValue );
+   /** --- bool setValueByPtr ---
+    * @return bool
+    */
+      function setValueByPtr( ConsoleValue PtrValue, ConsoleValue setterValue );
+   /** --- ConsoleValue getComponentPrt ---
+    * Get the pointer of a Console Vector Component
+    * @return ConsoleValue
+    */
+      function getComponentPrt( string variableStatement );
+   /** --- F32 getFloatByComponentPtr ---
+    * @return F32
+    */
+      function getFloatByComponentPtr( ConsoleValue PtrValue );
+   /** --- void setFloatByComponentPtr ---
+    */
+      function setFloatByComponentPtr( ConsoleValue PtrValue, float value );
+   /** --- void TEST_VAR_CREATE ---
+    * must be test inside and outside a function!
+    */
+      function TEST_VAR_CREATE();
+   /** --- void testLocalGlobal ---
+    */
+      function testLocalGlobal( string variableName );
    /** --- void dumpStringMemStats ---
     * @brief Dumps information about String memory usage
     * @ingroup Debugging
     * @ingroup Strings
     */
       function dumpStringMemStats();
-   /** --- const char * getTemporaryDirectory ---
-    * @brief Returns the OS temporary directory, "C:/Users/Mich/AppData/Local/Temp" for example
-    * @note This can be useful to adhering to OS standards and practices, but not really used in Torque 3D right now.
-    * @note Be very careful when getting into OS level File I/O.@return String containing path to OS temp directory
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryDirectory();
-   /** --- const char * getTemporaryFileName ---
-    * @brief Creates a name and extension for a potential temporary file
-    * This does not create the actual file. It simply creates a random name for a file that does not exist.
-    * @note This is legacy function brought over from TGB, and does not appear to have much use. Possibly deprecate?
-    * @ingroup FileSystem
-    * @internal
-    * @return const char *
-    */
-      function getTemporaryFileName();
-   /** --- const char * getUserDataDirectory ---
-    * getUserDataDirectory()
-    * @return const char *
-    */
-      function getUserDataDirectory();
    /** --- const char * getUserHomeDirectory ---
     * getUserHomeDirectory()
     * @return const char *
@@ -4099,6 +4298,10 @@ namespace Global {
     * @return F32
     */
       function getRandomF( float min, float max=0.f );
+   /** --- F32 mCatmullrom ---
+    * @return F32
+    */
+      function mCatmullrom( float t, float p0, float p1, float p2, float p3 );
    /** --- S32 mFloor ---
     * Round v down to the nearest integer.
     * @param v Number to convert to integer.@returns Number converted to integer.@ingroup Math
@@ -4277,6 +4480,20 @@ namespace Global {
     * @return bool
     */
       function mIsPow2( int v );
+   /** --- ConsoleValue runInjectedLambda ---
+    * Run injected Lambda function with parameters
+    * @return ConsoleValue
+    */
+      function runInjectedLambda( ...  );
+   /** --- ConsoleVector getRectCentered ---
+    * return a centered rect
+    * @return ConsoleVector
+    */
+      function getRectCentered( ConsoleVector vec );
+   /** --- void PrtVec4Scale ---
+    * Testing by reference
+    */
+      function PrtVec4Scale( ConsoleValue PtrValue1, float scale );
    /** --- void ConsoleDocForStub ---
     * @brief Set Con::ConsoleDocForStub - human readable output- exportConsoleDocu overwrites it.
     */
@@ -4846,6 +5063,61 @@ namespace Global {
     * Set window-local cursor Y position.
     */
       function ImSetCursorPosY( float local_y );
+   /** --- F32 GetFrameTime ---
+    * get the current frame time in seconds
+    * @return F32
+    */
+      function GetFrameTime();
+   /** --- bool SDL_BasicLoop ---
+    * Loop to only keep the scheduler running
+    * This is usefull when reloading the complete scritpt
+    * Demo in CrazyElf/main.elf
+    * @return bool
+    */
+      function SDL_BasicLoop();
+   /** --- bool SDL_MainLoop ---
+    * Main Loop for events and more...
+    * optional RendererID parameter is required when you set SDL_SetRenderLogicalPresentation
+    * to match the mouse position to the scaled screen.
+    * @return bool
+    */
+      function SDL_MainLoop( int RendererID=0 );
+   /** --- void EmscriptenMount ---
+    * Init the save Game for Emscripten
+    */
+      function EmscriptenMount();
+   /** --- void EmscriptenSync ---
+    * Sync the save Game for Emscripten
+    */
+      function EmscriptenSync();
+   /** --- bool SDL_OpenJoystick ---
+    * Open a joystick and return the internal JoyStickId
+    * @return bool
+    */
+      function SDL_OpenJoystick( int which );
+   /** --- const char* SDL_GetJoystickName ---
+    * Get the name of joystick 
+    * @return const char*
+    */
+      function SDL_GetJoystickName( int which );
+   /** --- void SDL_CloseJoystick ---
+    * Close the joystick
+    */
+      function SDL_CloseJoystick( int which );
+   /** --- bool SDL_OpenGamepad ---
+    * Open a joystick and return the internal JoyStickId
+    * @return bool
+    */
+      function SDL_OpenGamepad( int which );
+   /** --- const char* SDL_GetGamepadName ---
+    * Get the name of joystick 
+    * @return const char*
+    */
+      function SDL_GetGamepadName( int which );
+   /** --- void SDL_CloseGamepad ---
+    * Close the joystick
+    */
+      function SDL_CloseGamepad( int which );
    /** --- bool SDL_IsKeyPressed ---
     * return if the key with value scancode is pressed.
     * @return bool
@@ -4891,6 +5163,11 @@ namespace Global {
     * @return bool
     */
       function SDL_IsMouseButtonUp( int button );
+   /** --- String SDL_GetInputText ---
+    * Return the current input text only valid at the same frame see also: SDL_StartTextInput
+    * @return String
+    */
+      function SDL_GetInputText();
    /** --- F32 SDL_GetMouseDeltaX ---
     * Get mouse movement delta X for this frame.
     * @return F32
@@ -4916,6 +5193,11 @@ namespace Global {
     * @return F32
     */
       function SDL_GetMouseY();
+   /** --- ConsoleVector SDL_GetMousePoint ---
+    * Get absolute mouse position as ConsoleVector
+    * @return ConsoleVector
+    */
+      function SDL_GetMousePoint();
    /** --- const char* SDL_GetError ---
     * Get the last SDL Error.
     * @return const char*
@@ -4926,19 +5208,17 @@ namespace Global {
     * @return bool
     */
       function SDL_FileExists( string path );
-   /** --- bool SDL_GetPathInfo ---
-    * resultObjectId is the object which gets it dynamic fields filled with informationreturn true if the file exits
-    * @return bool
+   /** --- SimObject* SDL_GetPathInfo ---
+    * return an object  if the file exits with dynamic fields
+    * @return SimObject*
     */
-      function SDL_GetPathInfo( string path, int resultObjectId );
-   /** --- bool SDL_GlobDirectory ---
-    * resultObjectId is the object which gets it dynamic fields filled with information
-    * dynamic parameters are: query_path, query_pattern, query_ignorecase
-    * for the result: count, result_[i]
+      function SDL_GetPathInfo( string path );
+   /** --- Array* SDL_GlobDirectory ---
+    * scan a directory and return an Array Object with: dynamic parameters are: query_path, query_pattern, query_ignorecase
     * return true if result was not empty.
-    * @return bool
+    * @return Array*
     */
-      function SDL_GlobDirectory( string path, int resultObjectId, string pattern="*", bool patternIgnoreCase=true );
+      function SDL_GlobDirectory( string path, string pattern="*", bool patternIgnoreCase=true );
    /** --- bool SDL_CopyFile ---
     * Copy a file.
     * @return bool
@@ -4974,11 +5254,21 @@ namespace Global {
     * @return const char*
     */
       function SDL_GetCurrentDirectory();
-   /** --- const char* SDL_GetPrefPath ---
+   /** --- String SDL_GetPrefPath ---
     * Get the user-and-app-specific path where files can be written.
-    * @return const char*
+    * @return String
     */
       function SDL_GetPrefPath( string org, string app );
+   /** --- bool SDL_SaveFile ---
+    * save data to a file.
+    * @return bool
+    */
+      function SDL_SaveFile( string path, string data, uint size=0 );
+   /** --- const char* SDL_LoadFile ---
+    * load data from a file.
+    * @return const char*
+    */
+      function SDL_LoadFile( string path );
    /** --- void SDL_RENDERER_INIT ---
     * initialize the ElfSDL3::SDL3_Render System
     */
@@ -4995,10 +5285,11 @@ namespace Global {
     * @return const char *
     */
       function SDL_GetRenderDriver( int index );
-   /** --- const char * SDL_CreateWindowAndRenderer ---
+   /** --- ConsoleVector SDL_CreateWindowAndRenderer ---
     * This create a SDL_Window and SDL_Renderer.
-    * @return String: '1 [WindowID] [RenderID]' or '0' if failed
-    * @return const char *
+    * @return Vector: '.y= [WindowID] .x=[RenderID]' or '0' if failed
+    * See also event: onSDL_EVENT_WINDOW_CLOSE_REQUESTED(id) and SDL_DestroyWindow
+    * @return ConsoleVector
     */
       function SDL_CreateWindowAndRenderer( string title, int width, int height, U64 window_flags );
    /** --- S32 SDL_CreateWindow ---
@@ -5022,26 +5313,93 @@ namespace Global {
     * @return bool
     */
       function SDL_SetWindowIcon( int WindowID, int SurfaceID );
+   /** --- S32 SDL_GetWindowID ---
+    * get SDL_WindowID by internal WindowID
+    * @return S32
+    */
+      function SDL_GetWindowID( int WindowID );
+   /** --- S32 SDL_GetWindowFromID ---
+    * get the internal window object id from the event SDL_WindowID
+    * @return S32
+    */
+      function SDL_GetWindowFromID( int SDL_WindowID );
+   /** --- S32 SDL_GetWindowParent ---
+    * get internal WindowID of the parent of this internal WindowID
+    * @return S32
+    */
+      function SDL_GetWindowParent( int WindowID );
    /** --- bool SDL_SetWindowPosition ---
     * Set the Window position
     * @return bool
     */
       function SDL_SetWindowPosition( int WindowID, int x, int y );
+   /** --- ConsoleVector SDL_GetWindowPosition ---
+    * Get the Window position
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowPosition( int WindowID );
    /** --- bool SDL_SetWindowSize ---
     * Set the Window Size
     * @return bool
     */
       function SDL_SetWindowSize( int WindowID, int width, int height );
+   /** --- bool SDL_StartTextInput ---
+    * start text input mode for input onSDLTextInputEvent(%text)
+    * @return bool
+    */
+      function SDL_StartTextInput( int WindowID );
+   /** --- bool SDL_StopTextInput ---
+    * STOP text input mode for input onSDLTextInputEvent(%text)
+    * @return bool
+    */
+      function SDL_StopTextInput( int WindowID );
+   /** --- ConsoleVector SDL_GetWindowSize ---
+    * Get the Window Size
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowSize( int WindowID );
+   /** --- ConsoleVector SDL_GetWindowSafeArea ---
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowSafeArea( int WindowID );
+   /** --- bool SDL_SetWindowAspectRatio ---
+    * @return bool
+    */
+      function SDL_SetWindowAspectRatio( int WindowID, float min, float max );
+   /** --- ConsoleVector SDL_GetWindowAspectRatio ---
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowAspectRatio( int WindowID );
+   /** --- ConsoleVector SDL_GetWindowBordersSize ---
+    * Get the Window border size: top, left, bottom, right
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowBordersSize( int WindowID );
+   /** --- ConsoleVector SDL_GetWindowSizeInPixels ---
+    * Get the Window Size in pixels
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowSizeInPixels( int WindowID );
    /** --- bool SDL_SetWindowMinimumSize ---
     * Set the Window minimum Size
     * @return bool
     */
       function SDL_SetWindowMinimumSize( int WindowID, int width, int height );
+   /** --- ConsoleVector SDL_GetWindowMinimumSize ---
+    * Get the Window minimum Size
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowMinimumSize( int WindowID );
    /** --- bool SDL_SetWindowMaximumSize ---
     * Set the Window maximum Size
     * @return bool
     */
       function SDL_SetWindowMaximumSize( int WindowID, int width, int height );
+   /** --- ConsoleVector SDL_GetWindowMaximumSize ---
+    * Get the Window maximum Size
+    * @return ConsoleVector
+    */
+      function SDL_GetWindowMaximumSize( int WindowID );
    /** --- bool SDL_SetWindowBordered ---
     * Set bordered
     * @return bool
@@ -5052,6 +5410,39 @@ namespace Global {
     * @return bool
     */
       function SDL_SetWindowResizable( int WindowID, bool resizable );
+   /** --- bool SDL_SetWindowAlwaysOnTop ---
+    * @return bool
+    */
+      function SDL_SetWindowAlwaysOnTop( int WindowID, bool value );
+   /** --- bool SDL_SetWindowFillDocument ---
+    * Emscripten only
+    * @return bool
+    */
+      function SDL_SetWindowFillDocument( int WindowID, bool value );
+   /** --- bool SDL_ShowWindow ---
+    * @return bool
+    */
+      function SDL_ShowWindow( int WindowID );
+   /** --- bool SDL_HideWindow ---
+    * @return bool
+    */
+      function SDL_HideWindow( int WindowID );
+   /** --- bool SDL_RaiseWindow ---
+    * @return bool
+    */
+      function SDL_RaiseWindow( int WindowID );
+   /** --- bool SDL_MaximizeWindow ---
+    * @return bool
+    */
+      function SDL_MaximizeWindow( int WindowID );
+   /** --- bool SDL_MinimizeWindow ---
+    * @return bool
+    */
+      function SDL_MinimizeWindow( int WindowID );
+   /** --- bool SDL_RestoreWindow ---
+    * @return bool
+    */
+      function SDL_RestoreWindow( int WindowID );
    /** --- bool SDL_SetWindowFullscreen ---
     * Set fullscreen
     * @return bool
@@ -5096,14 +5487,14 @@ namespace Global {
     * @return S32
     */
       function SDL_CreateTextureFromSurface( int rendererID, int SurfaceID );
-   /** --- Point2F SDL_GetTextureSize ---
+   /** --- ConsoleVector SDL_GetTextureSize ---
     * get the size of a texture as float Point
-    * @return Point2F
+    * @return ConsoleVector
     */
       function SDL_GetTextureSize( int textureID );
-   /** --- RectF SDL_GetTextureRect ---
+   /** --- ConsoleVector SDL_GetTextureRect ---
     * get the size of a texture as float Rectangle (ElfSDL3 extension)
-    * @return RectF
+    * @return ConsoleVector
     */
       function SDL_GetTextureRect( int textureID );
    /** --- bool SDL_SetTextureColorMod ---
@@ -5137,11 +5528,44 @@ namespace Global {
     * @return bool
     */
       function SDL_SetRenderDrawColor( int rendererID, U8 r, U8 g, U8 b, U8 a=255 );
+   /** --- bool SDL_SetRenderDrawColorVec ---
+    * set the render color
+    * @return bool
+    */
+      function SDL_SetRenderDrawColorVec( int rendererID, ConsoleVector colorVec );
+   /** --- bool SDL_SetRenderDrawColorFloat ---
+    * set the render color using float
+    * @return bool
+    */
+      function SDL_SetRenderDrawColorFloat( int rendererID, float r, float g, float b, float a=1.f );
+   /** --- ConsoleVector SDL_GetRenderDrawColor ---
+    * get the render color
+    * @return ConsoleVector
+    */
+      function SDL_GetRenderDrawColor( int rendererID );
+   /** --- ConsoleVector SDL_GetRenderDrawColorFloat ---
+    * get the render color
+    * @return ConsoleVector
+    */
+      function SDL_GetRenderDrawColorFloat( int rendererID );
+   /** --- bool SDL_SetRenderColorScale ---
+    * @return bool
+    */
+      function SDL_SetRenderColorScale( int rendererID, float scale );
+   /** --- F32 SDL_GetRenderColorScale ---
+    * @return F32
+    */
+      function SDL_GetRenderColorScale( int rendererID );
    /** --- bool SDL_SetRenderDrawBlendMode ---
     * set the blendmode, without parameter NONE = disabled is set.
     * @return bool
     */
       function SDL_SetRenderDrawBlendMode( int rendererID, uint blendMode=SDL_BLENDMODE_NONE );
+   /** --- U32 SDL_GetRenderDrawBlendMode ---
+    * get the blendmode return U32_MAX if failed
+    * @return U32
+    */
+      function SDL_GetRenderDrawBlendMode( int rendererID );
    /** --- bool SDL_RenderClear ---
     * clear the current render device - called before the drawing begin - see also SDL_SetRenderDrawColor
     * @return bool
@@ -5152,16 +5576,39 @@ namespace Global {
     * @return bool
     */
       function SDL_RenderPoint( int rendererID, float x, float y );
+   /** --- bool SDL_RenderPoints ---
+    * render points from an Array of TypeVector (non TypeVector will be skipped!)
+    * no that fast, since we need to fill the points every call.
+    * @return bool
+    */
+      function SDL_RenderPoints( int rendererID, Array pointsArray );
    /** --- bool SDL_RenderLine ---
     * render a Line
     * @return bool
     */
       function SDL_RenderLine( int rendererID, float x1, float y1, float x2, float y2 );
+   /** --- bool SDL_RenderLineRect ---
+    * render a Line where (w)idth == x2 and (h)eight == y2
+    * @return bool
+    */
+      function SDL_RenderLineRect( int rendererID, RectF pointsRect );
+   /** --- bool SDL_RenderLines ---
+    * render points from an Array of TypeVector (non TypeVector will be skipped!)
+    * no that fast, since we need to fill the points every call.
+    * @return bool
+    */
+      function SDL_RenderLines( int rendererID, Array pointsArray );
    /** --- bool SDL_RenderRect ---
     * render a Rect (unfilled)
     * @return bool
     */
       function SDL_RenderRect( int rendererID, RectF rect );
+   /** --- bool SDL_RenderRects ---
+    * render points from an Array of TypeVector (non TypeVector will be skipped!)
+    * no that fast, since we need to fill the points every call.
+    * @return bool
+    */
+      function SDL_RenderRects( int rendererID, Array pointsArray );
    /** --- bool SDL_RenderFillRect ---
     * render a Rect (filled)
     * @return bool
@@ -5172,6 +5619,12 @@ namespace Global {
     * @return bool
     */
       function SDL_RenderRectF( int rendererID, float x, float y, float w, float h, bool filled=true );
+   /** --- bool SDL_RenderFillRects ---
+    * render points from an Array of TypeVector (non TypeVector will be skipped!)
+    * no that fast, since we need to fill the points every call.
+    * @return bool
+    */
+      function SDL_RenderFillRects( int rendererID, Array pointsArray );
    /** --- bool SDL_RenderTexture ---
     * render texture from src Rect to dstRect
     * @return bool
@@ -5213,10 +5666,10 @@ namespace Global {
     */
       function SDL_RenderDebugText( int rendererID, float x, float y, string str );
    /** --- bool SDL_PointInRect ---
-    * Check a point is in rect --- Integer Rect !! --
+    * Check a point is in rect
     * @return bool
     */
-      function SDL_PointInRect( Point2I p, RectI rect );
+      function SDL_PointInRect( Point2F p, RectF rect );
    /** --- bool SDL_PointInRectFloat ---
     * Check a point is in rect
     * @return bool
@@ -5232,14 +5685,14 @@ namespace Global {
     * @return bool
     */
       function SDL_HasRectIntersectionFloat( RectF rectA, RectF rectB );
-   /** --- RectF SDL_GetRectIntersectionFloat ---
+   /** --- ConsoleVector SDL_GetRectIntersectionFloat ---
     * get rect intersection (overlap)
-    * @return RectF
+    * @return ConsoleVector
     */
       function SDL_GetRectIntersectionFloat( RectF rectA, RectF rectB );
-   /** --- RectF SDL_GetRectUnionFloat ---
+   /** --- ConsoleVector SDL_GetRectUnionFloat ---
     * get rect unio both rects combined to one big.
-    * @return RectF
+    * @return ConsoleVector
     */
       function SDL_GetRectUnionFloat( RectF rectA, RectF rectB );
    /** --- bool SDL_GetRectAndLineIntersectionFloat ---
@@ -5252,24 +5705,180 @@ namespace Global {
     * @return const char*
     */
       function SDL_GetStringProperty( int propertiesID, string key );
+   /** --- bool SDL_Init ---
+    * Init SDL default Video and Audio
+    * @return bool
+    */
+      function SDL_Init( int InitFlags=SDL_INIT_VIDEO | SDL_INIT_AUDIO );
+   /** --- void SDL_Quit ---
+    * Quit SDL
+    */
+      function SDL_Quit();
+   /** --- ConsoleValue SDL_GetTicks ---
+    * Get the number of milliseconds that have elapsed since the SDL library
+    * @return ConsoleValue
+    */
+      function SDL_GetTicks();
+   /** --- ConsoleValue SDL_GetTicksNS ---
+    * Get the number of nanoseconds that have elapsed since the SDL library
+    * @return ConsoleValue
+    */
+      function SDL_GetTicksNS();
+   /** --- ConsoleValue SDL_GetPerformanceCounter ---
+    * Get the current value of the high resolution counter.
+    * @return ConsoleValue
+    */
+      function SDL_GetPerformanceCounter();
+   /** --- ConsoleValue SDL_GetPerformanceFrequency ---
+    * Get the count per second of the high resolution counter.
+    * @return ConsoleValue
+    */
+      function SDL_GetPerformanceFrequency();
+   /** --- void SDL_Delay ---
+    * Wait a specified number of milliseconds before returning.
+    */
+      function SDL_Delay( uint ms );
+   /** --- void SDL_DelayNS ---
+    * Wait a specified number of nanoseconds before returning.
+    */
+      function SDL_DelayNS( ConsoleValue ns );
+   /** --- void SDL_DelayPrecise ---
+    * Wait a specified number of nanoseconds before returning.
+    */
+      function SDL_DelayPrecise( ConsoleValue ns );
+   /** --- void SDL_SetClipboardText ---
+    * Push text into the Clipboard.
+    */
+      function SDL_SetClipboardText( string text );
+   /** --- const char* SDL_GetClipboardText ---
+    * Get text from the Clipboard.
+    * @return const char*
+    */
+      function SDL_GetClipboardText();
+   /** --- bool Audio_Init ---
+    * Init Audio Device for playback
+    * @return bool
+    */
+      function Audio_Init();
+   /** --- void Audio_Shutdown ---
+    * ShutDown Audio Device 
+    */
+      function Audio_Shutdown();
+   /** --- S32 Audio_LoadWav ---
+    * Load a Wave File.
+    * @return WavID
+    * @return S32
+    */
+      function Audio_LoadWav( string filename );
+   /** --- S32 Audio_UnLoadWav ---
+    * Unload a Wave Steam
+    * @return S32
+    */
+      function Audio_UnLoadWav( int WavID );
+   /** --- bool Audio_Play ---
+    * Play a Wave Stream.@param gain is the normalized volume
+    * @return bool
+    */
+      function Audio_Play( int WavID, float gain=1.0f, bool loop=false );
+   /** --- bool Audio_Stop ---
+    * Stop a Wave Stream.
+    * @return bool
+    */
+      function Audio_Stop( int WavID );
+   /** --- bool Audio_SetMasterVolume ---
+    * set the volume for all streams
+    * @return bool
+    */
+      function Audio_SetMasterVolume( float volume );
+   /** --- F32 Audio_GetMasterVolume ---
+    * get the volume for all streams
+    * @return F32
+    */
+      function Audio_GetMasterVolume();
+   /** --- S32 TestMidi ---
+    * make a midi test ....
+    * @return S32
+    */
+      function TestMidi();
+   /** --- S32 MelodyBegin ---
+    * create a melody maker
+    * @return S32
+    */
+      function MelodyBegin();
+   /** --- bool MelodyAdd ---
+    * data: {(int)LINENUMBER, (int)MIDITONE, (float) duration=0.2f, (float)amplitude=0.2f}
+    * add a tone at line number - in line exists it will be overwritten
+    * @return bool
+    */
+      function MelodyAdd( int MelodyID, ConsoleVector data );
+   /** --- bool MelodyDel ---
+    * Delete tone at linenumber
+    * @return bool
+    */
+      function MelodyDel( int MelodyID, int lineNumber );
+   /** --- String MelodyList ---
+    * list the melody
+    * @return String
+    */
+      function MelodyList( int MelodyID, int lineNumberStart=-1, int lineNumberEnd=-1 );
+   /** --- bool MelodyRun ---
+    * run = play the melody
+    * @return bool
+    */
+      function MelodyRun( int MelodyID, float gain=1.0 );
+   /** --- S32 MelodyGen ---
+    * gen = generate wavData from this melody
+    * @return S32
+    */
+      function MelodyGen( int MelodyID );
+   /** --- bool MelodyEnd ---
+    * remove this melody - if you used MelodyGen: the wave data will not be touched
+    * @return bool
+    */
+      function MelodyEnd( int MelodyID );
 };
 //------------------------------------------------------------------
 //                  C O N S T A N T S 
 //------------------------------------------------------------------
 /*
 --- Script Constants Dump ---
+  SCENE_PATH = "pref:/"
   SCENE_FILE = "pref:/aquarium.elfscene"
+  BACKGROUND_COLOR = { 176, 233, 252 , 255}
+  TEX_SIZE = 16
   SDL_FOLDER_VIDEOS = 10
   SDL_FOLDER_SCREENSHOTS = 8
-  SDL_FOLDER_PUBLICSHARE = 6
   SDL_FOLDER_PICTURES = 5
   SDL_FOLDER_DOWNLOADS = 3
   SDL_FOLDER_DESKTOP = 1
   SDL_FOLDER_HOME = 0
   SDL_PATHTYPE_OTHER = 3
-  SDL_PATHTYPE_DIRECTORY = 2
   SDL_PATHTYPE_FILE = 1
   SDL_PATHTYPE_NONE = 0
+  SDL_POWERSTATE_CHARGED = 4
+  SDL_POWERSTATE_ON_BATTERY = 1
+  SDL_HAT_RIGHTDOWN = 6
+  SDL_HAT_CENTERED = 0
+  SDL_GAMEPAD_AXIS_RIGHT_TRIGGER = 5
+  SDL_GAMEPAD_AXIS_RIGHTX = 2
+  SDL_GAMEPAD_AXIS_LEFTY = 1
+  SDL_GAMEPAD_BUTTON_TOUCHPAD = 20
+  SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2 = 18
+  SDL_GAMEPAD_BUTTON_LEFT_PADDLE1 = 17
+  SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1 = 16
+  SDL_GAMEPAD_BUTTON_MISC1 = 15
+  SDL_GAMEPAD_BUTTON_DPAD_LEFT = 13
+  SDL_GAMEPAD_BUTTON_DPAD_DOWN = 12
+  SDL_GAMEPAD_BUTTON_DPAD_UP = 11
+  SDL_FOLDER_PUBLICSHARE = 6
+  SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER = 10
+  SDL_GAMEPAD_BUTTON_RIGHT_STICK = 8
+  SDL_PATHTYPE_DIRECTORY = 2
+  SDL_GAMEPAD_BUTTON_LEFT_STICK = 7
+  SDL_HAT_LEFTDOWN = 12
+  SDL_GAMEPAD_BUTTON_GUIDE = 5
+  SDL_GAMEPAD_BUTTON_NORTH = 3
+  SDL_GAMEPAD_BUTTON_EAST = 1
   SDL_BUTTON_MIDDLE = 2
   SDL_BUTTON_LEFT = 1
   SDL_KMOD_ALT = 768
@@ -5284,6 +5893,7 @@ namespace Global {
   SDL_SCANCODE_AC_REFRESH = 285
   SDL_SCANCODE_AC_FORWARD = 283
   SDL_SCANCODE_AC_BACK = 282
+  SDL_GAMEPAD_AXIS_LEFT_TRIGGER = 4
   SDL_SCANCODE_AC_CLOSE = 275
   SDL_SCANCODE_AC_OPEN = 274
   SDL_SCANCODE_AC_NEW = 273
@@ -5295,11 +5905,13 @@ namespace Global {
   SDL_SCANCODE_RALT = 230
   SDL_SCANCODE_RCTRL = 228
   SDL_SCANCODE_LCTRL = 224
+  SDL_HAT_RIGHTUP = 3
   SDL_SCANCODE_KP_HEXADECIMAL = 221
   SDL_SCANCODE_KP_OCTAL = 219
   SDL_KMOD_SHIFT = 3
   SDL_SCANCODE_KP_BINARY = 218
   SDL_SCANCODE_KP_CLEARENTRY = 217
+  EXPORT_PNG_FILE = "pictures:/AquariumBackground.png"
   SDL_SCANCODE_KP_CLEAR = 216
   SDL_SCANCODE_KP_MEMSUBTRACT = 212
   SDL_SCANCODE_KP_MEMADD = 211
@@ -5326,6 +5938,7 @@ namespace Global {
   SDL_SCANCODE_CRSEL = 163
   SDL_SCANCODE_OPER = 161
   SDL_SCANCODE_SEPARATOR = 159
+  SDL_GAMEPAD_BUTTON_START = 6
   SDL_SCANCODE_RETURN2 = 158
   SDL_SCANCODE_CANCEL = 155
   SDL_SCANCODE_SYSREQ = 154
@@ -5421,12 +6034,14 @@ namespace Global {
   ImGuiMod_Shift = 8192
   SDL_SCANCODE_KP_ENTER = 88
   ImGuiTreeNodeFlags_NavLeftJumpsToParent = 131072
-  DARKBLUE = "0 82 172 255"
+  DARKBLUE = { 0, 82, 172, 255 }
   ImGuiTableColumnFlags_Disabled = 1
   SDL_SCANCODE_KP_EXCLAM = 207
   ImGuiInputTextFlags_AllowTabInput = 32
   ImGuiCol_TextSelectedBg = 53
+  SDL_POWERSTATE_UNKNOWN = 0
   SDL_SCANCODE_P = 19
+  SDL_GAMEPAD_BUTTON_BACK = 4
   ImGuiTreeNodeFlags_Bullet = 512
   cl_Blue = "0.000000 0.000000 1.000000 1.000000"
   ImGuiTreeNodeFlags_Leaf = 256
@@ -5444,6 +6059,7 @@ namespace Global {
   ImGuiWindowFlags_AlwaysVerticalScrollbar = 16384
   SDL_PIXELFORMAT_RGBX8888 = 371595268
   ImGuiWindowFlags_MenuBar = 1024
+  SDL_HAT_LEFTUP = 9
   ImGuiTreeNodeFlags_OpenOnArrow = 128
   ImGuiWindowFlags_NoBackground = 128
   SDL_SCANCODE_5 = 34
@@ -5453,10 +6069,10 @@ namespace Global {
   FLT_MAX = 3.40282e+38
   SDL_SCANCODE_KP_PLUS = 87
   ImGuiCol_Tab = 35
-  ACIDGREEN = "128 255 0 255"
+  ACIDGREEN = { 128, 255, 0, 255 }
   SDL_SCANCODE_KP_MEMMULTIPLY = 213
   SDL_SCANCODE_INTERNATIONAL7 = 141
-  SEABLUE = "20 20 50 255"
+  SEABLUE = { 20, 20, 50, 255 }
   SDL_SCANCODE_THOUSANDSSEPARATOR = 178
   ImGuiKey_Q = 562
   ImGuiInputTextFlags_NoHorizontalScroll = 32768
@@ -5467,8 +6083,9 @@ namespace Global {
   SDL_SCANCODE_AC_STOP = 284
   SDL_SCANCODE_AC_SEARCH = 280
   cl_Aquamarine = "0.500000 1.000000 0.830000 1.000000"
+  SDL_GAMEPAD_BUTTON_SOUTH = 0
   ImGuiTreeNodeFlags_SpanAllColumns = 16384
-  PINK = "255 109 194 255"
+  PINK = { 255, 109, 194, 255 }
   cl_Green = "0.000000 1.000000 0.000000 1.000000"
   ImGuiWindowFlags_NoMove = 4
   SDL_COLORSPACE_BT709_LIMITED = 554697761
@@ -5510,6 +6127,7 @@ namespace Global {
   SDL_KMOD_NONE = 0
   ImGuiWindowFlags_UnsavedDocument = 262144
   ImGuiStyleVar_FrameBorderSize = 13
+  SDL_GAMEPAD_AXIS_LEFTX = 0
   SDL_FLIP_NONE = 0
   SDL_SCANCODE_CURRENCYSUBUNIT = 181
   cl_Shadow = "0.000000 0.000000 0.000000 0.400000"
@@ -5524,15 +6142,16 @@ namespace Global {
   SDL_PIXELFORMAT_INDEX8 = 318769153
   SDL_COLORSPACE_BT601_FULL = 571480262
   SDL_SCANCODE_INTERNATIONAL9 = 143
-  BLANK = "0 0 0 0"
+  BLANK = { 0, 0, 0, 0 }
   SDL_SCANCODE_END = 77
   ImGuiKey_Tab = 512
   SDL_SCANCODE_POWER = 102
   ImGuiPopupFlags_MouseButtonRight = 8
-  GREEN = "0 228 48 255"
-  MAROON = "190 33 55 255"
-  LIME = "0 158 47 255"
-  DARKGREEN = "0 117 44 255"
+  GREEN = { 0, 228, 48, 255 }
+  MAROON = { 190, 33, 55, 255 }
+  LIME = { 0, 158, 47, 255 }
+  DARKGREEN = { 0, 117, 44, 255 }
+  SDL_POWERSTATE_CHARGING = 3
   SDL_PIXELFORMAT_RGBA64_FLOAT = 438321160
   SDL_WINDOW_OCCLUDED = 4
   SDL_PROPERTY_TYPE_INVALID = 0
@@ -5541,6 +6160,7 @@ namespace Global {
   SDL_PROPERTY_TYPE_STRING = 2
   SDL_WINDOW_INPUT_FOCUS = 512
   SDL_PIXELFORMAT_RGB24 = 386930691
+  PREVIEW_SIZE = 96
   ImGuiCol_NavWindowingDimBg = 60
   ImGuiTableFlags_ContextMenuInBody = 32
   SDL_SCANCODE_DECIMALSEPARATOR = 179
@@ -5548,11 +6168,12 @@ namespace Global {
   ImGuiCond_None = 0
   ImGuiTreeNodeFlags_Selected = 1
   SDL_FOLDER_COUNT = 11
+  SDL_GAMEPAD_BUTTON_LEFT_PADDLE2 = 19
   ImGuiWindowFlags_AlwaysAutoResize = 64
   SDL_LOGICAL_PRESENTATION_LETTERBOX = 2
   ImGuiCol_Header = 24
   SDL_BLENDOPERATION_ADD = 1
-  DARKPURPLE = "112 31 126 255"
+  DARKPURPLE = { 112, 31, 126, 255 }
   SDL_SCANCODE_E = 8
   ImGuiCol_TitleBg = 10
   SDL_PIXELFORMAT_UNKNOWN = 0
@@ -5566,14 +6187,14 @@ namespace Global {
   SDL_PIXELFORMAT_RGB565 = 353701890
   SDL_WINDOW_MODAL = 4096
   SDL_SCANCODE_KP_XOR = 194
-  VIOLET = "135 60 190 255"
+  VIOLET = { 135, 60, 190, 255 }
   SDL_WINDOW_TRANSPARENT = 1073741824
   SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA = 6
-  YELLOW = "253 249 0 255"
+  YELLOW = { 253, 249, 0, 255 }
   SDL_WINDOW_MOUSE_RELATIVE_MODE = 32768
   SDL_SCANCODE_Q = 20
   SDL_WINDOW_ALWAYS_ON_TOP = 65536
-  RAYWHITE = "245 245 245 255"
+  RAYWHITE = { 245, 245, 245, 255 }
   ImGuiWindowFlags_NoScrollWithMouse = 16
   SDL_SCANCODE_KP_POWER = 195
   SDL_WINDOW_MINIMIZED = 64
@@ -5581,7 +6202,8 @@ namespace Global {
   SDL_WINDOW_EXTERNAL = 2048
   SDL_WINDOW_BORDERLESS = 16
   ImGuiKey_Escape = 526
-  BLUE = "0 121 241 255"
+  BLUE = { 0, 121, 241, 255 }
+  MAG_DIR_VALUE = 15
   SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR = 4
   SDL_SCALEMODE_PIXELART = 2
   SDL_KMOD_CAPS = 8192
@@ -5597,11 +6219,12 @@ namespace Global {
   ImGuiStyleVar_WindowTitleAlign = 6
   SDL_LOGICAL_PRESENTATION_OVERSCAN = 3
   SDL_SCANCODE_F = 9
+  MAX_SCALE = 1024
   ImGuiTreeNodeFlags_FramePadding = 1024
   ImGuiKey_Y = 570
   SDL_BLENDMODE_MOD = 4
   SDL_SCANCODE_OUT = 160
-  ORANGE = "255 161 0 255"
+  ORANGE = { 255, 161, 0, 255 }
   ImGuiCol_NavWindowingHighlight = 59
   SDL_TEXTUREACCESS_STATIC = 0
   ImGuiWindowFlags_HorizontalScrollbar = 2048
@@ -5610,7 +6233,7 @@ namespace Global {
   cl_Black = "0.000000 0.000000 0.000000 1.000000"
   SDL_TEXTUREACCESS_TARGET = 2
   SDL_SCANCODE_APOSTROPHE = 52
-  SLATEGRAY = "45 45 45 255"
+  SLATEGRAY = { 45, 45, 45, 255 }
   SDL_COLORSPACE_BT2020_FULL = 571483657
   ImGuiPopupFlags_AnyPopup = 3072
   SDL_SCANCODE_KP_9 = 97
@@ -5621,7 +6244,7 @@ namespace Global {
   ImGuiInputTextFlags_CharsHexadecimal = 2
   ImGuiKey_5 = 541
   SDL_PIXELFORMAT_ARGB8888 = 372645892
-  MAGENTA = "255 0 255 255"
+  MAGENTA = { 255, 0, 255, 255 }
   SDL_SCANCODE_KP_PLUSMINUS = 215
   ImGuiStyleVar_TabRounding = 25
   ImGuiCol_Separator = 27
@@ -5634,25 +6257,28 @@ namespace Global {
   SDL_PROPERTY_TYPE_BOOLEAN = 5
   SDL_SCANCODE_HELP = 117
   ImGuiCol_ResizeGrip = 30
-  NEONPINK = "255 0 128 255"
+  NEONPINK = { 255, 0, 128, 255 }
   ImGuiStyleVar_DisabledAlpha = 1
   SDL_WINDOW_OPENGL = 2
   SDL_SCANCODE_APPLICATION = 101
   SDL_SCALEMODE_NEAREST = 0
-  GRAY = "130 130 130 255"
+  GRAY = { 130, 130, 130, 255 }
   ImGuiKey_3 = 539
   SDL_SCALEMODE_LINEAR = 1
+  MAX_LAYER = 20
   SDL_SCANCODE_MEDIA_REWIND = 266
   SDL_SCANCODE_F12 = 69
+  SCALE_SNAP = 8
   SDL_WINDOW_VULKAN = 268435456
   ImGuiCol_PlotHistogram = 45
   cl_Slate = "0.180000 0.240000 0.310000 1.000000"
   SDL_SCANCODE_EXECUTE = 116
   ImGuiCol_TextDisabled = 1
   ImGuiWindowFlags_AlwaysHorizontalScrollbar = 32768
+  SDL_HAT_DOWN = 4
   SDL_BLENDMODE_INVALID = 2147483647
   ImGuiCol_TableBorderLight = 49
-  BEIGE = "211 176 131 255"
+  BEIGE = { 211, 176, 131, 255 }
   ImGuiTableFlags_RowBg = 64
   SDL_COLORSPACE_HDR10 = 301999616
   SDL_BLENDFACTOR_DST_ALPHA = 9
@@ -5664,12 +6290,12 @@ namespace Global {
   SDL_BLENDOPERATION_MINIMUM = 4
   ImGuiCol_TableRowBg = 50
   SDL_WINDOW_MOUSE_GRABBED = 256
-  SKYBLUE = "102 191 255 255"
+  SKYBLUE = { 102, 191, 255, 255 }
   SDL_SCANCODE_KP_DIVIDE = 84
   SDL_SCANCODE_KP_MINUS = 86
   SDL_BLENDFACTOR_SRC_COLOR = 3
   ImGuiCol_Button = 21
-  WHITE = "255 255 255 255"
+  WHITE = { 255, 255, 255, 255 }
   SDL_SCANCODE_SLASH = 56
   ImGuiCol_MenuBarBg = 13
   SDL_BLENDFACTOR_SRC_ALPHA = 5
@@ -5679,7 +6305,7 @@ namespace Global {
   SDL_BLENDMODE_ADD_PREMULTIPLIED = 32
   ImGuiPopupFlags_MouseButtonMiddle = 12
   SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA = 10
-  BROWN = "127 106 79 255"
+  BROWN = { 127, 106, 79, 255 }
   SDL_SCANCODE_CURRENCYUNIT = 180
   ImGuiStyleVar_SeparatorTextAlign = 38
   SDL_SCANCODE_C = 6
@@ -5687,10 +6313,11 @@ namespace Global {
   SDL_PIXELFORMAT_BGR24 = 390076419
   ImGuiWindowFlags_NoScrollbar = 8
   SDL_SCANCODE_ESCAPE = 41
+  SDL_GAMEPAD_BUTTON_LEFT_SHOULDER = 9
   ImGuiWindowFlags_NoBringToFrontOnFocus = 8192
-  LIGHTGRAY = "200 200 200 255"
+  LIGHTGRAY = { 200, 200, 200, 255 }
   SDL_BLENDOPERATION_SUBTRACT = 2
-  DARKGRAY = "80 80 80 255"
+  DARKGRAY = { 80, 80, 80, 255 }
   SDL_PIXELFORMAT_ARGB32 = 377888772
   ImGuiCol_TabHovered = 34
   SDL_SCANCODE_HOME = 74
@@ -5700,10 +6327,10 @@ namespace Global {
   ImGuiKey_Delete = 522
   SDL_COLORSPACE_SRGB = 301991328
   ImGuiTableFlags_ScrollX = 16777216
-  RED = "230 41 55 255"
+  RED = { 230, 41, 55, 255 }
   SDL_COLORSPACE_YUV_DEFAULT = 554703046
   SDL_WINDOW_NOT_FOCUSABLE = 2147483648
-  BLACK = "0 0 0 255"
+  BLACK = { 0, 0, 0, 255 }
   cl_Kelp = "0.130000 0.290000 0.130000 1.000000"
   SDL_SCANCODE_UNKNOWN = 0
   SDL_SCANCODE_F8 = 65
@@ -5717,9 +6344,10 @@ namespace Global {
   ImGuiStyleVar_ItemInnerSpacing = 15
   ImGuiStyleVar_ScrollbarSize = 18
   ImGuiStyleVar_ScrollbarRounding = 19
+  LOGO_SPAWN_RATE = 50
   ImGuiStyleVar_GrabMinSize = 21
   ImGuiCol_ButtonActive = 23
-  WHITEBLEND = "255 255 255 254"
+  WHITEBLEND = { 255, 255, 255, 254 }
   ImGuiKey_B = 547
   SDL_SCANCODE_PRIOR = 157
   ImGuiStyleVar_TabBarOverlineSize = 30
@@ -5732,6 +6360,7 @@ namespace Global {
   SDL_SCANCODE_V = 25
   SDL_SCANCODE_MEDIA_PLAY = 262
   ImGuiStyleVar_COUNT = 41
+  SHOW_PREVIEW = 0
   ImGuiKey_LeftArrow = 513
   ImGuiInputTextFlags_None = 0
   ImGuiInputTextFlags_CharsDecimal = 1
@@ -5778,7 +6407,7 @@ namespace Global {
   ImGuiTableFlags_Borders = 1920
   ImGuiStyleVar_SeparatorTextBorderSize = 37
   ImGuiTableColumnFlags_DefaultHide = 2
-  PURPLE = "200 122 255 255"
+  PURPLE = { 200, 122, 255, 255 }
   ImGuiTableColumnFlags_WidthStretch = 8
   SDL_SCANCODE_BACKSPACE = 42
   ImGuiKey_Insert = 521
@@ -5791,6 +6420,7 @@ namespace Global {
   ImGuiMod_Super = 32768
   SDL_PROPERTY_TYPE_FLOAT = 4
   ImGuiKey_A = 546
+  MAG_MAX = 5000
   ImGuiKey_C = 548
   ImGuiTreeNodeFlags_SpanFullWidth = 4096
   ImGuiKey_E = 550
@@ -5816,6 +6446,7 @@ namespace Global {
   ImGuiKey_S = 564
   SDL_SCANCODE_MEDIA_STOP = 269
   ImGuiKey_U = 566
+  SDL_GAMEPAD_BUTTON_DPAD_RIGHT = 14
   cl_Coral = "1.000000 0.500000 0.310000 1.000000"
   ImGuiKey_V = 567
   SDL_FOLDER_TEMPLATES = 9
@@ -5872,11 +6503,13 @@ namespace Global {
   SDL_COLORSPACE_SRGB_LINEAR = 301991168
   SDL_SCANCODE_J = 13
   cl_DarkGray = "0.250000 0.250000 0.250000 1.000000"
+  SDL_GAMEPAD_AXIS_RIGHTY = 3
   SDL_PROPERTY_TYPE_NUMBER = 3
   cl_Brown = "0.600000 0.300000 0.000000 1.000000"
   SDL_SCANCODE_LANG8 = 151
   cl_Emerald = "0.160000 0.710000 0.440000 1.000000"
   SDL_SCANCODE_B = 5
+  SDL_HAT_UP = 1
   ImGuiKey_Space = 524
   cl_SkyBlue = "0.530000 0.810000 0.980000 1.000000"
   cl_Gold = "1.000000 0.840000 0.000000 1.000000"
@@ -5884,6 +6517,7 @@ namespace Global {
   cl_Seafoam = "0.600000 0.850000 0.750000 1.000000"
   cl_Sand = "0.760000 0.700000 0.500000 1.000000"
   cl_Ghost = "0.700000 0.700000 1.000000 0.500000"
+  SDL_GAMEPAD_BUTTON_WEST = 2
   ImGuiCond_FirstUseEver = 4
   ImGuiKey_X = 569
   cl_NeonPink = "1.000000 0.000000 0.500000 1.000000"
@@ -5919,6 +6553,7 @@ namespace Global {
   SDL_SCANCODE_SEMICOLON = 51
   SDL_SCANCODE_F19 = 110
   SDL_SCANCODE_GRAVE = 53
+  SDL_HAT_LEFT = 8
   SDL_SCANCODE_KP_PERCENT = 196
   SDL_SCANCODE_COMMA = 54
   SDL_SCALEMODE_INVALID = -1
@@ -5929,7 +6564,8 @@ namespace Global {
   SDL_SCANCODE_K = 14
   SDL_SCANCODE_F4 = 61
   SDL_SCANCODE_F5 = 62
-  GOLD = "255 203 0 255"
+  SDL_HAT_RIGHT = 2
+  GOLD = { 255, 203, 0, 255 }
   SDL_SCANCODE_F7 = 64
   SDL_SCANCODE_F11 = 68
   SDL_SCANCODE_F22 = 113
@@ -5944,7 +6580,7 @@ namespace Global {
   SDL_SCANCODE_PAGEDOWN = 78
   SDL_FOLDER_SAVEDGAMES = 7
   SDL_SCANCODE_RETURN = 40
-  DARKBROWN = "76 63 47 255"
+  DARKBROWN = { 76, 63, 47, 255 }
   SDL_SCANCODE_RIGHT = 79
   SDL_PIXELFORMAT_XRGB8888 = 370546692
   SDL_SCANCODE_LEFT = 80
@@ -5962,10 +6598,42 @@ namespace Global {
   SDL_SCANCODE_KP_7 = 95
   SDL_SCANCODE_KP_8 = 96
   SDL_SCANCODE_NONUSBACKSLASH = 100
+  LOGO_START_SPEED = 100
   SDL_SCANCODE_KP_EQUALS = 103
   SDL_SCANCODE_7 = 36
   SDL_SCANCODE_F15 = 106
+  SDL_POWERSTATE_NO_BATTERY = 2
   SDL_KMOD_RSHIFT = 2
   SDL_SCANCODE_F16 = 107
---- End of Dump (709 items) ---
+--- End of Dump (763 items) ---
+*/
+//------------------------------------------------------------------
+//                  Inline Functions 
+//------------------------------------------------------------------
+/*
+void print(..);
+void printf(fmt,..);
+const char* sprintf(fmt, ..);
+double math.randomf()
+double math.randomf(double limit )
+double math.randomf(double from. double to )
+double math.floor(double value)
+double math.ceil(double  value)
+double math.fabs(double value)
+double math.sin(double value)
+double math.cos(double value)
+double math.atan(double value)
+double math.tanh(double value)
+double math.sqrt(double value)
+bool math.iszero(double value)
+double math.fmod(double value1, double value2)
+double math.min(double value1, double value2)
+double math.max(double value1, double value2)
+double math.atan2(double value1, double value2)
+double math.pow(double value1, double value2)
+long math.clamp(long value1, long value2, long value2)
+double math.clampf(double value1, double value2, double value2)
+double math.lerp(double value1, double value2, double value2)
+double math.smoothstep(double value1, double value2, double value2)
+
 */

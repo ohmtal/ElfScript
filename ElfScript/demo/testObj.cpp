@@ -276,6 +276,8 @@ public:
     U64 mU64 = 0;
     S64 mS64 = 0;
 
+    ConsoleVector mVec;
+
     /*
      * Storing Point in a vector Vector implementation
      *
@@ -333,9 +335,12 @@ public:
         addField("testBool", TypeBool,   Offset(mBool, TestObj));
         addField("testString", TypeString, Offset(mTestName, TestObj));
         addField("testSlot", TypeS32, Offset(mSlots, TestObj), 3); //WARNING count is not validated!!!
+
+
         //----
         addProtectedField("pointSize", TypeS32, 0, &_setPointSize,&_getPointSize, "Set the point size (element count).");
 
+        addField("vec", TypeVector, Offset(mVec, TestObj));
 
     }
 

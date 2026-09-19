@@ -945,14 +945,14 @@ class SimObject: public ConsoleObject
                   // // #endif
             ) {
 
-                  #ifdef ENABLE_CONSOLE_VECTOR
+                  // #ifdef ENABLE_CONSOLE_VECTOR
                   if (fld->type == TypeVector) {
                         ConsoleVector* target = (ConsoleVector*)(((const char*)this) + fld->offset);
                         *target = stackP->getVector();
                         return true;
                   }
                   else
-                  #endif
+                  // #endif
                   if (fld->type == TypeF32 || fld->type == TypeF64)
                         return  this->setDataField(fld,stackP->getFloat() );
                   else

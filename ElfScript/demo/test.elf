@@ -28,6 +28,8 @@ new PointStorageObject(sto) {
 
 };
 
+
+
 sto.x = 1;
 
 
@@ -862,6 +864,13 @@ if ($failCount > 0 ) {
 }
 
 
+printSeparator();
+print ("--------------- TypeVector BUG!! ------------------");
+$o = new TestObj();
+// vardumpField("$o.vec");
+print("vec=",$o.vec);
+$o.vec = {1,2,3};
+print("vec=",$o.vec);
 
 
 
