@@ -530,18 +530,16 @@ class SimObject: public ConsoleObject
                               && fld->flag == 0
                               && (
                                     fld->type == TypeF32
-                                    || fld->type == TypeF64
+                                    || fld->type == TypeS32
                                     || fld->type == TypeBool
+                                    || fld->type == TypeVector
+                                    || fld->type == TypeF64
                                     || fld->type == TypeS8
                                     || fld->type == TypeU8
                                     || fld->type == TypeS16
-                                    || fld->type == TypeS32
                                     || fld->type == TypeU32
                                     || fld->type == TypeS64
                                     || fld->type == TypeU64
-                                    // #ifdef ENABLE_CONSOLE_VECTOR
-                                    || fld->type == TypeVector
-                                    // #endif
                               )) {
                               cacheP->type = staticField;
                               } else {

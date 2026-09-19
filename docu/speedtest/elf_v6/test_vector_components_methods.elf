@@ -1,0 +1,49 @@
+#define JLOOPS 25
+#define ILOOPS 1000000
+
+// This is slow ... the methods are meant to change a vector not for single values
+// so it's slow as the components without cache. I still have no idea why components
+// are slower than dynamic fields- i cache the pointer of the float value ...
+// an extra syntax would be help
+// like %vec:x then it should be as fast as an global variable or %vec:1
+
+
+%myVec = { 0.0, 0.0 };
+vardump("%myVec");
+
+for (%j in range  JLOOPS) {
+    for (%i in range ILOOPS) {
+        %myVec.add({1.0});
+    }
+    print("SUM (++) IS:" SPC %myVec.x);
+    // varDumpField("%myVec.x");
+    for (%i in range  ILOOPS) {
+        %myVec.sub({1.0});
+    }
+    print("SUM (--) IS:" SPC %myVec.x);
+    // varDumpField("%myVec.x");
+    %myVec =  {66.0};
+    print("set Sum to 66 == " SPC %myVec.x * 1);
+    for (%i in range  ILOOPS) {
+        %myVec.mul({%i + 1});
+        %myVec.div({%i + 1});
+    }
+    print("SUM (*/ %i+1) IS:" SPC %myVec.x);
+    // varDumpField("%myVec.x");
+    %ran = 0.0;
+    for (%i in range  ILOOPS / 2) {
+        // %ran = getRandomF(%i);
+        %ran = math.randomf(%i);
+        %myVec.sub({%ran});
+        %myVec.add({%ran});
+    }
+    vardump("%ran");
+    print("SUM (rand +-) IS:" SPC %myVec.x);
+    // varDumpField("%myVec.x");
+}
+%myVec.x -= 33.0 ;
+print("---------------------");
+print("---------------------");
+print("Final sum should be 33 == ", %myVec.x);
+print("---------------------");
+print("---------------------");

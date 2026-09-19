@@ -267,7 +267,7 @@ namespace ElfScript {
         if (!variableName) return;
 
         if (variableName[0] != Con::LocalVarTag && variableName[0] != Con::ParentVarTag) {
-            Con::errorf("Sorry [%s] in not a local variable %s", variableName);
+            Con::errorf("Sorry [%s] in not a local variable name", variableName);
             return;
         }
         ConsoleValue* localVal = nullptr;
