@@ -84,11 +84,6 @@ function StarField::Render(%this) {
     for( %i in range STAR_COUNT )
     {
 
-//         %pointVec = %this.starArray.at( %i );
-//         %pointX = %pointVec.x;
-//         %pointY = %pointVec.y;
-//         %pointZ = %pointVec.z - %dt * %this.speed;
-//
 
         // new tupple assignment
         [ %pointX , %pointY, %pointZ] = %starArray.at( %i );
@@ -131,49 +126,7 @@ function StarField::Render(%this) {
 
         %this.starArray.set(%i, { %pointX, %pointY, %pointZ});
     }
-    // for( %i in range STAR_COUNT )
-    // {
-    //
-    //     %pointVec = %this.starArray.at( %i );
-    //     %pointVec.z -= %dt * %this.speed;
-    //
-    //     // Calculate the screen position
-    //     %invZ = 1.0 /  %pointVec.z;
-    //     %screenPos_X = %this.halfW + (%pointVec.x * %invZ);
-    //     %screenPos_Y = %this.halfH + (%pointVec.y * %invZ);
-    //
-    //     if ( %pointVec.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
-    //         || %screenPos_X > %this.screenWidth || %screenPos_Y > %this.screenHeight)
-    //     {
-    //         %pointVec.x = math.randomf(%this.minW , %this.maxW);
-    //         %pointVec.y =  math.randomf(%this.minH , %this.maxH);
-    //         %pointVec.z = 1.0;
-    //         %screenPos_X = %this.halfW + %pointVec.x;
-    //         %screenPos_Y = %this.halfH + %pointVec.y;
-    //     }
-    //     // <<<<<<<<<<<<<<<<<<<<<
-    //     if (%this.drawLines)
-    //     {
-    //         %t = math.ClampF(%pointVec.z + START_DIV , 0.0 , 1.0 );
-    //
-    //         if ( (%t - %pointVec.z) > 1e-3)
-    //         {
-    //             %invT = 1.0 / %t;
-    //             %startX = %this.halfW  + ( %pointVec.x * %invT);
-    //             %startY = %this.halfH  + (  %pointVec.y * %invT);
-    //
-    //             SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
-    //         }
-    //     }
-    //     else
-    //     {
-    //         %radius = math.Lerp(2.0, 0.3, %pointVec.z);
-    //         // SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
-    //         SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
-    //     }
-    //
-    //     %this.starArray.set(%i, %pointVec);
-    // }
+
 
 
     %fontScale = 0.7;

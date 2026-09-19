@@ -8,7 +8,7 @@
 #define START_DIV 0.03125
 
 function createStarField() {
-    %obj = new ScriptGroup() {
+    %obj = new Group() {
         class = "StarField";
         TypeF32 speed = 0.4;
         TypeBool drawLines = false;
@@ -77,58 +77,56 @@ function StarField::Render(%this) {
     %ranMinW = $minW;
     %ranMaxW = $maxW;
 
+    %sW = $screenWidth;
+    %sH = $screenHeight;
+    %hW = %sW * 0.5;
+    %hH = %sH * 0.5;
+
     // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
     {
-        // this fetch/ setPoint combination is the fastest way i found so far.
-        // the local vars are fast anyway.
-
-
-        // %lStarPoints.fetchPoint(%i);
-        // %pointX = %lStarPoints.x;
-        // %pointY = %lStarPoints.y;
-        // %pointZ = %lStarPoints.z - %dt * %speed;
-
-
+        // fast tuple assignment
         [ %pointX , %pointY, %pointZ] = %lStarPoints.getPointVec(%i);
-        %pointZ -= %dt * %this.speed;
+        %pointZ -= %dt * %speed;
 
         // Calculate the screen position
         %invZ = 1.0 /  %pointZ;
-        %screenPos_X = $hW + (%pointX * %invZ);
-        %screenPos_Y = $hH + (%pointY * %invZ);
+        %screenPos_X = %hW + (%pointX * %invZ);
+        %screenPos_Y = %hH + (%pointY * %invZ);
 
         if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
-            || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
+            || %screenPos_X > %sW || %screenPos_Y > %sH)
         {
-            %pointX = GetRandomF($minH, $maxH);
-            %pointY = GetRandomF($minW, $maxW);
+            %pointX = math.randomf(%ranMinH, %ranMaxH);
+            %pointY = math.randomf(%ranMinW, %ranMaxW);
             %pointZ = 1.0;
-            %screenPos_X = $hW +  %pointX;
-            %screenPos_Y = $hH +  %pointY;
+            %screenPos_X = %hW +  %pointX;
+            %screenPos_Y = %hH +  %pointY;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%drawLines)
         {
-            %t = mClampF(%pointZ + START_DIV , 0.0 , 1.0 );
+            %t = math.clampF(%pointZ + START_DIV , 0.0 , 1.0 );
 
             if ( (%t - %pointZ) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = $hW + ( %pointX * %invT);
-                %startY = $hH + (  %pointY * %invT);
+                %startX = $hW + ( %pointX * %invT );
+                %startY = $hH + ( %pointY * %invT );
 
-                SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
+                // SDL_RenderLine(%renderer,%startX, %startY, %screenPos_X, %screenPos_Y );
+                SDL_RenderLineRect(%renderer,{%startX, %startY, %screenPos_X, %screenPos_Y} );
             }
         }
         else
         {
-            %radius = mLerp(2.0, 0.3, %pointZ);
-            // SDL_RenderRectF(%renderer, %screenPos_X, %screenPos_Y, %radius,%radius, true);
+            %radius = math.lerp(2.0, 0.3, %pointZ);
             SDL_RenderFillRect(%renderer, { %screenPos_X, %screenPos_Y, %radius,%radius});
         }
 
-        %lStarPoints.setPoint(%i, %pointX, %pointY, %pointZ);
+        // write back to PointStorageObject, both are the same at performance:
+        // %lStarPoints.setPoint(%i, %pointX, %pointY, %pointZ);
+        %lStarPoints.setPointVec(%i, { %pointX, %pointY, %pointZ });
     }
 
 

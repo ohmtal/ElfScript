@@ -49,7 +49,7 @@
 #include "Array.h"
 #include "LambdaMappings.h"
 
-#include "console/localVar.h"
+// #include "console/localVar.h"
 
 // ------------ Vector2 helper ----------------
 inline float lengthSquaredXY(const F32 x, const F32 y) {
@@ -192,47 +192,47 @@ public:
         this->mVector = vec4;
     }
     // -------------------------------------------------------------------------
-    // **** direct local var access !!!! - i ignore fails here ...***
-    void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-        ElfScript::setLocalFloat(varX, mVector.points[0]);
-        ElfScript::setLocalFloat(varY, mVector.points[1]);
-        if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
-        if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
-    }
-    // **** direct local var access for points !!!! - i ignore fails here ...***
-    bool getPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-        if ( index >= this->mPoints.size()) return false;
-        ElfScript::setLocalFloat(varX, this->mPoints[index].points[0]);
-        ElfScript::setLocalFloat(varY, this->mPoints[index].points[1]);
-        if (varZ) ElfScript::setLocalFloat(varZ, this->mPoints[index].points[2]);
-        if (varW) ElfScript::setLocalFloat(varW, this->mPoints[index].points[3]);
-        return true;
-    }
-    // **** direct local var access for points !!!! - i ignore fails here ...***
-    bool setPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
-        if ( index >= this->mPoints.size()) return false;
-        this->mPoints[index].points[0] = ElfScript::getLocalFloat(varX);
-        this->mPoints[index].points[1] = ElfScript::getLocalFloat(varY);
-        if (varZ) this->mPoints[index].points[2] = ElfScript::getLocalFloat(varZ);
-        if (varW) this->mPoints[index].points[3] = ElfScript::getLocalFloat(varW);
-        return true;
-    }
-
-// #ifdef ENABLE_CONSOLE_VECTOR
-    // fast fetch !!
-    // **** direct local var access for ConsoleVector!!!! - i ignore fails here ...***
-    bool getPointVecByReference(U32 index, const char* vecVar) {
-        if ( index >= this->mPoints.size()) return false;
-        ElfScript::setLocalVector(vecVar, this->mPoints[index]);
-        return true;
-    }
-    // **** direct local var access for ConsoleVector !!!! - i ignore fails here ...***
-    bool setPointVecByReference(U32 index,  const char* vecVar) {
-        if ( index >= this->mPoints.size()) return false;
-        this->mPoints[index] = ElfScript::getLocalVector(vecVar);
-        return true;
-    }
-// #endif
+//     // **** direct local var access !!!! - i ignore fails here ...***
+//     void getPosByReference(const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+//         ElfScript::setLocalFloat(varX, mVector.points[0]);
+//         ElfScript::setLocalFloat(varY, mVector.points[1]);
+//         if (varZ) ElfScript::setLocalFloat(varZ, mVector.points[2]);
+//         if (varW) ElfScript::setLocalFloat(varW, mVector.points[3]);
+//     }
+//     // **** direct local var access for points !!!! - i ignore fails here ...***
+//     bool getPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+//         if ( index >= this->mPoints.size()) return false;
+//         ElfScript::setLocalFloat(varX, this->mPoints[index].points[0]);
+//         ElfScript::setLocalFloat(varY, this->mPoints[index].points[1]);
+//         if (varZ) ElfScript::setLocalFloat(varZ, this->mPoints[index].points[2]);
+//         if (varW) ElfScript::setLocalFloat(varW, this->mPoints[index].points[3]);
+//         return true;
+//     }
+//     // **** direct local var access for points !!!! - i ignore fails here ...***
+//     bool setPointByReference(U32 index, const char* varX,const char* varY,const char* varZ = nullptr,const char* varW = nullptr) {
+//         if ( index >= this->mPoints.size()) return false;
+//         this->mPoints[index].points[0] = ElfScript::getLocalFloat(varX);
+//         this->mPoints[index].points[1] = ElfScript::getLocalFloat(varY);
+//         if (varZ) this->mPoints[index].points[2] = ElfScript::getLocalFloat(varZ);
+//         if (varW) this->mPoints[index].points[3] = ElfScript::getLocalFloat(varW);
+//         return true;
+//     }
+//
+// // #ifdef ENABLE_CONSOLE_VECTOR
+//     // fast fetch !!
+//     // **** direct local var access for ConsoleVector!!!! - i ignore fails here ...***
+//     bool getPointVecByReference(U32 index, const char* vecVar) {
+//         if ( index >= this->mPoints.size()) return false;
+//         ElfScript::setLocalVector(vecVar, this->mPoints[index]);
+//         return true;
+//     }
+//     // **** direct local var access for ConsoleVector !!!! - i ignore fails here ...***
+//     bool setPointVecByReference(U32 index,  const char* vecVar) {
+//         if ( index >= this->mPoints.size()) return false;
+//         this->mPoints[index] = ElfScript::getLocalVector(vecVar);
+//         return true;
+//     }
+// // #endif
     // -------------------------------------------------------------------------
     void write(Stream &stream, U32 tabStop, U32 flags) override {
         // Parent::write >>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -683,7 +683,7 @@ DefineEngineMethod(PointStorageObject, fetchPoint, bool, (U32 index), ,
 }
 
 
-
+// ------------------------------ Lambda Mapping ------------------------------
 
 DefineEngineMethod(PointStorageObject, mapFn, SimObjectId, (ConsoleValue funcValue, U32 customParamCount),,
     "Map a Lambda function to PointStorage. This can be used by stepFn or runFn\n"
