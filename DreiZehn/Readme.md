@@ -8,6 +8,51 @@ A lightweight, line by line, embedded scripting language built from scratch in C
 Ich wollte mir nur mal NaN boxing anschauen und dann hab ich gleich eine kleine Scriptsprache Drumherum gebaut *lol*.
 ```
 
+## Syntax 
+- The ';' spearator is only needed if you write multiple statements in one line.
+- Compare: 
+    - Or: ||
+    - And: &&
+    - Equal: ==
+    - Non Equal: !=
+- Supported operations: 
+    - Add: +,
+    - Sub: -
+    - Mul: *
+    - Div: /
+    - Bitwise shift right: >>
+    - Bitwise shift left: <<
+    - Bitwise Or: |
+    - Bitwise And: &
+- If: `if i == 5; print "is 5"; else print "is not 5"; end` 
+You always need a end at the end. Same for loops.
+- Loops: 
+    - for: `for i 1 2; print i; end` from to (inclusive) 
+    - while: `i = 0; while i < 5; i = i + 1; print i;end;`
+- Break: `break` the current statement 
+- Return: break the current statement and may return a value : `return 4`
+- Function parameters are simply added: `print "Hello World"`
+- If you need to pass statements you can use: `print "Hello" ( 1 + 1 )`
+- Object constructors are with a big first captial like: `Array.new`
+- libary function calls are all lower case like `math.randomf`
+- methods on objects are called with a Arrow: `arr->pop` 
+- fn: function definition: `fn hello param1 param2;print param1 param2; end; hello`
+- Uncomment: Full Line only at the start of a line: `#` or `--`
+
+Nore: I have not implemented `var++`,`var--`, `var [OP]=`  or `if !var ..`, maybe later. 
+
+# Add a new function in C++:
+It's so easy:
+```
+    using namespace DreiZehn;
+    FunctionMap::RegisterFunction("fnFoo", [](std::vector<Value>& args, Value& ret) -> bool {
+        printf("The Foo was here ...\n");
+        ret = Value(4711.0815);
+        return true;
+    });
+```
+
+
 ## Text Edior
 
 Since it's a uncommon syntax i had good results in my Editor setting Highlight mode:
