@@ -6,6 +6,7 @@
 - Elfscript 0.6f close to lua but still about 200ms:  **1.434u** 0.006s 0:01.45 98.6%     0+0k 0+0io 0pf+0w
 - Elfscript 0.6f outperform PHP 8: 2.242u 0.013s 0:02.31 97.4%     0+0k 18792+0io 97pf+0w
 - ElfScript 0.4 outperform python 3: 15.768u 0.005s 0:15.83 99.5%    0+0k 0+0io 0pf+0w. 
+- 🐢 Dreizehn 0.3: 23.020u 0.002s 0:23.07 99.7% 0+0k 0+0io 0pf+0w
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
 
