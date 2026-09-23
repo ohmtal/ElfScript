@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     RegisterDebugFunctions();
     RegisterUserFunc();
 
-    RegisterSDL3Functions(env);
+    RegisterSDL3Functions();
 
 
     if (argc > 1) {

@@ -18,6 +18,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <functional>
+#include <cassert>
 
 #include "Value.h"
 #include "AstNode.h"
@@ -25,15 +26,14 @@
 #include "FunctionMap.h"
 #include "Globals.h"
 #include "SymbolTable.h"
+#include "VariableFrame.h"
 
 // Byte Code
 #ifdef DREIZEHN_BYTECODE
-
 #include "VMStructure.h"
 #include "CompilerScope.h"
 #include "ASTCompiler.h"
 #include "VM.h"
-
 #endif
 
 namespace DreiZehn {
@@ -58,87 +58,34 @@ namespace DreiZehn {
 
 class Environment {
 private:
-    // variables stack
-    // std::unordered_map<std::string, Value> mVariables;
-    std::unordered_map<uint32_t, Value> mVariables;
 
-    // Garbage collection
-    std::vector<ValueObject*> mGarbageCollection;
     Environment* mParentEnv = nullptr;
+    VariableFrame* mVariableFrame = nullptr;
 public:
     Environment() : mParentEnv(nullptr) {
         Globals::gCurEnv = this;
+        mVariableFrame = new VariableFrame(nullptr);
     }
     Environment(Environment* parentEnv) : mParentEnv(parentEnv) {
         Globals::gCurEnv = this;
+        mVariableFrame = new VariableFrame(parentEnv->mVariableFrame);
     }
     ~Environment() {
-        doGarbageCollection();
         if (mParentEnv) Globals::gCurEnv = mParentEnv;
+        else Globals::gCurEnv = nullptr;
+
+        if (mVariableFrame) {
+            delete(mVariableFrame);
+            mVariableFrame = nullptr;
+        }
     }
 
-    // -------------------------------------------------------------------------
-    // Variable getter/setter
-    // -------------------------------------------------------------------------
-    void setVariable(uint32_t id, Value val) {
-
-        if (Globals::gShowVariableDebug) Tools::printf("DEBUG: setVariable :: name: %s id: %d, floatval: %f\n", SymbolTable::getName(id).c_str(), id, val.getFloat());
-
-        auto it = mVariables.find(id);
-        if (it != mVariables.end()) {
-            it->second = val;
-            return;
-        }
-
-        if (mParentEnv != nullptr) {
-            if (mParentEnv->tryUpdateVariable(id, val)) {
-                return;
-            }
-        }
-        mVariables[id] = val;
-    }
-    // -------------------------------------------------------------------------
-    bool tryUpdateVariable(uint32_t id, Value val) {
-        auto it = mVariables.find(id);
-        if (it != mVariables.end()) {
-            it->second = val;
-            return true;
-        }
-        if (mParentEnv != nullptr) {
-            return mParentEnv->tryUpdateVariable(id, val);
-        }
-        return false;
-    }
-    // // -------------------------------------------------------------------------
-    Value getVariable(uint32_t id) {
-        if (Globals::gShowVariableDebug) Tools::printf("DEBUG: getVariable :: name: %s id: %d\n", SymbolTable::getName(id).c_str(), id);
-
-        auto it = mVariables.find(id);
-        if (it != mVariables.end()) {
-            return it->second;
-        }
-
-        if (mParentEnv != nullptr) {
-            return mParentEnv->getVariable(id);
-        }
-
-        std::string varName = SymbolTable::getName(id);
-        Tools::errorf("Variable not found: %s\n", varName.c_str());
-        return Value();
-    }
-    // -------------------------------------------------------------------------
-    // GarbageCollection
-    // -------------------------------------------------------------------------
-    void addToGarbageCollection(ValueObject* obj) {
-        mGarbageCollection.push_back(obj);
+    VariableFrame* getVariableFrame() {
+        assert(mVariableFrame && "FATAL ERROR: Enviroment require a VariableFrame!");
+        return mVariableFrame;
     }
 
-    void doGarbageCollection() {
-        for (auto* obj : mGarbageCollection) {
-            delete obj;
-        }
-        mGarbageCollection.clear();
-    }
+
     // -------------------------------------------------------------------------
     // EXECUTE :D - currentEnv for function calls
     // -------------------------------------------------------------------------
@@ -158,7 +105,7 @@ public:
         if (auto* retStmt = dynamic_cast<ReturnStatement*>(node)) {
             if (retStmt->mExpression) {
                 Value retVal = retStmt->mExpression->evaluate(currentEnv);
-                currentEnv.setVariable(SymbolTable::insert("__return_value__"), retVal);
+                currentEnv.mVariableFrame->setVariable(SymbolTable::insert("__return_value__"), retVal);
             }
             return FlowSignal::Return;
         }
@@ -191,7 +138,7 @@ public:
 #else
         // prev byte code:
         if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
-            currentEnv.setVariable(assign->mVarNameSymbolId, assign->mRhs->evaluate(currentEnv));
+            currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, assign->mRhs->evaluate(currentEnv));
         }
 #endif
 
@@ -236,7 +183,7 @@ public:
             Environment loopEnv(&currentEnv);
 
             for (int i = start; i <= end; ++i) {
-                loopEnv.setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
+                loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
 
                 for (auto& statement : forStmt->mBody) {
                     FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);

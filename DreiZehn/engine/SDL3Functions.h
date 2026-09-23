@@ -5,10 +5,12 @@
 // Core Commands
 //-----------------------------------------------------------------------------
 #pragma once
-#include "FunctionMap.h"
-#include "ValueObject.h"
 #include <SDL3/SDL.h>
 #include <cstring>
+
+#include "FunctionMap.h"
+#include "ValueObject.h"
+#include "VariableFrame.h"
 
 namespace DreiZehn {
 
@@ -40,7 +42,7 @@ namespace DreiZehn {
     };
 
 
-    void RegisterSDL3Functions( Environment& env) {
+    void RegisterSDL3Functions( ) {
 
         using namespace FunctionMap;
 
@@ -116,7 +118,7 @@ namespace DreiZehn {
 
         // ---------------------------------------------------------------------
         // extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_CreateWindow(const char *title, int w, int h, SDL_WindowFlags flags);
-        RegisterFunction("SDL_CreateWindow", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("SDL_CreateWindow", [](std::vector<Value>& args, Value& ret) -> bool {
             if (args.size() != 4) {
                 Tools::errorf("usage: SDL_CreateWindow(const char *title, int w, int h, SDL_WindowFlags flags)\n");
                 return false;
@@ -135,13 +137,12 @@ namespace DreiZehn {
             }
             SDL_Window_Object* obj = new SDL_Window_Object(win);
             ret = Value(obj);
-            env.addToGarbageCollection(obj);
-
+            if (gCurrentFrame) gCurrentFrame->addToGarbageCollection(obj);
             return true;
         });
         // ---------------------------------------------------------------------
         // extern SDL_DECLSPEC void SDLCALL SDL_DestroyWindow(SDL_Window *window);
-        RegisterFunction("SDL_DestroyWindow", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("SDL_DestroyWindow", [](std::vector<Value>& args, Value& ret) -> bool {
             if (args.size() != 1 || !args[0].isPointer()) {
                 Tools::errorf("usage: SDL_DestroyWindow(SDL_Window *window)\n");
                 return false;
@@ -156,7 +157,7 @@ namespace DreiZehn {
         });
         // ---------------------------------------------------------------------
         // extern SDL_DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRenderer(SDL_Window *window, const char *name);
-        RegisterFunction("SDL_CreateRenderer", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("SDL_CreateRenderer", [](std::vector<Value>& args, Value& ret) -> bool {
             if (args.size() < 1) {
                 Tools::errorf("usage: SDL_CreateRenderer(SDL_Window *window, const char *name)\n");
                 return false;
@@ -175,7 +176,7 @@ namespace DreiZehn {
             }
             SDL_Renderer_Object* obj = new SDL_Renderer_Object(rend);
             ret = Value(obj);
-            env.addToGarbageCollection(obj);
+            if (gCurrentFrame) gCurrentFrame->addToGarbageCollection(obj);
             return true;
         });
         // ---------------------------------------------------------------------
@@ -183,10 +184,11 @@ namespace DreiZehn {
         // ---------------------------------------------------------------------
         // NOTE: Tool function to create an empty event object
         // used by SDL_PollEvent
-        RegisterFunction("SDL_CreateEvent", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("SDL_CreateEvent", [](std::vector<Value>& args, Value& ret) -> bool {
             SDL_Event_Object* obj = new SDL_Event_Object();
             ret = Value(obj);
-            env.addToGarbageCollection(obj);
+
+            if (gCurrentFrame) gCurrentFrame->addToGarbageCollection(obj);
             return true;
         });
         // extern SDL_DECLSPEC bool SDLCALL SDL_PollEvent(SDL_Event *event);

@@ -87,7 +87,7 @@ namespace DreiZehn {
             }
 
             auto* newStrObj = new StringValueObject(resultStr);
-            env.addToGarbageCollection(newStrObj);
+            env.getVariableFrame()->addToGarbageCollection(newStrObj);
             ret = Value(newStrObj);
             return true;
         });

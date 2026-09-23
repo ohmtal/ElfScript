@@ -21,7 +21,7 @@ namespace DreiZehn {
         if (mType == TokenType::StringLiteral) {
             auto* strObj = new StringValueObject(mRawValue);
 
-            env.addToGarbageCollection(strObj);
+            env.getVariableFrame()->addToGarbageCollection(strObj);
 
             return Value(strObj);
         }
@@ -30,12 +30,12 @@ namespace DreiZehn {
     // -------------------------------------------------------------------------
     Value VariableExpression::evaluate(Environment& env) {
         // return env.getVariable(SymbolTable::insert(mName));
-        return env.getVariable(mVariableNameSymbolId);
+        return env.getVariableFrame()->getVariable(mVariableNameSymbolId);
 
     }
     // -------------------------------------------------------------------------
     Value MethodExpression::evaluate(Environment& env) {
-        Value objectPointer = env.getVariable(mPointerNameSymbolId);
+        Value objectPointer = env.getVariableFrame()->getVariable(mPointerNameSymbolId);
         if (!objectPointer.isPointer()) {
             // Tools::errorf("RunTime Error: Object %s not found.\n", mPointerName.c_str());
             Tools::errorf("RunTime Error: Object %s not found.\n", SymbolTable::getName(mPointerNameSymbolId).c_str());
@@ -93,7 +93,7 @@ namespace DreiZehn {
             for (size_t i = 0; i < func.parameterNames.size(); ++i) {
                 if (i < arguments.size()) {
                     Value evaluatedArg = arguments[i]->evaluate(env);
-                    localEnv.setVariable(SymbolTable::insert(func.parameterNames[i]), evaluatedArg);
+                    localEnv.getVariableFrame()->setVariable(SymbolTable::insert(func.parameterNames[i]), evaluatedArg);
                 }
             }
             Value functionResult = Value(0);
@@ -101,7 +101,7 @@ namespace DreiZehn {
                 FlowSignal sig = env.execute(statement.get(), localEnv);
 
                 if (sig == FlowSignal::Return) {
-                    Value retVal = localEnv.getVariable(SymbolTable::insert("__return_value__"));
+                    Value retVal = localEnv.getVariableFrame()->getVariable(SymbolTable::insert("__return_value__"));
                     return retVal;
                 }
             }

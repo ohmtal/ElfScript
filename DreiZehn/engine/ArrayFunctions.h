@@ -7,20 +7,12 @@
 #pragma once
 
 #include <vector>
-#include "Environment.h"
 #include "Value.h"
 #include "ValueObject.h"
 #include "FunctionMap.h"
 
 namespace DreiZehn {
 
-//     ValueObjectMethod ArrayValueObject::mPush;
-//     ValueObjectMethod ArrayValueObject::mPop;
-//     ValueObjectMethod ArrayValueObject::mSize;
-//     ValueObjectMethod ArrayValueObject::mGet;
-//     ValueObjectMethod ArrayValueObject::mAt;
-//     ValueObjectMethod ArrayValueObject::mSet;
-//
 
     struct ArrayValueObject : public ValueObject {
         std::vector<Value> mElements;
@@ -102,7 +94,7 @@ namespace DreiZehn {
         RegisterFunction("Array.new", [&env](std::vector<Value>& args, Value& ret) -> bool {
             ArrayValueObject* arr = new ArrayValueObject();
             ret = Value(arr);
-            env.addToGarbageCollection(arr);
+            if (gCurrentFrame) gCurrentFrame->addToGarbageCollection(arr);
             return true;
         });
 
