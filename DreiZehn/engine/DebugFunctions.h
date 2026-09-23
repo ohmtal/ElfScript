@@ -7,6 +7,7 @@
 #pragma once
 #include "FunctionMap.h"
 #include "Globals.h"
+#include "ArrayFunctions.h"
 
 namespace DreiZehn {
 
@@ -38,6 +39,20 @@ namespace DreiZehn {
                     Tools::printf("  - %s \n", SymbolTable::getName(key).c_str());
                 }
             }
+            return true;
+        });
+        // ---------------------------------------------------------------------
+        RegisterFunction("debug.types", [](std::vector<Value>& args, Value& ret) -> bool {
+            Tools::printf("---------------- Types ------------------\n");
+            for (int i = 0; i <= gLastValueObjectType; i++) {
+                Tools::printf("%d: %s\n",i, gUserObjectTypes[i].c_str());
+            }
+            return true;
+        });
+        // ---------------------------------------------------------------------
+        RegisterFunction("debug.garbage", [](std::vector<Value>& args, Value& ret) -> bool {
+            Tools::printf("---------------- Garbage Collection ------------------\n");
+            if (gCurrentFrame) gCurrentFrame->listGarbageObjects();
             return true;
         });
 

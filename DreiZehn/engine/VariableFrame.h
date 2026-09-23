@@ -29,6 +29,8 @@ private:
     std::unordered_map<uint32_t, Value> mVariables;
     // Garbage collection
     std::vector<ValueObject*> mGarbageCollection;
+    int mGarbageCheckCounter = 0;
+
 
     VariableFrame* mParentFrame = nullptr;
 
@@ -41,25 +43,34 @@ public:
         gCurrentFrame = this;
         if (parentFrame == nullptr) {
             gMasterFrame = this;
-            mGarbageCollection.reserve(256);
+            mGarbageCollection.reserve(512);
         }
         mParentFrame = parentFrame;
     }
     ~VariableFrame() {
-        doGarbageCollection();
+        doGarbageCollection(true);
         gCurrentFrame = mParentFrame;
     }
 
     // -------------------------------------------------------------------------
     // Variable getter/setter
     // -------------------------------------------------------------------------
+private:
+    void internalSetVariable(Value& pre, Value& post) {
+        if (pre.isPointer()) static_cast<ValueObject*>(pre.asPointer())->setAssigned(false);
+        if (post.isPointer()) static_cast<ValueObject*>(post.asPointer())->setAssigned(true);
+        pre = post;
+    }
+public:
+    // -------------------------------------------------------------------------
     inline void setVariable(uint32_t id, Value val) {
 
-        if (Globals::gShowVariableDebug) Tools::printf("DEBUG: setVariable :: name: %s id: %d, floatval: %f\n", SymbolTable::getName(id).c_str(), id, val.getFloat());
+        // if (Globals::gShowVariableDebug) Tools::printf("DEBUG: setVariable :: name: %s id: %d, floatval: %f\n", SymbolTable::getName(id).c_str(), id, val.getFloat());
 
         auto it = mVariables.find(id);
         if (it != mVariables.end()) {
-            it->second = val;
+            // it->second = val;
+            internalSetVariable(it->second , val);
             return;
         }
 
@@ -68,13 +79,18 @@ public:
                 return;
             }
         }
-        mVariables[id] = val;
+
+
+
+        // mVariables[id] = val;
+        internalSetVariable( mVariables[id] , val);
     }
     // -------------------------------------------------------------------------
     inline bool tryUpdateVariable(uint32_t id, Value val) {
         auto it = mVariables.find(id);
         if (it != mVariables.end()) {
-            it->second = val;
+            // it->second = val;
+            internalSetVariable(it->second , val);
             return true;
         }
         if (mParentFrame != nullptr) {
@@ -84,7 +100,7 @@ public:
     }
     // // -------------------------------------------------------------------------
    inline Value getVariable(uint32_t id) {
-        if (Globals::gShowVariableDebug) Tools::printf("DEBUG: getVariable :: name: %s id: %d\n", SymbolTable::getName(id).c_str(), id);
+        // if (Globals::gShowVariableDebug) Tools::printf("DEBUG: getVariable :: name: %s id: %d\n", SymbolTable::getName(id).c_str(), id);
 
         auto it = mVariables.find(id);
         if (it != mVariables.end()) {
@@ -103,19 +119,56 @@ public:
     // GarbageCollection
     // -------------------------------------------------------------------------
     inline void addToGarbageCollection(ValueObject* obj) {
-       assert(gMasterFrame && "addToGarbageCollection but Frame have not MasterFrame!!!");
-       gMasterFrame->mGarbageCollection.push_back(obj);
-
-    }
-
-    inline void doGarbageCollection() {
-        // NOTE only on MasterFrame
-       if (!gMasterFrame || this != gMasterFrame) return ;
-        for (auto* obj : mGarbageCollection) {
-            delete obj;
+        assert(gMasterFrame && "addToGarbageCollection but Frame have not MasterFrame!!!");
+        gMasterFrame->mGarbageCollection.push_back(obj);
+        mGarbageCheckCounter++;
+        if (mGarbageCheckCounter > 500) {
+            mGarbageCheckCounter = 0;
+            doGarbageCollection(false);
         }
-        mGarbageCollection.clear();
+
     }
+
+    inline void listGarbageObjects() {
+       assert(gMasterFrame && "listGarbageObjects but Frame have not MasterFrame!!!");
+       int i = 0;
+       for (auto* obj : gMasterFrame->mGarbageCollection) {
+            // std::cout << "Object-Type: " << typeid(*obj).name() << "\n";
+           int objtype = obj->mType;
+           Tools::printf("#%d [%p] assigned: %s type:%d %s\n"
+                         , i, (void*)obj, obj->mAssigned ? "true" : "false"
+                         , objtype, gUserObjectTypes[objtype].c_str());
+
+           i++;
+       }
+    }
+
+    inline void doGarbageCollection(bool calledOnDestructor) {
+       const bool doMaster = (
+           gMasterFrame
+           && this == gMasterFrame
+           && calledOnDestructor
+       );
+       if (doMaster) {
+           for (auto* obj : mGarbageCollection) {
+               delete obj;
+           }
+           mGarbageCollection.clear();
+       } else {
+           auto it = std::remove_if(mGarbageCollection.begin(), mGarbageCollection.end(), [](auto* obj) {
+               if (!obj->mAssigned) {
+                   delete obj;
+                   return true; // mark for delete
+               }
+               return false;
+           });
+
+           mGarbageCollection.erase(it, mGarbageCollection.end());
+       }
+
+       //DEBUG: if (!calledOnDestructor) listGarbageObjects();
+    }
+    // -------------------------------------------------------------------------
 };
 
 

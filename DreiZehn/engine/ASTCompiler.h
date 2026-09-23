@@ -5,6 +5,7 @@
 // The power machine :)
 //-----------------------------------------------------------------------------
 #pragma once
+#include "VariableFrame.h"
 #include "VMStructure.h"
 #include <memory>
 
@@ -16,6 +17,7 @@ public:
     static void compileExpression(ASTNode* node, BytecodeChunk& chunk, CompilerScope& scope) {
         if (!node) return;
 
+        // ---------------------------------------------------------------------
         // --- literal
         if (auto* literal = dynamic_cast<LiteralExpression*>(node)) {
             Value finalValue;
@@ -30,22 +32,32 @@ public:
                     finalValue = Value(static_cast<int>(resDouble));
                 }
             }
+
             else if (literal->mType == TokenType::StringLiteral) {
-                // TODO  VM should keep track on trick objects !
-                // FIXME garbage colletion is NOT used here at the moment !!!!!!!
                 auto* strObj = new StringValueObject(literal->mRawValue);
+                if (gCurrentFrame) gCurrentFrame->addToGarbageCollection(strObj);
                 finalValue = Value(strObj);
             }
 
-            int constIdx = chunk.addConstant(finalValue);
-            chunk.emit(OpCode::Constant, constIdx);
+            uint32_t constIdx = chunk.addConstant(finalValue);
+            chunk.emit(OP_CONST);
+            chunk.emit(constIdx);
         }
 
+        //TODO ValueExpression
+
+        // ---------------------------------------------------------------------
         // --- variable
         else if (auto* varExpr = dynamic_cast<VariableExpression*>(node)) {
-            int slot = scope.getOrAssignSlot(varExpr->mVariableNameSymbolId);
-            chunk.emit(OpCode::GetLocal, slot);
+            // local register ..// uint32_t slot = scope.insert(varExpr->mVariableNameSymbolId);
+            U32 slot = varExpr->mVariableNameSymbolId;
+            chunk.emit(OP_LOAD_VAR);
+            chunk.emit(slot);
         }
+
+        // TODO  MethodExpression
+        // TODO  CallExpression
+        // TODO  AssignStatement
 
         // --- operation
         else if (auto* binary = dynamic_cast<BinaryOpExpression*>(node)) {
@@ -53,14 +65,26 @@ public:
             compileExpression(binary->mRight.get(), chunk, scope);
 
             switch (binary->mOp) {
-                case TokenType::Plus    : chunk.emit(OpCode::Add); break;
-                case TokenType::Minus   : chunk.emit(OpCode::Sub); break;
-                case TokenType::Mul     : chunk.emit(OpCode::Mul); break;
-                case TokenType::Div     : chunk.emit(OpCode::Div); break;
+                case TokenType::Plus    : chunk.emit(OP_ADD); break;
+                case TokenType::Minus   : chunk.emit(OP_SUB); break;
+                case TokenType::Mul     : chunk.emit(OP_MUL); break;
+                case TokenType::Div     : chunk.emit(OP_DIV); break;
                 default: Tools::errorf("COMPILE ERROR BinaryOpExpression : unknown TokenType: %d", (int)binary->mOp);
             }
         }
         // --- .....
+        //TODO BinaryExpression
+
+        //TODO IfStatement
+        //TODO ElseMarkerNode
+        //TODO FunctionDefineStartNode
+        //TODO FunctionDefineEndNode
+        //TODO ForStatement
+        //TODO BreakStatement
+        //TODO ReturnStatement
+        //TODO WhileStatement
+
+
     } // compileExpression
 }; //ASTCompiler
 } // namespace

@@ -41,7 +41,7 @@ namespace DreiZehn {
         });
 
         // ---------------------------------------------------------------------
-        DreiZehn::FunctionMap::RegisterFunction("run", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("run", [&env](std::vector<Value>& args, Value& ret) -> bool {
             if (args.size() < 1) {
                 Tools::errorf("file name requires for run\n");
                 return false;
@@ -64,7 +64,7 @@ namespace DreiZehn {
             return false;
         });
         // ---------------------------------------------------------------------
-        DreiZehn::FunctionMap::RegisterFunction("concat", [&env](std::vector<Value>& args, Value& ret) -> bool {
+        RegisterFunction("concat", [&env](std::vector<Value>& args, Value& ret) -> bool {
             std::string resultStr = "";
 
             for (const auto& val : args) {
@@ -93,7 +93,14 @@ namespace DreiZehn {
         });
 
         // ---------------------------------------------------------------------
-
+        RegisterFunction("core.gc", [&env](std::vector<Value>& args, Value& ret) -> bool {
+            if (gCurrentFrame) {
+                gCurrentFrame->doGarbageCollection(false);
+                return true;
+            }
+            return false;
+        });
+        // ---------------------------------------------------------------------
     } //RegisterCoreFunctions
 
 } //namespace

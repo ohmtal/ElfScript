@@ -14,11 +14,12 @@
 namespace DreiZehn {
 
 
+    const int TypeArrayObject =  registerUserObjectType("Array");
+
     struct ArrayValueObject : public ValueObject {
         std::vector<Value> mElements;
 
-
-        ArrayValueObject() : ValueObject(ValueObjectType::Userdata) { initSymbols(); }
+        ArrayValueObject() : ValueObject(TypeArrayObject) { initSymbols(); }
         ~ArrayValueObject() = default;
 
         inline static ValueObjectMethod mPush;

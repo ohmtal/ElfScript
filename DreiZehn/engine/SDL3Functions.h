@@ -14,31 +14,31 @@
 
 namespace DreiZehn {
 
-
-
-
+    const int Type_SDL_Window_Object =  registerUserObjectType("SDL_Window");
 
     struct SDL_Window_Object : ValueObject {
         SDL_Window* value = nullptr;
-        SDL_Window_Object(SDL_Window* win) : ValueObject(ValueObjectType::Userdata), value(win) {}
+        SDL_Window_Object(SDL_Window* win) : ValueObject(Type_SDL_Window_Object), value(win) {}
         ~SDL_Window_Object() {
             if (value) SDL_DestroyWindow(value);
             value = nullptr;
         }
     };
 
+    const int Type_SDL_Renderer_Object =  registerUserObjectType("SDL_Renderer");
     struct SDL_Renderer_Object : ValueObject {
         SDL_Renderer* value = nullptr;
-        SDL_Renderer_Object(SDL_Renderer* rend) : ValueObject(ValueObjectType::Userdata), value(rend) {}
+        SDL_Renderer_Object(SDL_Renderer* rend) : ValueObject(Type_SDL_Renderer_Object), value(rend) {}
         ~SDL_Renderer_Object() {
             if (value) SDL_DestroyRenderer(value);
             value = nullptr;
         }
     };
 
+    const int Type_SDL_Event_Object =  registerUserObjectType("SDL_Event_Object");
     struct SDL_Event_Object : ValueObject {
         SDL_Event value;
-        SDL_Event_Object() : ValueObject(ValueObjectType::Userdata) { std::memset(&value, 0, sizeof(SDL_Event)); }
+        SDL_Event_Object() : ValueObject(Type_SDL_Event_Object) { std::memset(&value, 0, sizeof(SDL_Event)); }
     };
 
 

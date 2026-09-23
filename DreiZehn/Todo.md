@@ -32,18 +32,20 @@ don't have to PoD Types here at the moment.
 - [X] optimized a bit found 3 sek on test_var bench ;) 
 
 # 0.4
+- [X] VariableFrame for variables and garbage collection
+- [X] ValueObject type registry (gUserObjectTypes / registerUserObjectType)
+- [X] When a new String is set the old should be deleted!!! ..
+    => added an mAssigned flag
+- [~] add delete method to ALL object.  .. onMethod must call the parent 
+    => let the garbage collection do that - i added the assigned flag. 
+    
 - [ ] Bytecode 
+    - [ ] change the direct threading like it is in ElfScript
+    - [ ] While i port it use the new VariableFrame 
+    
+- [ ] header only 
 
 # future ideas
 
-- local / global var is sometime mixed - since we fetch a global it is not found on local scope
-but it's a bit unclear when its global and when its local. 
 - change printf errorf to a overwritable class or add a handler 
-- make header only 
-- move to it's own project
-- change to bytecode compiler - really ? : maybe
 
-- add object/structs
-    - link propeties
-    - add method calls
-    

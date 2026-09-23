@@ -12,7 +12,24 @@
 namespace DreiZehn{
 class Value;
 
-enum class ValueObjectType { String, Userdata };
+enum ValueObjectType {
+    String   = 0,
+    Userdata = 1
+};
+
+inline int gLastValueObjectType = 1;
+inline std::unordered_map <int,std::string> gUserObjectTypes; //NOTE Type Registey
+
+inline int registerUserObjectType(std::string typeName) {
+    if (gLastValueObjectType == 1) {
+        gUserObjectTypes[0] = "String";
+        gUserObjectTypes[1]  = "UserData";
+    }
+    gLastValueObjectType++;
+    gUserObjectTypes[gLastValueObjectType] = typeName;
+    return gLastValueObjectType;
+}
+
 
 // TODO ... i need a id system for that ?! or as static .. later
 struct ValueObjectMethod {
@@ -41,7 +58,8 @@ struct ValueObjectMethod {
 };
 
 struct ValueObject {
-    ValueObjectType mType;
+    int mType;
+    bool mAssigned = false;
     virtual ~ValueObject() = default;
 
     inline virtual bool onMethodCall(uint32_t methodNameSymbolId,  std::vector<Value>& args, Value& ret) {
@@ -49,9 +67,10 @@ struct ValueObject {
         return false;
     }
 
+    inline void setAssigned(bool v) {mAssigned = v;}
 
 protected:
-    ValueObject(ValueObjectType t) : mType(t) {}
+    ValueObject(int t) : mType(t) {}
 };
 
 struct StringValueObject : public ValueObject {

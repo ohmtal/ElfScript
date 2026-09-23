@@ -92,9 +92,6 @@ public:
     inline FlowSignal execute(ASTNode* node, Environment& currentEnv) {
         if (!node) return FlowSignal::None;
 
-        //NOTE HARDCORE DEBUG
-        // std::cout << "DEBUG-EXECUTE: Node-Typ: " << typeid(*node).name() << "\n";
-
 
         // --- Break Statement ---
         if (dynamic_cast<BreakStatement*>(node)) {
@@ -112,7 +109,6 @@ public:
 
         // --- Assign ---
 #ifdef DREIZEHN_BYTECODE
-        // NOTE NEW DIRECT THREADING BYTE CODE COMPILER !! FIXME StringObject
         if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
             // new chunk
             BytecodeChunk chunk;
@@ -120,20 +116,12 @@ public:
 
             // compile
             ASTCompiler::compileExpression(assign->mRhs.get(), chunk, scope);
-            chunk.emit(OpCode::Exit);
-
-            // FIXME HACK variable in >>>>
-            std::vector<Value> locals(std::max(scope.getLocalCount(), 64), Value(0.0));
-            for (int slot = 0; slot < scope.getLocalCount(); ++slot) {
-                uint32_t varId = scope.getSymbolIdForSlot(slot);
-                locals[slot] = currentEnv.getVariable(varId);
-            }
-            //  <<<<<
+            chunk.emit(OP_EXIT);
 
             // fire!
-            Value result = runDirectThreadedVM(chunk,  /*HACK scope.getLocalCount()*/ locals);
+            Value result = runDirectThreadedVM(chunk);
             // save
-            currentEnv.setVariable(assign->mVarNameSymbolId, result);
+            currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, result);
         }
 #else
         // prev byte code:
@@ -172,13 +160,8 @@ public:
             Value startVal = forStmt->mStartExpr->evaluate(currentEnv);
             Value endVal = forStmt->mEndExpr->evaluate(currentEnv);
 
-            if (!startVal.isInt() || !endVal.isInt()) {
-                Tools::errorf("Error: 'for'-loop only support integer borders\n");
-                return FlowSignal::None;
-            }
-
-            int start = startVal.asInt();
-            int end = endVal.asInt();
+            int start = startVal.getInt();
+            int end = endVal.getInt();
 
             Environment loopEnv(&currentEnv);
 

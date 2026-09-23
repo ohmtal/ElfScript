@@ -22,13 +22,13 @@ private:
     int mNextSlotIndex = 0;
 
 public:
-    int getOrAssignSlot(uint32_t symbolId) {
+    uint32_t insert(uint32_t symbolId) {
         auto it = mSymbolIdToSlot.find(symbolId);
         if (it != mSymbolIdToSlot.end()) {
             return it->second;
         }
 
-        int assignedSlot = mNextSlotIndex++;
+        uint32_t assignedSlot = mNextSlotIndex++;
         mSymbolIdToSlot[symbolId] = assignedSlot;
         mSlotToSymbolId.push_back(symbolId);
         return assignedSlot;

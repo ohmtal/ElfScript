@@ -10,41 +10,77 @@
 #include <cstdint>
 namespace DreiZehn {
 
-enum class OpCode : uint16_t {
-    Constant,   // push const to stack
-    GetLocal,   // fetch var
-    SetLocal,   // write var
+typedef uint32_t U32; // dont want to break my fingers lol
 
-    Add, Sub, Mul, Div, // math
+enum  OpCodes : uint32_t {
+    OP_CONST,       // push const to stack
 
-    Exit        // bye bye
+    OP_LOAD_VAR,
+    OP_SAVE_VAR,
+
+    // for future use ...
+    OP_GET_LOCAL,   // fetch var
+    OP_SET_LOCAL,   // write var
+
+    // Math
+    OP_ADD,
+    OP_SUB,
+    OP_MUL,
+    OP_DIV,
+
+    OP_EXIT,        // bye bye
+    OP_INVALID
 };
 
-// raw command
-struct RawInstruction {
-    OpCode op;
-    uintptr_t arg = 0;
+inline const char* OpCodeNames[] = {
+    "OP_CONST",
+    "OP_LOAD_VAR",
+    "OP_SAVE_VAR",
+    "OP_GET_LOCAL",
+    "OP_SET_LOCAL",
+    "OP_ADD",
+    "OP_SUB",
+    "OP_MUL",
+    "OP_DIV",
+    "OP_EXIT",
+    "OP_INVALID"
 };
 
-// final command for direct threading
-struct Op {
-    void* labelAddress; // &&myCommand
-    uintptr_t argument; // backpack data
-};
+
+
+inline void disassembleInstruction(const uint32_t* code, size_t offset) {
+    uint32_t opcode = code[offset];
+
+    Tools::printf("%04zu: ", offset);
+
+    if (opcode < OP_INVALID) {
+        Tools::printf("%s", OpCodeNames[opcode]);
+
+        if (opcode == OP_CONST || opcode == OP_LOAD_VAR || opcode == OP_SAVE_VAR) {
+            Tools::printf(" (Arg: %u)", code[offset + 1]);
+        }
+    } else {
+        Tools::printf("UNKNOWN_OPCODE [%u]", opcode);
+    }
+    Tools::printf("\n");
+}
+
+
+// -----------------------------------------------------------------------------
 
 // the code chunk
 struct BytecodeChunk {
-    std::vector<RawInstruction> rawInstructions;
-    std::vector<Op> executableInstructions;
-    std::vector<Value> constants;
+    std::vector<uint32_t> mByteCodes;
+    std::vector<Value> mConstants;
 
-    int addConstant(Value val) {
-        constants.push_back(val);
-        return static_cast<int>(constants.size() - 1);
+    uint32_t addConstant(Value val) {
+        mConstants.push_back(val);
+        return static_cast<uint32_t>(mConstants.size() - 1);
     }
 
-    void emit(OpCode op, uintptr_t arg = 0) {
-        rawInstructions.push_back({op, arg});
+    U32 emit(uint32_t op) {
+        mByteCodes.push_back(op);
+        return (U32)mByteCodes.size() - 1;
     }
 };
 
