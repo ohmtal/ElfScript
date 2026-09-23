@@ -10,7 +10,7 @@
 
 function createStarField4() {
     %obj = new ScriptGroup() {
-        class = "StarField";
+        class = "StarField4";
         TypeF32 speed = 0.4;
         TypeBool drawLines = false;
         TypeF32 screenHeight = 0.0;
@@ -26,7 +26,7 @@ function createStarField4() {
     return %obj;
 }
 // -----------------------------------------------------------------------------
-function StarField::UpdateSize(%this) {
+function StarField4::UpdateSize(%this) {
     %this.screenWidth  = $Global::ScreenSize.x;
     %this.screenHeight = $Global::ScreenSize.y ;
 
@@ -44,7 +44,7 @@ function StarField::UpdateSize(%this) {
 
 }
 // -----------------------------------------------------------------------------
-function StarField::OnAdd(%this) {
+function StarField4::OnAdd(%this) {
 
 
     %this.updateSize();
@@ -74,12 +74,12 @@ function StarField::OnAdd(%this) {
     return true;
 }
 // -----------------------------------------------------------------------------
-function StarField::onRemove(%this) {
+function StarField4::onRemove(%this) {
 
 }
 
 // -----------------------------------------------------------------------------
-function StarField::Render(%this) {
+function StarField4::Render(%this) {
 
      %dt = $Global::FrameTime;
     %renderer = $Main.renderer;
@@ -151,8 +151,8 @@ function StarField::Render(%this) {
 
 }
 // -----------------------------------------------------------------------------
-function StarField::OnUpdate(%this, %dt) { }
-function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
+function StarField4::OnUpdate(%this, %dt) { }
+function StarField4::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %isRepeat) {
 
     if (!%isDown) return;
     switch (%scancode) {
@@ -161,7 +161,7 @@ function StarField::onSDLKeyBoardEvent(%this,%scancode, %modifiers, %isDown, %is
             echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
     }
 }
-function StarField::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
-function StarField::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
+function StarField4::onSDLMouseButtonEvent(%this,%button, %isDown, %x, %y) {}
+function StarField4::onSDLMouseWheelEvent(%this,%wheelX, %wheelY){
     %this.speed = math.ClampF( %this.speed + %wheelY / 10.0 , 0.01, 5.0);
 }

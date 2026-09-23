@@ -3415,7 +3415,6 @@ handle_OP_CALLFUNC_VECTOR: {
       PREPARE_CALLFUNC();
       thisObject = nullptr;
 
-// #ifdef ENABLE_CONSOLE_VECTOR
       ConsoleVector result = nsEntry->cb.mVectorCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3425,7 +3424,6 @@ handle_OP_CALLFUNC_VECTOR: {
             stack[_STK + 1].setVector(result);
             PUSH_STK();
       }
-// #endif
 
       FINIT_CALLFUNC();
       DISPATCH();
@@ -3435,7 +3433,6 @@ handle_OP_CALLFUNC_VALUE: {
 
       PREPARE_CALLFUNC();
       thisObject = nullptr;
-// #ifdef ENABLE_CONSOLE_VALUE_CALLBACK
       stack[_STK + 1] = nsEntry->cb.mConsoleValueCallbackFunc(thisObject, callArgc, callArgv);
       gCallStack.popFrame();
       if (code[ip] == OP_POP_STK)
@@ -3445,7 +3442,6 @@ handle_OP_CALLFUNC_VALUE: {
             // written above ! stack[_STK + 1].copyFrom( result) ;
             PUSH_STK();
       }
-// #endif
       FINIT_CALLFUNC();
       DISPATCH();
 }

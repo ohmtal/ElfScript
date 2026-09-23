@@ -76,16 +76,14 @@ function StarField::Render(%this) {
      SDL_RenderClear(%renderer);
 
 
-    SDL_SetRenderDrawColor(%renderer, 255,255,255);
+    // SDL_SetRenderDrawColor(%renderer, 255,255,255);
+    SDL_SetRenderDrawColor(%renderer, 155,155,180);
 
     %starArray = %this.starArray;
 
-    // using local vars maximum attempt:
     for( %i in range STAR_COUNT )
     {
-
-
-        // new tupple assignment
+        // new tuple assignment
         [ %pointX , %pointY, %pointZ] = %starArray.at( %i );
         %pointZ -= %dt * %this.speed;
 

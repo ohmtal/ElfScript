@@ -30,10 +30,10 @@ for j = 0, JLOOPS - 1 do
     print("SUM (rand +-) IS: " .. localX)
 end
 
-localX = localX - 66.0
+localX = localX - 33.0
 print("---------------------")
 print("---------------------")
-print("Final sum should be 0 == " .. localX)
+print("Final sum should be 33 == " .. localX)
 print("---------------------")
 print("---------------------")
 

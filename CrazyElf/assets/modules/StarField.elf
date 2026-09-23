@@ -8,7 +8,7 @@
 #define START_DIV 0.03125
 
 function createStarField() {
-    %obj = new Group() {
+    %obj = new ScriptGroup() {
         class = "StarField";
         TypeF32 speed = 0.4;
         TypeBool drawLines = false;
@@ -67,10 +67,11 @@ function StarField::Render(%this) {
     %drawLines = %this.drawLines;
 
     %speed = %this.speed;
-    SDL_SetRenderDrawColor(%renderer, 255,255,255);
+    // SDL_SetRenderDrawColor(%renderer, 255,255,255);
+    SDL_SetRenderDrawColor(%renderer, 55,55,55);
 
 
-    %lStarPoints = %this.starPoints.getId(); // slightly faster
+    %lStarPoints = %this.starPoints; // slightly faster
 
     %ranMinH = $minH;
     %ranMaxH = $maxH;
@@ -87,16 +88,33 @@ function StarField::Render(%this) {
     {
         // fast tuple assignment
         [ %pointX , %pointY, %pointZ] = %lStarPoints.getPointVec(%i);
+
         %pointZ -= %dt * %speed;
 
         // Calculate the screen position
         %invZ = 1.0 /  %pointZ;
+
+        // [ %screenPos_X, %screenPos_Y] = {
+        //      %hW + (%pointX * %invZ),
+        //      %hH + (%pointY * %invZ)
+        // };
         %screenPos_X = %hW + (%pointX * %invZ);
         %screenPos_Y = %hH + (%pointY * %invZ);
 
         if ( %pointZ < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
             || %screenPos_X > %sW || %screenPos_Y > %sH)
         {
+
+            // [ %pointX , %pointY, %pointZ ] = {
+            //      math.randomf(%ranMinH, %ranMaxH),
+            //      math.randomf(%ranMinW, %ranMaxW),
+            //      1.0
+            // };
+            //
+            // [%screenPos_X, %screenPos_Y] = {
+            //     %hW +  %pointX,
+            //     %hH +  %pointY
+            // };
             %pointX = math.randomf(%ranMinH, %ranMaxH);
             %pointY = math.randomf(%ranMinW, %ranMaxW);
             %pointZ = 1.0;
@@ -130,7 +148,7 @@ function StarField::Render(%this) {
     }
 
 
-    %fontScale = 0.7;
+    %fontScale = 0.8;
     SDL_SetRenderScale(%renderer, %fontScale, %fontScale);
     %scale10 = 10 / %fontScale;
     %text =  sprintf("[I] PointStorage and Tupple assign %d FPS",$Global::FPS);
