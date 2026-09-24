@@ -8,9 +8,9 @@
 #include <SDL3/SDL.h>
 #include <cstring>
 
-#include "FunctionMap.h"
-#include "ValueObject.h"
-#include "VariableFrame.h"
+#include "core/FunctionMap.h"
+#include "core/ValueObject.h"
+#include "core/VariableFrame.h"
 
 namespace DreiZehn {
 

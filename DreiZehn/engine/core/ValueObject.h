@@ -6,8 +6,8 @@
 
 #include <string>
 #include <iostream>
-#include "Tools.h"
-#include "SymbolTable.h"
+#include "toolbox/Tools.h"
+#include "toolbox/SymbolTable.h"
 
 namespace DreiZehn{
 class Value;

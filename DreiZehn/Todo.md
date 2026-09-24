@@ -51,7 +51,7 @@ under 15 sec and beat python here without bytecode ;)
 # 0.5
 
 - [ ] Bytecode ....    
-- [ ] header only 
+
 
 # future ideas
 

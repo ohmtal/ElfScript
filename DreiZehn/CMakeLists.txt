@@ -18,31 +18,48 @@ set(BUILD_WITH_SANITIZE ${SANITIZE_DEFAULT} CACHE BOOL "Build Application with -
 project(DreiZehn CXX)
 
 set(PROJECT_SRC
-    engine/Value.h
-    engine/ValueObject.h
-    engine/ValueObject.cpp
-    engine/Lexer.h
-    engine/Parser.h
-    engine/AstNode.h
-    engine/AstNode.cpp
+
+    # core
+    engine/core/AstNode.h
+    engine/core/FunctionMap.h
+    engine/core/Lexer.h
+    engine/core/Parser.h
+    engine/core/Value.h
+    engine/core/ValueObject.h
+    engine/core/ValueObject.cpp
+    engine/core/VariableFrame.h
+
     engine/Environment.h
-    engine/Tools.h
-    engine/CoreFunctions.h
-    engine/MathFunctions.h
-    engine/DebugFunctions.h
 
     engine/ScriptLoader.h
     engine/ScriptLoader.cpp
-    engine/ArrayFunctions.h
 
-    engine/SymbolTable.h
-    engine/CompilerScope.h
+    # Noderunner:
+    engine/noderunner/AstNode_noderunner.cpp
+
+    # Functions and objects
+    engine/functions/CoreFunctions.h
+    engine/functions/MathFunctions.h
+    engine/functions/DebugFunctions.h
+    engine/functions/ArrayFunctions.h
+    # --- optional SDL3 bindings
+    engine/functions/SDL3Functions.h
+
+    # ToolBox
+    engine/toolbox/SymbolTable.h
+    engine/toolbox/Tools.h
+
+    # Bytecode compiler TODO
+    # engine/bytecode/AstNode_bytecode.cpp
+    # engine/bytecode/ASTCompiler.h
+    # engine/bytecode/CompilerScope.h
+    # engine/bytecode/VM.h
+    # engine/bytecode/VMStructure.h
+
 
     engine/Globals.h
     engine/DreiZehn.h
 
-    # --- testing SDL3 bindings
-    engine/SDL3Functions.h
 
 
     src/main.cpp
@@ -64,6 +81,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_include_directories(${PROJECT_NAME} PRIVATE
      "${CMAKE_CURRENT_SOURCE_DIR}/"
+     "${CMAKE_CURRENT_SOURCE_DIR}/engine"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

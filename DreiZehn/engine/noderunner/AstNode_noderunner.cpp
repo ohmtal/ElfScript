@@ -2,10 +2,12 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// Value Evaluator
+// Ast Noded for NodeRunner - i use different code:
+// - NodeRunner => evaluate
+// - ByteCode => compile
 //-----------------------------------------------------------------------------
 #include "Environment.h"
-#include "FunctionMap.h"
+#include "core/FunctionMap.h"
 
 
 namespace DreiZehn {

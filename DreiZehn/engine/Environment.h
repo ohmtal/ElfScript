@@ -22,20 +22,22 @@
 #include <functional>
 #include <cassert>
 
-#include "Value.h"
-#include "AstNode.h"
-#include "Tools.h"
-#include "FunctionMap.h"
+#include "core/AstNode.h"
+#include "core/FunctionMap.h"
+#include "core/Value.h"
+#include "core/VariableFrame.h"
+
 #include "Globals.h"
-#include "SymbolTable.h"
-#include "VariableFrame.h"
+
+#include "toolbox/SymbolTable.h"
+#include "toolbox/Tools.h"
 
 // Byte Code
 #ifdef DREIZEHN_BYTECODE
-#include "VMStructure.h"
-#include "CompilerScope.h"
-#include "ASTCompiler.h"
-#include "VM.h"
+#include "bytecode/VMStructure.h"
+#include "bytecode/CompilerScope.h"
+#include "bytecode/ASTCompiler.h"
+#include "bytecode/VM.h"
 #endif
 
 namespace DreiZehn {

@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 #include "Value.h"
-#include "SymbolTable.h"
+#include "toolbox/SymbolTable.h"
 
 namespace DreiZehn::FunctionMap {
     class Enviorment;

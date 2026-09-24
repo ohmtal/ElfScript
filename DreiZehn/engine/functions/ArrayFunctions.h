@@ -12,9 +12,9 @@
 #pragma once
 
 #include <vector>
-#include "Value.h"
-#include "ValueObject.h"
-#include "FunctionMap.h"
+#include "core/Value.h"
+#include "core/ValueObject.h"
+#include "core/FunctionMap.h"
 
 namespace DreiZehn {
 

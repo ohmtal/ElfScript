@@ -7,7 +7,7 @@
 #pragma once
 #include <ctime>
 #include <cmath>
-#include "FunctionMap.h"
+#include "core/FunctionMap.h"
 #include "ScriptLoader.h"
 
 namespace DreiZehn {

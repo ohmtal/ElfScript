@@ -8,11 +8,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-
-
-#include "Globals.h"
-
-
 namespace DreiZehn::Tools{
 
     // ------------------------------------------------------------------
@@ -33,14 +28,4 @@ namespace DreiZehn::Tools{
         va_end(args);
     }
 
-    inline void PrintParseError(std::string message) {
-        errorf("Parse Error in Line [%d]\n%s\n%s\n",
-                     Globals::currentScriptLineNumber,
-                     Globals::currentScriptLine.c_str(),
-                     message.c_str());
-    }
-
-    inline void PrintRuntimeError(std::string message) {
-        errorf("RunTime Error: %s", message.c_str());
-    }
 }

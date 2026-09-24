@@ -3,9 +3,9 @@
 #include <sstream>
 
 #include "engine/DreiZehn.h"
-#include "engine/DebugFunctions.h"
-#include "engine/ArrayFunctions.h"
-#include "engine/SDL3Functions.h"
+#include "engine/functions/DebugFunctions.h"
+#include "engine/functions/ArrayFunctions.h"
+#include "engine/functions/SDL3Functions.h"
 
 void RegisterUserFunc() {
     using namespace DreiZehn;

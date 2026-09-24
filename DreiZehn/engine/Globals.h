@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "toolbox/Tools.h"
 
 namespace DreiZehn {
     class Environment;
@@ -24,5 +25,18 @@ namespace Globals {
     inline  bool gShowVariableDebug = false; //Debug
 }
 
+namespace Tools {
+    inline void PrintParseError(std::string message) {
+        errorf("Parse Error in Line [%d]\n%s\n%s\n",
+            Globals::currentScriptLineNumber,
+            Globals::currentScriptLine.c_str(),
+            message.c_str());
+    }
 
-} //namespace
+    inline void PrintRuntimeError(std::string message) {
+        errorf("RunTime Error: %s", message.c_str());
+    }
+}
+
+
+} //namespace DreiZehn

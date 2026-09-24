@@ -5,7 +5,7 @@
 // Core Commands
 //-----------------------------------------------------------------------------
 #pragma once
-#include "FunctionMap.h"
+#include "core/FunctionMap.h"
 #include "ScriptLoader.h"
 
 namespace DreiZehn {
