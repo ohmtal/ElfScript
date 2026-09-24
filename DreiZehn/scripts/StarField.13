@@ -80,32 +80,42 @@ if Init
             pY = Points_Y->get i
             pZ = Points_Z->get i
 
-            pZ = pZ - (Dt * Speed)
+            pZ -= Dt * Speed
 
-            if pZ < 0.01
-                pX = math.random minW maxW
-                pY = math.random minH maxH
-                pZ = 1.0
-            end
+--             if pZ < 0.01
+--                 pX = math.random minW maxW
+--                 pY = math.random minH maxH
+--                 pZ = 1.0
+--             end
 
             invZ = 1.0 / pZ
             screenX = (W * 0.5) + (pX * invZ)
             screenY = (H * 0.5) + (pY * invZ)
 
-            if (screenX < 0) || (screenX > W) || (screenY < 0)  || (screenY > H)
-                pZ = 0.0
+
+            if (pZ < 0.0) || (screenX < 0.0) || (screenX > W) || (screenY < 0.0)  || (screenY > H)
+                pX = math.random minW maxW
+                pY = math.random minH maxH
+                pZ = 1.0
+
+                screenX = W + pX
+                screenY = H + pY
             end
 
 
-            if pZ > 0.0
-                radius = 2.0 * (1.0 - pZ)
-                if radius < 0.5
-                    radius = 0.5
-                end
+            radius = math.lerp 2.0 0.3 pZ
+            SDL_SetRenderDrawColor Renderer 255 255 255 255
+            SDL_RenderFillRect Renderer screenX screenY radius radius
 
-                SDL_SetRenderDrawColor Renderer 255 255 255 255
-                SDL_RenderFillRect Renderer screenX screenY radius radius
-            end
+--             if pZ > 0.0
+--                 radius = 2.0 * (1.0 - pZ)
+--                 if radius < 0.5
+--                     radius = 0.5
+--                 end
+--
+--                 SDL_SetRenderDrawColor Renderer 255 255 255 255
+--                 SDL_RenderFillRect Renderer screenX screenY radius radius
+--             end
 
             Points_X->set i pX
             Points_Y->set i pY

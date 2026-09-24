@@ -5,7 +5,10 @@
 #include "engine/DreiZehn.h"
 #include "engine/functions/DebugFunctions.h"
 #include "engine/functions/ArrayFunctions.h"
+
+#ifdef DREIZEHN_SDL3
 #include "engine/functions/SDL3Functions.h"
+#endif
 
 void RegisterUserFunc() {
     using namespace DreiZehn;
@@ -29,8 +32,9 @@ int main(int argc, char* argv[]) {
     RegisterDebugFunctions();
     RegisterUserFunc();
 
+    #ifdef DREIZEHN_SDL3
     RegisterSDL3Functions();
-
+    #endif
 
     if (argc > 1) {
         std::string scriptPath = argv[1];

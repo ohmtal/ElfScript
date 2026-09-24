@@ -10,6 +10,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+set(WITHSDL3_DEFAULT ON)
+set(BUILD_WITH_SDL3 ${WITHSDL3_DEFAULT} CACHE BOOL "Build Application with SDL3 Demo")
 
 set(SANITIZE_DEFAULT OFF)
 set(BUILD_WITH_SANITIZE ${SANITIZE_DEFAULT} CACHE BOOL "Build Application with -fsanitize=address -g")
@@ -42,8 +44,7 @@ set(PROJECT_SRC
     engine/functions/MathFunctions.h
     engine/functions/DebugFunctions.h
     engine/functions/ArrayFunctions.h
-    # --- optional SDL3 bindings
-    engine/functions/SDL3Functions.h
+
 
     # ToolBox
     engine/toolbox/SymbolTable.h
@@ -66,8 +67,16 @@ set(PROJECT_SRC
 )
 
 # ------------- SDL3
-find_package(SDL3 REQUIRED)
+set (SDL3_LINKLIB "")
+if (BUILD_WITH_SDL3)
+    find_package(SDL3 REQUIRED)
+    set (SDL3_LINKLIB SDL3::SDL3)
 
+    list(APPEND PROJECT_SRC "engine/functions/SDL3Functions.h")
+
+    add_compile_definitions(DREIZEHN_SDL3)
+
+endif()
 # ------------- Main
 add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
@@ -85,7 +94,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    SDL3::SDL3
+    ${SDL3_LINKLIB}
 )
 
 if (BUILD_WITH_SANITIZE)

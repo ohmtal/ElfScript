@@ -122,6 +122,15 @@ namespace DreiZehn {
             ret = Value(std::sqrt(val));
             return true;
         });
+        // ---------------------------------------------------------------------
+        RegisterFunction("math.lerp", [](std::vector<Value>& args, Value& ret) -> bool {
+            if (args.size() != 3) return false;
+            // a + t * (b - a);
+            ret = Value(std::lerp(args[0].getDouble(),args[1].getDouble(),args[2].getDouble()));
+            return true;
+        });
+        // ---------------------------------------------------------------------
+
     }
 
 } //namespace
