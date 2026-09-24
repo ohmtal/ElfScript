@@ -11,11 +11,12 @@ maxH = H / 2
 minH = maxH * -1
 STAR_COUNT  = 420
 START_DIV   = 0.03125
+Speed       = 0.4
+fontScale   = 1.2
+-- Objects initialize with 0:
 Window      = 0
 Renderer    = 0
 Event       = 0
-Speed       = 0.4
-fontScale   = 1.2
 Points_X    = 0
 Points_Y    = 0
 Points_Z    = 0
@@ -125,3 +126,20 @@ end
 
 SDL_DestroyWindow Window
 SDL_Quit
+
+--  cleanup - unassign Global Objects:
+Window      = 0
+Renderer    = 0
+Event       = 0
+Points_X    = 0
+Points_Y    = 0
+Points_Z    = 0
+
+print "Starfield shutdown completed, running Garbage Collection manually..."
+-- Manually Call Garbage Collection:
+core.gc
+
+-- you can use:
+--  debug.garbage
+-- to check it worked - if you did use ´run "scripts/StarField.13"´ this on console
+

@@ -59,7 +59,7 @@ struct ValueObjectMethod {
 
 struct ValueObject {
     int mType;
-    bool mAssigned = false;
+    int mAssigned = 0;
     virtual ~ValueObject() = default;
 
     inline virtual bool onMethodCall(uint32_t methodNameSymbolId,  std::vector<Value>& args, Value& ret) {
@@ -67,7 +67,7 @@ struct ValueObject {
         return false;
     }
 
-    inline void setAssigned(bool v) {mAssigned = v;}
+    inline void setAssigned(bool v) {mAssigned += v ? 1 : -1;}
 
 protected:
     ValueObject(int t) : mType(t) {}

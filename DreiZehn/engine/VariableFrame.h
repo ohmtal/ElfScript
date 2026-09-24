@@ -135,8 +135,8 @@ public:
        for (auto* obj : gMasterFrame->mGarbageCollection) {
             // std::cout << "Object-Type: " << typeid(*obj).name() << "\n";
            int objtype = obj->mType;
-           Tools::printf("#%d [%p] assigned: %s type:%d %s\n"
-                         , i, (void*)obj, obj->mAssigned ? "true" : "false"
+           Tools::printf("#%d [%p] assigned: %d type:%d %s\n"
+                         , i, (void*)obj, obj->mAssigned
                          , objtype, gUserObjectTypes[objtype].c_str());
 
            i++;
@@ -156,7 +156,7 @@ public:
            mGarbageCollection.clear();
        } else {
            auto it = std::remove_if(mGarbageCollection.begin(), mGarbageCollection.end(), [](auto* obj) {
-               if (!obj->mAssigned) {
+               if (obj->mAssigned < 1) {
                    delete obj;
                    return true; // mark for delete
                }
