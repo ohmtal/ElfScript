@@ -42,18 +42,16 @@ don't have to PoD Types here at the moment.
     - [X] change the direct threading like it is in ElfScript
     - [X] While i port it use the new VariableFrame 
 - [X] Better Garbage collection and array also keep track of object assignment
-- [ ] Before I continue with ByteCode I'll optimize the current code i guess i can get
+- [X] Before I continue with ByteCode I'll optimize the current code i guess i can get
 under 15 sec and beat python here without bytecode ;)
-    - [ ] Operator ++, --, +=, -=, *=, /= 
-    - [ ] break the other BinaryExpression in more parts 
-    
-    
+    - [X] Operator ++, --, +=, -=, *=, /= 
+    - [X] other BinaryExpression to switch case
+- **12.478u 0.002s 0:12.52 99.6%    0+0k 0+0io 0pf+0w** 
+
 # 0.5
-
-- [ ] Bytecode ....    
-
+- [ ] Bytecode continue .... 
 
 # future ideas
-
+- header only - for easy include 
 - change printf errorf to a overwritable class or add a handler 
 

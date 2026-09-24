@@ -165,6 +165,7 @@ namespace DreiZehn {
             int32_t lCurInt = valPtr->asInt();
             switch (mOp) {
                 case TokenType::PlusPlus: lCurInt++; break;
+                case TokenType::MinusMinus: lCurInt--; break;
                 default: break;
             }
             *valPtr = Value(lCurInt);
@@ -173,6 +174,7 @@ namespace DreiZehn {
             double lCurDouble = valPtr->asDouble();
             switch (mOp) {
                 case TokenType::PlusPlus: lCurDouble += 1.0 ; break;
+                case TokenType::MinusMinus: lCurDouble -= 1.0 ; break;
                 default: break;
             }
             *valPtr = Value(lCurDouble);
@@ -183,8 +185,6 @@ namespace DreiZehn {
         return Value();
 
     }
-
-
     // -------------------------------------------------------------------------
 
     Value BinaryExpression::evaluate(Environment& env)  {
@@ -195,98 +195,75 @@ namespace DreiZehn {
         Value lVal = mLeft->evaluate(env);
         Value rVal = mRight->evaluate(env);
 
-        if (mOp == TokenType::Greater) {
-            double l = lVal.getDouble();
-            double r = rVal.getDouble();
-            return Value((l - r) > EPSILON ? 1 : 0);
-        }
-        else
-        if (mOp == TokenType::GreaterEqual) {
-            double l = lVal.getDouble();
-            double r = rVal.getDouble();
-            return Value(l > (r - EPSILON) ? 1 : 0);
-        }
-        else
-        if (mOp == TokenType::Less) {
-            double l = lVal.getDouble();
-            double r = rVal.getDouble();
-            return Value((r - l) > EPSILON ? 1 : 0);
-        }
-        else
-            if (mOp == TokenType::LowerEqual) {
+        switch (mOp) {
+            case TokenType::Greater: {
+                double l = lVal.getDouble();
+                double r = rVal.getDouble();
+                return Value((l - r) > EPSILON ? 1 : 0);
+            }
+            case TokenType::GreaterEqual: {
+                double l = lVal.getDouble();
+                double r = rVal.getDouble();
+                return Value(l > (r - EPSILON) ? 1 : 0);
+            }
+            case TokenType::Less:  {
+                double l = lVal.getDouble();
+                double r = rVal.getDouble();
+                return Value((r - l) > EPSILON ? 1 : 0);
+            }
+            case TokenType::LowerEqual: {
                 double l = lVal.getDouble();
                 double r = rVal.getDouble();
                 return Value(l < (r + EPSILON) ? 1 : 0);
             }
-        else
-        if (mOp == TokenType::Equal) {
-            if (lVal.isPointer() && rVal.isPointer()) {
-                return Value(lVal.asPointer() == rVal.asPointer() ? 1 : 0);
+            case TokenType::Equal: {
+                if (lVal.isPointer() && rVal.isPointer()) {
+                    return Value(lVal.asPointer() == rVal.asPointer() ? 1 : 0);
+                }
+                double l = lVal.getDouble();
+                double r = rVal.getDouble();
+                return Value(std::abs(l - r) < EPSILON ? 1 : 0);
             }
-            double l = lVal.getDouble();
-            double r = rVal.getDouble();
-            return Value(std::abs(l - r) < EPSILON ? 1 : 0);
-        }
-        else
-        if (mOp == TokenType::NotEqual) {
-            if (lVal.isPointer() && rVal.isPointer()) {
-                return Value(lVal.asPointer() != rVal.asPointer() ? 1 : 0);
+            case TokenType::NotEqual: {
+                if (lVal.isPointer() && rVal.isPointer()) {
+                    return Value(lVal.asPointer() != rVal.asPointer() ? 1 : 0);
+                }
+                double l = lVal.getDouble();
+                double r = rVal.getDouble();
+                return Value(std::abs(l - r) < EPSILON ? 0 : 1);
             }
-            double l = lVal.getDouble();
-            double r = rVal.getDouble();
-            return Value(std::abs(l - r) < EPSILON ? 0 : 1);
+            case TokenType::Or: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l || r);
+            }
+            case TokenType::And: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l && r);
+            }
+            case TokenType::BitAnd: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l & r);
+            }
+            case TokenType::BitOr: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l | r);
+            }
+            case TokenType::SHL: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l << r);
+            }
+            case TokenType::SHR: {
+                int l = lVal.getInt();
+                int r = rVal.getInt();
+                return Value( l >> r);
+            }
+            default: break;
         }
-        else
-        if (mOp == TokenType::Or) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l || r);
-        }
-        else
-        if (mOp == TokenType::And) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l && r);
-        }
-        else
-        if (mOp == TokenType::BitAnd) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l & r);
-        }
-        else
-        if (mOp == TokenType::BitOr) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l | r);
-        }
-        else
-        if (mOp == TokenType::SHL) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l << r);
-        }
-        else
-        if (mOp == TokenType::SHR) {
-            int l = lVal.getInt();
-            int r = rVal.getInt();
-            return Value( l >> r);
-        }
-
-        // if (lVal.isInt() && rVal.isInt()) {
-        //     if (mOp == TokenType::Plus) return Value(lVal.asInt() + rVal.asInt());
-        //     if (mOp == TokenType::Minus) return Value(lVal.asInt() - rVal.asInt());
-        //     if (mOp == TokenType::Mul) return Value(lVal.asInt() * rVal.asInt());
-        //     if (mOp == TokenType::Div) return Value(lVal.asInt() / rVal.asInt());
-        // }
-        // double lNum = lVal.getDouble();
-        // double rNum = rVal.getDouble();
-        //
-        // if (mOp == TokenType::Plus) return Value(lNum + rNum);
-        // if (mOp == TokenType::Minus) return Value(lNum - rNum);
-        // if (mOp == TokenType::Mul) return Value(lNum * rNum);
-        // if (mOp == TokenType::Div) return Value(lNum / rNum);
-
         return Value();
     }
 

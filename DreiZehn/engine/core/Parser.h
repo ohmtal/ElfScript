@@ -36,9 +36,18 @@ private:
         ;
     }
 
+    bool isMathAssignOperatorType(const Token& op) {
+        return op.mType == TokenType::AssignPlus
+        || op.mType == TokenType::AssignMinus
+        || op.mType == TokenType::AssignMul
+        || op.mType == TokenType::AssignDiv
+        ;
+    }
+
     bool isInlineMathType(const Token& op) {
         return
             op.mType == TokenType::PlusPlus
+            || op.mType == TokenType::MinusMinus
         ;
     }
 
@@ -70,8 +79,6 @@ private:
     }
     // -------------------------------------------------------------------------
     std::unique_ptr<Expression> parsePrimary() {
-
-
         if (peek().mType == TokenType::LParen) {
             advance();
 
@@ -103,7 +110,6 @@ private:
                 return std::make_unique<BinaryInlineExpression>(nameTokenSymbolId, op.mType);
             }
             else
-            // current peek must be the arrow
             if (peek().mType  == TokenType::Arrow
                 && peekNext().mType == TokenType::Identifier
             ) {
@@ -347,17 +353,24 @@ public:
         }
         else
         if (peek().mType == TokenType::Identifier) {
-            if (peekNext().mType == TokenType::Assign) {
+            Token nextToken = peekNext();
+            if (nextToken.mType == TokenType::Assign) {
                 std::string varName = advance().mValue;
                 advance(); // '='
                 auto rhs = parseComparison();
                 return std::make_unique<AssignStatement>(SymbolTable::insert( varName), std::move(rhs));
             }
-            else if (peekNext().mType == TokenType::Arrow) {
+            else if (nextToken.mType == TokenType::Arrow) {
                 return parsePrimary();
             }
-            else if (isInlineMathType( peekNext())) {
+            else if (isInlineMathType( nextToken)) {
                 return parsePrimary();
+            }
+            else if (isMathAssignOperatorType(nextToken)) {
+                std::string varName = advance().mValue;
+                Token op = advance();
+                auto rhs = parseComparison();
+                return std::make_unique<AssignOPStatement>(SymbolTable::insert( varName),op.mType, std::move(rhs));
             }
         }
 

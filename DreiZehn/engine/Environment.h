@@ -132,11 +132,43 @@ public:
                     currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, result);
                 }
                 #else
-                // prev byte code:
                 if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
                     currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, assign->mRhs->evaluate(currentEnv));
                 }
                 #endif
+                break;
+            }
+            // ---- AssignOPStatement
+            case NodeType::AssignOPStatement: {
+                if (auto* assignOP = dynamic_cast<AssignOPStatement*>(node)) {
+                    Value* valuePtr = currentEnv.mVariableFrame->getVariablePtr(assignOP->mVarNameSymbolId);
+                    Value rightHand = assignOP->mRhs->evaluate(currentEnv);
+                    if (valuePtr->isPointer() ) {
+                        Tools::PrintRuntimeError("Operation with pointer not allowed!\n");
+                        break;
+                    }
+                    if (valuePtr->isInt() && rightHand.isInt()) {
+                        int32_t intval = valuePtr->asInt();
+                        switch(assignOP->mOp) {
+                            case TokenType::AssignPlus:  intval += rightHand.getInt(); break;
+                            case TokenType::AssignMinus: intval -= rightHand.getInt(); break;
+                            case TokenType::AssignMul:   intval *= rightHand.getInt(); break;
+                            case TokenType::AssignDiv:  if (rightHand.getInt() != 0) {intval /= rightHand.getInt();} break;
+                            default: break;
+                        }
+                        *valuePtr = Value(intval);
+                    } else {
+                        double doubleval = valuePtr->getDouble();
+                        switch(assignOP->mOp) {
+                            case TokenType::AssignPlus:  doubleval += rightHand.getDouble(); break;
+                            case TokenType::AssignMinus: doubleval -= rightHand.getDouble(); break;
+                            case TokenType::AssignMul:   doubleval *= rightHand.getDouble(); break;
+                            case TokenType::AssignDiv:  if (rightHand.getDouble() != 0.0) {doubleval /= rightHand.getDouble();} break;
+                            default: break;
+                        }
+                        *valuePtr = Value(doubleval);
+                    }
+                }
                 break;
             }
             // --- If-Statement  ---

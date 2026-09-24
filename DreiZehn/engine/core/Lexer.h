@@ -23,7 +23,11 @@ enum class TokenType {
     , RParen
     // math
     , Plus , Minus , Mul , Div
-    , PlusPlus
+
+    , PlusPlus, MinusMinus
+
+    , AssignPlus, AssignMinus, AssignMul, AssignDiv
+
     // if ...
     , If, Greater, Less, Equal, NotEqual, Else
     // fn functions
@@ -61,10 +65,15 @@ inline const char* tokenTypeToString(TokenType type) {
         // math
         case TokenType::Plus:          return "Plus";
         case TokenType::PlusPlus:      return "PlusPlus";
+        case TokenType::MinusMinus:    return "MinusMinus";
         case TokenType::Minus:         return "Minus";
         case TokenType::Mul:           return "Mul";
         case TokenType::Div:           return "Div";
 
+        case TokenType::AssignPlus:    return "AssignPlus";
+        case TokenType::AssignMinus:   return "AssignMinus";
+        case TokenType::AssignMul:     return "AssignMul";
+        case TokenType::AssignDiv:     return "AssignDiv";
         // if ...
         case TokenType::If:            return "If";
         case TokenType::Greater:       return "Greater";
@@ -131,6 +140,11 @@ public:
             if (peek() == '>' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::GreaterEqual, ">="}); continue; }
             if (peek() == '<' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::LowerEqual, "<="}); continue; }
 
+           if (peek() == '+' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::AssignPlus, "+="}); continue; }
+           if (peek() == '-' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::AssignMinus, "-="}); continue; }
+           if (peek() == '*' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::AssignMul, "*="}); continue; }
+           if (peek() == '/' && peekNext() == '=') { advance();advance(); tokens.push_back({TokenType::AssignDiv, "/="}); continue; }
+
             if (peek() == '=') {
                 advance();
                 if (peek() == '=') { // "=="
@@ -147,6 +161,7 @@ public:
             }
 
             if (peek() == '+' && peekNext() == '+') { advance();advance(); tokens.push_back({TokenType::PlusPlus, "++"}); continue; }
+            if (peek() == '-' && peekNext() == '-') { advance();advance(); tokens.push_back({TokenType::MinusMinus, "--"}); continue; }
 
             if (peek() == '(') { advance(); tokens.push_back({TokenType::LParen, "("}); continue; }
             if (peek() == ')') { advance(); tokens.push_back({TokenType::RParen, ")"}); continue; }

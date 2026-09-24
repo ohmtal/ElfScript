@@ -36,7 +36,8 @@ enum class NodeType {
     ForStatement,
     BreakStatement,
     ReturnStatement,
-    WhileStatement
+    WhileStatement,
+    AssignOPStatement
 };
 
 #include <string>
@@ -63,6 +64,7 @@ constexpr const char* NodeTypeToString(NodeType type) {
         case NodeType::BreakStatement:          return "BreakStatement";
         case NodeType::ReturnStatement:         return "ReturnStatement";
         case NodeType::WhileStatement:          return "WhileStatement";
+        case NodeType::AssignOPStatement:       return "AssignOPStatement";
     }
     return "UnknownNodeType";
 }
@@ -204,6 +206,17 @@ struct BinaryInlineExpression : public Expression {
     }
 
     Value evaluate(Environment& env) override;
+};
+// AssingmentOP ------------------------------------------------------------------
+struct AssignOPStatement : public ASTNode {
+    uint32_t mVarNameSymbolId;
+    TokenType mOp;
+    std::unique_ptr<Expression> mRhs; // Right-Hand Side
+
+    AssignOPStatement(uint32_t varNameSymId, TokenType op, std::unique_ptr<Expression> expr)
+    : mVarNameSymbolId(varNameSymId),mOp(op),  mRhs(std::move(expr)) {
+        mNodeType  = NodeType::AssignOPStatement;
+    }
 };
 // If -------------------------------------------------------------------------
 // struct IfStatement : public ASTNode {
