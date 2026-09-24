@@ -48,10 +48,11 @@ under 15 sec and beat python here without bytecode ;)
     - [X] other BinaryExpression to switch case
 - **12.478u 0.002s 0:12.52 99.6%    0+0k 0+0io 0pf+0w** 
 
-# 0.5
-- [ ] Bytecode continue .... 
 
 # future ideas
-- header only - for easy include 
+- [ ] Bytecode continue .... 
+- [ ] header only - for easy include 
+    - Problem : CallExpression <> FunctionMap < ASTNode
+    
 - change printf errorf to a overwritable class or add a handler 
 
