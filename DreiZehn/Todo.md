@@ -38,11 +38,19 @@ don't have to PoD Types here at the moment.
     => added an mAssigned flag
 - [~] add delete method to ALL object.  .. onMethod must call the parent 
     => let the garbage collection do that - i added the assigned flag. 
+- [X] Bytecode 
+    - [X] change the direct threading like it is in ElfScript
+    - [X] While i port it use the new VariableFrame 
+- [X] Better Garbage collection and array also keep track of object assignment
+- [ ] Before I continue with ByteCode I'll optimize the current code i guess i can get
+under 15 sec and beat python here without bytecode ;)
+    - [ ] Operator ++, --, +=, -=, *=, /= 
+    - [ ] break the other BinaryExpression in more parts 
     
-- [ ] Bytecode 
-    - [ ] change the direct threading like it is in ElfScript
-    - [ ] While i port it use the new VariableFrame 
     
+# 0.5
+
+- [ ] Bytecode ....    
 - [ ] header only 
 
 # future ideas
