@@ -12,10 +12,15 @@ namespace DreiZehn {
     // -------------------------------------------------------------------------
     Value LiteralExpression::evaluate(Environment& env) {
         if (mType == TokenType::Number) {
-            if (mRawValue.find('.') != std::string::npos) {
-                return Value(std::stod(mRawValue));
+            char* endptr = nullptr;
+            bool  haveDot = mRawValue.find('.') != std::string::npos;
+            double resDouble = std::strtod(mRawValue.c_str(), &endptr);
+            if (mRawValue.empty() || *endptr != '\0') {
+                return Value(0);
+            } else {
+                if (haveDot) return Value(resDouble);
+                else return Value((int32_t)resDouble);
             }
-            return Value(std::stoi(mRawValue));
         }
 
         if (mType == TokenType::StringLiteral) {

@@ -159,7 +159,7 @@ public:
 
 
         // ---- for statement .....
-        #ifdef DREIZEHN_BYTECODE
+#ifdef DREIZEHN_BYTECODE
         else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
             BytecodeChunk chunk;
             CompilerScope scope;
@@ -174,28 +174,54 @@ public:
         }
 #else
         else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
+            if (!forStmt->mStartExpr || !forStmt->mEndExpr ) {
+                Tools::errorf("Runtime Error: invalid for borders!\n");
+                return FlowSignal::None;
+            }
             Value startVal = forStmt->mStartExpr->evaluate(currentEnv);
             Value endVal = forStmt->mEndExpr->evaluate(currentEnv);
 
             int start = startVal.getInt();
             int end = endVal.getInt();
 
+            if (start == end) return FlowSignal::None;
+
             Environment loopEnv(&currentEnv);
 
-            for (int i = start; i <= end; ++i) {
-                loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
+            if (start > end ) {
+                for (int i = start; i >= end; --i) {
+                    loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
 
-                for (auto& statement : forStmt->mBody) {
-                    FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
+                    for (auto& statement : forStmt->mBody) {
+                        FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
 
-                    if (sig == FlowSignal::Break) {
-                        return FlowSignal::None;
+                        if (sig == FlowSignal::Break) {
+                            return FlowSignal::None;
+                        }
+                        if (sig == FlowSignal::Return) {
+                            return FlowSignal::Return;
+                        }
                     }
-                    if (sig == FlowSignal::Return) {
-                        return FlowSignal::Return;
+                }
+
+            } else {
+                for (int i = start; i <= end; ++i) {
+                    loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
+
+                    for (auto& statement : forStmt->mBody) {
+                        FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
+
+                        if (sig == FlowSignal::Break) {
+                            return FlowSignal::None;
+                        }
+                        if (sig == FlowSignal::Return) {
+                            return FlowSignal::Return;
+                        }
                     }
                 }
             }
+
+
         }
 #endif
         // ---- While statement .....

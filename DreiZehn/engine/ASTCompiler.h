@@ -97,6 +97,11 @@ public:
         // ForStatement --------------------------------------------------------
 
         else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
+            if (!forStmt->mStartExpr || !forStmt->mEndExpr ) {
+                Tools::errorf("COMPILE ERROR: invalid for borders\n");
+                return;
+            }
+
             // add iter values to registers
             U32 iteratorSlot = scope.insert(forStmt->mIteratorVarNameSymbolId);
             U32 endValueTmpSlot = scope.allocateTemporarySlot();
@@ -110,6 +115,8 @@ public:
             compileExpression(forStmt->mEndExpr.get(), chunk, scope);
             chunk.emit(OP_SET_LOCAL);
             chunk.emit(endValueTmpSlot);
+
+//FIXME this is not very performant !! and cant do down step
 
             U32 loopConditionAddr = (U32)chunk.mByteCodes.size();
 
