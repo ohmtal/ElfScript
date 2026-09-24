@@ -10,6 +10,8 @@
 #include "engine/functions/SDL3Functions.h"
 #endif
 
+#include "linenoise/linenoise.h"
+
 void RegisterUserFunc() {
     using namespace DreiZehn;
     FunctionMap::RegisterFunction("fnFoo", [](std::vector<Value>& args, Value& ret) -> bool {
@@ -20,8 +22,40 @@ void RegisterUserFunc() {
 }
 
 
-// FIXME preprocssor!
 
+static void completion_callback(
+    const char* input,
+    linenoiseCompletions* completions
+) {
+    const std::string prefix = input ? input : "";
+
+    for (const auto& [key, value] : DreiZehn::FunctionMap::RegisteredFunctions) {
+        const std::string name = SymbolTable::getName(key);
+
+        if (name.compare(0, prefix.size(), prefix) == 0) {
+            linenoiseAddCompletion(completions, name.c_str());
+        }
+    }
+}
+
+bool read_line(const char* prompt, std::string& line) {
+    char* buffer = linenoise(prompt);
+
+    if (buffer == nullptr) {
+        return false;
+    }
+
+    line = buffer;
+
+    if (!line.empty()) {
+        linenoiseHistoryAdd(buffer);
+    }
+
+    linenoiseFree(buffer);
+    return true;
+}
+
+// -------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     using namespace DreiZehn;
 
@@ -35,6 +69,8 @@ int main(int argc, char* argv[]) {
     #ifdef DREIZEHN_SDL3
     RegisterSDL3Functions();
     #endif
+
+
 
     if (argc > 1) {
         std::string scriptPath = argv[1];
@@ -51,13 +87,16 @@ int main(int argc, char* argv[]) {
     // -------------------------------------------------------------------------
     std::string line;
 
+    linenoiseSetCompletionCallback(completion_callback);
+
+
     std::vector<OpenBlock> blockStack;
 
     while (true) {
-        for (size_t i = 0; i < blockStack.size(); ++i) std::cout << ".. ";
-        std::cout << (blockStack.empty() ? "> " : "");
-
-        std::getline(std::cin, line);
+        // for (size_t i = 0; i < blockStack.size(); ++i) std::cout << ".. ";
+        // std::cout << (blockStack.empty() ? "> " : "");
+        // std::getline(std::cin, line);
+        read_line("> ", line);
         if (line == "exit") break;
 
         std::stringstream stream(line);

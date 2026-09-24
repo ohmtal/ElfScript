@@ -1,6 +1,17 @@
 # Test for DreiZehn Script
 print "--- Run Engine-Test ---"
 
+-- Not working:
+-- print "..... multiline statement:"
+-- -- debug.toggle
+-- i = 1
+-- if ( (i == 2)
+--     || (i == 1) )
+--     print "huhu"
+-- end
+--
+-- return
+
 foo = 1
 if ( foo == 0 )
     print "Foo ist:" foo

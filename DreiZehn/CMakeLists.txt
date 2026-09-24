@@ -17,7 +17,7 @@ set(SANITIZE_DEFAULT OFF)
 set(BUILD_WITH_SANITIZE ${SANITIZE_DEFAULT} CACHE BOOL "Build Application with -fsanitize=address -g")
 
 # -----------------------------------------------------------------------------
-project(DreiZehn CXX)
+project(DreiZehn C CXX)
 
 set(PROJECT_SRC
 
@@ -62,7 +62,8 @@ set(PROJECT_SRC
     engine/DreiZehn.h
 
 
-
+    ext/linenoise/linenoise.c
+    ext/linenoise/linenoise.h
     src/main.cpp
 )
 
@@ -91,6 +92,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PRIVATE
      "${CMAKE_CURRENT_SOURCE_DIR}/"
      "${CMAKE_CURRENT_SOURCE_DIR}/engine"
+     "${CMAKE_CURRENT_SOURCE_DIR}/ext"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

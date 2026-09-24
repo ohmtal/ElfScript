@@ -48,6 +48,9 @@ under 15 sec and beat python here without bytecode ;)
     - [X] other BinaryExpression to switch case
 - **12.478u 0.002s 0:12.52 99.6%    0+0k 0+0io 0pf+0w** 
 
+# 0.5
+- multiline statement for example if..
+
 
 # future ideas
 - [ ] Bytecode continue .... 
