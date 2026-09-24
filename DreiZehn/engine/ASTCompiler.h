@@ -14,6 +14,8 @@ namespace DreiZehn {
 class ASTCompiler {
 public:
 
+#define DREIZEHN_BYTECODE_PORTING
+
     static void compileExpression(ASTNode* node, BytecodeChunk& chunk, CompilerScope& scope) {
         if (!node) return;
 
@@ -49,16 +51,29 @@ public:
         // ---------------------------------------------------------------------
         // --- variable
         else if (auto* varExpr = dynamic_cast<VariableExpression*>(node)) {
-            // local register ..// uint32_t slot = scope.insert(varExpr->mVariableNameSymbolId);
-            U32 slot = varExpr->mVariableNameSymbolId;
-            chunk.emit(OP_LOAD_VAR);
-            chunk.emit(slot);
+                U32 localSlot = scope.insert(varExpr->mVariableNameSymbolId);
+
+#ifdef DREIZEHN_BYTECODE_PORTING
+                chunk.emit(OP_LOAD_VAR);
+                chunk.emit(varExpr->mVariableNameSymbolId);
+                chunk.emit(OP_SET_LOCAL);
+                chunk.emit(localSlot);
+#endif
+
+                chunk.emit(OP_GET_LOCAL);
+                chunk.emit(localSlot);
         }
 
         // TODO  MethodExpression
         // TODO  CallExpression
-        // TODO  AssignStatement
 
+        // AssignStatement --------------------------------------------------------
+        else if (auto* assignStmt = dynamic_cast<AssignStatement*>(node)) {
+            compileExpression(assignStmt->mRhs.get(), chunk, scope);
+            U32 localSlot = scope.insert(assignStmt->mVarNameSymbolId);
+            chunk.emit(OP_SET_LOCAL);
+            chunk.emit(localSlot);
+        }
         // --- operation
         else if (auto* binary = dynamic_cast<BinaryOpExpression*>(node)) {
             compileExpression(binary->mLeft.get(), chunk, scope);
@@ -79,7 +94,65 @@ public:
         //TODO ElseMarkerNode
         //TODO FunctionDefineStartNode
         //TODO FunctionDefineEndNode
-        //TODO ForStatement
+
+        // ForStatement --------------------------------------------------------
+
+        else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
+            // add iter values to registers
+            U32 iteratorSlot = scope.insert(forStmt->mIteratorVarNameSymbolId);
+            U32 endValueTmpSlot = scope.allocateTemporarySlot();
+
+            // start to register
+            compileExpression(forStmt->mStartExpr.get(), chunk, scope);
+            chunk.emit(OP_SET_LOCAL);
+            chunk.emit(iteratorSlot);
+
+            // end to register
+            compileExpression(forStmt->mEndExpr.get(), chunk, scope);
+            chunk.emit(OP_SET_LOCAL);
+            chunk.emit(endValueTmpSlot);
+
+            U32 loopConditionAddr = (U32)chunk.mByteCodes.size();
+
+            // ITER
+            chunk.emit(OP_GET_LOCAL);
+            chunk.emit(iteratorSlot);
+            chunk.emit(OP_GET_LOCAL);
+            chunk.emit(endValueTmpSlot);
+            chunk.emit(OP_LESS_EQUAL);
+
+            chunk.emit(OP_JUMP_IF_FALSE);
+            U32 exitJumpPlaceholder = (U32)chunk.mByteCodes.size();
+            chunk.emit(0); // space for backpatching
+
+            for (auto& statement : forStmt->mBody) {
+                compileExpression(statement.get(), chunk, scope);
+            }
+
+            chunk.emit(OP_INC_LOCAL);
+            chunk.emit(iteratorSlot);
+            chunk.emit(1); //for step :D
+
+            // // chunk.emit(OP_GET_LOCAL);
+            // // chunk.emit(iteratorSlot);
+            // // chunk.emit(OP_CONST);
+            // // //NOTE this is the iter increment value for future changes step / neg
+            // // chunk.emit(chunk.addConstant(Value(1)));
+            // // chunk.emit(OP_ADD);
+            // // chunk.emit(OP_SET_LOCAL);
+            // // chunk.emit(iteratorSlot);
+
+            chunk.emit(OP_JUMP);
+            chunk.emit(loopConditionAddr);
+
+            // patch jmp
+            U32 loopEndAddr = (U32)chunk.mByteCodes.size();
+            chunk.mByteCodes[exitJumpPlaceholder] = loopEndAddr;
+
+            scope.freeTemporarySlot();
+        }
+
+
         //TODO BreakStatement
         //TODO ReturnStatement
         //TODO WhileStatement

@@ -116,10 +116,11 @@ public:
 
             // compile
             ASTCompiler::compileExpression(assign->mRhs.get(), chunk, scope);
+
             chunk.emit(OP_EXIT);
 
             // fire!
-            Value result = runDirectThreadedVM(chunk);
+            Value result = runDirectThreadedVM(chunk, scope.getLocalCount());
             // save
             currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, result);
         }
@@ -156,6 +157,20 @@ public:
 
 
         // ---- for statement .....
+        #ifdef DREIZEHN_BYTECODE
+        else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
+            BytecodeChunk chunk;
+            CompilerScope scope;
+
+             ASTCompiler::compileExpression(forStmt, chunk, scope);
+
+             //TODO: ASTCompiler::compileForStatement(forStmt, chunk, scope);
+
+            chunk.emit(OP_EXIT);
+
+            runDirectThreadedVM(chunk, scope.getLocalCount());
+        }
+#else
         else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
             Value startVal = forStmt->mStartExpr->evaluate(currentEnv);
             Value endVal = forStmt->mEndExpr->evaluate(currentEnv);
@@ -180,6 +195,7 @@ public:
                 }
             }
         }
+#endif
         // ---- While statement .....
         else if (auto* whileStmt = dynamic_cast<WhileStatement*>(node)) {
             Environment loopEnv(&currentEnv);
