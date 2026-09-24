@@ -8,7 +8,7 @@
 //  3. threadChunk(chunk)
 //  4. runDirectThreadedVM(chunk)
 
-#define DEBUG_TRACE_EXECUTION
+
 
 //-----------------------------------------------------------------------------
 #pragma once
@@ -103,7 +103,6 @@ inline Value runDirectThreadedVM(BytecodeChunk& chunk, size_t numLocals = 64) {
         ip += 2;
         return val;
     };
-
 
     // magic macro:
     #ifdef DEBUG_TRACE_EXECUTION

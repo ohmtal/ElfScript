@@ -5,6 +5,8 @@
 // Enviroment VM
 
 // #define DREIZEHN_BYTECODE
+// #define DREIZEHN_BYTECODE_PORTING
+// #define DEBUG_TRACE_EXECUTION
 //-----------------------------------------------------------------------------
 #pragma once
 

@@ -8,6 +8,8 @@
 #pragma once
 #include <vector>
 #include <cstdint>
+#include <cstring> //mem ...
+
 namespace DreiZehn {
 
 typedef uint32_t U32; // dont want to break my fingers lol
@@ -97,15 +99,23 @@ inline void disassembleInstruction(const uint32_t* code, size_t offset) {
 
 // the code chunk
 struct BytecodeChunk {
-    std::vector<uint32_t> mByteCodes;
+    std::vector<U32> mByteCodes;
     std::vector<Value> mConstants;
 
-    uint32_t addConstant(Value val) {
+    U32 addConstant(Value val) {
         mConstants.push_back(val);
-        return static_cast<uint32_t>(mConstants.size() - 1);
+        return static_cast<U32>(mConstants.size() - 1);
     }
 
-    U32 emit(uint32_t op) {
+
+    U32 emitValue(Value val) {
+        U32 startIp = (U32)mByteCodes.size();
+        mByteCodes.resize(startIp + 2);
+        std::memcpy(&mByteCodes[startIp], &val, sizeof(Value));
+        return startIp;
+    }
+
+    U32 emit(U32 op) {
         mByteCodes.push_back(op);
         return (U32)mByteCodes.size() - 1;
     }

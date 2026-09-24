@@ -14,7 +14,6 @@ namespace DreiZehn {
 class ASTCompiler {
 public:
 
-#define DREIZEHN_BYTECODE_PORTING
 
     static void compileExpression(ASTNode* node, BytecodeChunk& chunk, CompilerScope& scope) {
         if (!node) return;
