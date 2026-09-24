@@ -44,6 +44,7 @@ set(PROJECT_SRC
     engine/functions/MathFunctions.h
     engine/functions/DebugFunctions.h
     engine/functions/ArrayFunctions.h
+    engine/functions/VectorObjectFunctions.h
 
 
     # ToolBox

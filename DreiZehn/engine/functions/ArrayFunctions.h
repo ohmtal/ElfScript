@@ -128,6 +128,10 @@ namespace DreiZehn {
     };
     // -------------------------------------------------------------------------
     void RegisterArrayFunctions(Environment& env) {
+        // init Methods:
+        ArrayValueObject::initSymbols();
+
+
         using namespace FunctionMap;
 
         RegisterFunction("Array.new", [&env](std::vector<Value>& args, Value& ret) -> bool {

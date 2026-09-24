@@ -5,6 +5,7 @@
 #include "engine/DreiZehn.h"
 #include "engine/functions/DebugFunctions.h"
 #include "engine/functions/ArrayFunctions.h"
+#include "engine/functions/VectorObjectFunctions.h"
 
 #ifdef DREIZEHN_SDL3
 #include "engine/functions/SDL3Functions.h"
@@ -62,6 +63,7 @@ int main(int argc, char* argv[]) {
     Environment env;
     RegisterCoreFunctions(env);
     RegisterArrayFunctions(env);
+    RegisterVectorObjectFunctions();
     RegisterMathFunctions();
     RegisterDebugFunctions();
     RegisterUserFunc();
