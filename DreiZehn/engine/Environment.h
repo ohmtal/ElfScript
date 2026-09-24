@@ -96,171 +96,179 @@ public:
     inline FlowSignal execute(ASTNode* node, Environment& currentEnv) {
         if (!node) return FlowSignal::None;
 
+        if (Globals::gDumpStateNodes) Tools::printf("EXECUTE: %s\n", NodeTypeToString(node->mNodeType));
 
-        // --- Break Statement ---
-        if (dynamic_cast<BreakStatement*>(node)) {
-            return FlowSignal::Break;
-        }
-
-        // --- Return Statement ---
-        if (auto* retStmt = dynamic_cast<ReturnStatement*>(node)) {
-            if (retStmt->mExpression) {
-                Value retVal = retStmt->mExpression->evaluate(currentEnv);
-                currentEnv.mVariableFrame->setVariable(SymbolTable::insert("__return_value__"), retVal);
+        switch(node->mNodeType) {
+            // --- Break Statement ---
+            case NodeType::BreakStatement: {
+                return FlowSignal::Break;
             }
-            return FlowSignal::Return;
-        }
 
-        // --- Assign ---
-#ifdef DREIZEHN_BYTECODE
-        if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
-            // new chunk
-            BytecodeChunk chunk;
-            CompilerScope scope;
+            // --- Return Statement ---
+            case NodeType::ReturnStatement: {
+                auto* retStmt = dynamic_cast<ReturnStatement*>(node);
+                if (retStmt->mExpression) {
+                    Value retVal = retStmt->mExpression->evaluate(currentEnv);
+                    currentEnv.mVariableFrame->setVariable(SymbolTable::insert("__return_value__"), retVal);
+                }
+                return FlowSignal::Return;
+            }
+            // --- Assign ---
+            case NodeType::AssignStatement: {
+                #ifdef DREIZEHN_BYTECODE
+                if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
+                    // new chunk
+                    BytecodeChunk chunk;
+                    CompilerScope scope;
 
-            // compile
-            ASTCompiler::compileExpression(assign->mRhs.get(), chunk, scope);
+                    // compile
+                    ASTCompiler::compileExpression(assign->mRhs.get(), chunk, scope);
 
-            chunk.emit(OP_EXIT);
+                    chunk.emit(OP_EXIT);
 
-            // fire!
-            Value result = runDirectThreadedVM(chunk, scope.getLocalCount());
-            // save
-            currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, result);
-        }
-#else
-        // prev byte code:
-        if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
-            currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, assign->mRhs->evaluate(currentEnv));
-        }
-#endif
+                    // fire!
+                    Value result = runDirectThreadedVM(chunk, scope.getLocalCount());
+                    // save
+                    currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, result);
+                }
+                #else
+                // prev byte code:
+                if (auto* assign = dynamic_cast<AssignStatement*>(node)) {
+                    currentEnv.mVariableFrame->setVariable(assign->mVarNameSymbolId, assign->mRhs->evaluate(currentEnv));
+                }
+                #endif
+                break;
+            }
+            // --- If-Statement  ---
+            case NodeType::IfStatement: {
+                auto* ifStmt = dynamic_cast<IfStatement*>(node);
+                Value condVal = ifStmt->mCondition->evaluate(currentEnv);
 
+                double condNum = condVal.getDouble();
+                const double EPSILON = 1e-9;
+                bool isTrue = std::abs(condNum) > EPSILON;
 
-        // --- If-Statement  ---
-        else if (auto* ifStmt = dynamic_cast<IfStatement*>(node)) {
-            Value condVal = ifStmt->mCondition->evaluate(currentEnv);
+                if (isTrue) {
+                    for (auto& childNode : ifStmt->mBody) {
+                        if (!childNode) continue;
+                        FlowSignal sig = execute(childNode.get(), currentEnv);
+                        if (sig != FlowSignal::None) return sig;
+                    }
+                } else {
+                    for (auto& childNode : ifStmt->mElseBody) {
+                        if (!childNode) continue;
+                        FlowSignal sig = execute(childNode.get(), currentEnv);
+                        if (sig != FlowSignal::None) return sig;
+                    }
+                }
+                break;
+            }
 
-            double condNum = condVal.getDouble();
-            const double EPSILON = 1e-9;
-            bool isTrue = std::abs(condNum) > EPSILON;
+            // ---- for statement .....
+            case NodeType::ForStatement: {
+                #ifdef DREIZEHN_BYTECODE
+                    auto* forStmt = dynamic_cast<ForStatement*>(node);
+                    BytecodeChunk chunk;
+                    CompilerScope scope;
 
-            if (isTrue) {
-                for (auto& childNode : ifStmt->mBody) {
-                    if (!childNode) continue;
-                    FlowSignal sig = execute(childNode.get(), currentEnv);
+                    ASTCompiler::compileExpression(forStmt, chunk, scope);
+
+                    //TODO: ASTCompiler::compileForStatement(forStmt, chunk, scope);
+
+                    chunk.emit(OP_EXIT);
+
+                    runDirectThreadedVM(chunk, scope.getLocalCount());
+                #else
+                    auto* forStmt = dynamic_cast<ForStatement*>(node);
+                    if (!forStmt->mStartExpr || !forStmt->mEndExpr ) {
+                        Tools::errorf("Runtime Error: invalid for borders!\n");
+                        return FlowSignal::None;
+                    }
+                    Value startVal = forStmt->mStartExpr->evaluate(currentEnv);
+                    Value endVal = forStmt->mEndExpr->evaluate(currentEnv);
+
+                    int start = startVal.getInt();
+                    int end = endVal.getInt();
+
+                    Environment loopEnv(&currentEnv);
+
+                    if (start > end ) {
+                        for (int i = start; i >= end; --i) {
+                            loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
+
+                            for (auto& statement : forStmt->mBody) {
+                                FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
+
+                                if (sig == FlowSignal::Break) {
+                                    return FlowSignal::None;
+                                }
+                                if (sig == FlowSignal::Return) {
+                                    return FlowSignal::Return;
+                                }
+                            }
+                        }
+
+                    } else {
+                        for (int i = start; i <= end; ++i) {
+                            loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
+
+                            for (auto& statement : forStmt->mBody) {
+                                FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
+
+                                if (sig == FlowSignal::Break) {
+                                    return FlowSignal::None;
+                                }
+                                if (sig == FlowSignal::Return) {
+                                    return FlowSignal::Return;
+                                }
+                            }
+                        }
+                    }
+                #endif
+                break;
+            }
+
+            // ---- While statement .....
+            case NodeType::WhileStatement: {
+                auto* whileStmt = dynamic_cast<WhileStatement*>(node);
+                Environment loopEnv(&currentEnv);
+
+                auto checkCondition = [&]() -> bool {
+                    Value condVal = whileStmt->mCondition->evaluate(loopEnv);
+                    return (condVal.isInt() && condVal.asInt() != 0) ||
+                    (condVal.isDouble() && condVal.asDouble() != 0.0);
+                };
+
+                while (checkCondition()) {
+                    for (auto& statement : whileStmt->mBody) {
+                        FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
+
+                        if (sig == FlowSignal::Break) return FlowSignal::None;
+                        if (sig == FlowSignal::Return) return FlowSignal::Return;
+                    }
+                }
+                break;
+            }
+            // --- BlockStatement  ---
+            case NodeType::BlockStatement: {
+                auto* block = dynamic_cast<BlockStatement*>(node);
+                for (auto& statement : block->mBody) {
+                    if (!statement) continue;
+                    FlowSignal sig = execute(statement.get(), *this);
                     if (sig != FlowSignal::None) return sig;
                 }
-            } else {
-                for (auto& childNode : ifStmt->mElseBody) {
-                    if (!childNode) continue;
-                    FlowSignal sig = execute(childNode.get(), currentEnv);
-                    if (sig != FlowSignal::None) return sig;
-                }
-            }
-        }
-
-
-        // ---- for statement .....
-#ifdef DREIZEHN_BYTECODE
-        else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
-            BytecodeChunk chunk;
-            CompilerScope scope;
-
-             ASTCompiler::compileExpression(forStmt, chunk, scope);
-
-             //TODO: ASTCompiler::compileForStatement(forStmt, chunk, scope);
-
-            chunk.emit(OP_EXIT);
-
-            runDirectThreadedVM(chunk, scope.getLocalCount());
-        }
-#else
-        else if (auto* forStmt = dynamic_cast<ForStatement*>(node)) {
-            if (!forStmt->mStartExpr || !forStmt->mEndExpr ) {
-                Tools::errorf("Runtime Error: invalid for borders!\n");
                 return FlowSignal::None;
             }
-            Value startVal = forStmt->mStartExpr->evaluate(currentEnv);
-            Value endVal = forStmt->mEndExpr->evaluate(currentEnv);
 
-            int start = startVal.getInt();
-            int end = endVal.getInt();
-
-            if (start == end) return FlowSignal::None;
-
-            Environment loopEnv(&currentEnv);
-
-            if (start > end ) {
-                for (int i = start; i >= end; --i) {
-                    loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
-
-                    for (auto& statement : forStmt->mBody) {
-                        FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
-
-                        if (sig == FlowSignal::Break) {
-                            return FlowSignal::None;
-                        }
-                        if (sig == FlowSignal::Return) {
-                            return FlowSignal::Return;
-                        }
-                    }
+            // --- others ---
+            default: {
+                if (auto* expr = dynamic_cast<Expression*>(node)) {
+                    expr->evaluate(currentEnv);
                 }
-
-            } else {
-                for (int i = start; i <= end; ++i) {
-                    loopEnv.mVariableFrame->setVariable(forStmt->mIteratorVarNameSymbolId, Value(i));
-
-                    for (auto& statement : forStmt->mBody) {
-                        FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
-
-                        if (sig == FlowSignal::Break) {
-                            return FlowSignal::None;
-                        }
-                        if (sig == FlowSignal::Return) {
-                            return FlowSignal::Return;
-                        }
-                    }
-                }
+                break;
             }
 
-
-        }
-#endif
-        // ---- While statement .....
-        else if (auto* whileStmt = dynamic_cast<WhileStatement*>(node)) {
-            Environment loopEnv(&currentEnv);
-
-            auto checkCondition = [&]() -> bool {
-                Value condVal = whileStmt->mCondition->evaluate(loopEnv);
-                return (condVal.isInt() && condVal.asInt() != 0) ||
-                (condVal.isDouble() && condVal.asDouble() != 0.0);
-            };
-
-            while (checkCondition()) {
-                for (auto& statement : whileStmt->mBody) {
-                    FlowSignal sig = currentEnv.execute(statement.get(), loopEnv);
-
-                    if (sig == FlowSignal::Break) return FlowSignal::None;
-                    if (sig == FlowSignal::Return) return FlowSignal::Return;
-                }
-            }
-        }
-        // --- BlockStatement  ---
-        else
-        if (auto* block = dynamic_cast<BlockStatement*>(node)) {
-            for (auto& statement : block->mBody) {
-                if (!statement) continue;
-                FlowSignal sig = execute(statement.get(), *this);
-                if (sig != FlowSignal::None) return sig;
-            }
-            return FlowSignal::None;
-        }
-
-
-        // --- others ---
-        else if (auto* expr = dynamic_cast<Expression*>(node)) {
-            expr->evaluate(currentEnv);
-        }
+        } // ... SWITCH ...
 
         return FlowSignal::None;
     }

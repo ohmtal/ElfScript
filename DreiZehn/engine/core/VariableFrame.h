@@ -115,6 +115,26 @@ public:
         Tools::errorf("Variable not found: %s\n", varName.c_str());
         return Value();
     }
+
+    inline Value* getVariablePtr(uint32_t id) {
+        // if (Globals::gShowVariableDebug) Tools::printf("DEBUG: getVariable :: name: %s id: %d\n", SymbolTable::getName(id).c_str(), id);
+
+        auto it = mVariables.find(id);
+        if (it != mVariables.end()) {
+            return &it->second;
+        }
+
+        if (mParentFrame != nullptr) {
+            return mParentFrame->getVariablePtr(id);
+        }
+
+        // not found we set a new one !
+
+        std::string varName = SymbolTable::getName(id);
+        mVariables[id] = Value(0);
+        Tools::errorf("Variable not found: %s\n", varName.c_str());
+        return &mVariables[id];
+    }
     // -------------------------------------------------------------------------
     // GarbageCollection
     // -------------------------------------------------------------------------

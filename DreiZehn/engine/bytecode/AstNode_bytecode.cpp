@@ -150,6 +150,8 @@ namespace DreiZehn {
     // }
 
     // -------------------------------------------------------------------------
+    Value BinaryInlineExpression::evaluate(Environment& env)  { return Value(0);}
+    // -------------------------------------------------------------------------
 
     Value BinaryExpression::evaluate(Environment& env)  { return Value(0);}
     //     if (!mLeft.get() || !mRight.get()) {

@@ -147,6 +147,43 @@ namespace DreiZehn {
         return Value();
 
     }
+    // -------------------------------------------------------------------------
+    // ++ --
+    Value BinaryInlineExpression::evaluate(Environment& env)  {
+        if ( mVarNameSymbolId == 0 ) {
+            Tools::PrintParseError("variable is missing:");
+            return Value();
+        }
+        Value* valPtr = env.getVariableFrame()->getVariablePtr(mVarNameSymbolId);
+        if (!valPtr || valPtr->isPointer()) {
+            Tools::errorf("Invalid Pointer operation: %s\n",tokenTypeToString(mOp));
+            return Value();
+        }
+        // NOTE: should i cast it to int?!
+
+        if (valPtr->isInt() ) {
+            int32_t lCurInt = valPtr->asInt();
+            switch (mOp) {
+                case TokenType::PlusPlus: lCurInt++; break;
+                default: break;
+            }
+            *valPtr = Value(lCurInt);
+            return *valPtr;
+        } else  { // must be a Double!
+            double lCurDouble = valPtr->asDouble();
+            switch (mOp) {
+                case TokenType::PlusPlus: lCurDouble += 1.0 ; break;
+                default: break;
+            }
+            *valPtr = Value(lCurDouble);
+            return *valPtr;
+        }
+
+
+        return Value();
+
+    }
+
 
     // -------------------------------------------------------------------------
 

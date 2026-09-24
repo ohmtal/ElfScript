@@ -23,6 +23,7 @@ enum class TokenType {
     , RParen
     // math
     , Plus , Minus , Mul , Div
+    , PlusPlus
     // if ...
     , If, Greater, Less, Equal, NotEqual, Else
     // fn functions
@@ -59,6 +60,7 @@ inline const char* tokenTypeToString(TokenType type) {
 
         // math
         case TokenType::Plus:          return "Plus";
+        case TokenType::PlusPlus:      return "PlusPlus";
         case TokenType::Minus:         return "Minus";
         case TokenType::Mul:           return "Mul";
         case TokenType::Div:           return "Div";
@@ -144,6 +146,7 @@ public:
                 tokens.push_back({TokenType::NotEqual, "!="});
             }
 
+            if (peek() == '+' && peekNext() == '+') { advance();advance(); tokens.push_back({TokenType::PlusPlus, "++"}); continue; }
 
             if (peek() == '(') { advance(); tokens.push_back({TokenType::LParen, "("}); continue; }
             if (peek() == ')') { advance(); tokens.push_back({TokenType::RParen, ")"}); continue; }

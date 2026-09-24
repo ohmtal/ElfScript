@@ -36,6 +36,12 @@ private:
         ;
     }
 
+    bool isInlineMathType(const Token& op) {
+        return
+            op.mType == TokenType::PlusPlus
+        ;
+    }
+
     bool isMathType() {
         return
         isMathOperatorType(peek())
@@ -59,10 +65,13 @@ private:
         && peek().mType != TokenType::Semicolon
         && peek().mType != TokenType::End
         && peek().mType != TokenType::Else
-        && !isMathType();
+        && !isMathType()
+        ;
     }
     // -------------------------------------------------------------------------
     std::unique_ptr<Expression> parsePrimary() {
+
+
         if (peek().mType == TokenType::LParen) {
             advance();
 
@@ -75,13 +84,12 @@ private:
             }
             return expr;
         }
-
+        else
         if (peek().mType == TokenType::Number || peek().mType == TokenType::StringLiteral) {
             Token t = advance();
             return std::make_unique<LiteralExpression>(t.mType, t.mValue);
         }
-
-
+        else
         if (peek().mType == TokenType::Identifier) {
             Token nameToken = advance();
             uint32_t nameTokenSymbolId = SymbolTable::insert( nameToken.mValue);
@@ -90,6 +98,11 @@ private:
                 return std::make_unique<ValueExpression>((*constansPointer));
             }
 
+            if (isInlineMathType(peek())) {
+                Token op = advance();
+                return std::make_unique<BinaryInlineExpression>(nameTokenSymbolId, op.mType);
+            }
+            else
             // current peek must be the arrow
             if (peek().mType  == TokenType::Arrow
                 && peekNext().mType == TokenType::Identifier
@@ -137,12 +150,15 @@ private:
     std::unique_ptr<Expression> parseMath() {
         auto left = parsePrimary();
         while (isMathType()){
+
             Token op = advance();
+
             auto right = parsePrimary();
             if (isMathOperatorType(op))
                 left = std::make_unique<BinaryOpExpression>(std::move(left), op.mType, std::move(right));
             else
                 left = std::make_unique<BinaryExpression>(std::move(left), op.mType, std::move(right));
+
         }
 
         return left;
@@ -340,7 +356,9 @@ public:
             else if (peekNext().mType == TokenType::Arrow) {
                 return parsePrimary();
             }
-
+            else if (isInlineMathType( peekNext())) {
+                return parsePrimary();
+            }
         }
 
         return parseComparison();
