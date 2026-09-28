@@ -136,7 +136,7 @@ namespace Audio {
     /*
      * Add a short fade in/out to avoid clicks when notes change.
      */
-    static float envelope(S32 sample, S32 total_samples, S32 sampleRate = 48000)
+    static float envelope(S32 sample, S32 total_samples, S32 sampleRate)
     {
         const S32 fade_samples = sampleRate / 100;
 
@@ -180,7 +180,7 @@ namespace Audio {
             F64 wave = ElfMath::mSin(2.0 * M_PI * frequency * time) * 0.85 +
             ElfMath::mSin(2.0 * M_PI * frequency * 2.0 * time) * 0.15;
 
-            F32 gain = amplitude * envelope(i, sample_count);
+            F32 gain = amplitude * envelope(i, sample_count, sampleRate);
 
             samples[i] = (F32)(wave * gain);
         }
