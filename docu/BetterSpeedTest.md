@@ -9,6 +9,10 @@
 - 🐢 Dreizehn 0.3: 23.020u 0.002s 0:23.07 99.7% 0+0k 0+0io 0pf+0w
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
+## Version 0.8b
+- [ ] speed up script function calls (docu/speedtest/elf_v6/test_fibonacci.elf)
+    - this is very slow (fib 33): 4.462u 0.002s 0:04.47 99.7%     0+0k 0+0io 0pf+0w
+    
 
 ## Version 0.8
 
