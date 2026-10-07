@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // ConsoleVector Bindings
+// NOTE: moved to console/consoleVectorFunc!
 //-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
 #include "console/console.h"

@@ -46,7 +46,7 @@ namespace ElfScript::ConsoleVector {
 
         if (argV[2].isConsoleVector())
             resultValue.setVector( ElfMath::Vec4Mul(argV[1].v,argV[2].v));
-        if (argV[2].isNumberType())
+        else if (argV[2].isNumberType())
             resultValue.setVector( ElfMath::Vec4Mul(argV[1].v,(F32)argV[2].getFloat()));
         else return false;
 
@@ -58,7 +58,7 @@ namespace ElfScript::ConsoleVector {
 
         if (argV[2].isConsoleVector())
             resultValue.setVector( ElfMath::Vec4Div(argV[1].v,argV[2].v));
-        if (argV[2].isNumberType())
+        else if (argV[2].isNumberType())
             resultValue.setVector( ElfMath::Vec4Div(argV[1].v,(F32)argV[2].getFloat()));
         else return false;
 
