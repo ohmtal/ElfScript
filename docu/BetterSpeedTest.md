@@ -9,9 +9,15 @@
 - 🐢 Dreizehn 0.3: 23.020u 0.002s 0:23.07 99.7% 0+0k 0+0io 0pf+0w
 - ElfScript 0.? outperform OGE3D (my Torque3D based on 3.10) : 33.268u 0.299s 0:33.61 99.8%  0+0k 0+24io 0pf+0w
 
+## Version 0.8b
+- [ ] Inline ConsoleFunction
+    - [ ] codelet / wantedArgc 
+    - [ ] add it to method also ?!
+    - [ ] test debug dump ..
+
 ## Version 0.8a
-- [ ] removed console doc for functions and classed (commented out)
-- [ ] speed up script function calls (docu/speedtest/elf_v6/test_fibonacci.elf)
+- [X] removed console doc for functions and classed (commented out)
+- [X] speed up script function calls (docu/speedtest/elf_v6/test_fibonacci.elf)
     - [X] this is very slow (fib 33): 4.462u 0.002s 0:04.47 99.7%     0+0k 0+0io 0pf+0w
         - inline func call (schwere geburt): 1.174u 0.002s 0:01.18 99.1%     0+0k 0+0io 0pf+0w
     - [X] Crash at TestScript !!!!!! not finshed :(
@@ -29,11 +35,17 @@
             - iterStack and iterDepth !!!!
             - somewhere on unrolling iterDepth get negative and so to MAX U32!!! funny ,,,
             - unknown from where, but on OP_ITER_END _ITER is 1 and iterDepth is 0!!!! 
-    - [ ] more testing and then create a struct for the rollback stuff - not x different Vectors!!
-    - [ ] *TODO:* codelet + wantedArgc 
-    - [ ] finally add this to console methods
+    - [X] more testing and then create a struct for the rollback stuff - not x different Vectors!!
 
-- [ ] all ConsoleVectoFuncts need to be tested! 
+- [X] all ConsoleVectorFunc's need to be tested! 
+|Script | run 1 | run 2 | run 3 |
+| --- | --- | --- | --- |
+|test_localvar.elf |1.34s |1.34s |1.34s |
+|test_global.elf |2.41s |2.32s |2.34s |
+|test_static.elf |4.37s |4.37s |4.38s |
+|test_dynamic.elf |3.83s |3.82s |3.83s |
+|test_vector_components.elf |3.97s |3.87s |3.86s |
+|test_fibonacci.elf |1.14s |1.14s |1.14s |
 
     
 ## Version 0.8

@@ -8,6 +8,7 @@ scripts=(
     "test_static.elf"
     "test_dynamic.elf"
     "test_vector_components.elf"
+    "test_fibonacci.elf"
 )
 
 # Path to the executable
