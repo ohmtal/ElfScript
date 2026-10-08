@@ -849,12 +849,43 @@ $failCount = 0;
     }
 };
 
+%vec = {1,2,3,4};
+testAssert("equal", %vec.equal({1,2,3,4}), 1);
+testAssert("equal2", %vec.equal2({1,2,3,4}), 1);
+testAssert("equal3", %vec.equal3({1,2,3,4}), 1);
+
 %vec = {1,1,1,1};
 %vAssert("add", %vec.add({1,2,3,4}), {2,3,4,5});
 %vAssert("sub", %vec.sub({1,2,3,4}), {0,-1,-2,-3});
+%vAssert("mul", %vec.mul({1,2,3,4}), {1,2,3,4});
+%vec = {2,4,6,8};
+%vAssert("div", %vec.div({1,2,3,4}), {2,2,2,2});
+%vAssert("div number", %vec.div(2), {1,2,3,4});
 
 
-var_dump(%vec.randomize(0,10));
+
+%v = {10,10,10 ,10};
+%p =  {15,15};
+%vAssert("getRectCentered",%v.getRectCentered(%p), {15,15,10,10});
+testAssert("pointInRect",%v.pointInRect(%p), 1);
+testAssert("isValidRect",%p.isValidRect(), 0);
+testAssert("contains",%v.contains({12,12,3,3}), 1);
+testAssert("intersects",%v.intersects({15,15,10,10}), 1);
+testAssert("dist2",%v.dist2({10,10,10,10}), 0);
+testAssert("distSq2",%v.distSq2({11,11,10,10}), 2);
+testAssert("dist3",%v.dist3({10,10,10,10}), 0);
+testAssert("distSq3",%v.distSq3({11,11,11,10}), 3);
+testAssert("len2",%v.len2(), 14.1421356);
+testAssert("len2Sq",%v.len2Sq(), 200);
+testAssert("len3",%v.len3(), 17.3205090);
+testAssert("len3Sq",%v.len3Sq(), 300);
+%vAssert("normalized2",%v.normalized2(), {0.707106769, 0.707106769, 0, 0});
+%vAssert("normalized3",%v.normalized3(), {0.577350259,0.577350259,0.577350259, 0});
+testAssert("dot2",%v.dot2(%v), 200); //??
+testAssert("dot3",%v.dot3(%v), 300); //??
+testAssert("cross2",%v.cross2(%v), 0); //??
+testAssert("cross3",%v.cross3(%v), -100); //??
+
 
 printSeparator();
 if ($failCount > 0 ) {
@@ -864,13 +895,13 @@ if ($failCount > 0 ) {
 }
 
 
-printSeparator();
-print ("--------------- TypeVector BUG!! ------------------");
-$o = new TestObj();
-// vardumpField("$o.vec");
-print("vec=",$o.vec);
-$o.vec = {1,2,3};
-print("vec=",$o.vec);
+// printSeparator();
+// print ("--------------- TypeVector BUG!! ------------------");
+// $o = new TestObj();
+// // vardumpField("$o.vec");
+// print("vec=",$o.vec);
+// $o.vec = {1,2,3};
+// print("vec=",$o.vec);
 
 
 

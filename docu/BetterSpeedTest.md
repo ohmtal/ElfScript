@@ -14,9 +14,28 @@
 - [ ] speed up script function calls (docu/speedtest/elf_v6/test_fibonacci.elf)
     - [X] this is very slow (fib 33): 4.462u 0.002s 0:04.47 99.7%     0+0k 0+0io 0pf+0w
         - inline func call (schwere geburt): 1.174u 0.002s 0:01.18 99.1%     0+0k 0+0io 0pf+0w
+    - [X] Crash at TestScript !!!!!! not finshed :(
+        - from compiledEval_optimize.cpp:3098 heap-buffer-overflow
+        - must be the curStringTable
+        - after the localPoints(); call.
+        - ==> i save if the Table's was global or functions
+    - [X] next Crash in iteration ==> iterStack @4575 
+        - at 4547 << IterStackRecord& iter = iterStack[_ITER - 1]; << _ITER is 0!
+    - [X] !!! it does not crash but hangup for some time ?!!?! seeing it when testing ConsoleVectoFunc's    
+        ==>fixed with:  also store the iterDepth !!! ... but i guess this is also not perfect! 
+        - looks like it's in  runMathTests
+        - when i interruppt it's at OP_RETURN_VOID like it's stacked as jump ip 
+        - it's the CLEAR_ITER_STATE(); with abnorm high value !!!!! 
+            - iterStack and iterDepth !!!!
+            - somewhere on unrolling iterDepth get negative and so to MAX U32!!! funny ,,,
+            - unknown from where, but on OP_ITER_END _ITER is 1 and iterDepth is 0!!!! 
+    - [ ] more testing and then create a struct for the rollback stuff - not x different Vectors!!
     - [ ] *TODO:* codelet + wantedArgc 
     - [ ] finally add this to console methods
 
+- [ ] all ConsoleVectoFuncts need to be tested! 
+
+    
 ## Version 0.8
 
 - added GridObject 

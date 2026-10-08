@@ -2,8 +2,6 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// NOTE: untested so far
-//-----------------------------------------------------------------------------
 #pragma once
 
 #include "console/console.h"
@@ -58,12 +56,13 @@ inline ConsoleVector Vec4Mul(const ConsoleVector& v1, F32 f){
 
 
 inline ConsoleVector Vec4Div(const ConsoleVector& v1, const ConsoleVector& v2){
-    return {
-        v1.points[0]   / v2.points[0] != 0.f ? v2.points[0] :  1e-9f
-        ,v1.points[1]   / v2.points[1] != 0.f ? v2.points[1] :  1e-9f
-        ,v1.points[2]   / v2.points[2] != 0.f ? v2.points[2] :  1e-9f
-        ,v1.points[3]   / v2.points[3] != 0.f ? v2.points[3] :  1e-9f
+    ConsoleVector res =  {
+        v1.points[0]   / (v2.points[0] != 0.f ? v2.points[0] :  1e-9f)
+        ,v1.points[1]   / (v2.points[1] != 0.f ? v2.points[1] :  1e-9f)
+        ,v1.points[2]   / (v2.points[2] != 0.f ? v2.points[2] :  1e-9f)
+        ,v1.points[3]   / (v2.points[3] != 0.f ? v2.points[3] :  1e-9f)
     };
+    return res;
 }
 inline ConsoleVector Vec4Div(const ConsoleVector& v1, F32 f){
     if (f == 0.0f) f = 1e-9f;
@@ -121,8 +120,8 @@ inline bool isValidRect(const ConsoleVector& v)  {
 inline ConsoleVector getRectCentered(const ConsoleVector& v)  {
 
     ConsoleVector result = v;
-    result.points[0] -= v.points[2] / 2.0;
-    result.points[1] -= v.points[3] / 2.0;
+    result.points[0] += v.points[2] / 2.0;
+    result.points[1] += v.points[3] / 2.0;
     return result;
 }
 

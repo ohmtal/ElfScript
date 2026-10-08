@@ -165,12 +165,15 @@ Namespace::Entry* gCurrentFuncDecl = nullptr;
 ConsoleValue stack[MaxStackSize];
 S32 _STK = 0;
 
-// ElfScript 0.8 inline func call!! unrolling -----
-Vector<U32> mInterpreterReturnIPs;
-// Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
-Vector<S32> mInterpreterReturnStackPointers;
-// Vector<S32> mInterpreterReturnFrameIndices;
-// <<<<<
+// // ElfScript 0.8 inline func call!! unrolling -----
+// Vector<U32> mInterpreterReturnIPs;
+// // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
+// Vector<S32> mInterpreterReturnStackPointers;
+// // Vector<S32> mInterpreterReturnFrameIndices;
+// Vector<bool> mInterpreterReturnWasGlobalTable;
+// Vector<S32> mInterpreterReturnITERPointers;
+//
+// // <<<<<
 
 ReturnBuffer retBuffer;
 
@@ -1084,6 +1087,9 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    U32 stackStart = _STK;
    gExecCount++;
 #endif
+
+
+
 
    constexpr U32 TRACE_BUFFER_SIZE = 1024;
    static char traceBuffer[TRACE_BUFFER_SIZE];
@@ -3439,12 +3445,19 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
 
       //FIXME codelet and also for Method!
       // ElfScript 0.8 ... crazy inline func call attempt!
-      if (nsEntry->mFunctionOffset > 0 && nsEntry->mModule == this)
+      // NOTE: ITER stuck somewhere disabled at the moment !!!!
+      if (/*false &&*/ nsEntry->mFunctionOffset > 0 && nsEntry->mModule == this)
       {
             U32 nextOpcodeIP = ip;
 
             mInterpreterReturnIPs.push_back(nextOpcodeIP);
             mInterpreterReturnStackPointers.push_back(_STK);
+            //NOTE TODO FIXME HACK lol this corrupt the iterStack !!! i should change this to a Vector!
+            mInterpreterReturnITERPointers.push_back(_ITER);
+            mInterpreterReturnIterDepth.push_back(iterDepth);
+            _ITER = 0; //reset for new run !!!
+            iterDepth = 0;
+
 
             // S32 currentFrameIndex = (S32)Script::gEvalState.localStack.size() - 1;
             // mInterpreterReturnFrameIndices.push_back(currentFrameIndex);
@@ -3464,6 +3477,9 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
             }
 
             ip = targetIP + 10 + (3 * targetArgc);
+
+            bool isGlobal = curFloatTable == globalFloats;
+            mInterpreterReturnWasGlobalTable.push_back(isGlobal);
 
             curFloatTable = this->functionFloats;
             curStringTable = this->functionStrings;
@@ -3643,7 +3659,7 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION_METHOD: {
 
       ns = thisObject->getNamespace();
       nsEntry = ns->lookup(fnName);
-
+      // ---- same as without object ...=>
       if (nsEntry->mFunctionOffset)
       {
             ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
@@ -5508,6 +5524,11 @@ execFinished:
             _STK = mInterpreterReturnStackPointers.last();
             mInterpreterReturnStackPointers.pop_back();
 
+            _ITER = mInterpreterReturnITERPointers.last();
+            mInterpreterReturnITERPointers.pop_back();
+
+            iterDepth =  mInterpreterReturnIterDepth.last();
+            mInterpreterReturnIterDepth.pop_back();
             // S32 oldFrameIndex = mInterpreterReturnFrameIndices.last();
             // mInterpreterReturnFrameIndices.pop_back();
             //
@@ -5524,9 +5545,17 @@ execFinished:
             Script::gEvalState.getCurrentFrame().module = this;
             Script::gEvalState.getCurrentFrame().ip = ip;
 
-            curFloatTable = this->functionFloats;
-            curStringTable = this->functionStrings;
-            curStringTableLen = this->functionStringsMaxLen;
+            bool wasGlobal = mInterpreterReturnWasGlobalTable.last();
+            mInterpreterReturnWasGlobalTable.pop_back();
+            if (wasGlobal) {
+                  curFloatTable = globalFloats;
+                  curStringTable = globalStrings;
+                  curStringTableLen = globalStringsMaxLen;
+            } else {
+                  curFloatTable = this->functionFloats;
+                  curStringTable = this->functionStrings;
+                  curStringTableLen = this->functionStringsMaxLen;
+            }
 
             stack[_STK + 1] = returnValue;
             PUSH_STK();

@@ -55,7 +55,7 @@ DefineEngineFunction(PrtVec4Scale, void , (ConsoleValue PtrValue1, F32 scale),
 // Set be Reference functions  directly into the local/global variable
 //-----------------------------------------------------------------------------
 // LOL i did not test it and it's all wrong! ElfMath::Vec4Add(v1,v2); return the result Vector!
-/*
+
 DefineEngineFunction(Vec4Add, void , (const char* varVec1, const char* varVec2),
                      ,"v1 = v1 + v2") {
 
@@ -200,4 +200,4 @@ DefineEngineFunction(Vec4Contains, bool , (const char* varRect1, const char* var
     ConsoleVector v1 =  ElfScript::getLocalVector(varRect1);
     ConsoleVector v2 =  ElfScript::getLocalVector(varRect2);
     return ElfMath::contains(v1,v2);
-}*/
+}

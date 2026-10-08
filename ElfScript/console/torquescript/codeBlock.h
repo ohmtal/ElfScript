@@ -92,6 +92,17 @@ public:
 
    std::vector<FieldCache*> mFieldCache;
 
+   // ElfScript 0.8 inline func call!! unrolling -----
+   Vector<U32> mInterpreterReturnIPs;
+   // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
+   Vector<S32> mInterpreterReturnStackPointers;
+   // Vector<S32> mInterpreterReturnFrameIndices;
+   Vector<bool> mInterpreterReturnWasGlobalTable;
+   Vector<S32> mInterpreterReturnITERPointers;
+   Vector<U32> mInterpreterReturnIterDepth;
+
+   // <<<<<
+
    CompilerLocalVariableToRegisterMappingTable variableRegisterTable;
 
    U32 refCount;

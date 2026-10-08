@@ -77,7 +77,7 @@ namespace ElfScript::ConsoleVector {
         if (argC < 3 ) return false;
 
         if (argV[2].isConsoleVector())
-            resultValue.setBool( ElfMath::pointInRect(argV[1].v, argV[2].v));
+            resultValue.setBool( ElfMath::pointInRect(argV[2].v, argV[1].v));
         else return false;
 
         return true;
