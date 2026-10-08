@@ -39,9 +39,9 @@
 
 //#define DEBUG_SPEW
 
-// ElfScript changed to 29
-#define ST_INIT_SIZE 29
-// #define ST_INIT_SIZE 15
+// ElfScript changed to 29 , 0.8a back to 15!
+// #define ST_INIT_SIZE 29
+#define ST_INIT_SIZE 15
 
 static char scratchBuffer[1024];
 U32 Namespace::mCacheSequence = 0;

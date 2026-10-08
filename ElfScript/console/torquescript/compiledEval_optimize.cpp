@@ -169,7 +169,7 @@ S32 _STK = 0;
 Vector<U32> mInterpreterReturnIPs;
 // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
 Vector<S32> mInterpreterReturnStackPointers;
-Vector<S32> mInterpreterReturnFrameIndices;
+// Vector<S32> mInterpreterReturnFrameIndices;
 // <<<<<
 
 ReturnBuffer retBuffer;
@@ -2828,7 +2828,7 @@ handle_OP_LOADFIELD_FASTPATH:
 
 
       } else {
-            Con::errorf("LOAD: FIXME something failed here !!!!!! (%s object:%d)",  curField, curObject ? curObject->getId() : 0);
+            Con::errorf("LOAD: something failed here !!!!!! (%s object:%d)",  curField, curObject ? curObject->getId() : 0);
       }
 
       PUSH_STK();
@@ -2973,7 +2973,6 @@ handle_OP_SAVEFIELD_FASTPATH:
                   DISPATCH();
             }
 
-      // FIXME 3 simobject must be revisited!
             switch (cachePtr->type) {
                   case staticField: {
                         curObject->pushStaticFieldFastPath(cachePtr->staticFieldPtr,&stack[_STK]);
@@ -3085,7 +3084,7 @@ handle_OP_LOADIMMED_FLT:
 handle_OP_TAG_TO_STR:
       code[ip - 1] = OP_LOADIMMED_STR;
       // it's possible the string has already been converted
-      Con::warnf("Tagged string not supported in ElfScript or FIXME (%s:%d)", __FILE__, __LINE__);
+      Con::warnf("Tagged string not supported in ElfScript  (%s:%d)", __FILE__, __LINE__);
       // if (U8(curStringTable[code[ip]]) != StringTagPrefixByte)
       // {
       //    U32 id = GameAddTaggedString(curStringTable + code[ip]);
@@ -3438,17 +3437,17 @@ handle_OP_CALL_PARENT_CALL: {
 handle_OP_CALLFUNC_CONSOLEFUNCTION: {
       PREPARE_CALLFUNC();
 
-      //FIXME start crashing at fibo 16 memory corrupted!
+      //FIXME codelet and also for Method!
       // ElfScript 0.8 ... crazy inline func call attempt!
-      if (nsEntry->mFunctionOffset && nsEntry->mModule == this)
+      if (nsEntry->mFunctionOffset > 0 && nsEntry->mModule == this)
       {
             U32 nextOpcodeIP = ip;
 
             mInterpreterReturnIPs.push_back(nextOpcodeIP);
             mInterpreterReturnStackPointers.push_back(_STK);
 
-            S32 currentFrameIndex = (S32)Script::gEvalState.localStack.size() - 1;
-            mInterpreterReturnFrameIndices.push_back(currentFrameIndex);
+            // S32 currentFrameIndex = (S32)Script::gEvalState.localStack.size() - 1;
+            // mInterpreterReturnFrameIndices.push_back(currentFrameIndex);
 
             U32 targetIP = nsEntry->mFunctionOffset;
             U32 targetArgc   = code[targetIP + 8];
@@ -3459,7 +3458,7 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
             Script::gEvalState.getCurrentFrame().module = this;
             Script::gEvalState.getCurrentFrame().ip = ip;
 
-            //FIXME wantedArgc
+            //FIXME wantedArgc and codelet
             for(S32 i = 0; i < callArgc - 1; i++) {
                   Script::gEvalState.currentRegisterArray->values[i] = callArgv[i+1];
             }
@@ -5509,17 +5508,18 @@ execFinished:
             _STK = mInterpreterReturnStackPointers.last();
             mInterpreterReturnStackPointers.pop_back();
 
-            S32 oldFrameIndex = mInterpreterReturnFrameIndices.last();
-            mInterpreterReturnFrameIndices.pop_back();
-
-            if (oldFrameIndex >= 0 && oldFrameIndex < Script::gEvalState.localStack.size())
-            {
-                  Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[oldFrameIndex];
-            }
-            else
-            {
-                  Script::gEvalState.currentRegisterArray = NULL;
-            }
+            // S32 oldFrameIndex = mInterpreterReturnFrameIndices.last();
+            // mInterpreterReturnFrameIndices.pop_back();
+            //
+            // if (oldFrameIndex >= 0 && oldFrameIndex < Script::gEvalState.localStack.size())
+            // {
+            //       Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[oldFrameIndex];
+            // }
+            // else
+            // {
+            //       Script::gEvalState.currentRegisterArray = NULL;
+            // }
+            gCallStack.popFrame(); //THIS!!!
 
             Script::gEvalState.getCurrentFrame().module = this;
             Script::gEvalState.getCurrentFrame().ip = ip;
@@ -5531,7 +5531,6 @@ execFinished:
             stack[_STK + 1] = returnValue;
             PUSH_STK();
 
-            gCallStack.popFrame(); //THIS!!!
             popFrame = true;
             DISPATCH();
 
