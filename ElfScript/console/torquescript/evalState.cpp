@@ -1,116 +1,274 @@
 ﻿
 #include "evalState.h"
 
+
+// -----------------------------------------------------------------------------
+// ------------------- ElfScript 0.8a >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// -----------------------------------------------------------------------------
 void ExprEvalState::pushFrame(StringTableEntry frameName, Namespace *ns, S32 registerCount)
 {
       mFrameID++;
-#ifdef DEBUG_SPEW
-   validate();
+      #ifdef DEBUG_SPEW
+      validate();
 
-   Platform::outputDebugString("[ConsoleInternal] Pushing new frame for '%s' at %i",
-      frameName, mStackDepth);
-#endif
+      Platform::outputDebugString("[ConsoleInternal] Pushing new frame for '%s' at %i",
+                                  frameName, mStackDepth);
+      #endif
 
-   if (mStackDepth + 1 > stack.size())
-   {
-#ifdef DEBUG_SPEW
-      Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
-#endif
+      if (mStackDepth + 1 > stack.size())
+      {
+            #ifdef DEBUG_SPEW
+            Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
+            #endif
+            stack.push_back(new Dictionary);
+      }
 
-      stack.push_back(new Dictionary);
-   }
+      Dictionary& newFrame = *(stack[mStackDepth]);
+      newFrame.setState();
 
-   Dictionary& newFrame = *(stack[mStackDepth]);
-   newFrame.setState();
+      newFrame.scopeName = frameName;
+      newFrame.scopeNamespace = ns;
 
-   newFrame.scopeName = frameName;
-   newFrame.scopeNamespace = ns;
+      Con::pushStackFrame(stack[mStackDepth]);
+      mStackDepth++;
+      currentVariable = NULL;
 
-   Con::pushStackFrame(stack[mStackDepth]);
-   mStackDepth++;
-   currentVariable = NULL;
 
-   AssertFatal(!newFrame.getCount(), "ExprEvalState::pushFrame - Dictionary not empty!");
+      AssertFatal(!newFrame.getCount(), "ExprEvalState::pushFrame - Dictionary not empty!");
 
-   ConsoleValue* consoleValArray = new ConsoleValue[registerCount]();
-   localStack.push_back(ConsoleValueFrame(consoleValArray, false));
-   currentRegisterArray = &localStack.last();
+      if (mRegisterPool.size() + registerCount > mRegisterPool.capacity())
+      {
+            AssertFatal(false, "ExprEvalState::pushFrame - Register pool capacity exceeded! Increase reserve() in constructor.");
+      }
 
-   AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+      mRegisterPoolOffsets.push_back(mRegisterPool.size());
+      mRegisterPool.increment(registerCount);
 
-#ifdef DEBUG_SPEW
-   validate();
-#endif
+      ConsoleValue* consoleValArray = &mRegisterPool[mRegisterPoolOffsets.last()];
+
+      for (S32 i = 0; i < registerCount; i++)
+      {
+            ::new (&consoleValArray[i]) ConsoleValue();
+      }
+
+      localStack.push_back(ConsoleValueFrame(consoleValArray, true));
+      currentRegisterArray = &localStack.last();
+
+      AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+
+
+      #ifdef DEBUG_SPEW
+      validate();
+      #endif
 }
-
+// -----------------------------------------------------------------------------
 void ExprEvalState::popFrame()
 {
-   AssertFatal(mStackDepth > 0, "ExprEvalState::popFrame - Stack Underflow!");
+      AssertFatal(mStackDepth > 0, "ExprEvalState::popFrame - Stack Underflow!");
 
-#ifdef DEBUG_SPEW
-   validate();
+      #ifdef DEBUG_SPEW
+      validate();
 
-   Platform::outputDebugString("[ConsoleInternal] Popping %sframe at %i",
-      getCurrentFrame().isOwner() ? "" : "shared ", mStackDepth - 1);
-#endif
+      Platform::outputDebugString("[ConsoleInternal] Popping %sframe at %i",
+                                  getCurrentFrame().isOwner() ? "" : "shared ", mStackDepth - 1);
+      #endif
 
-   Con::popStackFrame();
-   mStackDepth--;
-   stack[mStackDepth]->reset();
-   currentVariable = NULL;
+      Con::popStackFrame();
+      mStackDepth--;
 
-   const ConsoleValueFrame& frame = localStack.last();
-   localStack.pop_back();
-   if (!frame.isReference)
-      delete[] frame.values;
+      if (stack[mStackDepth]->getCount() > 0)
+      {
+            stack[mStackDepth]->reset();
+      }
+      // stack[mStackDepth]->reset();
+      currentVariable = NULL;
 
-   currentRegisterArray = localStack.size() ? &localStack.last() : NULL;
+      if (mRegisterPoolOffsets.size() > 0)
+      {
+            S32 lastOffset = mRegisterPoolOffsets.last();
+            mRegisterPoolOffsets.pop_back();
 
-   AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+            if (lastOffset != -1)
+            {
+                  S32 currentSize = mRegisterPool.size();
+                  for (S32 i = lastOffset; i < currentSize; i++)
+                  {
+                        mRegisterPool[i].~ConsoleValue();
+                  }
+                  mRegisterPool.setSize(lastOffset);
+            }
+      }
 
-#ifdef DEBUG_SPEW
-   validate();
-#endif
+      const ConsoleValueFrame& frame = localStack.last();
+      localStack.pop_back();
+
+      if (!frame.isReference)
+            delete[] frame.values;
+
+      currentRegisterArray = localStack.size() ? &localStack.last() : NULL;
+
+      AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+
+      #ifdef DEBUG_SPEW
+      validate();
+      #endif
 }
+// -----------------------------------------------------------------------------
 
 void ExprEvalState::pushFrameRef(S32 stackIndex)
 {
-   AssertFatal(stackIndex >= 0 && stackIndex < mStackDepth, "You must be asking for a valid frame!");
+      AssertFatal(stackIndex >= 0 && stackIndex < mStackDepth, "You must be asking for a valid frame!");
 
-#ifdef DEBUG_SPEW
-   validate();
+      #ifdef DEBUG_SPEW
+      validate();
 
-   Platform::outputDebugString("[ConsoleInternal] Cloning frame from %i to %i",
-      stackIndex, mStackDepth);
-#endif
+      Platform::outputDebugString("[ConsoleInternal] Cloning frame from %i to %i",
+                                  stackIndex, mStackDepth);
+      #endif
 
-   if (mStackDepth + 1 > stack.size())
-   {
-#ifdef DEBUG_SPEW
-      Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
-#endif
+      if (mStackDepth + 1 > stack.size())
+      {
+            #ifdef DEBUG_SPEW
+            Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
+            #endif
+            stack.push_back(new Dictionary);
+      }
 
-      stack.push_back(new Dictionary);
-   }
+      Dictionary& newFrame = *(stack[mStackDepth]);
+      newFrame.setState(stack[stackIndex]);
 
-   Dictionary& newFrame = *(stack[mStackDepth]);
-   newFrame.setState(stack[stackIndex]);
+      Con::pushStackFrame(stack[mStackDepth]);
 
-   Con::pushStackFrame(stack[mStackDepth]);
+      mStackDepth++;
+      currentVariable = NULL;
 
-   mStackDepth++;
-   currentVariable = NULL;
+      ConsoleValue* values = localStack[stackIndex].values;
 
-   ConsoleValue* values = localStack[stackIndex].values;
-   localStack.push_back(ConsoleValueFrame(values, true));
-   currentRegisterArray = &localStack.last();
+      mRegisterPoolOffsets.push_back(-1);
 
-   AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+      localStack.push_back(ConsoleValueFrame(values, true));
+      currentRegisterArray = &localStack.last();
 
-#ifdef DEBUG_SPEW
-   validate();
-#endif
+      AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+
+      #ifdef DEBUG_SPEW
+      validate();
+      #endif
 }
+
+// -----------------------------------------------------------------------------
+//                          NOTE: ORIG
+// -----------------------------------------------------------------------------
+// void ExprEvalState::pushFrame(StringTableEntry frameName, Namespace *ns, S32 registerCount)
+// {
+//       mFrameID++;
+// #ifdef DEBUG_SPEW
+//    validate();
+//
+//    Platform::outputDebugString("[ConsoleInternal] Pushing new frame for '%s' at %i",
+//       frameName, mStackDepth);
+// #endif
+//
+//    if (mStackDepth + 1 > stack.size())
+//    {
+// #ifdef DEBUG_SPEW
+//       Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
+// #endif
+//
+//       stack.push_back(new Dictionary);
+//    }
+//
+//    Dictionary& newFrame = *(stack[mStackDepth]);
+//    newFrame.setState();
+//
+//    newFrame.scopeName = frameName;
+//    newFrame.scopeNamespace = ns;
+//
+//    Con::pushStackFrame(stack[mStackDepth]);
+//    mStackDepth++;
+//    currentVariable = NULL;
+//
+//    AssertFatal(!newFrame.getCount(), "ExprEvalState::pushFrame - Dictionary not empty!");
+//
+//    ConsoleValue* consoleValArray = new ConsoleValue[registerCount]();
+//    localStack.push_back(ConsoleValueFrame(consoleValArray, false));
+//    currentRegisterArray = &localStack.last();
+//
+//    AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+// #ifdef DEBUG_SPEW
+//    validate();
+// #endif
+// }
+//
+// void ExprEvalState::popFrame()
+// {
+//    AssertFatal(mStackDepth > 0, "ExprEvalState::popFrame - Stack Underflow!");
+//
+// #ifdef DEBUG_SPEW
+//    validate();
+//
+//    Platform::outputDebugString("[ConsoleInternal] Popping %sframe at %i",
+//       getCurrentFrame().isOwner() ? "" : "shared ", mStackDepth - 1);
+// #endif
+//
+//    Con::popStackFrame();
+//    mStackDepth--;
+//    stack[mStackDepth]->reset();
+//    currentVariable = NULL;
+//
+//    const ConsoleValueFrame& frame = localStack.last();
+//    localStack.pop_back();
+//    if (!frame.isReference)
+//       delete[] frame.values;
+//
+//    currentRegisterArray = localStack.size() ? &localStack.last() : NULL;
+//
+//    AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+//
+// #ifdef DEBUG_SPEW
+//    validate();
+// #endif
+// }
+
+// void ExprEvalState::pushFrameRef(S32 stackIndex)
+// {
+//    AssertFatal(stackIndex >= 0 && stackIndex < mStackDepth, "You must be asking for a valid frame!");
+//
+// #ifdef DEBUG_SPEW
+//    validate();
+//
+//    Platform::outputDebugString("[ConsoleInternal] Cloning frame from %i to %i",
+//       stackIndex, mStackDepth);
+// #endif
+//
+//    if (mStackDepth + 1 > stack.size())
+//    {
+// #ifdef DEBUG_SPEW
+//       Platform::outputDebugString("[ConsoleInternal] Growing stack by one frame");
+// #endif
+//
+//       stack.push_back(new Dictionary);
+//    }
+//
+//    Dictionary& newFrame = *(stack[mStackDepth]);
+//    newFrame.setState(stack[stackIndex]);
+//
+//    Con::pushStackFrame(stack[mStackDepth]);
+//
+//    mStackDepth++;
+//    currentVariable = NULL;
+//
+//    ConsoleValue* values = localStack[stackIndex].values;
+//    localStack.push_back(ConsoleValueFrame(values, true));
+//    currentRegisterArray = &localStack.last();
+//
+//    AssertFatal(mStackDepth == localStack.size(), avar("Stack sizes do not match. mStackDepth = %d, localStack = %d", mStackDepth, localStack.size()));
+//
+// #ifdef DEBUG_SPEW
+//    validate();
+// #endif
+// }
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript 0.8a ---------------------------------
 
 void ExprEvalState::pushDebugFrame(S32 stackIndex)
 {
@@ -135,6 +293,9 @@ ExprEvalState::ExprEvalState()
    mResetLocked = false;
    copyVariable = NULL;
    currentRegisterArray = NULL;
+
+   // ElfScript 0.8a
+   mRegisterPool.reserve(100000);
 }
 
 ExprEvalState::~ExprEvalState()

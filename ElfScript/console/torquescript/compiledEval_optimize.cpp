@@ -1321,11 +1321,12 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    ConsoleValue* simObjectLookupPtr = nullptr;
    Namespace::Entry* nsEntry = nullptr;
    Namespace* ns = NULL;
+   /* ElfScript 0.8
    const char* curFNDocBlock = NULL;
    const char* curNSDocBlock = NULL;
    const S32 nsDocLength = 128;
    char nsDocBlockClass[nsDocLength];
-
+   */
    S32 callArgc;
    ConsoleValue* callArgv;
 
@@ -1560,17 +1561,18 @@ handle_OP_FUNC_DECL:
 
             ns->addFunction(fnName, this, hasBody ? ip : 0);
 
-            if (curNSDocBlock)
-            {
-                  if (fnNamespace == StringTable->lookup(nsDocBlockClass))
-                  {
-                        char* usageStr = dStrdup(curNSDocBlock);
-                        usageStr[dStrlen(usageStr)] = '\0';
-                        ns->mUsage = usageStr;
-                        ns->mCleanUpUsage = true;
-                        curNSDocBlock = NULL;
-                  }
-            }
+            // ElfScript 0.8
+            // if (curNSDocBlock)
+            // {
+            //       if (fnNamespace == StringTable->lookup(nsDocBlockClass))
+            //       {
+            //             char* usageStr = dStrdup(curNSDocBlock);
+            //             usageStr[dStrlen(usageStr)] = '\0';
+            //             ns->mUsage = usageStr;
+            //             ns->mCleanUpUsage = true;
+            //             curNSDocBlock = NULL;
+            //       }
+            // }
 
             const U32 fnArgc = code[ip + 8];
 
@@ -1594,7 +1596,7 @@ handle_OP_FUNC_DECL:
             // No stack pops: mDefaultValues is gone.
 
             Namespace::relinkPackages();
-            curFNDocBlock = NULL;
+            //ElfScript 0.8 curFNDocBlock = NULL;
       }
 
       // Jump past header + body + codelets.  endIp is at code[ip + 7].
@@ -1801,8 +1803,9 @@ handle_OP_CREATE_OBJECT:
 handle_OP_ADD_OBJECT:
 {
       // See OP_SETCURVAR for why we do this.
-      curFNDocBlock = NULL;
-      curNSDocBlock = NULL;
+      // ElfScript 0.8
+      // curFNDocBlock = NULL;
+      // curNSDocBlock = NULL;
 
       // Do we place this object at the root?
       bool placeAtRoot = code[ip++];
@@ -2229,8 +2232,10 @@ handle_OP_SETCURVAR:
       // In order to let docblocks work properly with variables, we have
       // clear the current docblock when we do an assign. This way it
       // won't inappropriately carry forward to following function decls.
-      curFNDocBlock = NULL;
-      curNSDocBlock = NULL;
+      // ElfScript 0.8
+      // curFNDocBlock = NULL;
+      // curNSDocBlock = NULL;
+
       DISPATCH();
 
 handle_OP_SETCURVAR_CREATE:
@@ -2245,8 +2250,9 @@ handle_OP_SETCURVAR_CREATE:
 
       Script::gEvalState.setCurVarNameCreate(var);
 
-      curFNDocBlock = NULL;
-      curNSDocBlock = NULL;
+      // ElfScript 0.8
+      // curFNDocBlock = NULL;
+      // curNSDocBlock = NULL;
       DISPATCH();
 
 handle_OP_SETCURVAR_ARRAY:
@@ -2264,8 +2270,10 @@ handle_OP_SETCURVAR_ARRAY:
       Script::gEvalState.setCurVarName(var);
 
       // See OP_SETCURVAR for why we do this.
-      curFNDocBlock = NULL;
-      curNSDocBlock = NULL;
+      // ElfScript 0.8
+      // curFNDocBlock = NULL;
+      // curNSDocBlock = NULL;
+
       DISPATCH();
 
 
@@ -2281,8 +2289,10 @@ handle_OP_SETCURVAR_ARRAY_CREATE:
 
       Script::gEvalState.setCurVarNameCreate(var);
 
-      curFNDocBlock = NULL;
-      curNSDocBlock = NULL;
+      // ElfScript 0.8
+      // curFNDocBlock = NULL;
+      // curNSDocBlock = NULL;
+
       DISPATCH();
 
 // ~~~~~~~~~~~~~~~~~ LOADVAR
@@ -3081,33 +3091,37 @@ handle_OP_LOADIMMED_STR:
 
 handle_OP_DOCBLOCK_STR:
 {
-      // If the first word of the doc is '\class' or '@class', then this
-      // is a namespace doc block, otherwise it is a function doc block.
-      const char* docblock = curStringTable + code[ip++];
-
-      const char* sansClass = dStrstr(docblock, "@class");
-      if (!sansClass)
-            sansClass = dStrstr(docblock, "\\class");
-
-      if (sansClass)
-      {
-            // Don't save the class declaration. Scan past the 'class'
-            // keyword and up to the first whitespace.
-            sansClass += 7;
-            S32 index = 0;
-            while ((*sansClass != ' ') && (*sansClass != '\n') && *sansClass && (index < (nsDocLength - 1)))
-            {
-                  nsDocBlockClass[index++] = *sansClass;
-                  sansClass++;
-            }
-            nsDocBlockClass[index] = '\0';
-
-            curNSDocBlock = sansClass + 1;
-      }
-      else
-            curFNDocBlock = docblock;
-
+      // ElfScript 0.8 ignore !
+      ip++;
       DISPATCH();
+
+      // // If the first word of the doc is '\class' or '@class', then this
+      // // is a namespace doc block, otherwise it is a function doc block.
+      // const char* docblock = curStringTable + code[ip++];
+      //
+      // const char* sansClass = dStrstr(docblock, "@class");
+      // if (!sansClass)
+      //       sansClass = dStrstr(docblock, "\\class");
+      //
+      // if (sansClass)
+      // {
+      //       // Don't save the class declaration. Scan past the 'class'
+      //       // keyword and up to the first whitespace.
+      //       sansClass += 7;
+      //       S32 index = 0;
+      //       while ((*sansClass != ' ') && (*sansClass != '\n') && *sansClass && (index < (nsDocLength - 1)))
+      //       {
+      //             nsDocBlockClass[index++] = *sansClass;
+      //             sansClass++;
+      //       }
+      //       nsDocBlockClass[index] = '\0';
+      //
+      //       curNSDocBlock = sansClass + 1;
+      // }
+      // else
+      //       curFNDocBlock = docblock;
+      //
+      // DISPATCH();
 }
 
 handle_OP_LOADIMMED_IDENT:

@@ -13,6 +13,10 @@ public:
    Dictionary::Entry *currentVariable;
    Dictionary::Entry *copyVariable;
 
+   // ElfScript 0.8a:
+   Vector<ConsoleValue> mRegisterPool;
+   Vector<S32>          mRegisterPoolOffsets;
+
    S32 mFrameID; //ElfScript for cache
    U32 mStackDepth;
    bool mShouldReset; ///< Designates if the value stack should be reset
