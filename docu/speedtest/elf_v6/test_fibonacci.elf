@@ -1,8 +1,5 @@
-// $counter = 0;
-function fib ( %n ) {
+function fib ( %n , %foo = 1) {
     if ( %n <= 1 ) return %n;
-    // $counter++;
-    // print($counter, %n);
     return fib( %n - 1 ) + fib( %n - 2 );
 }
 

@@ -3440,7 +3440,7 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
 
       //FIXME start crashing at fibo 16 memory corrupted!
       // ElfScript 0.8 ... crazy inline func call attempt!
-      if (false && nsEntry->mFunctionOffset && nsEntry->mModule == this)
+      if (nsEntry->mFunctionOffset && nsEntry->mModule == this)
       {
             U32 nextOpcodeIP = ip;
 
@@ -5531,6 +5531,7 @@ execFinished:
             stack[_STK + 1] = returnValue;
             PUSH_STK();
 
+            gCallStack.popFrame(); //THIS!!!
             popFrame = true;
             DISPATCH();
 
