@@ -165,6 +165,13 @@ Namespace::Entry* gCurrentFuncDecl = nullptr;
 ConsoleValue stack[MaxStackSize];
 S32 _STK = 0;
 
+// ElfScript 0.8 inline func call!! unrolling -----
+Vector<U32> mInterpreterReturnIPs;
+// Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
+Vector<S32> mInterpreterReturnStackPointers;
+Vector<S32> mInterpreterReturnFrameIndices;
+// <<<<<
+
 ReturnBuffer retBuffer;
 
 char *getReturnBuffer(U32 bufferSize)
@@ -1095,6 +1102,10 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
 
    bool popFrame = false;
    const bool isInjectedLambda = setFrame == Con::LamdaCallInjectedFrame_ID;
+
+
+
+
 
    if (isInjectedLambda)
    {
@@ -3406,22 +3417,82 @@ handle_OP_CALL_PARENT_CALL: {
 }
 
 // ~~~~~~~~~~~~ CONSOLEFUNCTION ~~~~~~~~~~~~~~~~
+// Pre 0.8 inline func call
+// handle_OP_CALLFUNC_CONSOLEFUNCTION: {
+//    PREPARE_CALLFUNC();
+//    if (nsEntry->mFunctionOffset)
+//    {
+//          ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+//          stack[_STK + 1] = (returnFromFn);
+//    }
+//    else // no body
+//          stack[_STK + 1].setEmptyString();
+//
+//    PUSH_STK();
+//
+//    gCallStack.popFrame();
+//    FINIT_CALLFUNC();
+//    DISPATCH();
+// }
+
 handle_OP_CALLFUNC_CONSOLEFUNCTION: {
-   PREPARE_CALLFUNC();
-   if (nsEntry->mFunctionOffset)
-   {
-         ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
-         stack[_STK + 1] = (returnFromFn);
-   }
-   else // no body
-         stack[_STK + 1].setEmptyString();
+      PREPARE_CALLFUNC();
 
-   PUSH_STK();
+      //FIXME start crashing at fibo 16 memory corrupted!
+      // ElfScript 0.8 ... crazy inline func call attempt!
+      if (false && nsEntry->mFunctionOffset && nsEntry->mModule == this)
+      {
+            U32 nextOpcodeIP = ip;
 
-   gCallStack.popFrame();
-   FINIT_CALLFUNC();
-   DISPATCH();
+            mInterpreterReturnIPs.push_back(nextOpcodeIP);
+            mInterpreterReturnStackPointers.push_back(_STK);
+
+            S32 currentFrameIndex = (S32)Script::gEvalState.localStack.size() - 1;
+            mInterpreterReturnFrameIndices.push_back(currentFrameIndex);
+
+            U32 targetIP = nsEntry->mFunctionOffset;
+            U32 targetArgc   = code[targetIP + 8];
+            U32 targetRegCount = code[targetIP + 9];
+
+            Script::gEvalState.pushFrame(fnName, nsEntry->mNamespace, targetRegCount);
+
+            Script::gEvalState.getCurrentFrame().module = this;
+            Script::gEvalState.getCurrentFrame().ip = ip;
+
+            //FIXME wantedArgc
+            for(S32 i = 0; i < callArgc - 1; i++) {
+                  Script::gEvalState.currentRegisterArray->values[i] = callArgv[i+1];
+            }
+
+            ip = targetIP + 10 + (3 * targetArgc);
+
+            curFloatTable = this->functionFloats;
+            curStringTable = this->functionStrings;
+            curStringTableLen = this->functionStringsMaxLen;
+
+            FINIT_CALLFUNC();
+            DISPATCH_OPCODE(code[ip++]);
+
+      }
+      else
+      {
+            //Fallback to prevoius stuff
+            if (nsEntry->mFunctionOffset)
+            {
+                  ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+                  stack[_STK + 1] = (returnFromFn);
+            }
+            else // no body
+                  stack[_STK + 1].setEmptyString();
+
+            PUSH_STK();
+
+            gCallStack.popFrame();
+            FINIT_CALLFUNC();
+            DISPATCH();
+      }
 }
+
 
 // ~~~~~~~~~~~~ VECTOR ~~~~~~~~~~~~~~~~
 handle_OP_CALLFUNC_VECTOR: {
@@ -5427,7 +5498,44 @@ handle_OP_INVALID:
 
 // ----------------------------------- execFinished -----------------------------
 execFinished:
+      // ---- ElfScript 0.8 rollback inline function ---------
+      if (mInterpreterReturnIPs.size() > 0)
+      {
+            Script::gEvalState.popFrame();
 
+            ip = mInterpreterReturnIPs.last();
+            mInterpreterReturnIPs.pop_back();
+
+            _STK = mInterpreterReturnStackPointers.last();
+            mInterpreterReturnStackPointers.pop_back();
+
+            S32 oldFrameIndex = mInterpreterReturnFrameIndices.last();
+            mInterpreterReturnFrameIndices.pop_back();
+
+            if (oldFrameIndex >= 0 && oldFrameIndex < Script::gEvalState.localStack.size())
+            {
+                  Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[oldFrameIndex];
+            }
+            else
+            {
+                  Script::gEvalState.currentRegisterArray = NULL;
+            }
+
+            Script::gEvalState.getCurrentFrame().module = this;
+            Script::gEvalState.getCurrentFrame().ip = ip;
+
+            curFloatTable = this->functionFloats;
+            curStringTable = this->functionStrings;
+            curStringTableLen = this->functionStringsMaxLen;
+
+            stack[_STK + 1] = returnValue;
+            PUSH_STK();
+
+            popFrame = true;
+            DISPATCH();
+
+      }
+      //------------------------------------------------
    // if (telDebuggerOn && setFrame < 0)
    //    TelDebugger->popStackFrame();
 
@@ -5435,6 +5543,7 @@ execFinished:
    {
       Script::gEvalState.popFrame();
    }
+
 
    if (isInjectedLambda) {
    }

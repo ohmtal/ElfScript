@@ -1,17 +1,13 @@
-
-#define count 33
-
+// $counter = 0;
 function fib ( %n ) {
     if ( %n <= 1 ) return %n;
+    // $counter++;
+    // print($counter, %n);
     return fib( %n - 1 ) + fib( %n - 2 );
 }
-
 
 %i = 33;
 print ("running fib with number:",%i);
 print ("Fib" @ %i @ "=" @ fib(%i));
 
-// for (%i in Range count) {
-//     print ("Fib" @ %i @ "=" @ fib(%i));
-// }
 
