@@ -51,6 +51,14 @@ struct CompilerLocalVariableToRegisterMappingTable
 class Stream;
 class ConsoleValue;
 
+struct InterpreterRollBack {
+   U32 ip;
+   S32 stk;
+   bool wasGlobal;
+   S32 itr;
+   U32 itrDepth;
+};
+
 /// Core TorqueScript code management class.
 ///
 /// This class represents a block of code, usually mapped directly to a file.
@@ -93,13 +101,14 @@ public:
    std::vector<FieldCache*> mFieldCache;
 
    // ElfScript 0.8 inline func call!! unrolling -----
-   Vector<U32> mInterpreterReturnIPs;
-   // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
-   Vector<S32> mInterpreterReturnStackPointers;
-   // Vector<S32> mInterpreterReturnFrameIndices;
-   Vector<bool> mInterpreterReturnWasGlobalTable;
-   Vector<S32> mInterpreterReturnITERPointers;
-   Vector<U32> mInterpreterReturnIterDepth;
+   Vector<InterpreterRollBack> mInterpreterReturn;
+   // // Vector<U32> mInterpreterReturnIPs;
+   // // // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
+   // // Vector<S32> mInterpreterReturnStackPointers;
+   // // // Vector<S32> mInterpreterReturnFrameIndices;
+   // // Vector<bool> mInterpreterReturnWasGlobalTable;
+   // // Vector<S32> mInterpreterReturnITERPointers;
+   // // Vector<U32> mInterpreterReturnIterDepth;
 
    // <<<<<
 

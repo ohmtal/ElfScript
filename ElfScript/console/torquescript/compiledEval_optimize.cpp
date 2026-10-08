@@ -165,16 +165,6 @@ Namespace::Entry* gCurrentFuncDecl = nullptr;
 ConsoleValue stack[MaxStackSize];
 S32 _STK = 0;
 
-// // ElfScript 0.8 inline func call!! unrolling -----
-// Vector<U32> mInterpreterReturnIPs;
-// // Vector<ConsoleValueFrame*> mInterpreterReturnFrames;
-// Vector<S32> mInterpreterReturnStackPointers;
-// // Vector<S32> mInterpreterReturnFrameIndices;
-// Vector<bool> mInterpreterReturnWasGlobalTable;
-// Vector<S32> mInterpreterReturnITERPointers;
-//
-// // <<<<<
-
 ReturnBuffer retBuffer;
 
 char *getReturnBuffer(U32 bufferSize)
@@ -3448,19 +3438,14 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
       // NOTE: ITER stuck somewhere disabled at the moment !!!!
       if (/*false &&*/ nsEntry->mFunctionOffset > 0 && nsEntry->mModule == this)
       {
-            U32 nextOpcodeIP = ip;
-
-            mInterpreterReturnIPs.push_back(nextOpcodeIP);
-            mInterpreterReturnStackPointers.push_back(_STK);
-            //NOTE TODO FIXME HACK lol this corrupt the iterStack !!! i should change this to a Vector!
-            mInterpreterReturnITERPointers.push_back(_ITER);
-            mInterpreterReturnIterDepth.push_back(iterDepth);
-            _ITER = 0; //reset for new run !!!
+            InterpreterRollBack interRoll;
+            interRoll.ip = ip;
+            interRoll.stk = _STK;
+            interRoll.itr = _ITER;  //NOTE  only luck that it works ?? - coruppt the iterStack!!??
+            interRoll.itrDepth = iterDepth;
+            interRoll.wasGlobal = curFloatTable == globalFloats;
+            mInterpreterReturn.push_back(interRoll);
             iterDepth = 0;
-
-
-            // S32 currentFrameIndex = (S32)Script::gEvalState.localStack.size() - 1;
-            // mInterpreterReturnFrameIndices.push_back(currentFrameIndex);
 
             U32 targetIP = nsEntry->mFunctionOffset;
             U32 targetArgc   = code[targetIP + 8];
@@ -3478,15 +3463,14 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
 
             ip = targetIP + 10 + (3 * targetArgc);
 
-            bool isGlobal = curFloatTable == globalFloats;
-            mInterpreterReturnWasGlobalTable.push_back(isGlobal);
+
 
             curFloatTable = this->functionFloats;
             curStringTable = this->functionStrings;
             curStringTableLen = this->functionStringsMaxLen;
 
             FINIT_CALLFUNC();
-            DISPATCH_OPCODE(code[ip++]);
+            DISPATCH();
 
       }
       else
@@ -5514,40 +5498,23 @@ handle_OP_INVALID:
 // ----------------------------------- execFinished -----------------------------
 execFinished:
       // ---- ElfScript 0.8 rollback inline function ---------
-      if (mInterpreterReturnIPs.size() > 0)
+      if (mInterpreterReturn.size() > 0)
       {
             Script::gEvalState.popFrame();
 
-            ip = mInterpreterReturnIPs.last();
-            mInterpreterReturnIPs.pop_back();
+            const InterpreterRollBack interRoll = mInterpreterReturn.last();
+            mInterpreterReturn.pop_back();
 
-            _STK = mInterpreterReturnStackPointers.last();
-            mInterpreterReturnStackPointers.pop_back();
-
-            _ITER = mInterpreterReturnITERPointers.last();
-            mInterpreterReturnITERPointers.pop_back();
-
-            iterDepth =  mInterpreterReturnIterDepth.last();
-            mInterpreterReturnIterDepth.pop_back();
-            // S32 oldFrameIndex = mInterpreterReturnFrameIndices.last();
-            // mInterpreterReturnFrameIndices.pop_back();
-            //
-            // if (oldFrameIndex >= 0 && oldFrameIndex < Script::gEvalState.localStack.size())
-            // {
-            //       Script::gEvalState.currentRegisterArray = &Script::gEvalState.localStack[oldFrameIndex];
-            // }
-            // else
-            // {
-            //       Script::gEvalState.currentRegisterArray = NULL;
-            // }
+            ip    = interRoll.ip;
+            _STK  = interRoll.stk;
+            _ITER = interRoll.itr;
+            iterDepth = interRoll.itrDepth;
             gCallStack.popFrame(); //THIS!!!
 
             Script::gEvalState.getCurrentFrame().module = this;
             Script::gEvalState.getCurrentFrame().ip = ip;
 
-            bool wasGlobal = mInterpreterReturnWasGlobalTable.last();
-            mInterpreterReturnWasGlobalTable.pop_back();
-            if (wasGlobal) {
+            if (interRoll.wasGlobal) {
                   curFloatTable = globalFloats;
                   curStringTable = globalStrings;
                   curStringTableLen = globalStringsMaxLen;
