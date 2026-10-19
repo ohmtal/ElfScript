@@ -1363,7 +1363,7 @@ Con::EvalResult CodeBlock::exec(U32 ip, const char* functionName, Namespace* thi
    //  ----- XXTH: insane change started at 2026-08-05 ------
    // ==========================================================================
    // NOTE ElfScript 0.8.9.15 : changed to constexpr
-   constexpr void* dispatch_table[] = {
+   alignas(64) constexpr void* dispatch_table[] = {
          &&handle_OP_FUNC_DECL,
          &&handle_OP_DEFAULT_END,
          &&handle_OP_CREATE_OBJECT,
