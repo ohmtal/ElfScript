@@ -7,8 +7,6 @@
 
 %myVec = { 0.0, 0.0 };
 
-
-
 %loop1 = fn(%x) {
 
     for(%i in range ILOOPS)  {

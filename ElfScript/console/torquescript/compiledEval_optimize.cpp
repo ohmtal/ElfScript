@@ -163,6 +163,14 @@ Namespace::Entry* gCurrentFuncDecl = nullptr;
 
 
 ConsoleValue stack[MaxStackSize];
+// TEST in DreiZehn vector gives a better speed result.
+// std::vector<ConsoleValue>stack;
+// struct stackGuard {
+//       stackGuard() {
+//             stack.resize(MaxStackSize);
+//       }
+// } guard;
+
 S32 _STK = 0;
 
 ReturnBuffer retBuffer;
