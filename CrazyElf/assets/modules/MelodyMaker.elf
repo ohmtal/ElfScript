@@ -222,11 +222,12 @@ function MelodyMaker::parser(%this, %text) {
              %this.addLine("DEF: linenumer notenumber [len] [amplitude]");
              %this.addLine("EXAMPLE: 10 62 0.1");
         default:
-            if (math.Floor($p0) $= $p0) { //check it's a number but need string compare
+                print ("cmd:",  $p0, math.Floor($p0) $= $p0);
+            if (isInt($p0)) {
                 if (%count == 1) {
                     MelodyDel(%this.melody, $p0);
                 } else {
-                    if (math.Floor($p1) $= $p1) {
+                    if (isInt($p1)) {
                         MelodyAdd(%this.melody, {$p0,$p1,$p2,$p3}); //castet to floats so strings are not problem
                     } else {
                         %this.addLine(sprintf( "PARSE ERROR: PARAMETER 1 IS NOT A NUMBER: %s", %text));
