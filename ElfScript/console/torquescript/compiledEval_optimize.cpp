@@ -10,6 +10,9 @@
 
 #define ELF_ROCKET_08
 
+// ElfScript 0.8 calling a function directly and not spawn a new exec
+#define ELF_INLINE_CONSOLE_FUNC_CALL
+
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 // Copyright (c) 2015 Faust Logic, Inc.
@@ -3420,26 +3423,30 @@ handle_OP_CALL_PARENT_CALL: {
 }
 
 // ~~~~~~~~~~~~ CONSOLEFUNCTION ~~~~~~~~~~~~~~~~
+#ifndef ELF_INLINE_CONSOLE_FUNC_CALL
 // Pre 0.8 inline func call
-// handle_OP_CALLFUNC_CONSOLEFUNCTION: {
-//    PREPARE_CALLFUNC();
-//    if (nsEntry->mFunctionOffset)
-//    {
-//          ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
-//          stack[_STK + 1] = (returnFromFn);
-//    }
-//    else // no body
-//          stack[_STK + 1].setEmptyString();
-//
-//    PUSH_STK();
-//
-//    gCallStack.popFrame();
-//    FINIT_CALLFUNC();
-//    DISPATCH();
-// }
+handle_OP_CALLFUNC_CONSOLEFUNCTION: {
+   PREPARE_CALLFUNC();
+   if (nsEntry->mFunctionOffset)
+   {
+         ConsoleValue returnFromFn = nsEntry->mModule->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage).value;
+         stack[_STK + 1] = (returnFromFn);
+   }
+   else // no body
+         stack[_STK + 1].setEmptyString();
+
+   PUSH_STK();
+
+   gCallStack.popFrame();
+   FINIT_CALLFUNC();
+   DISPATCH();
+}
+#else //#ifndef ELF_INLINE_CONSOLE_FUNC_CALL
 
 handle_OP_CALLFUNC_CONSOLEFUNCTION: {
       PREPARE_CALLFUNC();
+
+
 
       //FIXME codelet and also for Method!
       // ElfScript 0.8 ... crazy inline func call attempt!
@@ -3449,7 +3456,7 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
             InterpreterRollBack interRoll;
             interRoll.ip = ip;
             interRoll.stk = _STK;
-            interRoll.itr = _ITER;  //NOTE  only luck that it works ?? - coruppt the iterStack!!??
+            interRoll.itr = _ITER;  //NOTE  only luck that it works ??
             interRoll.itrDepth = iterDepth;
             interRoll.wasGlobal = curFloatTable == globalFloats;
             mInterpreterReturn.push_back(interRoll);
@@ -3499,7 +3506,7 @@ handle_OP_CALLFUNC_CONSOLEFUNCTION: {
             DISPATCH();
       }
 }
-
+#endif
 
 // ~~~~~~~~~~~~ VECTOR ~~~~~~~~~~~~~~~~
 handle_OP_CALLFUNC_VECTOR: {
@@ -5506,6 +5513,7 @@ handle_OP_INVALID:
 // ----------------------------------- execFinished -----------------------------
 execFinished:
       // ---- ElfScript 0.8 rollback inline function ---------
+#ifdef ELF_INLINE_CONSOLE_FUNC_CALL
       if (mInterpreterReturn.size() > 0)
       {
             Script::gEvalState.popFrame();
@@ -5539,6 +5547,7 @@ execFinished:
             DISPATCH();
 
       }
+#endif // ELF_INLINE_CONSOLE_FUNC_CALL
       //------------------------------------------------
    // if (telDebuggerOn && setFrame < 0)
    //    TelDebugger->popStackFrame();
