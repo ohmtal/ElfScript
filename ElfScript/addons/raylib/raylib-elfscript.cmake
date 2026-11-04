@@ -16,7 +16,7 @@ if (RAYLIB_FETCH)
     if (RAYLIB_GIT_MASTER)
         set(RAY_TAG master)
     else()
-        set(RAY_TAG 6.0)
+        set(RAY_TAG 6.2)
     endif()
 
     FetchContent_Declare(
