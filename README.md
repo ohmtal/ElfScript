@@ -179,6 +179,12 @@ $fooObj.dump(); //list all fields and methods of the object
 
 ## Script related links
 
+- [DreiZehnScript](https://github.com/ohmtal/DreiZehnScript)
+- [Dirty Little Script](https://github.com/ohmtal/DirtyLittleScript)
+
+
+## Torque/Script related links
+
 - [Torque3D](https://github.com/TorqueGameEngines/Torque3D)
 - [KorkScript embeded TorqueScript](https://github.com/jamesu/korkscript/)
 - [OGE3D enhanced Torque3D 3.x](https://github.com/ohmtal/OGE3D)
