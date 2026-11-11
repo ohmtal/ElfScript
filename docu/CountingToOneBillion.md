@@ -1,12 +1,6 @@
 Note: I know this is not a real benchmark for a script language .. i do this just for fun. 
 And testing speed of Iterator. 
 
-Version 0.7a rocks the show ... any interpreted script language faster then ElfScript?
-If you know one, let me know. 
-
-My fastest Version 0.4g is a bit slower than 0.4a on this test, but does a 
-great job in my SpeedTest. ~~I guess I'll never reach under 5sec at test I.~~
-
 # I. For loop test counting to one billion (1000000000)
 
 - LuaJit (2.1.1784580905): 0.355u 0.003s 0:00.35 100.0%    0+0k 0+0io 0pf+0w
