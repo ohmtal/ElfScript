@@ -62,9 +62,14 @@ function StarField::OnAdd(%this) {
     }
 
 
-    // // setWindowSize(800,450);
-    // SetTargetFPS(0);
-    setVSync(0);
+    // setVSync(0);
+
+    %this.add ( %this.music = new SoundObject() {
+        fileName = "music/sample1_loop.ogg";
+        gain = 0.4;
+        loop = 1;
+    });
+    %this.music.play();
 
     return true;
 }

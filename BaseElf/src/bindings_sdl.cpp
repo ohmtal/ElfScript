@@ -2,39 +2,39 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// ElfScript BaseFlux/SDL3 binding
+// Complete moved into ElfScript/addons/BaseFlux
 //-----------------------------------------------------------------------------
-#include <SDL3/SDL.h>
-#include "console/engineAPI.h"
-#include "console/consoleExtras.h"
-#include "console/simSet.h"
-#include "core/volume.h"
-#include "math/mMathFn.h"
-#include "math/mMathConsoleVector.h"
-#include "core/util/tDictionary.h"
-
-
-#include "BaseFlux/Main.h"
-#include "BaseFlux/Draw.h"
-#include "BaseFlux/Collision.h"
-#include <console/script.h>
-
-#include "ConsoleTypes.h"
-#include "ColorConstants.h"
-#include <SDL3_render.h>
-
-
-//-----
-#include "Helpers.h"
-#include "SettingsObject.h"
-#include "SpriteObjects.h"
-#include "TextureObject.h"
-
-
-//-----
-
-extern BaseFlux::Main app;
-extern SDL_Point gMousePos;
+// #include <SDL3/SDL.h>
+// #include "console/engineAPI.h"
+// #include "console/consoleExtras.h"
+// #include "console/simSet.h"
+// #include "core/volume.h"
+// #include "math/mMathFn.h"
+// #include "math/mMathConsoleVector.h"
+// #include "core/util/tDictionary.h"
+//
+//
+// #include "BaseFlux/Main.h"
+// #include "BaseFlux/Draw.h"
+// #include "BaseFlux/Collision.h"
+// #include <console/script.h>
+//
+// #include "ConsoleTypes.h"
+// #include "ColorConstants.h"
+// #include <SDL3_render.h>
+//
+//
+// //-----
+// #include "Helpers.h"
+// #include "SettingsObject.h"
+// #include "SpriteObjects.h"
+// #include "TextureObject.h"
+//
+//
+// //-----
+//
+// extern BaseFlux::Main app;
+// extern SDL_Point gMousePos;
 
 
 /* constant example:
@@ -1172,50 +1172,50 @@ extern SDL_Point gMousePos;
 // // }
 // //
 
-// =============================================================================
-// SoundObject
-// Using BaseFlux sound - only WAV supported - nativ by SDL3
-// =============================================================================
-class SoundObject : public SimObject
-{
-    typedef SimObject Parent;
-    StringTableEntry mFileName=nullptr;
-    bool mLoop = false;
-    F32 mGain = 1.f;
-    BaseFlux::WavData* mWaveData;
-public:
-    DECLARE_CONOBJECT(SoundObject);
-    SoundObject() {
-        mFileName = StringTable->EmptyString();
-    }
-    bool onAdd() override {
-        mWaveData = app.getSound(mFileName);
-        if (!mWaveData) return false;
-        return Parent::onAdd();
-    }
-    // void onRemove() override;
-
-    BaseFlux::WavData* get() { return mWaveData; };
-    static void initPersistFields() {
-          Parent::initPersistFields();
-        addField("fileName", TypeString, Offset(mFileName,SoundObject));
-        addField("gain", TypeF32, Offset(mGain,SoundObject));
-        addField("loop", TypeBool, Offset(mLoop,SoundObject));
-    }
-
-    bool play() {
-        if (!mWaveData) return false;
-        return app.getAudioManager().play(mWaveData, mGain, mLoop);
-    }
-    bool stop() {
-        if (!mWaveData) return false;
-        return app.getAudioManager().stop(mWaveData);
-    }
-};
-IMPLEMENT_CONOBJECT(SoundObject);
-
-DefineEngineMethod(SoundObject, play,bool, (),,"play the sound" ) { return object->play(); }
-DefineEngineMethod(SoundObject, stop,bool, (),,"stop the sound" ) { return object->stop(); }
+// // // =============================================================================
+// // // SoundObject
+// // // Using BaseFlux sound - only WAV supported - nativ by SDL3
+// // // =============================================================================
+// // class SoundObject : public SimObject
+// // {
+// //     typedef SimObject Parent;
+// //     StringTableEntry mFileName=nullptr;
+// //     bool mLoop = false;
+// //     F32 mGain = 1.f;
+// //     BaseFlux::WavData* mWaveData;
+// // public:
+// //     DECLARE_CONOBJECT(SoundObject);
+// //     SoundObject() {
+// //         mFileName = StringTable->EmptyString();
+// //     }
+// //     bool onAdd() override {
+// //         mWaveData = app.getSound(mFileName);
+// //         if (!mWaveData) return false;
+// //         return Parent::onAdd();
+// //     }
+// //     // void onRemove() override;
+// //
+// //     BaseFlux::WavData* get() { return mWaveData; };
+// //     static void initPersistFields() {
+// //           Parent::initPersistFields();
+// //         addField("fileName", TypeString, Offset(mFileName,SoundObject));
+// //         addField("gain", TypeF32, Offset(mGain,SoundObject));
+// //         addField("loop", TypeBool, Offset(mLoop,SoundObject));
+// //     }
+// //
+// //     bool play() {
+// //         if (!mWaveData) return false;
+// //         return app.getAudioManager().play(mWaveData, mGain, mLoop);
+// //     }
+// //     bool stop() {
+// //         if (!mWaveData) return false;
+// //         return app.getAudioManager().stop(mWaveData);
+// //     }
+// // };
+// // IMPLEMENT_CONOBJECT(SoundObject);
+// //
+// // DefineEngineMethod(SoundObject, play,bool, (),,"play the sound" ) { return object->play(); }
+// // DefineEngineMethod(SoundObject, stop,bool, (),,"stop the sound" ) { return object->stop(); }
 
 // =============================================================================
 // // ConsoleFunctionGroupBegin( SDL, "SDL/BaseFlux functions");

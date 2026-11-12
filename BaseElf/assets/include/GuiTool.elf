@@ -139,6 +139,9 @@ function GuiTool::haveOverlay(%this) {
 function GuiTool::ShowMessage(%this, %message, %messageTime, %fontScale) {
     if (%messageTime $= "") %messageTime = 1.5;
     if (%fontScale $= "") %fontScale = 2.0;
+    // print("GuiTool::ShowMessage time:" SPC %messageTime);
+
+
     %this._messageFontScale = %fontScale;
     %this._messageTime = %messageTime;
     %this._message = %message;

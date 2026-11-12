@@ -30,6 +30,4 @@ set(BASEFLUX_ELFSCRIPT_SRC
    ${CMAKE_CURRENT_LIST_DIR}/TextureObject.h
    ${CMAKE_CURRENT_LIST_DIR}/TextureObject.cpp
 
-
-
 )

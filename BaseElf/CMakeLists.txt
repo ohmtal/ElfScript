@@ -98,8 +98,8 @@ else()
  set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)
 
  include(${ELF_CMAKE})
- include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
  include(${ELF_MODULE}/addons/BaseFlux/BaseFlux_ElfScript.cmake)
+ include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
 
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
@@ -119,8 +119,9 @@ endif()
 add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
-    ${SDL3_ELFSCRIPT_SRC}
+     # BASEFLUX_ELFSCRIPT_SRC BEFORE SDL3_ELFSCRIPT_SRC
     ${BASEFLUX_ELFSCRIPT_SRC}
+    ${SDL3_ELFSCRIPT_SRC}
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC
@@ -139,7 +140,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   "${ELFSCRIPT_INCLUDES}"
   "${ELF_MODULE}/addons/SDL3/"
   "${ELF_MODULE}/addons/BaseFlux/"
-  "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

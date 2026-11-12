@@ -353,9 +353,6 @@ namespace BaseFluxElf {
     }
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
-    // this is ported from OmFlux/KorkTest to OmFlux/ElfTest to baseElf
-    // since it was inital written for KorkTest it use old style ConsoleFunction
-    // -----------------------------------------------------------------------------
     DefineEngineFunction(getFullScreen, bool, (),, "return true if in fullscreen mode") {
         Uint32 flags = SDL_GetWindowFlags(app.getWindow());
         return (flags & SDL_WINDOW_FULLSCREEN);

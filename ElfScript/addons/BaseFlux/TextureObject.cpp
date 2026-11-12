@@ -50,9 +50,9 @@ namespace BaseFluxElf {
             }
             mTexture = SDL_CreateTexture(
                 app.getRenderer(),
-                                         SDL_PIXELFORMAT_RGBA8888,
-                                         SDL_TEXTUREACCESS_STATIC,
-                                         1, 1
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_STATIC,
+                1, 1
             );
             if (mTexture) {
                 uint32_t whitePixel = 0xFFFFFFFF;

@@ -101,7 +101,8 @@ namespace ElfSDL3 {
     // DefineEngineFunction(ShutdownSDLBindings, void, (), ,"ShutDown the ElfScript SDL3-Bindings subsystem"){ InitSDLBindings();}
     // ----------------------------------------------------------------------------
     // ----------------------------------------------------------------------------
-    DefineEngineFunction(GetFrameTime, F64, (), , "Get the current frame time") {
+    DefineEngineFunction(SDL_FrameTime, F64, (),
+                         , "Get the current frame time from SDL_BasicLoop or SDL_MainLoop ") {
         return FrameTime;
     }
 
