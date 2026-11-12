@@ -66,6 +66,8 @@ using namespace Compiler;
 //XXTH macro to pop stk
 #define POP_STK() {  _STK--; }
 #define PUSH_STK() {  _STK++; }
+// NOTE: Elf stack is different _STK is not the count!
+#define PEEK_STACK(distance) (stack[_STK  - (distance)])
 
 enum EvalConstants
 {
@@ -2172,6 +2174,7 @@ handle_OP_DEC: { // 0.5a OP_DEC fast path
             // stackRef.setFloat(stackRef.getFloat() - 1.0);
       }
       // Script::gEvalState.setLocalFloatVariable(reg, Script::gEvalState.getLocalFloatVariable(reg) - 1.0);
+      PEEK_STACK(0) = stackRef;
       DISPATCH();
 }
 
@@ -2185,6 +2188,7 @@ handle_OP_ASSIGN_ADD:{
       } else {
             stackRef.setFastFloat(stackRef.getFloat() + extrVal.getFloat());
       }
+      PEEK_STACK(0) = stackRef;
       DISPATCH();
 }
 
@@ -2198,6 +2202,8 @@ handle_OP_ASSIGN_SUB: {
       } else {
             stackRef.setFastFloat(stackRef.getFloat() - extrVal.getFloat());
       }
+      PEEK_STACK(0) = stackRef;
+
       DISPATCH();
 }
 handle_OP_ASSIGN_MUL: {
@@ -2210,6 +2216,8 @@ handle_OP_ASSIGN_MUL: {
       } else {
             stackRef.setFastFloat(stackRef.getFloat() * extrVal.getFloat());
       }
+      PEEK_STACK(0) = stackRef;
+
       DISPATCH();
 }
 handle_OP_ASSIGN_DIV: {
@@ -2227,6 +2235,8 @@ handle_OP_ASSIGN_DIV: {
       } else {
             stackRef.setFastFloat(stackRef.getFloat() / f);
       }
+      PEEK_STACK(0) = stackRef;
+
       DISPATCH();
 }
 

@@ -352,12 +352,12 @@ else()
 endif()
 
 if (ELF_ENABLE_DOC_EXPORTER)
-    list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
+    list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/addons/console/consoleDocExporter.cpp)
 endif()
 
 if (ELF_ENABLE_NATIV_CONSOLE)
     if(UNIX)
-      list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
+      list(APPEND ELFSCRIPT_SRC ${CMAKE_CURRENT_LIST_DIR}/addons/shellConsole/POSIXConsole.cpp)
     endif()
 endif()
 
