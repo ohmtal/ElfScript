@@ -10,6 +10,9 @@ set(BASEFLUX_ELFSCRIPT_SRC
 
    ${CMAKE_CURRENT_LIST_DIR}/ColorConstants.h
 
+   ${CMAKE_CURRENT_LIST_DIR}/FileDialog.h
+   ${CMAKE_CURRENT_LIST_DIR}/FileDialog.cpp
+
    ${CMAKE_CURRENT_LIST_DIR}/Helpers.h
    ${CMAKE_CURRENT_LIST_DIR}/Helpers.cpp
 

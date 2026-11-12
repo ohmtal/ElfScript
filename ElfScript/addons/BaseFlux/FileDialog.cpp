@@ -2,54 +2,34 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// FIXME unfinished!!!
 // Binding to ImFileDialog
 //-----------------------------------------------------------------------------
-#include "spice/gui/ImFileDialog.h"
+#include <string>
 #include "console/engineAPI.h"
 #include "console/consoleExtras.h"
 #include <core/strings/stringUnit.h>
-#include <string>
+
+#include "spice/gui/ImFileDialog.h"
+
 #include "Helpers.h"
+#include "FileDialog.h"
 //-----------------------------------------------------------------------------
 
 namespace BaseFluxElf {
 
 
-
-class FileDialogObject: public SimObject {
-     typedef SimObject Parent;
-public:
-    DECLARE_CONOBJECT(FileDialogObject);
-
-    ImFileDialog mFileDialog;
-
-    bool onAdd() override{
+    bool FileDialogObject::onAdd() {
         mFileDialog.mCustomQuickPathes["Assets"] = getFullPath("assets:/").c_str();
         mFileDialog.mCustomQuickPathes["Home"]   = getFullPath("home:/").c_str();
         return Parent::onAdd();
     }
-//     static void initPersistFields() {
-//         Parent::initPersistFields();
-//         // addField("caption", TypeString, Offset(mFileDialog.mLabel, FileDialogObject), "Current selected file,");
-//
-//
-// //FIXME setting a string cause crash std::string vs TypeString!!!!!!!
-//
-//         addField("selectedFile", TypeString, Offset(mFileDialog.selectedFile, FileDialogObject), "Current selected file,");
-//         addField("selectedExt", TypeString, Offset(mFileDialog.selectedExt, FileDialogObject), "Current selected file extension");
-//
-//         addField("cancelPressed", TypeBool, Offset(mFileDialog.mCancelPressed, FileDialogObject), "the user pressed cancel");
-//
-//         addField("SaveMode", TypeBool, Offset(mFileDialog.mSaveExt, FileDialogObject), "Default file extension in save mode");
-//         addField("SaveExt", TypeString, Offset(mFileDialog.mSaveExt, FileDialogObject), "Default file extension in save mode");
-//     }
+
 
     /*
      * set path and filter of FileDialog filer are TAB separated extension
      * ext like: .wav
      */
-    void init(const char* path, const char* filterTabSep) {
+    void FileDialogObject::init(const char* path, const char* filterTabSep) {
         if (!path) return;
         std::vector<std::string> filters = {};
         if (filterTabSep && dStrlen(filterTabSep) > 0) {
@@ -63,7 +43,7 @@ public:
     }
 
 
-    void setLoadMode(const char* fileName,const char* caption, const char* filterTabSep) {
+    void FileDialogObject::setLoadMode(const char* fileName,const char* caption, const char* filterTabSep) {
         if (!fileName ) return;
 
         mFileDialog.reset();
@@ -82,7 +62,7 @@ public:
         mFileDialog.mFilters = filters;   }
 
     // fileExt like: .wav
-    void setSaveMode(const char* fileName, const char* fileExt, const char* caption, const char* filterTabSep) {
+    void FileDialogObject::setSaveMode(const char* fileName, const char* fileExt, const char* caption, const char* filterTabSep) {
         if (!fileName || !fileExt) return;
 
         mFileDialog.reset();
@@ -102,7 +82,6 @@ public:
         mFileDialog.mFilters = filters;
     }
 
-}; //class
 IMPLEMENT_CONOBJECT(FileDialogObject);
 
 

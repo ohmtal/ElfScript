@@ -8,9 +8,7 @@ cmake_minimum_required(VERSION 3.24)
 project(BaseElf)
 set(PROJECT_SRC
     src/main.cpp
-    src/bindings_sdl.cpp
-    src/bindings/FileDialog.cpp
-
+    # src/bindings_sdl.cpp
     # src/ConsoleTypes.cpp moved to addons
 )
 
