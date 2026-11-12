@@ -37,9 +37,12 @@ bool gShowConsole = false;
 String gDirectory = "";
 String gScriptFile = "main.elf";
 
-extern void InitBindings_SDL();
-extern void postInitBindings_SDL();
-extern void ShutdownBindings_SDL();
+namespace BaseFluxElf {
+extern void Init();
+extern void Shutdown();
+extern void PostInit();
+
+}
 extern void InitBindings_ImGui();
 
 //-----------------------------------------------------------------------------
@@ -154,7 +157,7 @@ int main(int argc, char* argv[]) {
     if (!gDirectory.endsWith("/")) gDirectory += "/";
     app.mBasePath = gDirectory.c_str();
     engineGlue::init(MyLogger, (gDirectory + "assets"));
-    InitBindings_SDL();
+    BaseFluxElf::Init();
     InitBindings_ImGui();
     ElfSDL3::InitKeyCodes();
     ElfSDL3::RegisterFileSystemConstants();
@@ -177,7 +180,7 @@ int main(int argc, char* argv[]) {
 
     if ( !app.InitSDL() ) return 1;
 
-    postInitBindings_SDL();
+    BaseFluxElf::PostInit();
     app.initImGui();
 
 
@@ -272,7 +275,7 @@ int main(int argc, char* argv[]) {
     };
 
     app.OnShutDown = [&]() {
-        ShutdownBindings_SDL();
+        BaseFluxElf::Shutdown();
         engineGlue::shutDown();
         if (Con::isFunction("OnShutDown")) Con::executef("OnShutDown");
     };

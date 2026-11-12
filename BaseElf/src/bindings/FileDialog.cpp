@@ -10,9 +10,13 @@
 #include "console/consoleExtras.h"
 #include <core/strings/stringUnit.h>
 #include <string>
+#include "Helpers.h"
 //-----------------------------------------------------------------------------
-extern String getFullPath(String pathIdent = "base:/");
-//-----------------------------------------------------------------------------
+
+namespace BaseFluxElf {
+
+
+
 class FileDialogObject: public SimObject {
      typedef SimObject Parent;
 public:
@@ -148,4 +152,5 @@ DefineEngineMethod(FileDialogObject, getSaveExt, const char *,(),,"get the save 
     return object->mFileDialog.mSaveExt.c_str();
 }
 
+} //namespace
 

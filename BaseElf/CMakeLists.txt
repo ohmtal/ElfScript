@@ -10,9 +10,11 @@ set(PROJECT_SRC
     src/main.cpp
     src/bindings_sdl.cpp
     src/bindings/FileDialog.cpp
-    src/myPlatformProcess.cc
+
     # src/ConsoleTypes.cpp moved to addons
 )
+
+
 
 set (ASSET_PATH ${CMAKE_CURRENT_LIST_DIR}/assets@assets)
 # -----------------------------------------------------------------------------
@@ -99,6 +101,7 @@ else()
 
  include(${ELF_CMAKE})
  include(${ELF_MODULE}/addons/SDL3/SDL3_ElfScript.cmake)
+ include(${ELF_MODULE}/addons/BaseFlux/BaseFlux_ElfScript.cmake)
 
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
@@ -107,12 +110,10 @@ else()
   # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
   # ImGui Bindings
   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/ImGui/bindings_imgui.cpp)
-  # SDL3Elf
-  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_input.cpp)
-  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_Filesystem.cpp)
-  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/ConsoleTypes.cpp)
-  # list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/SDL3/SDL3_render.cpp)
+
 endif()
+
+
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<< ElfScript ========================
 
 
@@ -121,6 +122,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
     ${SDL3_ELFSCRIPT_SRC}
+    ${BASEFLUX_ELFSCRIPT_SRC}
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   ELFSCRIPT_CUSTOM_SHUTDOWN_FUNC
@@ -138,6 +140,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PRIVATE
   "${ELFSCRIPT_INCLUDES}"
   "${ELF_MODULE}/addons/SDL3/"
+  "${ELF_MODULE}/addons/BaseFlux/"
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
