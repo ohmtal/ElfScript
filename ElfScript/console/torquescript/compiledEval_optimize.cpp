@@ -3904,6 +3904,31 @@ handle_OP_CALLFUNC:
       else if (callType == FuncCallExprNode::MethodCall)
       {
             ConsoleValue& simObjectLookupValue = callArgv[1];
+
+
+            // also here vec functions!
+
+            if (simObjectLookupValue.isConsoleVector()) {
+                  gCallStack.popFrame();
+                  if (!ElfScript::ConsoleVector::funcCaller(callArgc, callArgv, stack[_STK + 1])) {
+                        stack[_STK + 1].setEmptyString();
+                  }
+
+                  if (code[ip] == OP_POP_STK){
+                        ip++;
+                  } else  {
+                        PUSH_STK();
+                  }
+
+                  FINIT_CALLFUNC();
+                  DISPATCH();
+            }
+
+            // --------
+
+
+
+
             thisObject = getThisObject(simObjectLookupValue);
 
             if (thisObject == NULL)
