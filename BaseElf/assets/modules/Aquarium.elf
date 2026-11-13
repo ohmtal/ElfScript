@@ -5,7 +5,7 @@
 // Prototype for 2D Editor using a Aquarium
 // Graphics: Fish Pack 2.0 - Created/distributed by Kenney (www.kenney.nl)
 //-----------------------------------------------------------------------------
-// FIXME implement: 1.) Add Mouse Object!! which is cloned or placed
+// TODO: implement: 1.) Add Mouse Object!! which is cloned or placed
 $ControlHelp=
 "Control Scheme:" NL
 "---------------" NL
@@ -73,7 +73,7 @@ function Aquarium::onAdd(%this) {
 
     %this.add( new SpriteGroup(SceneObjects));
     SceneObjects.viewPort = {1152, 648};
-    %this.placementLayer = mFloor(MAX_LAYER / 2); // start with in the middle
+    %this.placementLayer = mFloor(MAX_LAYER / 2); // start in the middle
     %this.selectedSceneObject = 0;
     %this.add( new SimSet(SelectList));
 
@@ -332,9 +332,6 @@ function Aquarium::Render(%this) {
     %mousePos = GetMousePosition();
     %haveMouseObject = isObject(%this.mouseObject);
     %haveOverlay =  GuiTool.haveOverlay();
-
-
-
 
     if (%this.dirty ) {
         if (!SetRenderTarget(RenderTarget.getId()))  { error("Failed to set RenderTarget to " SPC  RenderTarget.getId());}

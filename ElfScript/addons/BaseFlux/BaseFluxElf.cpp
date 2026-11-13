@@ -597,17 +597,6 @@ namespace BaseFluxElf {
                 gScriptFile= argv[i];
                 dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
             }
-            // if (argStr.equal("--script")) {
-            //     if (i + 1 < argc) {
-            //         gScriptFile= argv[++i];
-            //         dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
-            //     } else {
-            //         dPrintf("--script but no file parameter usage: --script myFile.cs\n");
-            //         return 1;
-            //     }
-            //     continue;
-            // }
-
 
         } //for ...
         return 0;
@@ -673,12 +662,12 @@ namespace BaseFluxElf {
         };
 
         // -------------------------------------------------------------------------
-        app.OnUpdate = [&](const float dt) {
+        app.OnUpdate = [](const float dt) {
             if (gDoUpdateCall)Con::executef("OnUpdate", dt);
             engineGlue::process((SimTime)(dt * 1000.f));
         };
         // -------------------------------------------------------------------------
-        app.OnEvent = [&](const SDL_Event& event) {
+        app.OnEvent = [](const SDL_Event& event) {
             if (app.getImGuiIO())  {
                 if (app.getImGuiIO()->WantTextInput) {
                     if (event.type == SDL_EVENT_KEY_DOWN ||
@@ -747,17 +736,14 @@ namespace BaseFluxElf {
 
         };
 
-        app.OnShutDown = [&]() {
+        app.OnShutDown = []() {
             BaseFluxElf::Shutdown();
             engineGlue::shutDown();
             if (Con::isFunction("OnShutDown")) Con::executef("OnShutDown");
         };
 
-            app.Execute();
-
-
-
-            return 0;
+        app.Execute();
+        return 0;
     }
 
 

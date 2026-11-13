@@ -1,7 +1,6 @@
 // AtlasFont must be a TextureObject
 // assuming the AtlasFont's grid is 10x10
 
-//FIXME move this to a Cpp !!!
 $FONT_EFFECT_WAVE=1;
 $FONT_EFFECT_SHAKE=2;
 $FONT_EFFECT_RAINBOW=3;

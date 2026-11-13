@@ -34,12 +34,12 @@ function ImGuiDemo::onAdd(%this) {
         TypeS32     myInt = 0;
         TypeString  myString = "Hello Input!";
         TypeS32     myComboIndex = 0;
+        // Tab separated values:
         TypeString  ComboValues = "Apfel" TAB "Birne" TAB "Erdbeere" TAB "Kiwi";
     };
 
     %this.add(ImStorage);
-    new SoundObject(Sound1) { fileName = "sound/sound1.wav"; };
-    %this.add(Sound1);
+    %this.add(new SoundObject(Sound1) { fileName = "sound/sound1.wav"; });
 
     %this.add ( new SimObject(FieldInspector));
     FieldInspector.inspect(ImStorage.getId());
@@ -135,7 +135,7 @@ function ImGuiDemo::Render(%this) {
             }
 
 
-            //the tricky ones:
+            //the tricky ones: Values are given by Variablename
             if (ImCombo("Fruits:", "ImStorage.myComboIndex", ImStorage.ComboValues)) {
                 echo("The selected fruit is" SPC ImStorage.myComboIndex SPC getField(ImStorage.ComboValues, ImStorage.myComboIndex));
             }
