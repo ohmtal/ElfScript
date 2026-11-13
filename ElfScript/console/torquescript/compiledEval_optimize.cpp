@@ -2757,7 +2757,7 @@ handle_OP_LOADFIELD_FASTPATH:
                               ,(void*)curObject , curField,curFieldArray, (S32)cachePtr->type);
 #endif
                   if (cachePtr->cacheFailed) {
-                        #ifdef TORQUE_DEBUG
+                        #ifdef TORQUE_DEBUG_TOOMUCH
                         Con::warnf("LOAD II: object: %d [%p]:: Invalid field detected : %s [id:%d]", curObject ? curObject->getId() : 0 ,
                                    (void*)curObject, curField, curObject->getId());
                         #endif
